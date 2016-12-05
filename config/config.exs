@@ -12,7 +12,7 @@ config :ello,
 # Rails and ecto migrations are in-compatable.
 # Rails is really true source of migrations, but ecto will try to read
 # incompatable table of same name and blow up if we don't set this.
-config :ello, App.Repo, migration_source: "ecto_migrations"
+config :ello, Ello.Repo, migration_source: "ecto_migrations"
 
 # Configures the endpoint
 config :ello, Ello.Endpoint,

@@ -5,7 +5,11 @@ defmodule Ello.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", Ello do
+  @read [:index, :show]
+
+  scope "/v2", alias: Ello.V2, as: :v2 do
     pipe_through :api
+
+    resources "/categories", CategoryController, only: @read
   end
 end
