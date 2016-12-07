@@ -1,5 +1,6 @@
 defmodule Ello.V2.CategoryView do
   use Ello.Web, :view
+  alias Ello.V2.ImageView
 
   def render("index.json", %{categories: categories}) do
     %{
@@ -31,7 +32,7 @@ defmodule Ello.V2.CategoryView do
     |> Map.take(@attributes)
     |> Map.merge(%{
       id: "#{category.id}",
-      tile_image: "TODO",
+      tile_image: render(ImageView, "image.json", model: category, attribute: :tile_image),
       links: %{
         promotionals: ["TODO"],
         recent: %{related: related_link(category)},
