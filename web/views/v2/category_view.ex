@@ -1,10 +1,14 @@
 defmodule Ello.V2.CategoryView do
   use Ello.Web, :view
-  alias Ello.V2.ImageView
+  alias Ello.V2.{ImageView,PromotionalView}
 
   def render("index.json", %{categories: categories}) do
+    promotionals = Enum.flat_map(categories, &(&1.promotionals))
     %{
-      categories: render_many(categories, __MODULE__, "category.json")
+      categories: render_many(categories, __MODULE__, "category.json"),
+      linked: %{
+        promotionals: render_many(promotionals, PromotionalView, "promotional.json"),
+      }
     }
   end
 
@@ -34,7 +38,7 @@ defmodule Ello.V2.CategoryView do
       id: "#{category.id}",
       tile_image: render(ImageView, "image.json", model: category, attribute: :tile_image),
       links: %{
-        promotionals: ["TODO"],
+        promotionals: Enum.map(category.promotionals, &("#{&1.id}")),
         recent: %{related: related_link(category)},
       }
     })

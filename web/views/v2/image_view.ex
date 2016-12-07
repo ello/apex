@@ -95,7 +95,7 @@ defmodule Ello.V2.ImageView do
   end
 
   defp extension("image/png"), do: ".png"
-  defp extension("image/jpg"), do: ".jpg"
+  defp extension("image/jpeg"), do: ".jpg"
   defp extension("image/gif"), do: ".gif"
   defp extension(_), do: ".png"
 

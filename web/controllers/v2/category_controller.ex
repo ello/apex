@@ -1,6 +1,6 @@
 defmodule Ello.V2.CategoryController do
   use Ello.Web, :controller
-  alias Ello.Category
+  alias Ello.CategoryService
 
   @doc """
   GET /v2/categories
@@ -18,24 +18,11 @@ defmodule Ello.V2.CategoryController do
 
   Render a single category by slug
   """
-  def show(conn, %{"id" => slug}) do
-    render(conn, category: Repo.get_by!(Category, slug: slug))
+  def show(conn, %{"id" => id_or_slug}) do
+    render(conn, category: CategoryService.find(id_or_slug))
   end
 
-  defp categories(%{"all" => _}) do
-    Repo.all(Category)
-  end
-  defp categories(%{"meta" => _}) do
-    Category
-    |> where([c], not is_nil(c.level))
-    |> order_by([:level, :order])
-    |> Repo.all
-  end
-  defp categories(_) do
-    Category
-    |> where([c], not is_nil(c.level))
-    |> where([c], c.level != "meta")
-    |> order_by([:level, :order])
-    |> Repo.all
-  end
+  defp categories(%{"all" => _}),  do: CategoryService.all
+  defp categories(%{"meta" => _}), do: CategoryService.active_with_meta
+  defp categories(_),              do: CategoryService.active_without_meta
 end

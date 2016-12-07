@@ -17,5 +17,7 @@ defmodule Ello.Category do
     field :cta_caption, :string
     field :cta_href, :string
     field :uses_page_promotionals, :boolean
+
+    has_many :promotionals, Ello.Promotional
   end
 end
