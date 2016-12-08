@@ -52,5 +52,5 @@ defmodule Ello.CategoryService do
   defp exclude_meta(q),   do: where(q, [c], c.level != "meta")
 
   # Preloads
-  defp with_related(q), do: Repo.preload(q, :promotionals)
+  defp with_related(q), do: Repo.preload(q, promotionals: :user)
 end

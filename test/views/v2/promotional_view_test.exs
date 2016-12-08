@@ -8,6 +8,14 @@ defmodule Ello.V2.PromotionalViewTest do
     expected = %{
       id: "41",
       category_id: "2",
+      user_id: "1",
+      links: %{
+        user: %{
+          href: "/api/v2/users/1",
+          id: "1",
+          type: "users",
+        },
+      },
       image: %{
         "hdpi" => %{
           "metadata" => %{"height" => 414, "size" => 93161, "type" => "image/jpeg", "width" => 414},
@@ -33,6 +41,7 @@ defmodule Ello.V2.PromotionalViewTest do
     %Promotional{
       id: 41,
       category_id: 2,
+      user_id: 1,
       image: "ello-optimized-da955f87.jpg",
       image_metadata: %{
         "optimized" => %{
@@ -53,7 +62,7 @@ defmodule Ello.V2.PromotionalViewTest do
           "width"  => 414,
           "height" => 414,
         }
-      }
+      },
     }
   end
 end

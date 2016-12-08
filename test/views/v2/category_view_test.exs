@@ -1,14 +1,15 @@
 defmodule Ello.V2.CategoryViewTest do
   use Ello.ConnCase, async: true
   import Phoenix.View #For render/2
-  alias Ello.{Category,Promotional}
+  alias Ello.{Category,Promotional,User}
   alias Ello.V2.CategoryView
 
   test "index.json - renders each category, promo, and user" do
     assert %{
       categories: [_, _],
       linked: %{
-        promotionals: [_]
+        promotionals: [_],
+        users: [_],
       }
     } = render(CategoryView, "index.json", categories: [cat1, cat2])
   end
@@ -17,7 +18,8 @@ defmodule Ello.V2.CategoryViewTest do
     assert %{
       categories: %{},
       linked: %{
-        promotionals: [_]
+        promotionals: [_],
+        users: [_],
       }
     } = render(CategoryView, "show.json", category: cat2)
   end
@@ -171,7 +173,12 @@ defmodule Ello.V2.CategoryViewTest do
           id: 41,
           category_id: 2,
           image: "ello-optimized-da955f87.jpg",
-          image_metadata: %{}
+          image_metadata: %{},
+          user_id: 1,
+          user: %User{
+            id: 1,
+            username: "doesn't matter"
+          }
         }
       ]
     }

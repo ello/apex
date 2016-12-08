@@ -8,6 +8,6 @@ defmodule Ello.Promotional do
     field :updated_at, Ecto.DateTime
 
     belongs_to :category, Ello.Category
-    #belongs_to :user, Ello.User
+    belongs_to :user, Ello.User
   end
 end
