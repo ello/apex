@@ -14,6 +14,7 @@ defmodule Ello.V2.ImageView do
   """
 
   # TODO: Actually support pixelation - needs user auth
+  # TODO: This could probably be cleaned up with a struct for each version
 
   def render("image.json", %{model: model, attribute: attr}) do
     meta = String.to_atom(Atom.to_string(attr) <> "_metadata")
@@ -98,9 +99,4 @@ defmodule Ello.V2.ImageView do
   defp extension("image/jpeg"), do: ".jpg"
   defp extension("image/gif"), do: ".gif"
   defp extension(_), do: ".png"
-
-  # def default_url
-  #   filename = [['ello', 'default', version_filename].compact.join('-'), default_file_ext].join('.')
-  #   ActionController::Base.helpers.image_url("fallback/#{model_class_name}/#{mounted_as}/#{filename}")
-  # end
 end

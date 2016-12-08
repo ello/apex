@@ -4,8 +4,8 @@ defmodule Ello.V2.ImageViewTest do
   alias Ello.Category
   alias Ello.V2.ImageView
 
-  test "rendering an image" do
-    assert render(ImageView, "image.json", %{model: category, attribute: :tile_image}) ==
+  test "image.json - rendering an image given model and attribute" do
+    assert render(ImageView, "image.json", model: category, attribute: :tile_image) ==
       %{
         "original" => %{
           "url" => "https://assets.ello.co/uploads/category/tile_image/2/ello-optimized-8bcedb76.jpg"
@@ -40,8 +40,8 @@ defmodule Ello.V2.ImageViewTest do
       }
   end
 
-  test "rendering the default for a category" do
-    assert render(ImageView, "image.json", %{model: %Category{}, attribute: :tile_image}) ==
+  test "image.json - rendering the default for a category" do
+    assert render(ImageView, "image.json", model: %Category{}, attribute: :tile_image) ==
       %{
         "original" => %{
           "url" => "https://assets.ello.co/images/fallback/category/tile_image/ello-default.png",

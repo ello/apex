@@ -14,7 +14,10 @@ defmodule Ello.V2.CategoryView do
 
   def render("show.json", %{category: category}) do
     %{
-      categories: render_one(category, __MODULE__, "category.json")
+      categories: render_one(category, __MODULE__, "category.json"),
+      linked: %{
+        promotionals: render_many(category.promotionals, PromotionalView, "promotional.json"),
+      }
     }
   end
 
