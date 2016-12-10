@@ -44,6 +44,7 @@ defmodule Ello.V2.CategoryViewTest do
       tile_image: %{
         "original" => %{
           "url" => "https://assets.ello.co/images/fallback/category/tile_image/ello-default.png",
+          "metadata" => nil,
         },
         "large" => %{
           "url" => "https://assets.ello.co/images/fallback/category/tile_image/ello-default-large.png",
@@ -177,7 +178,8 @@ defmodule Ello.V2.CategoryViewTest do
           user_id: 1,
           user: %User{
             id: 1,
-            username: "doesn't matter"
+            username: "doesn't matter",
+            settings: %User.Settings{},
           }
         }
       ]

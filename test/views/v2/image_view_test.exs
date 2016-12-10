@@ -45,6 +45,7 @@ defmodule Ello.V2.ImageViewTest do
       %{
         "original" => %{
           "url" => "https://assets.ello.co/images/fallback/category/tile_image/ello-default.png",
+          "metadata" => nil,
         },
         "large" => %{
           "url" => "https://assets.ello.co/images/fallback/category/tile_image/ello-default-large.png",

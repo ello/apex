@@ -14,14 +14,13 @@ defmodule Ello.V2.ImageView do
   """
 
   # TODO: Actually support pixelation - needs user auth
-  # TODO: This could probably be cleaned up with a struct for each version
-
+  #
   def render("image.json", %{model: model, attribute: attr}) do
     meta = String.to_atom(Atom.to_string(attr) <> "_metadata")
     do_render(model, Map.get(model, attr), Map.get(model, meta), attr)
   end
 
-  defp do_render(model, nil, _, attr), do: default_for(model.__struct__, attr)
+  defp do_render(model, nil, _, attr), do: default_for(model, attr)
   defp do_render(model, image, metadata, attr) do
     metadata
     |> Enum.reduce(%{}, &render_version(&1, &2, model, image, attr))
@@ -39,27 +38,6 @@ defmodule Ello.V2.ImageView do
     asset_host
     |> URI.merge(asset_path(model, attr) <> "/" <> filename(name, version, type))
     |> URI.to_string
-  end
-
-  #TODO: This should probably be more dynamic
-  defp default_for(Ello.Category, :tile_image) do
-    %{
-      "original" => %{
-        "url" => "https://assets.ello.co/images/fallback/category/tile_image/ello-default.png",
-      },
-      "large" => %{
-        "url" => "https://assets.ello.co/images/fallback/category/tile_image/ello-default-large.png",
-        "metadata" => nil,
-      },
-      "regular" => %{
-        "url" => "https://assets.ello.co/images/fallback/category/tile_image/ello-default-regular.png",
-        "metadata" => nil,
-      },
-      "small" => %{
-        "url" => "https://assets.ello.co/images/fallback/category/tile_image/ello-default-small.png",
-        "metadata" => nil,
-      },
-    }
   end
 
   def asset_path(model, attr) do
@@ -99,4 +77,43 @@ defmodule Ello.V2.ImageView do
   defp extension("image/jpeg"), do: ".jpg"
   defp extension("image/gif"), do: ".gif"
   defp extension(_), do: ".png"
+
+  @default_avatar_images 47
+  @default_cover_images 30
+  defp default_for(%Ello.Category{}, :tile_image) do
+    base_path = "images/fallback/category/tile_image"
+    gen_defaults(["original", "large", "regular", "small"], base_path, "png")
+  end
+  defp default_for(%Ello.User{} = u, :avatar) do
+    image_id = case rem(u.id, @default_avatar_images) do
+      0 -> @default_avatar_images
+      other -> other
+    end
+    base_path = "images/fallback/user/cover_image/#{image_id}"
+    gen_defaults(["original", "large", "regular", "small"], base_path, "png")
+  end
+  defp default_for(%Ello.User{} = u, :cover_image) do
+    image_id = case rem(u.id, @default_cover_images) do
+      0 -> @default_cover_images
+      other -> other
+    end
+    base_path = "images/fallback/user/cover_image/#{image_id}"
+    gen_defaults(["original", "large", "regular", "small"], base_path, "jpeg")
+  end
+
+  defp gen_defaults(variations, base_path, format) do
+    Enum.reduce variations, %{}, fn(variation, json) ->
+      Map.put(json, variation, %{
+        "url"      => default_url(base_path, variation, format),
+        "metadata" => nil,
+      })
+    end
+  end
+
+  defp default_url(path, "original", format) do
+    "#{asset_host}/#{path}/ello-default.#{format}"
+  end
+  defp default_url(path, variation, format) do
+    "#{asset_host}/#{path}/ello-default-#{variation}.#{format}"
+  end
 end
