@@ -1,10 +1,20 @@
 defmodule Ello.V2.UserViewTest do
   use Ello.ConnCase, async: true
   import Phoenix.View #For render/2
-  alias Ello.User
   alias Ello.V2.UserView
 
-  test "user.json - it renders the user" do
+  setup %{conn: conn} do
+    archer = Script.build(:archer)
+    user = Factory.build(:user, %{
+      id: 1234,
+      relationship_to_current_user: Factory.build(:relationship,
+                                                  owner: archer,
+                                                  priority: "friend")
+    })
+    {:ok, conn: user_conn(conn, archer), archer: archer, user: user}
+  end
+
+  test "user.json - it renders the user", %{conn: conn, archer: archer} do
     expected = %{
       id: "42",
       href: "/api/v2/users/42",
@@ -19,7 +29,7 @@ defmodule Ello.V2.UserViewTest do
       has_loves_enabled: true,
       has_auto_watch_enabled: true,
       experimental_features: true,
-      #relationship_priority: "self",
+      relationship_priority: "self",
       bad_for_seo: false,
       is_hireable: false,
       is_collaborateable: false,
@@ -121,74 +131,10 @@ defmodule Ello.V2.UserViewTest do
       },
       links: %{ categories: [] }
     }
-    assert render(UserView, "user.json", user: user1) == expected
+    assert render(UserView, "user.json", user: archer, conn: conn) == expected
   end
 
-  def user1 do
-    %User{
-      id: 42,
-      username: "archer",
-      name: "Sterling Archer",
-      bad_for_seo?: false,
-      location: "New York, NY",
-      background_position: "50% 50%",
-      avatar: "ello-2274bdfe-57d8-4499-ba67-a7c003d5a962.png",
-      avatar_metadata: %{
-        "large" => %{
-          "size" => 220669,
-          "type" => "image/png",
-          "width" => 360,
-          "height" => 360
-        },
-        "regular" => %{
-          "size" => 36629,
-          "type" => "image/png",
-          "width" => 120,
-          "height" => 120
-        },
-        "small" => %{
-          "size" => 17753,
-          "type" => "image/png",
-          "width" => 60,
-          "height" => 60
-        }
-      },
-      cover_image: "ello-e76606cf-44b0-48b5-9918-1efad8e0272c.jpeg",
-      cover_image_metadata: %{
-        "optimized" => %{
-          "size" => 1177127,
-          "type" => "image/jpeg",
-          "width" => 1880,
-          "height" => 1410
-        },
-        "xhdpi" => %{
-          "size" => 582569,
-          "type" => "image/jpeg",
-          "width" => 1116,
-          "height" => 837
-        },
-        "hdpi" => %{
-          "size" => 150067,
-          "type" => "image/jpeg",
-          "width" => 552,
-          "height" => 414
-        },
-        "mdpi" => %{
-          "size" => 40106,
-          "type" => "image/jpeg",
-          "width" => 276,
-          "height" => 207
-        },
-        "ldpi" => %{
-          "size" => 10872,
-          "type" => "image/jpeg",
-          "width" => 132,
-          "height" => 99
-        }
-      },
-      settings: %User.Settings{
-        views_adult_content: true,
-      }
-    }
+  test "user.json - knows user relationship", %{conn: conn, user: user} do
+    assert render(UserView, "user.json", user: user, conn: conn).relationship_priority == "friend"
   end
 end

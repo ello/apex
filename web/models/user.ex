@@ -27,5 +27,10 @@ defmodule Ello.User do
     field :updated_at, Ecto.DateTime
 
     embeds_one :settings, Ello.User.Settings
+    has_many :relationships, Ello.Relationship, foreign_key: :owner_id
+    has_many :inverse_relationships, Ello.Relationship, foreign_key: :subject_id
+
+    # Used to eager load user's relationship to current user.
+    has_one :relationship_to_current_user, Ello.Relationship, foreign_key: :subject_id
   end
 end

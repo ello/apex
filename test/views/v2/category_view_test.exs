@@ -1,37 +1,48 @@
 defmodule Ello.V2.CategoryViewTest do
   use Ello.ConnCase, async: true
   import Phoenix.View #For render/2
-  alias Ello.{Category,Promotional,User}
   alias Ello.V2.CategoryView
 
-  test "index.json - renders each category, promo, and user" do
+  setup %{conn: conn} do
+    cat1 = Script.insert(:espionage_category)
+    cat2 = Script.insert(:lacross_category)
+    {:ok, conn: conn, cat1: cat1, cat2: cat2}
+  end
+
+  test "index.json - renders each category, promo, and user", context do
     assert %{
       categories: [_, _],
       linked: %{
         promotionals: [_],
         users: [_],
       }
-    } = render(CategoryView, "index.json", categories: [cat1, cat2])
+    } = render(CategoryView, "index.json",
+      categories: [context.cat1, context.cat2],
+      conn: context.conn
+    )
   end
 
-  test "show.json - renders category, promos and users" do
+  test "show.json - renders category, promos and users", context do
     assert %{
       categories: %{},
       linked: %{
         promotionals: [_],
         users: [_],
       }
-    } = render(CategoryView, "show.json", category: cat2)
+    } = render(CategoryView, "show.json",
+      category: context.cat2,
+      conn: context.conn
+    )
   end
 
-  test "category.json - default image" do
+  test "category.json - default image", context do
     expected = %{
-      id: "1",
-      name: "Design",
-      slug: "design",
+      id: "#{context.cat1.id}",
+      name: "Espionage",
+      slug: "espionage",
       cta_caption: nil,
       cta_href: nil,
-      description: "All thing design related",
+      description: "All things spying related",
       is_sponsored: false,
       level: nil,
       order: 0,
@@ -39,7 +50,7 @@ defmodule Ello.V2.CategoryViewTest do
       header: nil,
       links: %{
         promotionals: [],
-        recent: %{related: "/api/v2/categories/design/posts/recent"}
+        recent: %{related: "/api/v2/categories/espionage/posts/recent"}
       },
       tile_image: %{
         "original" => %{
@@ -60,32 +71,35 @@ defmodule Ello.V2.CategoryViewTest do
         },
       }
     }
-    assert render(CategoryView, "category.json", category: cat1) == expected
+    assert render(CategoryView, "category.json",
+      category: context.cat1,
+      conn: context.conn
+    ) == expected
   end
 
-  test "category.json - without image" do
+  test "category.json - with image", context do
     expected = %{
-      id: "2",
-      name: "Development",
-      slug: "development",
+      id: "#{context.cat2.id}",
+      name: "Lacross",
+      slug: "lacross",
       cta_caption: nil,
       cta_href: nil,
-      description: "All thing dev related",
+      description: "All things lacross related",
       is_sponsored: false,
       level: "Primary",
       order: 0,
       uses_page_promotionals: false,
       header: nil,
       links: %{
-        promotionals: ["41"],
-        recent: %{related: "/api/v2/categories/development/posts/recent"}
+        promotionals: Enum.map(context.cat2.promotionals, &("#{&1.id}")),
+        recent: %{related: "/api/v2/categories/lacross/posts/recent"}
       },
       tile_image: %{
         "original" => %{
-          "url" => "https://assets.ello.co/uploads/category/tile_image/2/ello-optimized-8bcedb76.jpg"
+          "url" => "https://assets.ello.co/uploads/category/tile_image/#{context.cat2.id}/ello-optimized-8bcedb76.jpg"
         },
         "large" => %{
-          "url" => "https://assets.ello.co/uploads/category/tile_image/2/ello-large-23cb59fe.png",
+          "url" => "https://assets.ello.co/uploads/category/tile_image/#{context.cat2.id}/ello-large-23cb59fe.png",
           "metadata" => %{
             "size"   => 855144,
             "type"   => "image/png",
@@ -94,7 +108,7 @@ defmodule Ello.V2.CategoryViewTest do
           }
         },
         "regular" => %{
-          "url" => "https://assets.ello.co/uploads/category/tile_image/2/ello-regular-23cb59fe.png",
+          "url" => "https://assets.ello.co/uploads/category/tile_image/#{context.cat2.id}/ello-regular-23cb59fe.png",
           "metadata" => %{
             "size"   => 556821,
             "type"   => "image/png",
@@ -103,7 +117,7 @@ defmodule Ello.V2.CategoryViewTest do
           }
         },
         "small" => %{
-          "url" => "https://assets.ello.co/uploads/category/tile_image/2/ello-small-23cb59fe.png",
+          "url" => "https://assets.ello.co/uploads/category/tile_image/#{context.cat2.id}/ello-small-23cb59fe.png",
           "metadata" => %{
             "size"   => 126225,
             "type"   => "image/png",
@@ -113,76 +127,9 @@ defmodule Ello.V2.CategoryViewTest do
         }
       }
     }
-    assert render(CategoryView, "category.json", category: cat2) == expected
-  end
-
-  defp cat1 do
-    %Category{
-      id: 1,
-      name: "Design",
-      slug: "design",
-      cta_caption: nil,
-      cta_href: nil,
-      description: "All thing design related",
-      is_sponsored: false,
-      level: nil,
-      order: 0,
-      uses_page_promotionals: false,
-      created_at: Ecto.DateTime.utc,
-      updated_at: Ecto.DateTime.utc,
-      promotionals: [],
-    }
-  end
-
-  defp cat2 do
-    %Category{
-      id: 2,
-      name: "Development",
-      slug: "development",
-      cta_caption: nil,
-      cta_href: nil,
-      description: "All thing dev related",
-      is_sponsored: false,
-      level: "Primary",
-      order: 0,
-      uses_page_promotionals: false,
-      created_at: Ecto.DateTime.utc,
-      updated_at: Ecto.DateTime.utc,
-      tile_image: "ello-optimized-8bcedb76.jpg",
-      tile_image_metadata: %{
-        "large" => %{
-          "size"   => 855144,
-          "type"   => "image/png",
-          "width"  => 1000,
-          "height" => 1000
-        },
-        "regular" => %{
-          "size"   => 556821,
-          "type"   => "image/png",
-          "width"  => 800,
-          "height" => 800
-        },
-        "small" => %{
-          "size"   => 126225,
-          "type"   => "image/png",
-          "width"  => 360,
-          "height" => 360
-        },
-      },
-      promotionals: [
-        %Promotional{
-          id: 41,
-          category_id: 2,
-          image: "ello-optimized-da955f87.jpg",
-          image_metadata: %{},
-          user_id: 1,
-          user: %User{
-            id: 1,
-            username: "doesn't matter",
-            settings: %User.Settings{},
-          }
-        }
-      ]
-    }
+    assert render(CategoryView, "category.json",
+      category: context.cat2,
+      conn: context.conn
+    ) == expected
   end
 end

@@ -2,25 +2,25 @@ defmodule Ello.V2.CategoryView do
   use Ello.Web, :view
   alias Ello.V2.{ImageView,PromotionalView,UserView}
 
-  def render("index.json", %{categories: categories}) do
+  def render("index.json", %{categories: categories, conn: conn}) do
     promotionals = Enum.flat_map(categories, &(&1.promotionals))
     users = Enum.map(promotionals, &(&1.user))
     %{
       categories: render_many(categories, __MODULE__, "category.json"),
       linked: %{
         promotionals: render_many(promotionals, PromotionalView, "promotional.json"),
-        users: render_many(users, UserView, "user.json"),
+        users: render_many(users, UserView, "user.json", conn: conn),
       }
     }
   end
 
-  def render("show.json", %{category: category}) do
+  def render("show.json", %{category: category, conn: conn}) do
     users = Enum.map(category.promotionals, &(&1.user))
     %{
       categories: render_one(category, __MODULE__, "category.json"),
       linked: %{
         promotionals: render_many(category.promotionals, PromotionalView, "promotional.json"),
-        users: render_many(users, UserView, "user.json"),
+        users: render_many(users, UserView, "user.json", conn: conn),
       }
     }
   end

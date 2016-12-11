@@ -27,7 +27,10 @@ defmodule Ello.ConnCase do
 
       import Ello.Router.Helpers
 
-      import Ello.ConnCase, only: [auth_conn: 2]
+      import Ello.ConnCase, only: [auth_conn: 2, user_conn: 2]
+      alias Ello.Factory
+      alias Ello.Factory.Script
+      alias Ello.{User,Relationship,Category,Promotional}
 
       # The default endpoint for testing
       @endpoint Ello.Endpoint
@@ -47,8 +50,22 @@ defmodule Ello.ConnCase do
     {:ok, conn: conn}
   end
 
+  @doc """
+  Takes a conn and a user and returns a conn with a auth token.
+
+  Used for full request specs which hit authentication via routes.
+  """
   def auth_conn(conn, user) do
     Plug.Conn.put_req_header(conn, "authorization", "Bearer #{gen_token(user)}")
+  end
+
+  @doc """
+  Takes a conn and a user and returns a conn with the user assigned.
+
+  Used for view tests which do not execute authentication, but need conns.
+  """
+  def user_conn(conn, user) do
+    Plug.Conn.assign(conn, :user, user)
   end
 
   defp gen_token(%Ello.User{} = user) do

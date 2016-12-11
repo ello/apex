@@ -1,7 +1,6 @@
 defmodule Ello.V2.ImageViewTest do
   use Ello.ConnCase, async: true
   import Phoenix.View #For render/2
-  alias Ello.Category
   alias Ello.V2.ImageView
 
   test "image.json - rendering an image given model and attribute" do
@@ -62,8 +61,8 @@ defmodule Ello.V2.ImageViewTest do
       }
   end
 
-  defp category do
-    %Category{
+  defp category do 
+    Factory.build(:category, %{
       id: 2,
       tile_image: "ello-optimized-8bcedb76.jpg",
       tile_image_metadata: %{
@@ -86,6 +85,6 @@ defmodule Ello.V2.ImageViewTest do
           "height" => 360
         },
       },
-    }
+    })
   end
 end

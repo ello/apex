@@ -2,7 +2,7 @@ defmodule Ello.V2.UserView do
   use Ello.Web, :view
   alias Ello.V2.ImageView
 
-  def render("user.json", %{user: user}) do
+  def render("user.json", %{user: user, conn: conn}) do
     %{
       id: "#{user.id}",
       href: "/api/v2/users/#{user.id}",
@@ -17,7 +17,7 @@ defmodule Ello.V2.UserView do
       has_loves_enabled: user.settings.has_loves_enabled,
       has_auto_watch_enabled: user.settings.has_auto_watch_enabled,
       experimental_features: true,
-      #relationship_priority: "self",
+      relationship_priority: relationship(user, conn),
       bad_for_seo: user.bad_for_seo?,
       is_hireable: user.settings.is_hireable,
       is_collaborateable: user.settings.is_collaborateable,
@@ -35,4 +35,9 @@ defmodule Ello.V2.UserView do
       }
     }
   end
+
+  defp relationship(%{id: id}, %{assigns: %{user: %{id: id}}}), do: "self"
+  defp relationship(%{relationship_to_current_user: nil}, _), do: nil
+  defp relationship(%{relationship_to_current_user: %{priority: p}}, _), do: p
+  defp relationship(_user, _conn), do: nil
 end
