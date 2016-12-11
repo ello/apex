@@ -27,6 +27,8 @@ defmodule Ello.ConnCase do
 
       import Ello.Router.Helpers
 
+      import Ello.ConnCase, only: [auth_conn: 2]
+
       # The default endpoint for testing
       @endpoint Ello.Endpoint
     end
@@ -39,6 +41,29 @@ defmodule Ello.ConnCase do
       Ecto.Adapters.SQL.Sandbox.mode(Ello.Repo, {:shared, self()})
     end
 
-    {:ok, conn: Phoenix.ConnTest.build_conn()}
+    conn = Phoenix.ConnTest.build_conn()
+           |> Plug.Conn.put_req_header("accept", "application/json")
+
+    {:ok, conn: conn}
+  end
+
+  def auth_conn(conn, user) do
+    Plug.Conn.put_req_header(conn, "authorization", "Bearer #{gen_token(user)}")
+  end
+
+  defp gen_token(%Ello.User{} = user) do
+    payload = %{
+      exp: Joken.current_time + 10,
+      iss: "Ello, PBC",
+      data: %{
+        id: user.id,
+        username: user.username,
+      }
+    }
+    payload
+    |> Joken.token
+    |> Joken.with_signer(Ello.JWT.hs256_signer)
+    |> Joken.sign
+    |> Joken.get_compact
   end
 end

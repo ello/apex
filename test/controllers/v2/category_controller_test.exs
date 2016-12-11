@@ -6,8 +6,9 @@ defmodule Ello.V2.CategoryControllerTest do
     Repo.insert(featured)
     Repo.insert(development)
     Repo.insert(design)
+    archer = Repo.insert!(archer)
 
-    {:ok, conn: conn}
+    {:ok, conn: auth_conn(conn, archer)}
   end
 
   test "GET /v2/categories/:slug", %{conn: conn} do
@@ -78,6 +79,15 @@ defmodule Ello.V2.CategoryControllerTest do
       uses_page_promotionals: false,
       created_at: Ecto.DateTime.utc,
       updated_at: Ecto.DateTime.utc,
+    }
+  end
+
+  defp archer do
+    %Ello.User{
+      username: "archer",
+      name: "Sterling Archer",
+      location: "New York, NY",
+      email_hash: "not used"
     }
   end
 end

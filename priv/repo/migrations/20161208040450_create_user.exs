@@ -5,6 +5,7 @@ defmodule Ello.Repo.Migrations.CreateUser do
     create_if_not_exists table(:users) do
       # Currently Used Fields
       add :email, :string
+      add :email_hash, :string
       add :username, :string
       add :name, :string
       add :short_bio, :text
@@ -49,7 +50,6 @@ defmodule Ello.Repo.Migrations.CreateUser do
       # t.datetime "locked_at"
       # t.datetime "last_bounced_from_sendgrid_at"
       # t.datetime "last_bounced_from_mailchimp_at"
-      # t.string   "email_hash",                     limit: 255,                 null: false
       # t.string   "web_onboarding_version",         limit: 255
       # t.integer  "followed_category_ids",                                                   array: true
       # t.string   "locked_reason"

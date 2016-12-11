@@ -7,7 +7,9 @@ use Mix.Config
 
 # General application configuration
 config :ello,
-  ecto_repos: [Ello.Repo]
+  ecto_repos: [Ello.Repo],
+  jwt_alg: :rs512,
+  jwt_private_key: System.get_env("JWT_PRIVATE_KEY")
 
 # Rails and ecto migrations are in-compatable.
 # Rails is really true source of migrations, but ecto will try to read

@@ -3,6 +3,7 @@ defmodule Ello.User do
 
   schema "users" do
     field :email, :string
+    field :email_hash, :string
     field :username, :string
     field :name, :string
     field :short_bio, :string
