@@ -16,7 +16,7 @@ defmodule Ello.Repo.Migrations.CreateUser do
 
       add :avatar, :string
       add :avatar_metadata, :json
-      add :cover_image, :string,
+      add :cover_image, :string
       add :cover_image_metadata, :json
       add :background_position, :string
 
