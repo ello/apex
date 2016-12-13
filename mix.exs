@@ -38,6 +38,7 @@ defmodule Ello.Mixfile do
       {:gettext, "~> 0.11"},
       {:joken, "~> 1.3.0"},
       {:cowboy, "~> 1.0"},
+      {:redix, "~> 0.4.0"},
 
       # Test Dependencies
       {:ex_machina, "~> 1.0", only: :test},

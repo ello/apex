@@ -14,6 +14,7 @@ defmodule Ello do
       supervisor(Ello.Endpoint, []),
       # Start your own worker by calling: Ello.Worker.start_link(arg1, arg2, arg3)
       # worker(Ello.Worker, [arg1, arg2, arg3]),
+      supervisor(Ello.Redis, []),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
