@@ -27,5 +27,5 @@ defmodule Ello.V2.CategoryController do
   defp categories(_, conn),              do: CategoryService.active_without_meta(current_user(conn))
 
   defp current_user(%{assigns: %{user: user}}), do: user
-  defp current_user(), do: nil
+  defp current_user(_), do: nil
 end
