@@ -17,7 +17,7 @@ config :ello, Ello.Endpoint,
   cache_static_manifest: "priv/static/manifest.json"
 
 # Do not print debug messages in production
-config :logger, level: :info
+config :logger, level: :debug
 
 # Configure your database
 config :ello, Ello.Repo,
