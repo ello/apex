@@ -1,6 +1,6 @@
 defmodule Ello.CategoryService do
   import Ecto.Query
-  alias Ello.{Category,Repo}
+  alias Ello.{Category,Repo,UserService}
 
   @moduledoc """
   Responsible for retreiving and loading categories and related data.
@@ -44,6 +44,7 @@ defmodule Ello.CategoryService do
     |> priority_order
     |> Repo.all
     |> with_related(current_user)
+    |> preload_counts
   end
 
   # Scopes
@@ -57,5 +58,29 @@ defmodule Ello.CategoryService do
     # Preload the relationship the current user has to the subjects - in one query
     current_user_relationships = where(Ello.Relationship, owner_id: ^id)
     Repo.preload(q, promotionals: [user: [relationship_to_current_user: current_user_relationships]])
+  end
+
+  # TODO: This should probably be extracted to it's own module.
+  # Not sure what that looks like, but this could be cleaned up with ETS or a
+  # local in memory cache or similar.
+  defp preload_counts(categories) do
+
+    # Gather all users
+    users = categories
+            |> Enum.flat_map(&(&1.promotionals))
+            |> Enum.map(&(&1.user))
+            |> Enum.uniq_by(&(&1.id))
+
+    users_with_counts = UserService.prefetch_counts(users)
+
+    counted_users_by_id = Enum.group_by(users_with_counts, &(&1.id))
+
+    # Replace users in relationships with preloded users.
+    Enum.map categories, fn(cat) ->
+      promotionals = Enum.map cat.promotionals, fn(promo) ->
+        Map.put(promo, :user, hd(counted_users_by_id[promo.user.id]))
+      end
+      Map.put(cat, :promotionals, promotionals)
+    end
   end
 end

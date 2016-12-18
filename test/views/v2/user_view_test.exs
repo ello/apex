@@ -33,10 +33,10 @@ defmodule Ello.V2.UserViewTest do
       bad_for_seo: false,
       is_hireable: false,
       is_collaborateable: false,
-      #posts_count: 8,
-      #followers_count: 31,
-      #following_count: 66,
-      #loves_count: 189,
+      posts_count: nil,
+      followers_count: nil,
+      following_count: nil,
+      loves_count: nil,
       #formatted_short_bio: "<p>Backend Lead <a href='/ello' class='user-mention'>@ello</a>, but fond of cars and inspired by architecture. Finding beauty in engineering.</p>",
       # external_links_list: [
       #   %{

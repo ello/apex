@@ -32,5 +32,11 @@ defmodule Ello.User do
 
     # Used to eager load user's relationship to current user.
     has_one :relationship_to_current_user, Ello.Relationship, foreign_key: :subject_id
+
+    # Used to hold user counts retreived from user
+    field :loves_count, :integer, virtual: true
+    field :posts_count, :integer, virtual: true
+    field :following_count, :integer, virtual: true
+    field :followers_count, :integer, virtual: true
   end
 end

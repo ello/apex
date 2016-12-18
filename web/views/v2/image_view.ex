@@ -41,7 +41,7 @@ defmodule Ello.V2.ImageView do
   end
 
   def asset_path(model, attr) do
-    "uploads/#{model_folder_name(model)}/#{attr}/#{model.id}"
+    "/uploads/#{model_folder_name(model)}/#{attr}/#{model.id}"
   end
 
   # TODO: Make setting

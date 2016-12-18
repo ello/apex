@@ -22,6 +22,10 @@ defmodule Ello.V2.UserView do
       is_hireable: user.settings.is_hireable,
       is_collaborateable: user.settings.is_collaborateable,
       background_position: "50% 50%",
+      followers_count: user.followers_count,
+      following_count: user.following_count,
+      loves_count: user.loves_count,
+      posts_count: user.posts_count,
       avatar: render(ImageView, "image.json",
         model: user,
         attribute: :avatar
