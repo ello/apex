@@ -15,15 +15,14 @@ defmodule Ello.UserService do
     {:ok, counts} = Ello.Redis.command(["MGET" | keys])
 
     # Add counts to users
-    users_with_counts =
-      for user <- users,
+    for user <- users,
         [followers, following, loves, posts] <- Enum.chunk(counts, 4) do
-        Map.merge user, %{
-          loves_count:     loves,
-          posts_count:     posts,
-          following_count: following,
-          followers_count: followers,
-        }
-      end
+      Map.merge user, %{
+        loves_count:     loves,
+        posts_count:     posts,
+        following_count: following,
+        followers_count: followers,
+      }
+    end
   end
 end

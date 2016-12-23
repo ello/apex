@@ -8,6 +8,7 @@ use Mix.Config
 # General application configuration
 config :ello,
   ecto_repos: [Ello.Repo],
+  redis_url: "redis://localhost:6379",
   jwt_alg: :rs512,
   jwt_private_key: System.get_env("JWT_PRIVATE_KEY")
 

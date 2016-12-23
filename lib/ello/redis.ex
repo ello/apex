@@ -15,7 +15,7 @@ defmodule Ello.Redis do
   @doc "Start pool of n workers on start"
   def init([]) do
     workers = Enum.map 1..@redis_pool_size, fn(i) ->
-      worker(Redix, [[], [name: :"redis_#{i}"]], id: {Redix, i})
+      worker(Redix, [redis_url, [name: :"redis_#{i}"]], id: {Redix, i})
     end
     supervise(workers, strategy: :one_for_one)
   end
@@ -28,4 +28,6 @@ defmodule Ello.Redis do
   defp random_worker do
     :"redis_#{Enum.random(1..@redis_pool_size)}"
   end
+
+  defp redis_url, do: Application.get_env(:ello, :redis_url)
 end

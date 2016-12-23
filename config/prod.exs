@@ -27,6 +27,7 @@ config :ello, Ello.Repo,
   pool_size: 20
 
 config :ello,
+  redis_url: System.get_env("REDIS_URL"),
   jwt_alg: :rs512,
   jwt_private_key: System.get_env("JWT_PRIVATE_KEY")
 
