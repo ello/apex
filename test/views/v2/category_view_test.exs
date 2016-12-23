@@ -4,7 +4,7 @@ defmodule Ello.V2.CategoryViewTest do
   alias Ello.V2.CategoryView
 
   setup %{conn: conn} do
-    cat1 = Script.insert(:espionage_category)
+    cat1 = Script.insert(:espionage_category, header: "Spy Shit")
     cat2 = Script.insert(:lacross_category)
     {:ok, conn: conn, cat1: cat1, cat2: cat2}
   end
@@ -47,7 +47,8 @@ defmodule Ello.V2.CategoryViewTest do
       level: nil,
       order: 0,
       uses_page_promotionals: false,
-      header: nil,
+      allow_in_onboarding: false,
+      header: "Spy Shit",
       links: %{
         promotionals: [],
         recent: %{related: "/api/v2/categories/espionage/posts/recent"}
@@ -89,7 +90,8 @@ defmodule Ello.V2.CategoryViewTest do
       level: "Primary",
       order: 0,
       uses_page_promotionals: false,
-      header: nil,
+      allow_in_onboarding: false,
+      header: "Lacross",
       links: %{
         promotionals: Enum.map(context.cat2.promotionals, &("#{&1.id}")),
         recent: %{related: "/api/v2/categories/lacross/posts/recent"}
