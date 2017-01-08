@@ -26,6 +26,7 @@ defmodule Ello.V2.UserView do
       following_count: user.following_count,
       loves_count: user.loves_count,
       posts_count: user.posts_count,
+      external_links_list: LinkAnalyzer.format_links_for_serialization(user.links),
       avatar: render(ImageView, "image.json",
         model: user,
         attribute: :avatar
