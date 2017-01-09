@@ -26,6 +26,8 @@ defmodule Ello.Core.Mixfile do
   defp deps do
     [
       {:phoenix_ecto, "~> 3.0"},
+      {:postgrex,     ">= 0.0.0"},
+      {:redix,        "~> 0.4.0"},
     ]
   end
 end

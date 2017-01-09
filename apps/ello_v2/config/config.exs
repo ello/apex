@@ -7,7 +7,8 @@ use Mix.Config
 
 # General application configuration
 config :ello_v2,
-  namespace: Ello.V2
+  namespace: Ello.V2,
+  ecto_repos: []
 
 # Configures the endpoint
 config :ello_v2, Ello.V2.Endpoint,

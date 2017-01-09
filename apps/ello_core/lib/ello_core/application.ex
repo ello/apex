@@ -1,6 +1,4 @@
 defmodule Ello.Core.Application do
-  # See http://elixir-lang.org/docs/stable/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   use Application
@@ -8,10 +6,8 @@ defmodule Ello.Core.Application do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
-    # Define workers and child supervisors to be supervised
     children = [
-      # Starts a worker by calling: Ello.Core.Worker.start_link(arg1, arg2, arg3)
-      # worker(Ello.Core.Worker, [arg1, arg2, arg3]),
+      supervisor(Ello.Core.Redis, []),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
