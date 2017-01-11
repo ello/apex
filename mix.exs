@@ -10,7 +10,9 @@ defmodule Ello.Mixfile do
   end
 
   defp deps do
-    []
+    [
+      {:credo, "~> 0.5.3", only: :dev}
+    ]
   end
 
   defp aliases do
