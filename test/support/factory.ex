@@ -49,6 +49,7 @@ defmodule Ello.Factory do
         email_hash: "archerelloco",
         bad_for_seo?: false,
         location: "New York, NY",
+        links: "http://twitter.com/ArcherFX",
         background_position: "50% 50%",
         avatar: "ello-2274bdfe-57d8-4499-ba67-a7c003d5a962.png",
         avatar_metadata: %{

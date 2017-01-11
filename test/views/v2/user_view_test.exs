@@ -38,14 +38,14 @@ defmodule Ello.V2.UserViewTest do
       following_count: nil,
       loves_count: nil,
       #formatted_short_bio: "<p>Backend Lead <a href='/ello' class='user-mention'>@ello</a>, but fond of cars and inspired by architecture. Finding beauty in engineering.</p>",
-      # external_links_list: [
-      #   %{
-      #     "url" => "http://twitter.com/ArcherFX",
-      #     "text" => "twitter.com/ArcherFX",
-      #     "type" => "Twitter",
-      #     "icon" => "https://social-icons.ello.co/twitter.png"
-      #   },
-      # ],
+      external_links_list: [
+        %{
+          url: "http://twitter.com/ArcherFX",
+          text: "twitter.com/ArcherFX",
+          type: "Twitter",
+          icon: "https://social-icons.ello.co/twitter.png"
+        },
+      ],
       background_position: "50% 50%",
       avatar: %{
         "original" => %{

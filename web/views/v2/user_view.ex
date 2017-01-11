@@ -1,6 +1,7 @@
 defmodule Ello.V2.UserView do
   use Ello.Web, :view
   alias Ello.V2.ImageView
+  alias Ello.V2.LinkView
 
   def render("user.json", %{user: user, conn: conn}) do
     %{
@@ -26,7 +27,7 @@ defmodule Ello.V2.UserView do
       following_count: user.following_count,
       loves_count: user.loves_count,
       posts_count: user.posts_count,
-      external_links_list: render(LinkView, "links.json", user.links),
+      external_links_list: render(LinkView, "links.json", %{links: user.links}),
       avatar: render(ImageView, "image.json",
         model: user,
         attribute: :avatar
