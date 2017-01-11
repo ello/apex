@@ -1,11 +1,16 @@
 defmodule Ello.Router do
   use Ello.Web, :router
 
-  pipeline :api do
+  pipeline :v2 do
     plug :accepts, ["json"]
+    plug Ello.V2.Authenticate
   end
 
-  scope "/api", Ello do
-    pipe_through :api
+  @read [:index, :show]
+
+  scope "/v2", alias: Ello.V2, as: :v2 do
+    pipe_through :v2
+
+    resources "/categories", CategoryController, only: @read
   end
 end

@@ -1,0 +1,34 @@
+defmodule Ello.V2.CategoryControllerTest do
+  use Ello.ConnCase
+
+  setup %{conn: conn} do
+    archer = Script.insert(:archer)
+    Script.insert(:featured_category)
+    Script.insert(:espionage_category)
+    Script.insert(:lacross_category)
+    {:ok, conn: auth_conn(conn, archer)}
+  end
+
+  test "GET /v2/categories/:slug", %{conn: conn} do
+    conn = get(conn, v2_category_path(conn, :show, "featured"))
+    assert %{"name" => "Featured"} = json_response(conn, 200)["categories"]
+  end
+
+  test "GET /v2/categories?all=true", %{conn: conn} do
+    conn = get(conn, v2_category_path(conn, :index), %{all: true})
+    assert %{"categories" => categories} = json_response(conn, 200)
+    assert Enum.map(categories, &(&1["name"])) == ["Featured", "Espionage", "Lacross"]
+  end
+
+  test "GET /v2/categories?meta=true", %{conn: conn} do
+    conn = get(conn, v2_category_path(conn, :index), %{meta: true})
+    assert %{"categories" => categories} = json_response(conn, 200)
+    assert Enum.map(categories, &(&1["name"])) == ["Lacross", "Featured"]
+  end
+
+  test "GET /v2/categories", %{conn: conn} do
+    conn = get(conn, v2_category_path(conn, :index))
+    assert %{"categories" => categories} = json_response(conn, 200)
+    assert Enum.map(categories, &(&1["name"])) == ["Lacross"]
+  end
+end

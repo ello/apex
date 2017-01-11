@@ -4,7 +4,7 @@ defmodule Ello.Mixfile do
   def project do
     [app: :ello,
      version: "0.0.1",
-     elixir: "~> 1.2",
+     elixir: "~> 1.3",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
@@ -30,12 +30,19 @@ defmodule Ello.Mixfile do
   #
   # Type `mix help deps` for examples and options.
   defp deps do
-    [{:phoenix, "~> 1.2.1"},
-     {:phoenix_pubsub, "~> 1.0"},
-     {:phoenix_ecto, "~> 3.0"},
-     {:postgrex, ">= 0.0.0"},
-     {:gettext, "~> 0.11"},
-     {:cowboy, "~> 1.0"}]
+    [
+      {:phoenix, "~> 1.2.1"},
+      {:phoenix_pubsub, "~> 1.0"},
+      {:phoenix_ecto, "~> 3.0"},
+      {:postgrex, ">= 0.0.0"},
+      {:gettext, "~> 0.11"},
+      {:joken, "~> 1.3.0"},
+      {:cowboy, "~> 1.0"},
+      {:redix, "~> 0.4.0"},
+
+      # Test Dependencies
+      {:ex_machina, "~> 1.0", only: :test},
+    ]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
