@@ -25,6 +25,8 @@ defmodule Ello.Repo.Migrations.CreateUser do
       add :bad_for_seo?, :boolean, default: true
       add :category_ids, {:array, :integer}
 
+      add :settings, :json
+
       add :created_at, :utc_datetime
       add :updated_at, :utc_datetime
 

@@ -9,4 +9,4 @@ config :ello_core, Ello.Core.Repo,
   password: "postgres",
   database: "ello_test_ex",
   hostname: "localhost",
-  pool_size: 10
+  pool: Ecto.Adapters.SQL.Sandbox

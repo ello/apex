@@ -7,6 +7,6 @@ config :ello_core, Ello.Core.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
   password: "postgres",
-  database: "ello_dev",
+  database: "ello_development",
   hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
+  pool_size: 10

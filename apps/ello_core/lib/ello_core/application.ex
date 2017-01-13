@@ -8,6 +8,7 @@ defmodule Ello.Core.Application do
 
     children = [
       supervisor(Ello.Core.Redis, []),
+      supervisor(Ello.Core.Repo, []),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

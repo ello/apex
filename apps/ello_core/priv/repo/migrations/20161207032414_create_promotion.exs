@@ -3,8 +3,8 @@ defmodule Ello.Repo.Migrations.CreatePromotionals do
 
   def change do
     create_if_not_exists table(:promotionals) do
-      add :tile_image, :string
-      add :tile_image_metadata, :json
+      add :image, :string
+      add :image_metadata, :json
       add :created_at, :utc_datetime
       add :updated_at, :utc_datetime
 
