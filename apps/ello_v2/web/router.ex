@@ -1,5 +1,6 @@
 defmodule Ello.V2.Router do
   use Ello.V2.Web, :router
+  use Honeybadger.Plug
 
   pipeline :api do
     plug :accepts, ["json"]

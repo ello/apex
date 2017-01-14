@@ -37,6 +37,7 @@ defmodule Ello.V2.Mixfile do
       {:phoenix_pubsub, "~> 1.0"},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
+      {:honeybadger, "~> 0.1"},
 
       {:ello_core, in_umbrella: true},
     ]

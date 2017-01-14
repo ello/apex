@@ -20,4 +20,5 @@ defmodule Ello.V2.Endpoint do
   plug Plug.Head
 
   plug Ello.V2.Router
+  use Honeybadger.Plug
 end
