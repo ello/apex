@@ -14,12 +14,13 @@ defmodule Ello.Auth.RequireUser do
   """
 
   use Plug.Builder
-  alias Ello.Core.Network.User
   alias Ello.Auth.RequireToken
 
   plug RequireToken
   plug :require_user
 
-  def require_user(%{assigns: %{current_user: %User{}}} = conn, _), do: conn
+  def require_user(%{assigns: %{current_user: user}} = conn, _)
+    when not is_nil(user),
+    do: conn
   def require_user(conn, _), do: halt send_resp(conn, 401, "Please sign in.")
 end

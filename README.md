@@ -24,6 +24,11 @@ of dispatch is to delegate HTTP and Websocket requests to the proper app.
 V2 is a Phoenix app serving the Ello V2 JSON API. It queries `Core` and `Auth`
 as needed. [README]()
 
+### `Ello.Auth`
+
+Auth provides plugs for authenticating requests and verifying JWTs. It depends
+on `Core` to lookup users.
+
 ## Getting Started
 
 ### Requirements

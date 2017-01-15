@@ -31,11 +31,11 @@ defmodule Ello.Auth.RequireTokenTest do
   end
 
   test "with a valid user token" do
-    user = Factory.insert(:user)
+    user = NetworkStub.user(1)
     conn = conn("GET", "/doesnotmatter")
            |> put_req_header("authorization", "Bearer " <> JWT.generate(user))
     results = Example.call(conn, [])
     assert results.status == 200
-    assert results.assigns[:current_user].id == user.id
+    assert results.assigns[:current_user] == user
   end
 end

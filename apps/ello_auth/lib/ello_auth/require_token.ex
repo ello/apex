@@ -16,8 +16,6 @@ defmodule Ello.Auth.RequireToken do
   use Plug.Builder
   import Plug.Conn
   alias Ello.Auth.JWT
-  alias Ello.Core.Repo
-  alias Ello.Core.Network.User
 
   plug :get_jwt
   plug :verify_jwt
@@ -44,6 +42,7 @@ defmodule Ello.Auth.RequireToken do
   defp assign_user_if_user(conn, _), do: conn
 
   defp load_user(id) do
-    Repo.get(User, id)
+    {module, fun} = Application.get_env(:ello_auth, :user_lookup_mfa)
+    apply(module, fun, [id])
   end
 end

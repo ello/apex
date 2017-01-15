@@ -15,6 +15,30 @@ defmodule Ello.Core.NetworkTest do
     }
   end
 
+  test "user/2 - without current user", context do
+    user_id = context.friend1.id
+    Redis.command(["SET", "user:#{user_id}:posts_counter", "11"])
+    Redis.command(["SET", "user:#{user_id}:loves_counter", "12"])
+
+    assert %User{} = user = Network.user(user_id)
+
+    assert user.posts_count == 11
+    assert user.loves_count == 12
+    assert user.relationship_to_current_user.__struct__ == NotLoaded
+  end
+
+  test "user/2 - with current user", context do
+    user_id = context.friend1.id
+    Redis.command(["SET", "user:#{user_id}:posts_counter", "11"])
+    Redis.command(["SET", "user:#{user_id}:loves_counter", "12"])
+
+    assert %User{} = user = Network.user(user_id, context.current)
+
+    assert user.posts_count == 11
+    assert user.loves_count == 12
+    assert user.relationship_to_current_user.priority == "friend"
+  end
+
   test "users/2 - with current user", context do
     user_ids = [context.friend1.id, context.noise1.id, context.norelation.id]
     Enum.each user_ids, fn(id) ->

@@ -10,7 +10,22 @@ defmodule Ello.Core.Network do
   """
 
   @doc """
-  Get users by ids.
+  Get a single user by id.
+
+  Includes postgres info and bulk fetched redis info.
+
+  If the current_user is passed in the user relationship will also be included.
+  """
+  @spec user(id :: integer, current_user :: User.t | nil) :: User.t
+  def user(id, current_user \\ nil) do
+    User
+    |> Repo.get(id)
+    |> preload_current_user_relationship(current_user)
+    |> prefetch_user_counts
+  end
+
+  @doc """
+  Get multiple users by ids.
 
   Includes postgres info and bulk fetched redis info.
 
@@ -32,6 +47,8 @@ defmodule Ello.Core.Network do
   end
 
   defp prefetch_user_counts([]), do: []
+  defp prefetch_user_counts(%User{} = user),
+    do: hd(prefetch_user_counts([user]))
   defp prefetch_user_counts(users) do
     # Get counts from redis
     {:ok, counts} = Redis.command(["MGET" | count_keys_for_users(users)])
