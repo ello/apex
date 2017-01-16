@@ -1,7 +1,9 @@
 defmodule Ello.Auth.JWT do
   @moduledoc """
-
+  Responsible for generating and verifying JWTs.
   """
+
+  @issuer "Ello, PBC"
 
   @doc """
   Verifies an Ello JWT is correctly signed and has appropriate data.
@@ -17,7 +19,7 @@ defmodule Ello.Auth.JWT do
     jwt
     |> Joken.token
     |> Joken.with_validation("exp", &(&1 > Joken.current_time))
-    |> Joken.with_validation("iss", &(&1 == "Ello, PBC"))
+    |> Joken.with_validation("iss", &(&1 == @issuer))
     |> Joken.with_signer(jwt_signer())
     |> Joken.verify!
   end
@@ -31,7 +33,7 @@ defmodule Ello.Auth.JWT do
   def generate do
     sign_token(%{
       exp: Joken.current_time + jwt_exp_duration(),
-      iss: "Ello, PBC",
+      iss: @issuer,
     })
   end
 
@@ -46,7 +48,7 @@ defmodule Ello.Auth.JWT do
   def generate(%{id: id}) do
     sign_token(%{
       exp: Joken.current_time + jwt_exp_duration(),
-      iss: "Ello, PBC",
+      iss: @issuer,
       data: %{
         id: id
       }
@@ -76,7 +78,8 @@ defmodule Ello.Auth.JWT do
   # 2. Convert PEM style private key to a JWK (JSON WEB KEY)
   # 3. Convert to the proper RS512 Joken.Signer
   defp rs512_signer do
-    Application.get_env(:ello_auth, :jwt_private_key)
+    pem = Application.get_env(:ello_auth, :jwt_private_key)
+    pem
     |> JOSE.JWK.from_pem
     |> Joken.rs512
   end
@@ -84,8 +87,7 @@ defmodule Ello.Auth.JWT do
   # In test we just use a simple string to sign tokens so this service does not
   # need the private key.
   def hs256_signer do
-    Application.get_env(:ello_auth, :jwt_secret)
-    |> Joken.hs256
+    Joken.hs256(Application.get_env(:ello_auth, :jwt_secret))
   end
 
   # How long should generated tokens be valid for?

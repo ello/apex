@@ -9,33 +9,36 @@ defmodule Ello.Auth.RequireTokenTest do
     def foo(conn, _), do: send_resp(conn, 200, "bar")
   end
 
-  test "without a token" do
-    conn = conn("GET", "/doesnotmatter")
-    results = Example.call(conn, [])
-    assert results.status == 401
+  setup do
+    {:ok, conn: conn("GET", "/doesnotmatter")}
   end
 
-  test "with an invalid token" do
-    conn = conn("GET", "/doesnotmatter")
+  test "without a token", %{conn: conn} do
+    resp = Example.call(conn, [])
+    assert resp.status == 401
+  end
+
+  test "with an invalid token", %{conn: conn} do
+    resp = conn
            |> put_req_header("authorization", "Bearer ey.nonsense.foo")
-    results = Example.call(conn, [])
-    assert results.status == 401
+           |> Example.call([])
+    assert resp.status == 401
   end
 
-  test "with a valid public token" do
-    conn = conn("GET", "/doesnotmatter")
+  test "with a valid public token", %{conn: conn} do
+    resp = conn
            |> put_req_header("authorization", "Bearer " <> JWT.generate)
-    results = Example.call(conn, [])
-    assert results.status == 200
-    refute results.assigns[:current_user]
+           |> Example.call([])
+    assert resp.status == 200
+    refute resp.assigns[:current_user]
   end
 
-  test "with a valid user token" do
+  test "with a valid user token", %{conn: conn} do
     user = NetworkStub.user(1)
-    conn = conn("GET", "/doesnotmatter")
+    resp = conn
            |> put_req_header("authorization", "Bearer " <> JWT.generate(user))
-    results = Example.call(conn, [])
-    assert results.status == 200
-    assert results.assigns[:current_user] == user
+           |> Example.call([])
+    assert resp.status == 200
+    assert resp.assigns[:current_user] == user
   end
 end
