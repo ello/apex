@@ -64,19 +64,19 @@ defmodule Ello.Core.Factory do
         avatar: "ello-2274bdfe-57d8-4499-ba67-a7c003d5a962.png",
         avatar_metadata: %{
           "large" => %{
-            "size" => 220669,
+            "size" => 220_669,
             "type" => "image/png",
             "width" => 360,
             "height" => 360
           },
           "regular" => %{
-            "size" => 36629,
+            "size" => 36_629,
             "type" => "image/png",
             "width" => 120,
             "height" => 120
           },
           "small" => %{
-            "size" => 17753,
+            "size" => 17_753,
             "type" => "image/png",
             "width" => 60,
             "height" => 60
@@ -85,31 +85,31 @@ defmodule Ello.Core.Factory do
         cover_image: "ello-e76606cf-44b0-48b5-9918-1efad8e0272c.jpeg",
         cover_image_metadata: %{
           "optimized" => %{
-            "size" => 1177127,
+            "size" => 1_177_127,
             "type" => "image/jpeg",
             "width" => 1880,
             "height" => 1410
           },
           "xhdpi" => %{
-            "size" => 582569,
+            "size" => 582_569,
             "type" => "image/jpeg",
             "width" => 1116,
             "height" => 837
           },
           "hdpi" => %{
-            "size" => 150067,
+            "size" => 150_067,
             "type" => "image/jpeg",
             "width" => 552,
             "height" => 414
           },
           "mdpi" => %{
-            "size" => 40106,
+            "size" => 40_106,
             "type" => "image/jpeg",
             "width" => 276,
             "height" => 207
           },
           "ldpi" => %{
-            "size" => 10872,
+            "size" => 10_872,
             "type" => "image/jpeg",
             "width" => 132,
             "height" => 99
@@ -171,19 +171,19 @@ defmodule Ello.Core.Factory do
         tile_image: "ello-optimized-8bcedb76.jpg",
         tile_image_metadata: %{
           "large" => %{
-            "size"   => 855144,
+            "size"   => 855_144,
             "type"   => "image/png",
             "width"  => 1000,
             "height" => 1000
           },
           "regular" => %{
-            "size"   => 556821,
+            "size"   => 556_821,
             "type"   => "image/png",
             "width"  => 800,
             "height" => 800
           },
           "small" => %{
-            "size"   => 126225,
+            "size"   => 126_225,
             "type"   => "image/png",
             "width"  => 360,
             "height" => 360
