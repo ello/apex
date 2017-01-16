@@ -33,18 +33,8 @@ defmodule Ello.Core.Network do
 
   defp prefetch_user_counts([]), do: []
   defp prefetch_user_counts(users) do
-    # Get keys for each counter
-    keys = Enum.flat_map users, fn(%{id: id}) ->
-      [
-        "user:#{id}:followers_counter",
-        "user:#{id}:followed_users_counter",
-        "user:#{id}:loves_counter",
-        "user:#{id}:posts_counter",
-      ]
-    end
-
     # Get counts from redis
-    {:ok, counts} = Redis.command(["MGET" | keys])
+    {:ok, counts} = Redis.command(["MGET" | count_keys_for_users(users)])
 
     # Add counts to users
     counts
@@ -59,5 +49,17 @@ defmodule Ello.Core.Network do
         followers_count: followers,
       }
     end)
+  end
+
+  defp count_keys_for_users(users) do
+    # Get keys for each counter
+    Enum.flat_map users, fn(%{id: id}) ->
+      [
+        "user:#{id}:followers_counter",
+        "user:#{id}:followed_users_counter",
+        "user:#{id}:loves_counter",
+        "user:#{id}:posts_counter",
+      ]
+    end
   end
 end

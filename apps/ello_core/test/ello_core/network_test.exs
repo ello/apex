@@ -6,8 +6,11 @@ defmodule Ello.Core.NetworkTest do
     current = Factory.insert(:user)
     {:ok,
       current:    current,
-      friend1:    Factory.insert(:relationship, owner: current).subject,
-      noise1:     Factory.insert(:relationship, owner: current, priority: "noise").subject,
+      friend1:    Factory.insert(:relationship,
+                                 owner: current).subject,
+      noise1:     Factory.insert(:relationship,
+                                 owner: current,
+                                 priority: "noise").subject,
       norelation: Factory.insert(:user),
     }
   end

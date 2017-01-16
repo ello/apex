@@ -1,0 +1,19 @@
+language: elixir
+elixir:
+  - 1.4.0
+otp_release:
+  - 19.2
+addons:
+  postgresql: '9.3'
+services:
+  - redis-server
+script:
+- mix credo -a
+- mix test
+notifications:
+  email: false
+  slack:
+    on_success: change
+    on_failure: change
+    rooms:
+      secure: oQ+gH/oYwMcB06l1zUNJdmHn5gi4JIXqehJCpqePvw0lc83SlkAgaTeffWL5l7yqXwzTOKMQQcMYeJWMoWmhzKCW0dPDS4pZDtW8Pt7MXd6YhyTbAOodOKXj2UPbihpMtAx8FzniKAVnaPmrqLo8T0R9l1UhcnCiZE3KfrgTgZXuzrMv0Z1k5GB0zTYqkYY3I4AaTn8xLp4clfUI3qeLE8cigxC6ZQ7gUOr0rE5hbmcqJsN0auuIe2aLOU9sVXGPd/efwnW9O1gHcEv7h5f0RH8gkGlvUCSpD6Yvn55O3jOmIxCLFNY0smCLLnK4S5WDgrI0DLEhX0mGeFT1+kI5wQ+iE4xtj5r2KtHaiOg7t63M+CoTbQzk/S8xWpUXG4gidGsXUcsgMVLbronlNGMiFGcub/1dz5tDjT77C1dtDZeWqunLj5R2apW71uK8ouL+cck4ePja1+kCM/0wgPT4TfA9m2lcbnC/AggGO9VFrttL8VqF+czXFwrZgvBqI3f0HSpErDYUoxzejVvhqB+QUFNN4fNHcQ+DIlzHxlAMd0k+7sRoD1NJeq5gcXnRFUJ68PRCQgOD2A+OVQWdTgDDCH05jzVjgOVolRIQ9+krd/R03TUbqIzK6ei8j43SiEZnfpEc3ae3BH7KJlrkPWtCYF1ptxkKStEtmqOzu1dQTBw=
