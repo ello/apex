@@ -16,6 +16,9 @@ config :ello_v2, Ello.V2.Endpoint,
   url: [host: "example.com", port: 80],
   cache_static_manifest: "priv/static/manifest.json"
 
+config :ello_v2,
+  social_icons_url: System.get_env("SOCIAL_ICONS_URL") || "https://social-icons.ello.co"
+
 # Do not print debug messages in production
 config :logger, level: :info
 

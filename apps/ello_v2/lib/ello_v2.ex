@@ -5,12 +5,12 @@ defmodule Ello.V2 do
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
   def start(_type, _args) do
-    #import Supervisor.Spec
+    import Supervisor.Spec
 
     # Define workers and child supervisors to be supervised
     children = [
       # Start the endpoint when the application starts
-      # supervisor(Ello.V2.Endpoint, []),
+      supervisor(Ello.V2.Endpoint, []),
       # Start your own worker by calling: Ello.V2.Worker.start_link(arg1, arg2, arg3)
       # worker(Ello.V2.Worker, [arg1, arg2, arg3]),
     ]
