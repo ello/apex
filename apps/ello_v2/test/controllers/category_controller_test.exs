@@ -6,7 +6,12 @@ defmodule Ello.V2.CategoryControllerTest do
     Script.insert(:featured_category)
     Script.insert(:espionage_category)
     Script.insert(:lacross_category)
-    {:ok, conn: auth_conn(conn, archer)}
+    {:ok, conn: auth_conn(conn, archer), unauth_conn: conn}
+  end
+
+  test "GET /v2/categories/:slug - without token", %{unauth_conn: conn} do
+    conn = get(conn, category_path(conn, :show, "featured"))
+    assert conn.status == 401
   end
 
   test "GET /v2/categories/:slug", %{conn: conn} do

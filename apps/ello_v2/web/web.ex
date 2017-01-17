@@ -5,7 +5,7 @@ defmodule Ello.V2.Web do
 
   This can be used in your application as:
 
-      use Ello.V2.Web, :controller
+      use Ello.V3.Web, :controller
       use Ello.V2.Web, :view
 
   The definitions below will be executed for every view,
@@ -22,12 +22,19 @@ defmodule Ello.V2.Web do
     end
   end
 
-  def controller do
+  def public_controller do
     quote do
       use Phoenix.Controller, namespace: Ello.V2
 
       import Ello.V2.Router.Helpers
       import Ello.V2.Gettext
+    end
+  end
+
+  def controller do
+    quote do
+      unquote(public_controller)
+      plug Ello.Auth.RequireToken
     end
   end
 
