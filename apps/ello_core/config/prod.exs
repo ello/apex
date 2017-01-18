@@ -7,4 +7,4 @@ config :ello_core, Ello.Core.Repo,
   adapter: Ecto.Adapters.Postgres,
   url: {:system, "DATABASE_URL"},
   ssl: true,
-  pool_size: 20
+  pool_size: String.to_integer(System.get_env("ECTO_POOL_SIZE") || "20")

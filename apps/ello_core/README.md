@@ -20,3 +20,7 @@ Instead the lib directory should be a nested structure where wrapper "service"
 libs do the querying/work have the schemas they use nested under them. In this
 way the service modules become the public API and the schemas modules are
 internal implementation details.
+
+
+* REDIS_POOL_SIZE - how many connections per dyno to open with redis.
+* ECTO_POOL_SIZE - how many connections per dyno to open with postgres.

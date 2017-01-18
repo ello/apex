@@ -7,6 +7,7 @@ config :ello_core, Ello.Core.Repo,
   migration_source: "ecto_migrations"
 
 config :ello_core,
-  ecto_repos: [Ello.Core.Repo]
+  ecto_repos: [Ello.Core.Repo],
+  redis_pool_size: String.to_integer(System.get_env("REDIS_POOL_SIZE") || "5")
 
 import_config "#{Mix.env}.exs"
