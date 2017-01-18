@@ -28,6 +28,8 @@ defmodule Ello.Dispatch.Mixfile do
       {:phoenix, "~> 1.2"},
       {:honeybadger, "~> 0.1"},
 
+      {:discorelic, github: "nogates/discorelic"},
+
       {:ello_v2, in_umbrella: true},
     ]
   end

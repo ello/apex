@@ -21,6 +21,12 @@ libs do the querying/work have the schemas they use nested under them. In this
 way the service modules become the public API and the schemas modules are
 internal implementation details.
 
+## Configuration
 
+Ello.Core expects the following environmental variables in production
+(like) environments:
+
+* REDIS_URL - For redis access, should be same as mothership.
+* DATABASE_URL - For postgres access, should be same as mothership.
 * REDIS_POOL_SIZE - how many connections per dyno to open with redis.
 * ECTO_POOL_SIZE - how many connections per dyno to open with postgres.
