@@ -7,14 +7,12 @@ defmodule Ello.Core.Redis do
   load balancing technique then a real "checkout" style pool.
   """
 
-  @redis_pool_size 5
-
   @doc "Start supervisor"
   def start_link, do: Supervisor.start_link(__MODULE__, [])
 
   @doc "Start pool of n workers on start"
   def init([]) do
-    workers = Enum.map 1..@redis_pool_size, fn(i) ->
+    workers = Enum.map 1..redis_pool_size(), fn(i) ->
       worker(Redix, [redis_url(), [name: :"redis_#{i}"]], id: {Redix, i})
     end
     supervise(workers, strategy: :one_for_one)
@@ -26,8 +24,10 @@ defmodule Ello.Core.Redis do
   end
 
   defp random_worker do
-    :"redis_#{Enum.random(1..@redis_pool_size)}"
+    :"redis_#{Enum.random(1..redis_pool_size())}"
   end
 
   defp redis_url, do: Application.get_env(:ello_core, :redis_url)
+
+  defp redis_pool_size, do: Application.get_env(:ello_core, :redis_pool_size)
 end
