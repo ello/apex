@@ -13,6 +13,8 @@ config :ello_v2, Ello.V2.Endpoint,
   check_origin: false,
   watchers: []
 
+config :ello_v2,
+  social_icons_url: "https://social-icons.ello.co"
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"

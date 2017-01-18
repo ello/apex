@@ -6,5 +6,8 @@ config :ello_v2, Ello.V2.Endpoint,
   http: [port: 4001],
   server: false
 
+config :ello_v2,
+  social_icons_url: "https://social-icons.ello.co"
+
 # Print only warnings and errors during test
 config :logger, level: :warn
