@@ -5,6 +5,7 @@ defmodule Ello.V2.LinkViewTest do
 
   @social_icons_url Application.get_env(:ello_v2, :social_icons_url)
 
+  @lint false
   defp test_links do
     %{
       "appstore.com/asdf/asdf" => [%{url: "http://appstore.com/asdf/asdf", text: "appstore.com/asdf/asdf", type: "Apple Store", icon: "#{@social_icons_url}/apple.png"}],

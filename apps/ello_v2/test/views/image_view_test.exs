@@ -13,7 +13,7 @@ defmodule Ello.V2.ImageViewTest do
         "large" => %{
           "url" => "https://assets.ello.co/uploads/category/tile_image/2/ello-large-23cb59fe.png",
           "metadata" => %{
-            "size"   => 855144,
+            "size"   => 855_144,
             "type"   => "image/png",
             "width"  => 1000,
             "height" => 1000
@@ -22,7 +22,7 @@ defmodule Ello.V2.ImageViewTest do
         "regular" => %{
           "url" => "https://assets.ello.co/uploads/category/tile_image/2/ello-regular-23cb59fe.png",
           "metadata" => %{
-            "size"   => 556821,
+            "size"   => 556_821,
             "type"   => "image/png",
             "width"  => 800,
             "height" => 800
@@ -31,7 +31,7 @@ defmodule Ello.V2.ImageViewTest do
         "small" => %{
           "url" => "https://assets.ello.co/uploads/category/tile_image/2/ello-small-23cb59fe.png",
           "metadata" => %{
-            "size"   => 126225,
+            "size"   => 126_225,
             "type"   => "image/png",
             "width"  => 360,
             "height" => 360
@@ -68,19 +68,19 @@ defmodule Ello.V2.ImageViewTest do
       tile_image: "ello-optimized-8bcedb76.jpg",
       tile_image_metadata: %{
         "large" => %{
-          "size"   => 855144,
+          "size"   => 855_144,
           "type"   => "image/png",
           "width"  => 1000,
           "height" => 1000
         },
         "regular" => %{
-          "size"   => 556821,
+          "size"   => 556_821,
           "type"   => "image/png",
           "width"  => 800,
           "height" => 800
         },
         "small" => %{
-          "size"   => 126225,
+          "size"   => 126_225,
           "type"   => "image/png",
           "width"  => 360,
           "height" => 360

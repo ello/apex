@@ -17,8 +17,6 @@ defmodule Ello.V2.ImageView do
       ])
   """
 
-  # TODO: Actually support pixelation - needs user auth
-  #
   def render("image.json", %{model: model, attribute: attr}) do
     meta = String.to_atom(Atom.to_string(attr) <> "_metadata")
     do_render(model, Map.get(model, attr), Map.get(model, meta), attr)
@@ -48,7 +46,6 @@ defmodule Ello.V2.ImageView do
     "/uploads/#{model_folder_name(model)}/#{attr}/#{model.id}"
   end
 
-  # TODO: Make setting
   def asset_host do
     "https://assets.ello.co"
   end

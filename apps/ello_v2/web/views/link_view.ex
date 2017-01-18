@@ -13,9 +13,10 @@ defmodule Ello.V2.LinkView do
   end
 
   defp sanitize_url(link) do
-    cond do
-      String.match?(link, ~r/\Ahttp/i) -> link
-      true -> "http://" <> link
+    if String.match?(link, ~r/\Ahttp/i) do
+      link
+    else
+      "http://" <> link
     end
   end
 

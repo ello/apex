@@ -103,7 +103,7 @@ defmodule Ello.V2.CategoryViewTest do
         "large" => %{
           "url" => "https://assets.ello.co/uploads/category/tile_image/#{context.cat2.id}/ello-large-23cb59fe.png",
           "metadata" => %{
-            "size"   => 855144,
+            "size"   => 855_144,
             "type"   => "image/png",
             "width"  => 1000,
             "height" => 1000
@@ -112,7 +112,7 @@ defmodule Ello.V2.CategoryViewTest do
         "regular" => %{
           "url" => "https://assets.ello.co/uploads/category/tile_image/#{context.cat2.id}/ello-regular-23cb59fe.png",
           "metadata" => %{
-            "size"   => 556821,
+            "size"   => 556_821,
             "type"   => "image/png",
             "width"  => 800,
             "height" => 800
@@ -121,7 +121,7 @@ defmodule Ello.V2.CategoryViewTest do
         "small" => %{
           "url" => "https://assets.ello.co/uploads/category/tile_image/#{context.cat2.id}/ello-small-23cb59fe.png",
           "metadata" => %{
-            "size"   => 126225,
+            "size"   => 126_225,
             "type"   => "image/png",
             "width"  => 360,
             "height" => 360

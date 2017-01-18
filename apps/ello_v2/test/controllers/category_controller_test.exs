@@ -22,18 +22,25 @@ defmodule Ello.V2.CategoryControllerTest do
   test "GET /v2/categories?all=true", %{conn: conn} do
     conn = get(conn, category_path(conn, :index), %{all: true})
     assert %{"categories" => categories} = json_response(conn, 200)
-    assert Enum.map(categories, &(&1["name"])) == ["Lacross", "Featured", "Espionage"]
+    assert Enum.member?(category_names(categories), "Lacross") == true
+    assert Enum.member?(category_names(categories), "Featured") == true
+    assert Enum.member?(category_names(categories), "Espionage") == true
   end
 
   test "GET /v2/categories?meta=true", %{conn: conn} do
     conn = get(conn, category_path(conn, :index), %{meta: true})
     assert %{"categories" => categories} = json_response(conn, 200)
-    assert Enum.map(categories, &(&1["name"])) == ["Lacross", "Featured"]
+    assert Enum.member?(category_names(categories), "Lacross") == true
+    assert Enum.member?(category_names(categories), "Featured") == true
   end
 
   test "GET /v2/categories", %{conn: conn} do
     conn = get(conn, category_path(conn, :index))
     assert %{"categories" => categories} = json_response(conn, 200)
-    assert Enum.map(categories, &(&1["name"])) == ["Lacross"]
+    assert Enum.member?(category_names(categories), "Lacross") == true
+  end
+
+  defp category_names(categories) do
+    Enum.map(categories, &(&1["name"]))
   end
 end

@@ -3,6 +3,7 @@ defmodule Ello.V2.UserView do
   alias Ello.V2.ImageView
   alias Ello.V2.LinkView
 
+  @lint false
   def render("user.json", %{user: user, conn: conn}) do
     %{
       id: "#{user.id}",
@@ -28,17 +29,9 @@ defmodule Ello.V2.UserView do
       loves_count: user.loves_count,
       posts_count: user.posts_count,
       external_links_list: render(LinkView, "links.json", %{links: user.links}),
-      avatar: render(ImageView, "image.json",
-        model: user,
-        attribute: :avatar
-      ),
-      cover_image: render(ImageView, "image.json",
-        model: user,
-        attribute: :cover_image
-      ),
-      links: %{
-        categories: user.category_ids,
-      }
+      avatar: render(ImageView, "image.json", model: user, attribute: :avatar),
+      cover_image: render(ImageView, "image.json", model: user, attribute: :cover_image),
+      links: %{categories: user.category_ids}
     }
   end
 

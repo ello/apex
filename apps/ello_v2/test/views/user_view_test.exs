@@ -54,7 +54,7 @@ defmodule Ello.V2.UserViewTest do
         "large" => %{
           "url" => "https://assets.ello.co/uploads/user/avatar/42/ello-large-fad52e18.png",
           "metadata" => %{
-            "size" => 220669,
+            "size" => 220_669,
             "type" => "image/png",
             "width" => 360,
             "height" => 360
@@ -63,7 +63,7 @@ defmodule Ello.V2.UserViewTest do
         "regular" => %{
           "url" => "https://assets.ello.co/uploads/user/avatar/42/ello-regular-fad52e18.png",
           "metadata" => %{
-            "size" => 36629,
+            "size" => 36_629,
             "type" => "image/png",
             "width" => 120,
             "height" => 120
@@ -72,7 +72,7 @@ defmodule Ello.V2.UserViewTest do
         "small" => %{
           "url" => "https://assets.ello.co/uploads/user/avatar/42/ello-small-fad52e18.png",
           "metadata" => %{
-            "size" => 17753,
+            "size" => 17_753,
             "type" => "image/png",
             "width" => 60,
             "height" => 60
@@ -86,7 +86,7 @@ defmodule Ello.V2.UserViewTest do
         "optimized" => %{
           "url" => "https://assets.ello.co/uploads/user/cover_image/42/ello-optimized-061fb4e4.jpg",
           "metadata" => %{
-            "size" => 1177127,
+            "size" => 1_177_127,
             "type" => "image/jpeg",
             "width" => 1880,
             "height" => 1410
@@ -95,7 +95,7 @@ defmodule Ello.V2.UserViewTest do
         "xhdpi" => %{
           "url" => "https://assets.ello.co/uploads/user/cover_image/42/ello-xhdpi-061fb4e4.jpg",
           "metadata" => %{
-            "size" => 582569,
+            "size" => 582_569,
             "type" => "image/jpeg",
             "width" => 1116,
             "height" => 837
@@ -104,7 +104,7 @@ defmodule Ello.V2.UserViewTest do
         "hdpi" => %{
           "url" => "https://assets.ello.co/uploads/user/cover_image/42/ello-hdpi-061fb4e4.jpg",
           "metadata" => %{
-            "size" => 150067,
+            "size" => 150_067,
             "type" => "image/jpeg",
             "width" => 552,
             "height" => 414
@@ -113,7 +113,7 @@ defmodule Ello.V2.UserViewTest do
         "mdpi" => %{
           "url" => "https://assets.ello.co/uploads/user/cover_image/42/ello-mdpi-061fb4e4.jpg",
           "metadata" => %{
-            "size" => 40106,
+            "size" => 40_106,
             "type" => "image/jpeg",
             "width" => 276,
             "height" => 207
@@ -122,14 +122,14 @@ defmodule Ello.V2.UserViewTest do
         "ldpi" => %{
           "url" => "https://assets.ello.co/uploads/user/cover_image/42/ello-ldpi-061fb4e4.jpg",
           "metadata" => %{
-            "size" => 10872,
+            "size" => 10_872,
             "type" => "image/jpeg",
             "width" => 132,
             "height" => 99
           }
         }
       },
-      links: %{ categories: [] }
+      links: %{categories: []}
     }
     assert render(UserView, "user.json", user: archer, conn: conn) == expected
   end

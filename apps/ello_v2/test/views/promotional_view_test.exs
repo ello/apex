@@ -17,18 +17,18 @@ defmodule Ello.V2.PromotionalViewTest do
       },
       image: %{
         "hdpi" => %{
-          "metadata" => %{"height" => 414, "size" => 93161, "type" => "image/jpeg", "width" => 414},
+          "metadata" => %{"height" => 414, "size" => 93_161, "type" => "image/jpeg", "width" => 414},
           "url" => "https://assets.ello.co/uploads/promotional/image/41/ello-hdpi-01c119b5.jpg"
         },
         "optimized" => %{
-          "metadata" => %{"height" => 800, "size" => 266621, "type" => "image/jpeg", "width" => 800},
+          "metadata" => %{"height" => 800, "size" => 266_621, "type" => "image/jpeg", "width" => 800},
           "url" => "https://assets.ello.co/uploads/promotional/image/41/ello-optimized-01c119b5.jpg"
         },
         "original" => %{
           "url" => "https://assets.ello.co/uploads/promotional/image/41/ello-optimized-da955f87.jpg"
         },
         "xhdpi" => %{
-          "metadata" => %{"height" => 800, "size" => 267149, "type" => "image/jpeg", "width" => 800},
+          "metadata" => %{"height" => 800, "size" => 267_149, "type" => "image/jpeg", "width" => 800},
           "url" => "https://assets.ello.co/uploads/promotional/image/41/ello-xhdpi-01c119b5.jpg"
         }
       }
@@ -44,19 +44,19 @@ defmodule Ello.V2.PromotionalViewTest do
       image: "ello-optimized-da955f87.jpg",
       image_metadata: %{
         "optimized" => %{
-          "size"   => 266621,
+          "size"   => 266_621,
           "type"   => "image/jpeg",
           "width"  => 800,
           "height" => 800,
         },
         "xhdpi" => %{
-          "size"   => 267149,
+          "size"   => 267_149,
           "type"   => "image/jpeg",
           "width"  => 800,
           "height" => 800,
         },
         "hdpi" => %{
-          "size"   => 93161,
+          "size"   => 93_161,
           "type"   => "image/jpeg",
           "width"  => 414,
           "height" => 414,
