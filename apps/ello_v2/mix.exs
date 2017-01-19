@@ -39,6 +39,7 @@ defmodule Ello.V2.Mixfile do
       {:cowboy, "~> 1.0"},
 
       {:ello_core, in_umbrella: true},
+      {:ello_auth, in_umbrella: true},
     ]
   end
 end

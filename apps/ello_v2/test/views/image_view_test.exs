@@ -1,11 +1,11 @@
 defmodule Ello.V2.ImageViewTest do
-  use Ello.V2.ConnCase, async: true
+  use Ello.V2.ConnCase
   import Phoenix.View #For render/2
   alias Ello.V2.ImageView
   alias Ello.Core.Discovery.Category
 
   test "image.json - rendering an image given model and attribute" do
-    assert render(ImageView, "image.json", model: category, attribute: :tile_image) ==
+    assert render(ImageView, "image.json", model: category(), attribute: :tile_image) ==
       %{
         "original" => %{
           "url" => "https://assets.ello.co/uploads/category/tile_image/2/ello-optimized-8bcedb76.jpg"
@@ -40,6 +40,44 @@ defmodule Ello.V2.ImageViewTest do
       }
   end
 
+  test "image.json - rendering an image given model and attribute - with domain sharding" do
+    Application.put_env(:ello_v2, :asset_host, "https://assets%d.ello.co")
+    assert render(ImageView, "image.json", model: category(), attribute: :tile_image) ==
+      %{
+        "original" => %{
+          "url" => "https://assets1.ello.co/uploads/category/tile_image/2/ello-optimized-8bcedb76.jpg"
+        },
+        "large" => %{
+          "url" => "https://assets2.ello.co/uploads/category/tile_image/2/ello-large-23cb59fe.png",
+          "metadata" => %{
+            "size"   => 855_144,
+            "type"   => "image/png",
+            "width"  => 1000,
+            "height" => 1000
+          }
+        },
+        "regular" => %{
+          "url" => "https://assets0.ello.co/uploads/category/tile_image/2/ello-regular-23cb59fe.png",
+          "metadata" => %{
+            "size"   => 556_821,
+            "type"   => "image/png",
+            "width"  => 800,
+            "height" => 800
+          }
+        },
+        "small" => %{
+          "url" => "https://assets0.ello.co/uploads/category/tile_image/2/ello-small-23cb59fe.png",
+          "metadata" => %{
+            "size"   => 126_225,
+            "type"   => "image/png",
+            "width"  => 360,
+            "height" => 360
+          }
+        }
+      }
+    Application.put_env(:ello_v2, :asset_host, "https://assets.ello.co")
+  end
+
   test "image.json - rendering the default for a category" do
     assert render(ImageView, "image.json", model: %Category{}, attribute: :tile_image) ==
       %{
@@ -62,7 +100,7 @@ defmodule Ello.V2.ImageViewTest do
       }
   end
 
-  defp category do 
+  defp category do
     Factory.build(:category, %{
       id: 2,
       tile_image: "ello-optimized-8bcedb76.jpg",
