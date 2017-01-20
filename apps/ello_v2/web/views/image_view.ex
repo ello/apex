@@ -17,6 +17,12 @@ defmodule Ello.V2.ImageView do
       ])
   """
 
+  def render("image.json", %{conn: conn, image: image}) do
+    image.versions
+    |> Enum.reduce(%{}, &render_version2(&1, &2, image))
+    |> Map.put("original", %{url: image_url2(image.path, image.filename)})
+  end
+
   def render("image.json", %{model: model, attribute: attr}) do
     meta = String.to_atom(Atom.to_string(attr) <> "_metadata")
     do_render(model, Map.get(model, attr), Map.get(model, meta), attr)
@@ -29,6 +35,12 @@ defmodule Ello.V2.ImageView do
     |> Map.put("original", %{"url" => image_url(model, image, attr)})
   end
 
+  defp render_version2(version, results, image) do
+    Map.put(results, version.name, %{
+      url:      image_url2(image.path, version.filename),
+      metadata: Map.take(version, [:height, :width, :size, :type]),
+    })
+  end
   defp render_version({version, meta}, versions, model, image, attr) do
     Map.put(versions, version, %{
       "url"      => image_url(model, image, attr, version, meta["type"]),
@@ -36,6 +48,12 @@ defmodule Ello.V2.ImageView do
     })
   end
 
+  defp image_url2(path, filename) do
+    filename
+    |> asset_host
+    |> URI.merge(path <> "/" <> filename)
+    |> URI.to_string
+  end
   defp image_url(model, name, attr, version \\ nil, type \\ nil) do
     filename = filename(name, version, type)
 

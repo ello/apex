@@ -13,7 +13,7 @@ defmodule Ello.Core.Factory do
 
       created_at: Ecto.DateTime.utc,
       updated_at: Ecto.DateTime.utc,
-    }
+    } |> Ello.Core.Network.User.Avatar.build
   end
 
   def category_factory do
@@ -121,7 +121,7 @@ defmodule Ello.Core.Factory do
         settings: %User.Settings{
           views_adult_content: true,
         }
-      }
+      } |> Ello.Core.Network.User.Avatar.build
     end
 
 

@@ -5,13 +5,13 @@ defmodule Ello.V2.UserViewTest do
 
   setup %{conn: conn} do
     spying = Script.insert(:espionage_category)
-    archer = Script.build(:archer, categories: [spying])
+    archer = Script.build(:archer, categories: [spying]) |> Ello.Core.Network.User.Avatar.build
     user = Factory.build(:user, %{
       id: 1234,
       relationship_to_current_user: Factory.build(:relationship,
                                                   owner: archer,
                                                   priority: "friend")
-    })
+    }) |> Ello.Core.Network.User.Avatar.build
     {:ok, [
         conn: user_conn(conn, archer),
         archer: archer,
@@ -69,33 +69,33 @@ defmodule Ello.V2.UserViewTest do
       background_position: "50% 50%",
       avatar: %{
         "original" => %{
-          "url" => "https://assets.ello.co/uploads/user/avatar/42/ello-2274bdfe-57d8-4499-ba67-a7c003d5a962.png"
+          url: "https://assets.ello.co/uploads/user/avatar/42/ello-2274bdfe-57d8-4499-ba67-a7c003d5a962.png"
         },
         "large" => %{
-          "url" => "https://assets.ello.co/uploads/user/avatar/42/ello-large-fad52e18.png",
-          "metadata" => %{
-            "size" => 220_669,
-            "type" => "image/png",
-            "width" => 360,
-            "height" => 360
+          url: "https://assets.ello.co/uploads/user/avatar/42/ello-large-fad52e18.png",
+          metadata: %{
+            size: 220_669,
+            type: "image/png",
+            width: 360,
+            height: 360
           }
         },
         "regular" => %{
-          "url" => "https://assets.ello.co/uploads/user/avatar/42/ello-regular-fad52e18.png",
-          "metadata" => %{
-            "size" => 36_629,
-            "type" => "image/png",
-            "width" => 120,
-            "height" => 120
+          url: "https://assets.ello.co/uploads/user/avatar/42/ello-regular-fad52e18.png",
+          metadata: %{
+            size: 36_629,
+            type: "image/png",
+            width: 120,
+            height: 120
           }
         },
         "small" => %{
-          "url" => "https://assets.ello.co/uploads/user/avatar/42/ello-small-fad52e18.png",
-          "metadata" => %{
-            "size" => 17_753,
-            "type" => "image/png",
-            "width" => 60,
-            "height" => 60
+          url: "https://assets.ello.co/uploads/user/avatar/42/ello-small-fad52e18.png",
+          metadata: %{
+            size: 17_753,
+            type: "image/png",
+            width: 60,
+            height: 60
           }
         }
       },

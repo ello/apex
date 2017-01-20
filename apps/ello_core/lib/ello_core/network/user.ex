@@ -17,6 +17,7 @@ defmodule Ello.Core.Network.User do
     field :location_lat, :float
     field :location_long, :float
 
+    field :avatar_struct, :map, virtual: true
     field :avatar, :string
     field :avatar_metadata, :map
     field :cover_image, :string

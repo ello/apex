@@ -2,6 +2,7 @@ defmodule Ello.Core.Network do
   import Ecto.Query
   alias Ello.Core.{Repo,Redis,Network,Discovery}
   alias Network.{User,Relationship}
+  alias User.Avatar
 
   @moduledoc """
   Responsible for retreiving and loading users and relationships.
@@ -71,6 +72,7 @@ defmodule Ello.Core.Network do
     |> preload_current_user_relationship(current_user)
     |> prefetch_user_counts
     |> prefetch_categories
+    |> build_image_structs
   end
 
   defp preload_current_user_relationship(users, nil), do: users
@@ -128,5 +130,12 @@ defmodule Ello.Core.Network do
                           |> List.flatten
         Map.put(user, :categories, user_categories)
     end
+  end
+
+  defp build_image_structs(%User{} = user) do
+    Avatar.build(user)
+  end
+  defp build_image_structs(users) do
+    Enum.map(users, &Avatar.build/1)
   end
 end

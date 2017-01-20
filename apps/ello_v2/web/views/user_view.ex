@@ -50,8 +50,8 @@ defmodule Ello.V2.UserView do
       experimental_features: experimental_features(user),
       relationship_priority: relationship(user, conn),
       bad_for_seo: user.bad_for_seo?,
-      external_links_list: render(LinkView, "links.json", %{links: user.links}),
-      avatar: render(ImageView, "image.json", model: user, attribute: :avatar),
+      external_links_list: render(LinkView, "links.json", links: user.links),
+      avatar: render(ImageView, "image.json", conn: conn, image: user.avatar_struct),
       cover_image: render(ImageView, "image.json", model: user, attribute: :cover_image),
       links: links(user, conn)
     })
