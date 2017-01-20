@@ -37,8 +37,11 @@ defmodule Ello.V2.ImageView do
   end
 
   defp image_url(model, name, attr, version \\ nil, type \\ nil) do
-    asset_host
-    |> URI.merge(asset_path(model, attr) <> "/" <> filename(name, version, type))
+    filename = filename(name, version, type)
+
+    filename
+    |> asset_host
+    |> URI.merge(asset_path(model, attr) <> "/" <> filename)
     |> URI.to_string
   end
 
@@ -46,8 +49,20 @@ defmodule Ello.V2.ImageView do
     "/uploads/#{model_folder_name(model)}/#{attr}/#{model.id}"
   end
 
-  def asset_host do
-    "https://assets.ello.co"
+  def asset_host(filename) do
+    asset_host = Application.get_env(:ello_v2, :asset_host)
+    if String.contains?(asset_host, "%d") do
+      String.replace(asset_host, "%d", asset_host_number(filename))
+    else
+      asset_host
+    end
+  end
+
+  defp asset_host_number(filename) do
+    :zlib.open
+    |> :zlib.crc32(filename)
+    |> Integer.mod(3)
+    |> Integer.to_string
   end
 
   defp model_folder_name(%{__struct__: module}) do
@@ -112,9 +127,9 @@ defmodule Ello.V2.ImageView do
   end
 
   defp default_url(path, "original", format) do
-    "#{asset_host}/#{path}/ello-default.#{format}"
+    "#{asset_host("")}/#{path}/ello-default.#{format}"
   end
   defp default_url(path, variation, format) do
-    "#{asset_host}/#{path}/ello-default-#{variation}.#{format}"
+    "#{asset_host("")}/#{path}/ello-default-#{variation}.#{format}"
   end
 end
