@@ -62,6 +62,8 @@ defmodule Ello.Core.Factory do
         location: "New York, NY",
         links: "http://twitter.com/ArcherFX",
         background_position: "50% 50%",
+        short_bio: "I have been spying for a while now",
+        formatted_short_bio: "<p>I have been spying for a while now</p>",
         avatar: "ello-2274bdfe-57d8-4499-ba67-a7c003d5a962.png",
         avatar_metadata: %{
           "large" => %{

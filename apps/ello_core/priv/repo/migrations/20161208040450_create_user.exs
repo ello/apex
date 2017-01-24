@@ -9,6 +9,7 @@ defmodule Ello.Repo.Migrations.CreateUser do
       add :username, :string
       add :name, :string
       add :short_bio, :text
+      add :formatted_short_bio, :text
       add :links, :text
       add :location, :string
       add :location_lat, :float

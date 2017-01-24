@@ -11,6 +11,7 @@ defmodule Ello.V2.UserView do
       username: user.username,
       name: user.name,
       location: user.location,
+      formatted_short_bio: user.formatted_short_bio,
       posts_adult_content: user.settings.posts_adult_content,
       views_adult_content: user.settings.views_adult_content,
       has_commenting_enabled: user.settings.has_commenting_enabled,
