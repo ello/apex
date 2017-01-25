@@ -24,6 +24,7 @@ defmodule Ello.Core.Network.User do
     field :is_public, :boolean, default: true
     field :bad_for_seo?, :boolean, default: true
     field :category_ids, {:array, :integer}, default: []
+    field :categories, {:array, :map}, default: [], virtual: true
 
     field :created_at, Ecto.DateTime
     field :updated_at, Ecto.DateTime

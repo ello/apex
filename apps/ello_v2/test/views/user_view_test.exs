@@ -4,17 +4,37 @@ defmodule Ello.V2.UserViewTest do
   alias Ello.V2.UserView
 
   setup %{conn: conn} do
-    archer = Script.build(:archer)
+    spying = Script.insert(:espionage_category)
+    archer = Script.build(:archer, categories: [spying])
     user = Factory.build(:user, %{
       id: 1234,
       relationship_to_current_user: Factory.build(:relationship,
                                                   owner: archer,
                                                   priority: "friend")
     })
-    {:ok, conn: user_conn(conn, archer), archer: archer, user: user}
+    {:ok, [
+        conn: user_conn(conn, archer),
+        archer: archer,
+        user: user,
+        spying: spying,
+    ]}
   end
 
-  test "user.json - it renders the user", %{conn: conn, archer: archer} do
+  test "show.json - it renders the user and categories", context do
+    archer_id = "#{context.archer.id}"
+    spying_id = "#{context.spying.id}"
+    assert %{
+      users: %{id: ^archer_id},
+      linked: %{
+        categories: [%{id: ^spying_id}],
+      }
+    } = render(UserView, "show.json",
+      user: context.archer,
+      conn: context.conn
+    )
+  end
+
+  test "user.json - it renders the user", %{conn: conn, archer: archer, spying: spying} do
     expected = %{
       id: "42",
       href: "/api/v2/users/42",
@@ -129,7 +149,7 @@ defmodule Ello.V2.UserViewTest do
           }
         }
       },
-      links: %{categories: []}
+      links: %{categories: ["#{spying.id}"]}
     }
     assert render(UserView, "user.json", user: archer, conn: conn) == expected
   end

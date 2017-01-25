@@ -1,9 +1,19 @@
 defmodule Ello.V2.UserView do
   use Ello.V2.Web, :view
   alias Ello.V2.{
+    CategoryView,
     ImageView,
     LinkView,
   }
+
+  def render("show.json", %{user: user, conn: conn}) do
+    %{
+      users: render_one(user, __MODULE__, "user.json", conn: conn),
+      linked: %{
+        categories: render_many(user.categories, CategoryView, "category.json", conn: conn),
+      }
+    }
+  end
 
   @attributes [
     :username,
@@ -43,8 +53,14 @@ defmodule Ello.V2.UserView do
       external_links_list: render(LinkView, "links.json", %{links: user.links}),
       avatar: render(ImageView, "image.json", model: user, attribute: :avatar),
       cover_image: render(ImageView, "image.json", model: user, attribute: :cover_image),
-      links: %{categories: user.category_ids}
+      links: links(user, conn)
     })
+  end
+
+  def links(user, _conn) do
+    %{
+      categories: Enum.map(user.categories, &("#{&1.id}"))
+    }
   end
 
   defp relationship(%{id: id}, %{assigns: %{current_user: %{id: id}}}), do: "self"

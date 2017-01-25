@@ -45,11 +45,22 @@ defmodule Ello.V2.CategoryView do
       id: "#{category.id}",
       header: header(category),
       tile_image: render(ImageView, "image.json", model: category, attribute: :tile_image),
-      links: %{
-        promotionals: Enum.map(category.promotionals, &("#{&1.id}")),
-        recent: %{related: related_link(category)},
-      }
+      links: links(category)
     })
+  end
+
+  # Only link promotionals if they are preloaded - this does not happen when
+  # sideloading categories with users.
+  defp links(%{promotionals: promos} = category) when is_list(promos) do
+    %{
+      promotionals: Enum.map(promos, &("#{&1.id}")),
+      recent: %{related: related_link(category)},
+    }
+  end
+  defp links(category) do
+    %{
+      recent: %{related: related_link(category)},
+    }
   end
 
   defp related_link(%{slug: slug}) do

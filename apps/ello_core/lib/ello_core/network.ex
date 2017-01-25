@@ -1,6 +1,6 @@
 defmodule Ello.Core.Network do
   import Ecto.Query
-  alias Ello.Core.{Repo,Redis,Network}
+  alias Ello.Core.{Repo,Redis,Network,Discovery}
   alias Network.{User,Relationship}
 
   @moduledoc """
@@ -16,12 +16,17 @@ defmodule Ello.Core.Network do
 
   If the current_user is passed in the user relationship will also be included.
   """
-  @spec user(id :: integer, current_user :: User.t | nil) :: User.t
-  def user(id, current_user \\ nil) do
+  @spec user(id :: integer | String.t, current_user :: User.t | nil) :: User.t
+  def user(id_or_username, current_user \\ nil)
+  def user("~" <> username, current_user) do
+    User
+    |> Repo.get_by(username: username)
+    |> user_preloads(current_user)
+  end
+  def user(id, current_user) do
     User
     |> Repo.get(id)
-    |> preload_current_user_relationship(current_user)
-    |> prefetch_user_counts
+    |> user_preloads(current_user)
   end
 
   @doc """
@@ -36,8 +41,16 @@ defmodule Ello.Core.Network do
     User
     |> where([u], u.id in ^ids)
     |> Repo.all
+    |> user_preloads(current_user)
+  end
+
+  defp user_preloads(nil, _), do: nil
+  defp user_preloads([], _), do: []
+  defp user_preloads(user_or_users, current_user) do
+    user_or_users
     |> preload_current_user_relationship(current_user)
     |> prefetch_user_counts
+    |> prefetch_categories
   end
 
   defp preload_current_user_relationship(users, nil), do: users
@@ -77,6 +90,23 @@ defmodule Ello.Core.Network do
         "user:#{id}:loves_counter",
         "user:#{id}:posts_counter",
       ]
+    end
+  end
+
+  defp prefetch_categories(%User{} = user), do: hd(prefetch_categories([user]))
+  defp prefetch_categories(users) do
+    categories = users
+                 |> Enum.flat_map(&(&1.category_ids))
+                 |> Discovery.categories_by_ids
+                 |> Enum.group_by(&(&1.id))
+    Enum.map users, fn
+      %{category_ids: []} = user -> user
+      user ->
+        user_categories = categories
+                          |> Map.take(user.category_ids)
+                          |> Map.values
+                          |> List.flatten
+        Map.put(user, :categories, user_categories)
     end
   end
 end
