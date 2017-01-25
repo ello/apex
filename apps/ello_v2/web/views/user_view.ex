@@ -1,43 +1,72 @@
 defmodule Ello.V2.UserView do
   use Ello.V2.Web, :view
-  alias Ello.V2.ImageView
-  alias Ello.V2.LinkView
+  alias Ello.V2.{
+    ImageView,
+    LinkView,
+  }
 
-  @lint false
+  @attributes [
+    :username,
+    :name,
+    :location,
+    :formatted_short_bio,
+    :background_position,
+    :followers_count,
+    :following_count,
+    :loves_count,
+    :posts_count,
+  ]
+
+  @settings_attributes [
+    :posts_adult_content,
+    :views_adult_content,
+    :has_commenting_enabled,
+    :has_sharing_enabled,
+    :has_reposting_enabled,
+    :has_loves_enabled,
+    :has_auto_watch_enabled,
+    :is_hireable,
+    :is_collaborateable,
+  ]
+
   def render("user.json", %{user: user, conn: conn}) do
-    %{
+    user
+    |> Map.take(@attributes)
+    |> Map.merge(Map.take(user.settings, @settings_attributes))
+    |> Map.merge(%{
       id: "#{user.id}",
+      name: name(user, conn),
       href: "/api/v2/users/#{user.id}",
-      username: user.username,
-      name: user.name,
-      location: user.location,
-      formatted_short_bio: user.formatted_short_bio,
-      posts_adult_content: user.settings.posts_adult_content,
-      views_adult_content: user.settings.views_adult_content,
-      has_commenting_enabled: user.settings.has_commenting_enabled,
-      has_sharing_enabled: user.settings.has_sharing_enabled,
-      has_reposting_enabled: user.settings.has_reposting_enabled,
-      has_loves_enabled: user.settings.has_loves_enabled,
-      has_auto_watch_enabled: user.settings.has_auto_watch_enabled,
-      experimental_features: true,
+      experimental_features: experimental_features(user),
       relationship_priority: relationship(user, conn),
       bad_for_seo: user.bad_for_seo?,
-      is_hireable: user.settings.is_hireable,
-      is_collaborateable: user.settings.is_collaborateable,
-      background_position: "50% 50%",
-      followers_count: user.followers_count,
-      following_count: user.following_count,
-      loves_count: user.loves_count,
-      posts_count: user.posts_count,
       external_links_list: render(LinkView, "links.json", %{links: user.links}),
       avatar: render(ImageView, "image.json", model: user, attribute: :avatar),
       cover_image: render(ImageView, "image.json", model: user, attribute: :cover_image),
       links: %{categories: user.category_ids}
-    }
+    })
   end
 
   defp relationship(%{id: id}, %{assigns: %{current_user: %{id: id}}}), do: "self"
   defp relationship(%{relationship_to_current_user: nil}, _), do: nil
   defp relationship(%{relationship_to_current_user: %{priority: p}}, _), do: p
   defp relationship(_user, _conn), do: nil
+
+  defp experimental_features(%{is_staff: true}), do: true
+  defp experimental_features(%{has_experimental_features: true}), do: true
+  defp experimental_features(_), do: false
+
+  defp name(user, %{assigns: %{current_user: nil}}), do: user.name
+  defp name(user, conn) do
+    if blocked?(user, conn), do: "- blocked -", else: user.name
+  end
+
+  defp blocked?(_, %{assigns: %{current_user: nil}}), do: false
+  defp blocked?(_, %{assigns: %{current_user: %{is_staff: true}}}), do: false
+  defp blocked?(user, conn) do
+    case relationship(user, conn) do
+      "blocked" -> true
+      _ -> false
+    end
+  end
 end

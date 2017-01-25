@@ -28,7 +28,7 @@ defmodule Ello.V2.UserViewTest do
       has_reposting_enabled: true,
       has_loves_enabled: true,
       has_auto_watch_enabled: true,
-      experimental_features: true,
+      experimental_features: false,
       relationship_priority: "self",
       bad_for_seo: false,
       is_hireable: false,
