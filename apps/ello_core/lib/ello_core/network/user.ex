@@ -8,6 +8,7 @@ defmodule Ello.Core.Network.User do
     field :username, :string
     field :name, :string
     field :short_bio, :string
+    field :formatted_short_bio, :string
     field :links, :string
     field :location, :string
     field :location_lat, :float

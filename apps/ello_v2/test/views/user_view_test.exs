@@ -37,7 +37,7 @@ defmodule Ello.V2.UserViewTest do
       followers_count: nil,
       following_count: nil,
       loves_count: nil,
-      #formatted_short_bio: "<p>Backend Lead <a href='/ello' class='user-mention'>@ello</a>, but fond of cars and inspired by architecture. Finding beauty in engineering.</p>",
+      formatted_short_bio: "<p>I have been spying for a while now</p>",
       external_links_list: [
         %{
           url: "http://twitter.com/ArcherFX",

@@ -51,7 +51,7 @@ defmodule Ello.V2.LinkViewTest do
   end
 
   test "links.json - returns an array of sanitized links and icon data" do
-    Enum.each test_links, fn {link, link_data} ->
+    Enum.each test_links(), fn {link, link_data} ->
       assert render(LinkView, "links.json", %{links: link}) == link_data
     end
   end

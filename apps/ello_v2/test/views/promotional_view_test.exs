@@ -33,7 +33,7 @@ defmodule Ello.V2.PromotionalViewTest do
         }
       }
     }
-    assert render(PromotionalView, "promotional.json", promotional: promo) == expected
+    assert render(PromotionalView, "promotional.json", promotional: promo()) == expected
   end
 
   def promo do
