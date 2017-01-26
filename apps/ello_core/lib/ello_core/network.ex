@@ -30,6 +30,26 @@ defmodule Ello.Core.Network do
   end
 
   @doc """
+  Load a user as current user.
+
+  This is intended to be the user as needed for querying the network based on
+  user relationships.
+
+  Skips preloads (for performance):
+    * categories
+    * counts
+
+  Includes preloads (for querying):
+    * blocked user ids
+    * inverse blocked user ids
+  """
+  def load_current_user(id) do
+    User
+    |> Repo.get(id)
+    |> User.preload_blocked_ids
+  end
+
+  @doc """
   Get multiple users by ids.
 
   Includes postgres info and bulk fetched redis info.

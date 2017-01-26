@@ -8,6 +8,16 @@ defmodule Ello.V2.UserController do
   Render a single user by id or username
   """
   def show(conn, %{"id" => id_or_username}) do
-    render(conn, user: Network.user(id_or_username, current_user(conn)))
+    user = Network.user(id_or_username, current_user(conn))
+    if can_view_user?(conn, user) do
+      render(conn, user: user)
+    else
+      send_resp(conn, 404, "")
+    end
   end
+
+  defp can_view_user?(%{assigns: %{current_user: current_user}}, user) do
+    not user.id in current_user.all_blocked_ids
+  end
+  defp can_view_user?(_, _), do: true
 end

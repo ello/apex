@@ -1,11 +1,12 @@
 defmodule Ello.V2.UserControllerTest do
-  use Ello.V2.ConnCase
+  use Ello.V2.ConnCase, async: false
+  alias Ello.Core.Redis
 
   setup %{conn: conn} do
     user = Factory.insert(:user)
     spying = Script.insert(:espionage_category)
     archer = Script.insert(:archer, category_ids: [spying.id])
-    {:ok, conn: auth_conn(conn, user), unauth_conn: conn, archer: archer}
+    {:ok, conn: auth_conn(conn, user), unauth_conn: conn, archer: archer, user: user}
   end
 
   test "GET /v2/users/:id - without token", %{unauth_conn: conn, archer: archer} do
@@ -28,5 +29,25 @@ defmodule Ello.V2.UserControllerTest do
   test "GET /v2/users/~:username - user token", %{conn: conn, archer: archer} do
     conn = get(conn, user_path(conn, :show, "~#{archer.username}"))
     assert %{"name" => "Sterling Archer"} = json_response(conn, 200)["users"]
+  end
+
+  test "GET /v2/users/~:username - when blocked", context do
+    Redis.command(["SADD", "user:#{context.user.id}:block_id_cache", context.archer.id])
+
+    conn = auth_conn(context.unauth_conn, context.user)
+    conn = get(conn, user_path(conn, :show, context.archer))
+    assert conn.status == 404
+
+    Redis.command(["SREM", "user:#{context.user.id}:block_id_cache", context.archer.id])
+  end
+
+  test "GET /v2/users/~:username - when inverse blocked", context do
+    Redis.command(["SADD", "user:#{context.user.id}:inverse_block_id_cache", context.archer.id])
+
+    conn = auth_conn(context.unauth_conn, context.user)
+    conn = get(conn, user_path(conn, :show, context.archer))
+    assert conn.status == 404
+
+    Redis.command(["SREM", "user:#{context.user.id}:inverse_block_id_cache", context.archer.id])
   end
 end
