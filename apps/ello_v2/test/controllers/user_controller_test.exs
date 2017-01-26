@@ -31,7 +31,7 @@ defmodule Ello.V2.UserControllerTest do
     assert %{"name" => "Sterling Archer"} = json_response(conn, 200)["users"]
   end
 
-  test "GET /v2/users/~:username - when blocked", context do
+  test "GET /v2/users/:id - when blocked", context do
     Redis.command(["SADD", "user:#{context.user.id}:block_id_cache", context.archer.id])
 
     conn = auth_conn(context.unauth_conn, context.user)
@@ -41,7 +41,7 @@ defmodule Ello.V2.UserControllerTest do
     Redis.command(["SREM", "user:#{context.user.id}:block_id_cache", context.archer.id])
   end
 
-  test "GET /v2/users/~:username - when inverse blocked", context do
+  test "GET /v2/users/:id - when inverse blocked", context do
     Redis.command(["SADD", "user:#{context.user.id}:inverse_block_id_cache", context.archer.id])
 
     conn = auth_conn(context.unauth_conn, context.user)
@@ -49,5 +49,17 @@ defmodule Ello.V2.UserControllerTest do
     assert conn.status == 404
 
     Redis.command(["SREM", "user:#{context.user.id}:inverse_block_id_cache", context.archer.id])
+  end
+
+  test "GET /v2/users/:id - public token, private user ", %{unauth_conn: conn, archer: archer} do
+    archer
+    |> Ecto.Changeset.change(is_public: false)
+    |> Ello.Core.Repo.update!
+
+    conn = conn
+           |> public_conn
+           |> get(user_path(conn, :show, archer))
+
+    assert conn.status == 404
   end
 end

@@ -19,5 +19,6 @@ defmodule Ello.V2.UserController do
   defp can_view_user?(%{assigns: %{current_user: current_user}}, user) do
     not user.id in current_user.all_blocked_ids
   end
+  defp can_view_user?(_, %{is_public: false}), do: false
   defp can_view_user?(_, _), do: true
 end
