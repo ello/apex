@@ -5,13 +5,13 @@ defmodule Ello.V2.UserViewTest do
 
   setup %{conn: conn} do
     spying = Script.insert(:espionage_category)
-    archer = Script.build(:archer, categories: [spying]) |> Ello.Core.Network.User.Avatar.build
+    archer = Script.build(:archer, categories: [spying]) |> Ello.Core.Network.User.load_images
     user = Factory.build(:user, %{
       id: 1234,
       relationship_to_current_user: Factory.build(:relationship,
                                                   owner: archer,
                                                   priority: "friend")
-    }) |> Ello.Core.Network.User.Avatar.build
+    }) |> Ello.Core.Network.User.load_images
     {:ok, [
         conn: user_conn(conn, archer),
         archer: archer,
@@ -101,51 +101,51 @@ defmodule Ello.V2.UserViewTest do
       },
       cover_image: %{
         "original" => %{
-          "url" => "https://assets.ello.co/uploads/user/cover_image/42/ello-e76606cf-44b0-48b5-9918-1efad8e0272c.jpeg"
+          url: "https://assets.ello.co/uploads/user/cover_image/42/ello-e76606cf-44b0-48b5-9918-1efad8e0272c.jpeg"
         },
         "optimized" => %{
-          "url" => "https://assets.ello.co/uploads/user/cover_image/42/ello-optimized-061fb4e4.jpg",
-          "metadata" => %{
-            "size" => 1_177_127,
-            "type" => "image/jpeg",
-            "width" => 1880,
-            "height" => 1410
+          url: "https://assets.ello.co/uploads/user/cover_image/42/ello-optimized-061fb4e4.jpg",
+          metadata: %{
+            size: 1_177_127,
+            type: "image/jpeg",
+            width: 1880,
+            height: 1410
           }
         },
         "xhdpi" => %{
-          "url" => "https://assets.ello.co/uploads/user/cover_image/42/ello-xhdpi-061fb4e4.jpg",
-          "metadata" => %{
-            "size" => 582_569,
-            "type" => "image/jpeg",
-            "width" => 1116,
-            "height" => 837
+          url: "https://assets.ello.co/uploads/user/cover_image/42/ello-xhdpi-061fb4e4.jpg",
+          metadata: %{
+            size: 582_569,
+            type: "image/jpeg",
+            width: 1116,
+            height: 837
           }
         },
         "hdpi" => %{
-          "url" => "https://assets.ello.co/uploads/user/cover_image/42/ello-hdpi-061fb4e4.jpg",
-          "metadata" => %{
-            "size" => 150_067,
-            "type" => "image/jpeg",
-            "width" => 552,
-            "height" => 414
+          url: "https://assets.ello.co/uploads/user/cover_image/42/ello-hdpi-061fb4e4.jpg",
+          metadata: %{
+            size: 150_067,
+            type: "image/jpeg",
+            width: 552,
+            height: 414
           }
         },
         "mdpi" => %{
-          "url" => "https://assets.ello.co/uploads/user/cover_image/42/ello-mdpi-061fb4e4.jpg",
-          "metadata" => %{
-            "size" => 40_106,
-            "type" => "image/jpeg",
-            "width" => 276,
-            "height" => 207
+          url: "https://assets.ello.co/uploads/user/cover_image/42/ello-mdpi-061fb4e4.jpg",
+          metadata: %{
+            size: 40_106,
+            type: "image/jpeg",
+            width: 276,
+            height: 207
           }
         },
         "ldpi" => %{
-          "url" => "https://assets.ello.co/uploads/user/cover_image/42/ello-ldpi-061fb4e4.jpg",
-          "metadata" => %{
-            "size" => 10_872,
-            "type" => "image/jpeg",
-            "width" => 132,
-            "height" => 99
+          url: "https://assets.ello.co/uploads/user/cover_image/42/ello-ldpi-061fb4e4.jpg",
+          metadata: %{
+            size: 10_872,
+            type: "image/jpeg",
+            width: 132,
+            height: 99
           }
         }
       },

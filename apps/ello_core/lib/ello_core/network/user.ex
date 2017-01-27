@@ -2,6 +2,7 @@ defmodule Ello.Core.Network.User do
   use Ecto.Schema
   alias Ello.Core.Redis
   alias Ello.Core.Network.{Relationship, User}
+  alias User.{Avatar, CoverImage, Settings}
 
   @type t :: %__MODULE__{}
 
@@ -20,6 +21,7 @@ defmodule Ello.Core.Network.User do
     field :avatar_struct, :map, virtual: true
     field :avatar, :string
     field :avatar_metadata, :map
+    field :cover_image_struct, :map, virtual: true
     field :cover_image, :string
     field :cover_image_metadata, :map
     field :background_position, :string
@@ -33,7 +35,7 @@ defmodule Ello.Core.Network.User do
     field :created_at, Ecto.DateTime
     field :updated_at, Ecto.DateTime
 
-    embeds_one :settings, User.Settings
+    embeds_one :settings, Settings
     has_many :relationships, Relationship, foreign_key: :owner_id
     has_many :inverse_relationships, Relationship, foreign_key: :subject_id
 
@@ -50,6 +52,16 @@ defmodule Ello.Core.Network.User do
     field :inverse_blocked_ids, {:array, :integer}, default: [], virtual: true
     field :blocked_ids, {:array, :integer}, default: [], virtual: true
     field :all_blocked_ids, {:array, :integer}, default: [], virtual: true
+  end
+
+  @doc """
+  Converts image metadata into avatar and cover image structs
+  """
+  @spec load_images(user :: t) :: t
+  def load_images(user) do
+    user
+    |> Map.put(:avatar_struct, Avatar.from_user(user))
+    |> Map.put(:cover_image_struct, CoverImage.from_user(user))
   end
 
   @doc """
