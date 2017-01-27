@@ -6,6 +6,7 @@ defmodule Ello.Core.Redis do
   Each worker can handle multiple concurrent requests, so this is more of a
   load balancing technique then a real "checkout" style pool.
   """
+  import NewRelicPhoenix, only: [measure_segment: 2]
 
   @doc "Start supervisor"
   def start_link, do: Supervisor.start_link(__MODULE__, [])
@@ -19,8 +20,10 @@ defmodule Ello.Core.Redis do
   end
 
   @doc "Execute any redis command and get response back."
-  def command(command) do
-    Redix.command(random_worker(), command)
+  def command([operation | _] = command, opts \\ []) do
+    measure_segment {:db, "Redis.#{operation}-#{opts[:name] || "unnamed"}"} do
+      Redix.command(random_worker(), command)
+    end
   end
 
   defp random_worker do

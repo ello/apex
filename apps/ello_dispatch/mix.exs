@@ -28,7 +28,7 @@ defmodule Ello.Dispatch.Mixfile do
       {:phoenix, "~> 1.2"},
       {:honeybadger, "~> 0.1"},
 
-      {:discorelic, github: "nogates/discorelic"},
+      {:newrelic_phoenix, github: "ello/newrelic_phoenix", branch: "master"},
 
       {:ello_v2, in_umbrella: true},
     ]

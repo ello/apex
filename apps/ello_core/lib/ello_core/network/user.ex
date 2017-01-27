@@ -67,12 +67,12 @@ defmodule Ello.Core.Network.User do
   end
 
   defp blocked_ids(%__MODULE__{id: id}) do
-    {:ok, ids} = Redis.command(["SMEMBERS", "user:#{id}:block_id_cache"])
+    {:ok, ids} = Redis.command(["SMEMBERS", "user:#{id}:block_id_cache"], name: :blocked_ids)
     Enum.map(ids, &String.to_integer/1)
   end
 
   defp inverse_blocked_ids(%__MODULE__{id: id}) do
-    {:ok, ids} = Redis.command(["SMEMBERS", "user:#{id}:inverse_block_id_cache"])
+    {:ok, ids} = Redis.command(["SMEMBERS", "user:#{id}:inverse_block_id_cache"], name: :inverse_blocked_ids)
     Enum.map(ids, &String.to_integer/1)
   end
 end
