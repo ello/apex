@@ -84,7 +84,7 @@ defmodule Ello.Core.Network do
     do: hd(prefetch_user_counts([user]))
   defp prefetch_user_counts(users) do
     # Get counts from redis
-    {:ok, counts} = Redis.command(["MGET" | count_keys_for_users(users)])
+    {:ok, counts} = Redis.command(["MGET" | count_keys_for_users(users)], name: :user_counts)
 
     # Add counts to users
     counts

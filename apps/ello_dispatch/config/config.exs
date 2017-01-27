@@ -6,7 +6,7 @@ config :ello_dispatch, Ello.Dispatch.Endpoint,
   url:  [host: System.get_env("ELLO_DOMAIN") || "localhost"],
   http: [port: System.get_env("PORT") || 5000],
   render_errors: [view: Ello.Dispatch.ErrorView, accepts: ~w(json)],
-  instrumenters: [Ello.Dispatch.NewRelic]
+  instrumenters: [NewRelicPhoenix.Endpoint]
 
 config :ello_dispatch,
   ecto_repos: []
@@ -16,9 +16,9 @@ env_name = System.get_env("ENVIRONMENT_NAME") || Mix.env
 config :honeybadger,
   environment_name: env_name
 
-config :discorelic,
+config :newrelic_phoenix,
   application_name: "Elixir API - #{env_name}",
-  license_key: System.get_env("NEW_RELIC_LICENSE_KEY")
+  license_key: {:system, "NEW_RELIC_LICENSE_KEY"}
 
 
 import_config "#{Mix.env}.exs"
