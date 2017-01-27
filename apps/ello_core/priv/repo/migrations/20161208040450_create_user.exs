@@ -22,7 +22,9 @@ defmodule Ello.Repo.Migrations.CreateUser do
       add :background_position, :string
 
       add :is_system_user, :boolean, default: false
+      add :is_staff, :boolean, default: false
       add :is_public, :boolean, default: true
+      add :has_experimental_features, :boolean, default: false
       add :bad_for_seo?, :boolean, default: true
       add :category_ids, {:array, :integer}
 
@@ -43,8 +45,6 @@ defmodule Ello.Repo.Migrations.CreateUser do
       # t.datetime "confirmed_at"
       # t.datetime "confirmation_sent_at"
       # t.string   "unconfirmed_email",              limit: 255
-      # t.boolean  "has_experimental_features",                  default: false, null: false
-      # t.boolean  "is_staff",                                   default: false, null: false
       # t.boolean  "is_featured",                                default: false
       # t.string   "avatar_tmp",                     limit: 255
       # t.string   "cover_image_tmp",                limit: 255

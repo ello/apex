@@ -2,10 +2,10 @@ defmodule Ello.V2.CategoryControllerTest do
   use Ello.V2.ConnCase
 
   setup %{conn: conn} do
-    archer = Script.insert(:archer)
     Script.insert(:featured_category)
-    Script.insert(:espionage_category)
     Script.insert(:lacross_category)
+    spying = Script.insert(:espionage_category)
+    archer = Script.insert(:archer, category_ids: [spying.id])
     {:ok, conn: auth_conn(conn, archer), unauth_conn: conn}
   end
 

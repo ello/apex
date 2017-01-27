@@ -55,4 +55,11 @@ defmodule Ello.Core.DiscoveryTest do
     assert context.inactive.id in cat_ids
     assert context.meta.id     in cat_ids
   end
+
+  test "categories_by_ids/1", context do
+    cats = Discovery.categories_by_ids([context.active1.id, context.inactive.id])
+    cat_ids = Enum.map(cats, &(&1.id))
+    assert context.active1.id  in cat_ids
+    refute context.inactive.id in cat_ids
+  end
 end

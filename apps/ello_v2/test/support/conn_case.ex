@@ -22,7 +22,7 @@ defmodule Ello.V2.ConnCase do
       use Phoenix.ConnTest
 
       import Ello.V2.Router.Helpers
-      import Ello.V2.ConnCase, only: [auth_conn: 2, user_conn: 2]
+      import Ello.V2.ConnCase, only: [auth_conn: 2, user_conn: 2, public_conn: 1]
       alias Ello.Core.{Factory, Factory.Script}
 
       # The default endpoint for testing
@@ -44,6 +44,13 @@ defmodule Ello.V2.ConnCase do
   """
   def auth_conn(conn, user) do
     Plug.Conn.put_req_header(conn, "authorization", "Bearer #{JWT.generate(user)}")
+  end
+
+  @doc """
+  Takes a conn retuns a conn with a public JWT token included.
+  """
+  def public_conn(conn) do
+    Plug.Conn.put_req_header(conn, "authorization", "Bearer #{JWT.generate()}")
   end
 
   @doc """

@@ -25,7 +25,4 @@ defmodule Ello.V2.CategoryController do
   defp categories(%{"all" => _}, conn),  do: Discovery.categories(current_user(conn), meta: true, inactive: true)
   defp categories(%{"meta" => _}, conn), do: Discovery.categories(current_user(conn), meta: true)
   defp categories(_, conn),              do: Discovery.categories(current_user(conn))
-
-  defp current_user(%{assigns: %{current_user: user}}), do: user
-  defp current_user(_), do: nil
 end

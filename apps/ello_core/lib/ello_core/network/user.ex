@@ -1,6 +1,9 @@
 defmodule Ello.Core.Network.User do
   use Ecto.Schema
+  alias Ello.Core.Redis
   alias Ello.Core.Network.{Relationship, User}
+
+  @type t :: %__MODULE__{}
 
   schema "users" do
     field :email, :string
@@ -24,6 +27,7 @@ defmodule Ello.Core.Network.User do
     field :is_public, :boolean, default: true
     field :bad_for_seo?, :boolean, default: true
     field :category_ids, {:array, :integer}, default: []
+    field :categories, {:array, :map}, default: [], virtual: true
 
     field :created_at, Ecto.DateTime
     field :updated_at, Ecto.DateTime
@@ -35,10 +39,40 @@ defmodule Ello.Core.Network.User do
     # Used to eager load user's relationship to current user.
     has_one :relationship_to_current_user, Relationship, foreign_key: :subject_id
 
-    # Used to hold user counts retreived from user
+    # Used to hold user counts retreived from Redis
     field :loves_count, :integer, virtual: true
     field :posts_count, :integer, virtual: true
     field :following_count, :integer, virtual: true
     field :followers_count, :integer, virtual: true
+
+    # Used to hold blocked ids retreived from Redis
+    field :inverse_blocked_ids, {:array, :integer}, default: [], virtual: true
+    field :blocked_ids, {:array, :integer}, default: [], virtual: true
+    field :all_blocked_ids, {:array, :integer}, default: [], virtual: true
+  end
+
+  @doc """
+  Load blocked and inverse blocked ids.
+
+  Typically used on current user to ensure no blocked users/posts are returned.
+  """
+  @spec preload_blocked_ids(user :: t) :: t
+  def preload_blocked_ids(%__MODULE__{id: nil} = user), do: user
+  def preload_blocked_ids(%__MODULE__{} = user) do
+    user = user
+           |> Map.put(:inverse_blocked_ids, inverse_blocked_ids(user))
+           |> Map.put(:blocked_ids, blocked_ids(user))
+
+    Map.put(user, :all_blocked_ids, user.inverse_blocked_ids ++ user.blocked_ids)
+  end
+
+  defp blocked_ids(%__MODULE__{id: id}) do
+    {:ok, ids} = Redis.command(["SMEMBERS", "user:#{id}:block_id_cache"])
+    Enum.map(ids, &String.to_integer/1)
+  end
+
+  defp inverse_blocked_ids(%__MODULE__{id: id}) do
+    {:ok, ids} = Redis.command(["SMEMBERS", "user:#{id}:inverse_block_id_cache"])
+    Enum.map(ids, &String.to_integer/1)
   end
 end
