@@ -21,7 +21,7 @@ defmodule Ello.V2.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {Ello.V2, []},
-     applications: [:phoenix, :phoenix_pubsub, :cowboy, :logger, :gettext]]
+     applications: [:phoenix, :phoenix_pubsub, :cowboy, :logger, :gettext, :httpoison]]
   end
 
   # Specifies which paths to compile per environment.
@@ -37,6 +37,8 @@ defmodule Ello.V2.Mixfile do
       {:phoenix_pubsub, "~> 1.0"},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
+      {:ex_json_schema, "~> 0.5.3", only: :test},
+      {:httpoison, "~> 0.11.0"},
 
       {:ello_core, in_umbrella: true},
       {:ello_auth, in_umbrella: true},

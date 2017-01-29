@@ -12,3 +12,10 @@ config :ello_v2,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+
+# Get json schemas from ninja.
+config :ex_json_schema,
+  :remote_schema_resolver, fn(url) ->
+    Ello.V2.JsonSchema.resolve(url)
+  end
