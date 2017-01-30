@@ -2,6 +2,7 @@ defmodule Ello.V2.PromotionalViewTest do
   use Ello.V2.ConnCase, async: true
   import Phoenix.View #For render/2
   alias Ello.V2.PromotionalView
+  alias Ello.Core.Discovery.Promotional
 
   test "promotional.json - it renders with an image" do
     expected = %{
@@ -52,7 +53,7 @@ defmodule Ello.V2.PromotionalViewTest do
   end
 
   def promo do
-    Factory.build(:promotional, %{
+    Promotional.load_images(Factory.build(:promotional, %{
       id: 41,
       category_id: 2,
       user_id: 1,
@@ -77,6 +78,6 @@ defmodule Ello.V2.PromotionalViewTest do
           "height" => 414,
         }
       },
-    }) |> Ello.Core.Discovery.Promotional.load_images
+    }))
   end
 end
