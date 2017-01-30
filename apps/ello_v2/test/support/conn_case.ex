@@ -30,7 +30,7 @@ defmodule Ello.V2.ConnCase do
     end
   end
 
-  setup tags do
+  setup _tags do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Ello.Core.Repo)
     conn = Phoenix.ConnTest.build_conn()
            |> Plug.Conn.put_req_header("accept", "application/json")

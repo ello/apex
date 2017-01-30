@@ -17,7 +17,7 @@ defmodule Ello.V2.ImageView do
       ])
   """
 
-  def render("image.json", %{conn: conn, image: image}) do
+  def render("image.json", %{conn: _conn, image: image}) do
     image.versions
     |> Enum.reduce(%{}, &render_version2(&1, &2, image))
     |> Map.put("original", %{url: image_url2(image.path, image.filename)})

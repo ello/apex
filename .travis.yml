@@ -8,6 +8,7 @@ addons:
 services:
   - redis-server
 script:
+- mix compile --warnings-as-errors
 - mix credo -a
 - mix test
 notifications:
