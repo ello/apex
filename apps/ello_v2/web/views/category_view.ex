@@ -8,7 +8,7 @@ defmodule Ello.V2.CategoryView do
     %{
       categories: render_many(categories, __MODULE__, "category.json", conn: conn),
       linked: %{
-        promotionals: render_many(promotionals, PromotionalView, "promotional.json"),
+        promotionals: render_many(promotionals, PromotionalView, "promotional.json", conn: conn),
         users: render_many(users, UserView, "user.json", conn: conn),
       }
     }
@@ -19,7 +19,7 @@ defmodule Ello.V2.CategoryView do
     %{
       categories: render_one(category, __MODULE__, "category.json", conn: conn),
       linked: %{
-        promotionals: render_many(category.promotionals, PromotionalView, "promotional.json"),
+        promotionals: render_many(category.promotionals, PromotionalView, "promotional.json", conn: conn),
         users: render_many(users, UserView, "user.json", conn: conn),
       }
     }

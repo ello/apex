@@ -37,7 +37,7 @@ defmodule Ello.Core.Factory do
       user: build(:user),
       created_at: Ecto.DateTime.utc,
       updated_at: Ecto.DateTime.utc,
-    }
+    } |> Promotional.load_images
   end
 
   def relationship_factory do

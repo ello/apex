@@ -2,6 +2,7 @@ defmodule Ello.Core.Discovery.Promotional do
   use Ecto.Schema
   alias Ello.Core.Discovery.Category
   alias Ello.Core.Network.User
+  alias __MODULE__.PromotionalImage
 
   @type t :: %__MODULE__{}
 
@@ -21,6 +22,6 @@ defmodule Ello.Core.Discovery.Promotional do
   """
   @spec load_images(promo :: t) :: t
   def load_images(promo) do
-    promo
+    Map.put(promo, :image_struct, PromotionalImage.from_promo(promo))
   end
 end

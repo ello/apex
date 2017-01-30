@@ -17,23 +17,38 @@ defmodule Ello.V2.PromotionalViewTest do
       },
       image: %{
         "hdpi" => %{
-          "metadata" => %{"height" => 414, "size" => 93_161, "type" => "image/jpeg", "width" => 414},
-          "url" => "https://assets.ello.co/uploads/promotional/image/41/ello-hdpi-01c119b5.jpg"
+          metadata: %{
+            height: 414,
+            size: 93_161,
+            type: "image/jpeg",
+            width: 414,
+          },
+          url: "https://assets.ello.co/uploads/promotional/image/41/ello-hdpi-01c119b5.jpg"
         },
         "optimized" => %{
-          "metadata" => %{"height" => 800, "size" => 266_621, "type" => "image/jpeg", "width" => 800},
-          "url" => "https://assets.ello.co/uploads/promotional/image/41/ello-optimized-01c119b5.jpg"
+          metadata: %{
+            height: 800,
+            size: 266_621,
+            type: "image/jpeg",
+            width: 800
+          },
+          url: "https://assets.ello.co/uploads/promotional/image/41/ello-optimized-01c119b5.jpg"
         },
         "original" => %{
-          "url" => "https://assets.ello.co/uploads/promotional/image/41/ello-optimized-da955f87.jpg"
+          url: "https://assets.ello.co/uploads/promotional/image/41/ello-optimized-da955f87.jpg"
         },
         "xhdpi" => %{
-          "metadata" => %{"height" => 800, "size" => 267_149, "type" => "image/jpeg", "width" => 800},
-          "url" => "https://assets.ello.co/uploads/promotional/image/41/ello-xhdpi-01c119b5.jpg"
+          metadata: %{
+            height: 800,
+            size: 267_149,
+            type: "image/jpeg",
+            width: 800
+          },
+          url: "https://assets.ello.co/uploads/promotional/image/41/ello-xhdpi-01c119b5.jpg"
         }
       }
     }
-    assert render(PromotionalView, "promotional.json", promotional: promo()) == expected
+    assert render(PromotionalView, "promotional.json", promotional: promo(), conn: build_conn()) == expected
   end
 
   def promo do
@@ -62,6 +77,6 @@ defmodule Ello.V2.PromotionalViewTest do
           "height" => 414,
         }
       },
-    })
+    }) |> Ello.Core.Discovery.Promotional.load_images
   end
 end
