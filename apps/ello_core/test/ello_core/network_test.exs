@@ -1,6 +1,7 @@
 defmodule Ello.Core.NetworkTest do
   use Ello.Core.Case
   alias Ecto.Association.NotLoaded
+  alias Ello.Core.Image
 
   setup do
     current = Factory.insert(:user)
@@ -27,6 +28,8 @@ defmodule Ello.Core.NetworkTest do
     assert user.posts_count == 11
     assert user.loves_count == 12
     assert user.relationship_to_current_user.__struct__ == NotLoaded
+    assert %Image{} = user.avatar_struct
+    assert %Image{} = user.cover_image_struct
   end
 
   test "user/2 - username- without current user", context do
@@ -39,6 +42,8 @@ defmodule Ello.Core.NetworkTest do
     assert user.posts_count == 11
     assert user.loves_count == 12
     assert user.relationship_to_current_user.__struct__ == NotLoaded
+    assert %Image{} = user.avatar_struct
+    assert %Image{} = user.cover_image_struct
   end
 
   test "user/2 - with current user", context do
@@ -51,6 +56,8 @@ defmodule Ello.Core.NetworkTest do
     assert user.posts_count == 11
     assert user.loves_count == 12
     assert user.relationship_to_current_user.priority == "friend"
+    assert %Image{} = user.avatar_struct
+    assert %Image{} = user.cover_image_struct
   end
 
   test "users/2 - with current user", context do
@@ -76,6 +83,8 @@ defmodule Ello.Core.NetworkTest do
     assert u3.loves_count == 12
     assert u3.relationship_to_current_user == nil
     assert context.category.id in Enum.map(u3.categories, &(&1.id))
+    assert %Image{} = u3.avatar_struct
+    assert %Image{} = u3.cover_image_struct
 
     Enum.each user_ids, fn(id) ->
       Redis.command(["DEL", "user:#{id}:posts_counter"])
@@ -96,6 +105,8 @@ defmodule Ello.Core.NetworkTest do
     assert u1.loves_count == 12
     assert u1.relationship_to_current_user.__struct__ == NotLoaded
     assert u1.categories == []
+    assert %Image{} = u1.avatar_struct
+    assert %Image{} = u1.cover_image_struct
 
     assert u2.posts_count == 11
     assert u2.loves_count == 12

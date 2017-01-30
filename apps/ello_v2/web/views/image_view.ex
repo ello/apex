@@ -11,9 +11,8 @@ defmodule Ello.V2.ImageView do
   Usage:
 
       render(Ello.V2.ImageView, :image, [
-        model:      model,      # The wrapping struct
-        attribute: :tile_image, # The field which stores the image
-        conn:      conn         # The connection - for determining pixelation.
+        image: user.avatar_struct, # An %Ello.Core.Image{} struct
+        conn:  conn                # The conn - for determining pixelation.
       ])
   """
 
@@ -38,9 +37,15 @@ defmodule Ello.V2.ImageView do
   defp render_version2(version, results, image) do
     Map.put(results, version.name, %{
       url:      image_url2(image.path, version.filename),
-      metadata: Map.take(version, [:height, :width, :size, :type]),
+      metadata: metadata(version)
     })
   end
+
+  defp metadata(%{height: nil, width: nil, size: nil, type: nil}), do: nil
+  defp metadata(version) do
+    Map.take(version, [:height, :width, :size, :type])
+  end
+
   defp render_version({version, meta}, versions, model, image, attr) do
     Map.put(versions, version, %{
       "url"      => image_url(model, image, attr, version, meta["type"]),

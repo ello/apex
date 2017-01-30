@@ -13,7 +13,7 @@ defmodule Ello.Core.Factory do
 
       created_at: Ecto.DateTime.utc,
       updated_at: Ecto.DateTime.utc,
-    } |> Ello.Core.Network.User.load_images
+    } |> User.load_images
   end
 
   def category_factory do
@@ -27,7 +27,7 @@ defmodule Ello.Core.Factory do
       promotionals: [build(:promotional)],
       created_at:   Ecto.DateTime.utc,
       updated_at:   Ecto.DateTime.utc,
-    }
+    } |> Category.load_images
   end
 
   def promotional_factory do
@@ -121,7 +121,7 @@ defmodule Ello.Core.Factory do
         settings: %User.Settings{
           views_adult_content: true,
         }
-      } |> Ello.Core.Network.User.load_images
+      } |> User.load_images
     end
 
 
@@ -138,11 +138,12 @@ defmodule Ello.Core.Factory do
         uses_page_promotionals: true,
         created_at: Ecto.DateTime.utc,
         updated_at: Ecto.DateTime.utc,
-      }
+      } |> Category.load_images
     end
 
     def espionage_category_factory do
       %Category{
+        id: 100_000,
         name: "Espionage",
         slug: "espionage",
         cta_caption: nil,
@@ -155,11 +156,12 @@ defmodule Ello.Core.Factory do
         created_at: Ecto.DateTime.utc,
         updated_at: Ecto.DateTime.utc,
         promotionals: [],
-      }
+      } |> Category.load_images
     end
 
     def lacross_category_factory do
       %Category{
+        id: 100_001,
         name: "Lacross",
         slug: "lacross",
         cta_caption: nil,
@@ -193,7 +195,7 @@ defmodule Ello.Core.Factory do
           },
         },
         promotionals: [Ello.Core.Factory.build(:promotional)]
-      }
+      } |> Category.load_images
     end
   end
 end

@@ -1,6 +1,9 @@
 defmodule Ello.Core.Discovery.Category do
   use Ecto.Schema
   alias Ello.Core.Discovery.Promotional
+  alias __MODULE__.TileImage
+
+  @type t :: %__MODULE__{}
 
   schema "categories" do
     field :name, :string
@@ -11,6 +14,7 @@ defmodule Ello.Core.Discovery.Category do
     field :updated_at, Ecto.DateTime
     field :tile_image, :string
     field :tile_image_metadata, :map
+    field :tile_image_struct, :map, virtual: true
     field :allow_in_onboarding, :boolean, default: false
     field :description, :string
     field :is_sponsored, :boolean, default: false
@@ -20,5 +24,13 @@ defmodule Ello.Core.Discovery.Category do
     field :uses_page_promotionals, :boolean
 
     has_many :promotionals, Promotional
+  end
+
+  @doc """
+  Converts image metadata into title_image_struct
+  """
+  @spec load_images(category :: t) :: t
+  def load_images(category) do
+    Map.put(category, :tile_image_struct, TileImage.from_category(category))
   end
 end

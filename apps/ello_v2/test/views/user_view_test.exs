@@ -5,13 +5,13 @@ defmodule Ello.V2.UserViewTest do
 
   setup %{conn: conn} do
     spying = Script.insert(:espionage_category)
-    archer = Script.build(:archer, categories: [spying]) |> Ello.Core.Network.User.load_images
+    archer = Script.build(:archer, categories: [spying])
     user = Factory.build(:user, %{
       id: 1234,
       relationship_to_current_user: Factory.build(:relationship,
                                                   owner: archer,
                                                   priority: "friend")
-    }) |> Ello.Core.Network.User.load_images
+    })
     {:ok, [
         conn: user_conn(conn, archer),
         archer: archer,
