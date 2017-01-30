@@ -1,7 +1,7 @@
 defmodule Ello.Core.Discovery do
   import Ecto.Query
   alias Ello.Core.{Repo, Network, Discovery}
-  alias Discovery.Category
+  alias Discovery.{Category, Promotional}
   alias Network.User
 
   @moduledoc """
@@ -17,11 +17,13 @@ defmodule Ello.Core.Discovery do
     Category
     |> Repo.get_by!(slug: slug)
     |> include_promotionals(current_user)
+    |> load_images
   end
   def category(id, current_user) when is_number(id) do
     Category
     |> Repo.get!(id)
     |> include_promotionals(current_user)
+    |> load_images
   end
 
   def categories_by_ids(ids) when is_list(ids) do
@@ -30,6 +32,7 @@ defmodule Ello.Core.Discovery do
     |> include_inactive_categories(false)
     |> include_meta_categories(false)
     |> Repo.all
+    |> load_images
   end
 
   @doc """
@@ -46,6 +49,7 @@ defmodule Ello.Core.Discovery do
     |> priority_order
     |> Repo.all
     |> include_promotionals(current_user)
+    |> load_images
   end
 
   # Category Scopes
@@ -62,5 +66,17 @@ defmodule Ello.Core.Discovery do
 
   defp include_promotionals(categories, current_user) do
     Repo.preload(categories, promotionals: [user: &Network.users(&1, current_user)])
+  end
+
+  defp load_images(categories) when is_list(categories) do
+    Enum.map(categories, &load_images/1)
+  end
+  defp load_images(%Category{promotionals: promos} = category) when is_list(promos) do
+    category
+    |> Category.load_images
+    |> Map.put(:promotionals, Enum.map(promos, &Promotional.load_images/1))
+  end
+  defp load_images(%Category{} = category) do
+    Category.load_images(category)
   end
 end

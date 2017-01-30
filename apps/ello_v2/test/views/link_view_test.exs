@@ -5,9 +5,7 @@ defmodule Ello.V2.LinkViewTest do
 
   @social_icons_url Application.get_env(:ello_v2, :social_icons_url)
 
-  @lint false
-  defp test_links do
-    %{
+  @test_links %{
       "appstore.com/asdf/asdf" => [%{url: "http://appstore.com/asdf/asdf", text: "appstore.com/asdf/asdf", type: "Apple Store", icon: "#{@social_icons_url}/apple.png"}],
       "https://itunes.apple.com/app/apple-store/asdf" => [%{url: "https://itunes.apple.com/app/apple-store/asdf", text: "itunes.apple.com/app/apple-store/asdf", type: "Apple Store", icon: "#{@social_icons_url}/apple.png"}],
       "https://asdfband.bandcamp.com" => [%{url: "https://asdfband.bandcamp.com", text: "asdfband.bandcamp.com", type: "Bandcamp", icon: "#{@social_icons_url}/bandcamp.png"}],
@@ -48,10 +46,9 @@ defmodule Ello.V2.LinkViewTest do
       "https://www.youtube.com/user/asdf" => [%{url: "https://www.youtube.com/user/asdf", text: "www.youtube.com/user/asdf", type: "Youtube", icon: "#{@social_icons_url}/youtube.png"}],
       "https://www.youtube.com/channel/asdf" => [%{url: "https://www.youtube.com/channel/asdf", text: "www.youtube.com/channel/asdf", type: "Youtube", icon: "#{@social_icons_url}/youtube.png"}]
     }
-  end
 
   test "links.json - returns an array of sanitized links and icon data" do
-    Enum.each test_links(), fn {link, link_data} ->
+    Enum.each @test_links, fn {link, link_data} ->
       assert render(LinkView, "links.json", %{links: link}) == link_data
     end
   end

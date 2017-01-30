@@ -71,6 +71,7 @@ defmodule Ello.Core.Network do
     |> preload_current_user_relationship(current_user)
     |> prefetch_user_counts
     |> prefetch_categories
+    |> build_image_structs
   end
 
   defp preload_current_user_relationship(users, nil), do: users
@@ -128,5 +129,10 @@ defmodule Ello.Core.Network do
                           |> List.flatten
         Map.put(user, :categories, user_categories)
     end
+  end
+
+  defp build_image_structs(%User{} = user), do: User.load_images(user)
+  defp build_image_structs(users) do
+    Enum.map(users, &build_image_structs/1)
   end
 end

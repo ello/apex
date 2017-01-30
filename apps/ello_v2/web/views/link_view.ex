@@ -23,7 +23,7 @@ defmodule Ello.V2.LinkView do
   defp sanitize_text(link), do: String.replace(link, ~r/\Ahttps?:\/\//i, "")
 
   defp match_url_to_icon_and_format(url) do
-    icon_types
+    icon_types()
     |> Enum.find(&Regex.match?(&1.regex, url))
     |> format_link(url)
   end
