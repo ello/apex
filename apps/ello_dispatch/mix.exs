@@ -27,6 +27,7 @@ defmodule Ello.Dispatch.Mixfile do
       {:plug,   "~> 1.3"},
       {:phoenix, "~> 1.2"},
       {:honeybadger, "~> 0.1"},
+      {:cors_plug, "~> 1.1"},
 
       {:newrelic_phoenix, github: "ello/newrelic_phoenix", branch: "master"},
 

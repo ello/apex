@@ -18,6 +18,7 @@ defmodule Ello.Dispatch.Endpoint do
     json_decoder: Poison
 
   plug Plug.Head
+  plug CORSPlug
 
   plug Ello.Dispatch
 end
