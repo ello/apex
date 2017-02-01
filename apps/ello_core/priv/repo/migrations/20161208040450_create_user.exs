@@ -14,6 +14,8 @@ defmodule Ello.Repo.Migrations.CreateUser do
       add :location, :string
       add :location_lat, :float
       add :location_long, :float
+      add :locked_at, :utc_datetime
+      add :locked_reason, :string
 
       add :avatar, :string
       add :avatar_metadata, :json
@@ -50,12 +52,10 @@ defmodule Ello.Repo.Migrations.CreateUser do
       # t.string   "cover_image_tmp",                limit: 255
       # t.integer  "failed_attempts",                            default: 0
       # t.string   "unlock_token",                   limit: 255
-      # t.datetime "locked_at"
       # t.datetime "last_bounced_from_sendgrid_at"
       # t.datetime "last_bounced_from_mailchimp_at"
       # t.string   "web_onboarding_version",         limit: 255
       # t.integer  "followed_category_ids",                                   array: true
-      # t.string   "locked_reason"
     end
   end
 end
