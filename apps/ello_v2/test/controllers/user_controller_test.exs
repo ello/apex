@@ -53,6 +53,16 @@ defmodule Ello.V2.UserControllerTest do
     Redis.command(["SREM", "user:#{context.user.id}:inverse_block_id_cache", context.archer.id])
   end
 
+  test "GET /v2/users/:id - when locked", context do
+    context.archer
+    |> Ecto.Changeset.change(locked_at: Ecto.DateTime.utc)
+    |> Ello.Core.Repo.update!
+
+    conn = auth_conn(context.unauth_conn, context.user)
+    conn = get(conn, user_path(conn, :show, context.archer))
+    assert conn.status == 404
+  end
+
   test "GET /v2/users/:id - public token, private user ", %{unauth_conn: conn, archer: archer} do
     archer
     |> Ecto.Changeset.change(is_public: false)
