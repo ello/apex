@@ -7,7 +7,7 @@ defmodule Ello.V2.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/v2", Ello.V2 do
+  scope "/api/v2", Ello.V2 do
     pipe_through :api
 
     get "/ping", StatusController, :ping

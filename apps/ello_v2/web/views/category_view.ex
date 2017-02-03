@@ -4,7 +4,7 @@ defmodule Ello.V2.CategoryView do
 
   def render("index.json", %{categories: categories, conn: conn}) do
     promotionals = Enum.flat_map(categories, &(&1.promotionals))
-    users = Enum.map(promotionals, &(&1.user))
+    users = promotionals |> Enum.map(&(&1.user)) |> Enum.uniq_by(&(&1.id))
     %{
       categories: render_many(categories, __MODULE__, "category.json", conn: conn),
       linked: %{
@@ -15,7 +15,7 @@ defmodule Ello.V2.CategoryView do
   end
 
   def render("show.json", %{category: category, conn: conn}) do
-    users = Enum.map(category.promotionals, &(&1.user))
+    users = category.promotionals |> Enum.map(&(&1.user)) |> Enum.uniq_by(&(&1.id))
     %{
       categories: render_one(category, __MODULE__, "category.json", conn: conn),
       linked: %{
