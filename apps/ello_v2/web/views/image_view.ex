@@ -12,18 +12,29 @@ defmodule Ello.V2.ImageView do
       ])
   """
 
-  def render("image.json", %{conn: _conn, image: image}) do
+  def render("image.json", %{conn: conn, image: image}) do
     image.versions
-    |> Enum.reduce(%{}, &render_version(&1, &2, image))
+    |> Enum.reduce(%{}, &render_version(&1, &2, image, conn))
     |> Map.put("original", %{url: image_url(image.path, image.filename)})
   end
 
-  defp render_version(version, results, image) do
+  defp render_version(version, results, image, conn) do
     Map.put(results, version.name, %{
-      url:      image_url(image.path, version.filename),
+      url:      image_url(image.path, filename(version, image, conn)),
       metadata: metadata(version)
     })
   end
+
+  # content nsfw + no nsfw = pixellated
+  defp filename(version,
+                %{user: %{settings: %{posts_adult_content: true}}},
+                %{assigns: %{allow_nsfw: false}}), do: version.pixellated_filename
+  # content nudity + no nudity = pixellated
+  defp filename(version,
+                %{user: %{settings: %{posts_nudity: true}}},
+                %{assigns: %{allow_nudity: false}}), do: version.pixellated_filename
+  # _ + _ = normal
+  defp filename(version, _, _), do: version.filename
 
   defp metadata(%{height: nil, width: nil, size: nil, type: nil}), do: nil
   defp metadata(version) do

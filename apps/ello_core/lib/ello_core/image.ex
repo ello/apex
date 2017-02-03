@@ -4,7 +4,7 @@ defmodule Ello.Core.Image do
   @type t :: %__MODULE__{}
 
   defmodule Version do
-    defstruct [name: nil, width: nil, height: nil, size: nil, type: nil, filename: nil]
+    defstruct [name: nil, width: nil, height: nil, size: nil, type: nil, filename: nil, pixellated_filename: nil]
 
     def from_metadata(metadata, original_filename) do
       Enum.map metadata, fn({name, properties}) ->
@@ -15,6 +15,7 @@ defmodule Ello.Core.Image do
           size: properties["size"],
           type: properties["type"],
           filename: properties["filename"] || filename(original_filename, name, properties["type"]),
+          pixellated_filename: properties["filename"] || filename(original_filename, name <> "-pixellated", properties["type"]),
         }
       end
     end
