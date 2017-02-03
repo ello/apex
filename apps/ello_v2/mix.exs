@@ -39,6 +39,8 @@ defmodule Ello.V2.Mixfile do
       {:cowboy, "~> 1.0"},
       {:ex_json_schema, "~> 0.5.3", only: :test},
       {:httpoison, "~> 0.11.0"},
+      {:html_sanitize_ex, "~> 1.0.0"},
+      {:curtail, "~> 0.1"},
 
       {:ello_core, in_umbrella: true},
       {:ello_auth, in_umbrella: true},

@@ -30,7 +30,12 @@ defmodule Ello.V2.ImageView do
     Map.take(version, [:height, :width, :size, :type])
   end
 
-  defp image_url(path, filename) do
+  @doc """
+  Return a full URI given an image path and file name.
+
+  Handles domain sharding.
+  """
+  def image_url(path, filename) do
     filename
     |> asset_host
     |> URI.merge(path <> "/" <> filename)

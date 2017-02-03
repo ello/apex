@@ -24,7 +24,15 @@ defmodule Ello.V2.UserViewTest do
     archer_id = "#{context.archer.id}"
     spying_id = "#{context.spying.id}"
     assert %{
-      users: %{id: ^archer_id},
+      users: %{
+        id: ^archer_id,
+        meta_attributes: %{
+          description: "I have been spying for a while now",
+          image: "https://assets.ello.co/uploads/user/cover_image/42/ello-optimized-061fb4e4.jpg",
+          robots: "index, follow",
+          title: "Sterling Archer (@archer) | Ello"
+        },
+      },
       linked: %{
         categories: [%{id: ^spying_id}],
       }
