@@ -4,11 +4,12 @@ defmodule Ello.V2.UserView do
     CategoryView,
     ImageView,
     LinkView,
+    UserMetaAttributesView,
   }
 
   def render("show.json", %{user: user, conn: conn}) do
     %{
-      users: render_one(user, __MODULE__, "user.json", conn: conn),
+      users: render_one(user, __MODULE__, "user.json", conn: conn, meta: true),
       linked: %{
         categories: render_many(user.categories, CategoryView, "category.json", conn: conn),
       }
@@ -39,10 +40,11 @@ defmodule Ello.V2.UserView do
     :is_collaborateable,
   ]
 
-  def render("user.json", %{user: user, conn: conn}) do
+  def render("user.json", %{user: user, conn: conn} = opts) do
     user
     |> Map.take(@attributes)
     |> Map.merge(Map.take(user.settings, @settings_attributes))
+    |> add_meta(user, opts[:meta])
     |> Map.merge(%{
       id: "#{user.id}",
       name: name(user, conn),
@@ -53,9 +55,14 @@ defmodule Ello.V2.UserView do
       external_links_list: render(LinkView, "links.json", links: user.links),
       avatar: render(ImageView, "image.json", conn: conn, image: user.avatar_struct),
       cover_image: render(ImageView, "image.json", conn: conn, image: user.cover_image_struct),
-      links: links(user, conn)
+      links: links(user, conn),
     })
   end
+
+  defp add_meta(resp, user, true) do
+    Map.put(resp, :meta_attributes, render(UserMetaAttributesView, "user.json", user: user))
+  end
+  defp add_meta(resp, _, _), do: resp
 
   def links(user, _conn) do
     %{

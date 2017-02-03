@@ -9,9 +9,11 @@ defmodule Ello.Core.Network.User.CoverImage do
       filename: "ello-default.png",
       path:     "images/fallback/user/cover_image/#{default_image_id(user.id)}",
       versions: Image.Version.from_metadata(%{
-        "large"   => %{"filename" => "#{path}/ello-default-large.png"},
-        "regular" => %{"filename" => "#{path}/ello-default-regular.png"},
-        "small"   => %{"filename" => "#{path}/ello-default-small.png"},
+        "optimized" => %{"filename" => "#{path}/ello-default-optimized.png"},
+        "xhdpi"     => %{"filename" => "#{path}/ello-default-xhdpi.png"},
+        "hdpi"      => %{"filename" => "#{path}/ello-default-hdpi.png"},
+        "ldpi"      => %{"filename" => "#{path}/ello-default-ldpi.png"},
+        "mdpi"      => %{"filename" => "#{path}/ello-default-mdpi.png"},
       }, nil)
     }
   end
