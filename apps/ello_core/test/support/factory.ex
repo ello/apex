@@ -1,7 +1,8 @@
 defmodule Ello.Core.Factory do
-  alias Ello.Core.{Repo, Discovery, Network}
+  alias Ello.Core.{Repo, Discovery, Network, Content}
   alias Discovery.{Category, Promotional}
   alias Network.{User, Relationship}
+  alias Content.{Post}
   use ExMachina.Ecto, repo: Repo
 
   def user_factory do
@@ -14,6 +15,35 @@ defmodule Ello.Core.Factory do
       created_at: Ecto.DateTime.utc,
       updated_at: Ecto.DateTime.utc,
     } |> User.load_images
+  end
+
+  def post_factory do
+    %Post{
+      author:    build(:user),
+      token:     sequence(:post_token, &"testtoken#{&1}wouldberandom"),
+      seo_title: "test post",
+      is_adult_content: false,
+      is_disabled: false,
+      has_nudity: false,
+      is_saleable: false,
+
+      created_at: Ecto.DateTime.utc,
+      updated_at: Ecto.DateTime.utc,
+    }
+  end
+
+  def repost_factory do
+    post_factory()
+    |> Map.merge(%{
+      reposted_source: build(:post)
+    })
+  end
+
+  def comment_factory do
+    post_factory()
+    |> Map.merge(%{
+      parent_post: build(:post)
+    })
   end
 
   def category_factory do
