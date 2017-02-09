@@ -20,8 +20,8 @@ defmodule Ello.Core.Content.Post do
     field :created_at, Ecto.DateTime
     field :updated_at, Ecto.DateTime
 
-    field :rendered_content, :map
-    field :rendered_summary, :map
+    field :rendered_content, {:array, :map}
+    field :rendered_summary, {:array, :map}
 
     belongs_to :author, User
 
@@ -31,7 +31,8 @@ defmodule Ello.Core.Content.Post do
     belongs_to :parent_post, __MODULE__
     has_many :comments, __MODULE__, foreign_key: :parent_post_id
 
-    embeds_many :body, Block
+    field :body, {:array, :map}
+    # embeds_many :body, Block
   end
 
 end
