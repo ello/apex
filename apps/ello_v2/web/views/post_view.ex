@@ -9,6 +9,10 @@ defmodule Ello.V2.PostView do
    :is_adult_content,
    :body,
    :created_at,
+   :comments_count,
+   :loves_count,
+   :reposts_count,
+   :views_count,
   ]
 
   def render("show.json", %{post: post, conn: conn}) do
@@ -25,23 +29,11 @@ defmodule Ello.V2.PostView do
   #      :repost_path,
   #      :repost_via_id,
   #      :repost_via_path
-
-  # attributes :comments_count,
-  #            :loves_count,
-  #            :reposts_count,
-  #            :views_count,
-  #            :views_count_rounded,
-  #            group: :counts
-
-  # # current user state
-  # attributes :loved,
-  #            :reposted,
-  #            :watching,
-  #            group: :user_state
-
-  # # SEO meta tag attributes
-  # attributes :meta_attributes,
-  #            group: :meta_attributes
+  #      :views_count_rounded,
+  #      :loved,
+  #      :reposted,
+  #      :watching,
+  #      :meta_attributes,
   def render("post.json", %{post: post, conn: conn}) do
     post
     |> Map.take(@attributes)

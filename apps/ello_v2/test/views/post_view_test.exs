@@ -26,6 +26,10 @@ defmodule Ello.V2.PostViewTest do
       author_id: "#{user.id}",
       is_adult_content: post.is_adult_content,
       body: post.body,
+      loves_count: post.loves_count,
+      comments_count: post.comments_count,
+      reposts_count: post.reposts_count,
+      views_count: post.views_count,
       created_at: post.created_at,
       links: %{
         author: %{id: "#{user.id}",

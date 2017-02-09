@@ -33,6 +33,12 @@ defmodule Ello.Core.Content.Post do
 
     field :body, {:array, :map}
     # embeds_many :body, Block
+
+    # Used to hold post counts retreived from Redis
+    field :loves_count, :integer, virtual: true
+    field :comments_count, :integer, virtual: true
+    field :reposts_count, :integer, virtual: true
+    field :views_count, :integer, virtual: true
   end
 
 end
