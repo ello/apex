@@ -12,6 +12,8 @@ defmodule Ello.Core.Repo.Migrations.CreatePosts do
       add :is_saleable, :boolean
 
       add :body, :json
+      add :rendered_content, :json
+      add :rendered_summary, :json
 
       add :mentioned_usernames, {:array, :string}, default: []
       add :category_ids, {:array, :integer}, default: []

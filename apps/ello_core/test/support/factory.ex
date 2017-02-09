@@ -26,7 +26,17 @@ defmodule Ello.Core.Factory do
       is_disabled: false,
       has_nudity: false,
       is_saleable: false,
-
+      body: [%{"kind" => "text", "data" => "Phrasing!"}],
+      rendered_content: [%{
+                           "kind" => "text",
+                           "data" => "<p>Phrasing!</p>",
+                           "link_url" => nil
+                         }],
+      rendered_summary: [%{
+                           "kind" => "text",
+                           "data" => "<p>Phrasing!</p>",
+                           "link_url" => nil
+                         }],
       created_at: Ecto.DateTime.utc,
       updated_at: Ecto.DateTime.utc,
     }

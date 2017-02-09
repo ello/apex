@@ -20,6 +20,9 @@ defmodule Ello.Core.Content.Post do
     field :created_at, Ecto.DateTime
     field :updated_at, Ecto.DateTime
 
+    field :rendered_content, :map
+    field :rendered_summary, :map
+
     belongs_to :author, User
 
     belongs_to :reposted_source, __MODULE__
