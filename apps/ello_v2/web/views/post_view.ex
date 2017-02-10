@@ -4,6 +4,7 @@ defmodule Ello.V2.PostView do
     UserView,
   }
   alias Ello.V2.Util
+  alias Ello.Core.Content.Post
 
   @attributes [
     :token,
@@ -24,16 +25,20 @@ defmodule Ello.V2.PostView do
       }
     }
   end
-  #TODO: :content_warning,
+  #TODO:
+  #      :reposted,
+  #      :loved,
+  #      :watching,
+  #
+  #      :meta_attributes,
+  #
   #      :repost_content,
   #      :repost_id,
   #      :repost_path,
   #      :repost_via_id,
   #      :repost_via_path
-  #      :loved,
-  #      :reposted,
-  #      :watching,
-  #      :meta_attributes,
+  #
+  #      :content_warning,
   def render("post.json", %{post: post, conn: conn}) do
     post
     |> Map.take(@attributes)
@@ -46,10 +51,11 @@ defmodule Ello.V2.PostView do
       author_id: "#{post.author.id}",
       links: links(post, conn),
       views_count_rounded: Util.number_to_human(post.views_count),
+      reposted: reposted(post.repost_from_current_user),
     })
   end
 
-  def links(post, _conn) do
+  defp links(post, _conn) do
     %{
       author: %{
         id: "#{post.author.id}",
@@ -58,4 +64,7 @@ defmodule Ello.V2.PostView do
       },
     }
   end
+
+  defp reposted(nil), do: false
+  defp reposted(%Post{}), do: true
 end

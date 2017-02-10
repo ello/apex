@@ -5,7 +5,11 @@ defmodule Ello.V2.PostViewTest do
 
   setup %{conn: conn} do
     archer       = Script.build(:archer)
-    post         = Factory.build(:post, %{id: 1, author: archer})
+    post         = Factory.build(:post, %{
+      id: 1,
+      author: archer,
+      repost_from_current_user: nil,
+    })
     current_user = Factory.build(:user)
     {:ok, [
         conn: user_conn(conn, current_user),
@@ -32,6 +36,7 @@ defmodule Ello.V2.PostViewTest do
       views_count: 4_123,
       views_count_rounded: "4.12K",
       created_at: post.created_at,
+      reposted: false,
       links: %{
         author: %{id: "#{user.id}",
           type: "users",

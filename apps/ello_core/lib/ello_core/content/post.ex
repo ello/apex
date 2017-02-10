@@ -34,6 +34,10 @@ defmodule Ello.Core.Content.Post do
     field :body, {:array, :map}
     # embeds_many :body, Block
 
+    # has_one :love_from_current_user, Love, foreign_key: :subject_id
+    # has_one :watch_from_current_user, Watch, foreign_key: :subject_id
+    has_one :repost_from_current_user, __MODULE__, foreign_key: :reposted_source_id
+
     # Used to hold post counts retreived from Redis
     field :loves_count, :integer, virtual: true
     field :comments_count, :integer, virtual: true

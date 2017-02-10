@@ -1,4 +1,5 @@
 defmodule Ello.Core.Content do
+  import Ecto.Query
   alias Ello.Core.{
     Repo,
     Redis,
@@ -23,8 +24,20 @@ defmodule Ello.Core.Content do
 
   defp post_preloads(post_or_posts, current_user) do
     post_or_posts
-    |> Repo.preload(author: &Network.users(&1, current_user))
+    |> prefetch_author(current_user)
+    |> prefetch_current_user_repost(current_user)
     |> prefetch_post_counts
+  end
+
+  defp prefetch_author([], _), do: []
+  defp prefetch_author(post_or_posts, current_user) do
+    Repo.preload(post_or_posts, author: &Network.users(&1, current_user))
+  end
+
+  defp prefetch_current_user_repost(post_or_posts, nil), do: post_or_posts
+  defp prefetch_current_user_repost(post_or_posts, %{id: id}) do
+    current_user_repost_query = where(Post, author_id: ^id)
+    Repo.preload(post_or_posts, [repost_from_current_user: current_user_repost_query])
   end
 
   defp prefetch_post_counts([]), do: []
