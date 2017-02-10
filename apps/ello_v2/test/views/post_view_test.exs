@@ -2,7 +2,7 @@ defmodule Ello.V2.PostViewTest do
   use Ello.V2.ConnCase, async: true
   import Phoenix.View #For render/2
   alias Ello.V2.PostView
-  alias Ello.Core.Content.{Post,Love}
+  alias Ello.Core.Content.{Post,Love,Watch}
 
   setup %{conn: conn} do
     archer       = Script.build(:archer)
@@ -11,6 +11,7 @@ defmodule Ello.V2.PostViewTest do
       author: archer,
       repost_from_current_user: nil,
       love_from_current_user: nil,
+      watch_from_current_user: nil,
     })
     current_user = Factory.build(:user)
     {:ok, [
@@ -40,6 +41,7 @@ defmodule Ello.V2.PostViewTest do
       created_at: post.created_at,
       reposted: false,
       loved: false,
+      watched: false,
       links: %{
         author: %{id: "#{user.id}",
           type: "users",
@@ -51,14 +53,16 @@ defmodule Ello.V2.PostViewTest do
     )
   end
 
-  test "post.json - it renders the post loved and reposted", context do
+  test "post.json - it renders the post reposted loved watched", context do
     post = Map.merge(context.post, %{
       repost_from_current_user: %Post{},
       love_from_current_user: %Love{deleted: false},
+      watch_from_current_user: %Watch{},
     })
     assert %{
       reposted: true,
       loved: true,
+      watched: true,
     } = render(PostView, "post.json",
       post: post,
       conn: context.conn

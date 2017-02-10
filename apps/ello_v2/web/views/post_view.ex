@@ -4,7 +4,7 @@ defmodule Ello.V2.PostView do
     UserView,
   }
   alias Ello.V2.Util
-  alias Ello.Core.Content.{Post,Love}
+  alias Ello.Core.Content.{Post,Love,Watch}
 
   @attributes [
     :token,
@@ -26,8 +26,6 @@ defmodule Ello.V2.PostView do
     }
   end
   #TODO:
-  #      :watching,
-  #
   #      :meta_attributes,
   #
   #      :repost_content,
@@ -40,8 +38,7 @@ defmodule Ello.V2.PostView do
   def render("post.json", %{post: post, conn: conn}) do
     post
     |> Map.take(@attributes)
-    |> Map.merge(
-    %{
+    |> Map.merge(%{
       id: "#{post.id}",
       href: "/api/v2/posts/#{post.id}",
       summary: post.rendered_summary,
@@ -51,6 +48,7 @@ defmodule Ello.V2.PostView do
       views_count_rounded: Util.number_to_human(post.views_count),
       reposted: reposted(post.repost_from_current_user),
       loved: loved(post.love_from_current_user),
+      watched: watched(post.watch_from_current_user),
     })
   end
 
@@ -69,4 +67,7 @@ defmodule Ello.V2.PostView do
 
   defp loved(%Love{deleted: deleted}), do: !deleted
   defp loved(_), do: false
+
+  defp watched(%Watch{}), do: true
+  defp watched(_), do: false
 end

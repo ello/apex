@@ -8,6 +8,7 @@ defmodule Ello.Core.Content do
   alias __MODULE__.{
     Post,
     Love,
+    Watch,
   }
 
   @spec post(id_or_slug :: String.t | integer, current_user :: User.t | nil) :: Post.t
@@ -28,6 +29,7 @@ defmodule Ello.Core.Content do
     |> prefetch_author(current_user)
     |> prefetch_current_user_repost(current_user)
     |> prefetch_current_user_love(current_user)
+    |> prefetch_current_user_watch(current_user)
     |> prefetch_post_counts
   end
 
@@ -46,6 +48,12 @@ defmodule Ello.Core.Content do
   defp prefetch_current_user_love(post_or_posts, %{id: id}) do
     current_user_love_query = where(Love, user_id: ^id)
     Repo.preload(post_or_posts, [love_from_current_user: current_user_love_query])
+  end
+
+  defp prefetch_current_user_watch(post_or_posts, nil), do: post_or_posts
+  defp prefetch_current_user_watch(post_or_posts, %{id: id}) do
+    current_user_watch_query = where(Watch, user_id: ^id)
+    Repo.preload(post_or_posts, [watch_from_current_user: current_user_watch_query])
   end
 
   defp prefetch_post_counts([]), do: []
