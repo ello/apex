@@ -2,6 +2,7 @@ defmodule Ello.V2.PostViewTest do
   use Ello.V2.ConnCase, async: true
   import Phoenix.View #For render/2
   alias Ello.V2.PostView
+  alias Ello.Core.Content.{Post,Love}
 
   setup %{conn: conn} do
     archer       = Script.build(:archer)
@@ -9,6 +10,7 @@ defmodule Ello.V2.PostViewTest do
       id: 1,
       author: archer,
       repost_from_current_user: nil,
+      love_from_current_user: nil,
     })
     current_user = Factory.build(:user)
     {:ok, [
@@ -37,15 +39,42 @@ defmodule Ello.V2.PostViewTest do
       views_count_rounded: "4.12K",
       created_at: post.created_at,
       reposted: false,
+      loved: false,
       links: %{
         author: %{id: "#{user.id}",
           type: "users",
           href: "/api/v2/users/#{user.id}"}
       }
     } == render(PostView, "post.json",
-               post: context.post,
-               conn: context.conn
-             )
+      post: context.post,
+      conn: context.conn
+    )
+  end
+
+  test "post.json - it renders the post loved and reposted", context do
+    post = Map.merge(context.post, %{
+      repost_from_current_user: %Post{},
+      love_from_current_user: %Love{deleted: false},
+    })
+    assert %{
+      reposted: true,
+      loved: true,
+    } = render(PostView, "post.json",
+      post: post,
+      conn: context.conn
+    )
+  end
+
+  test "post.json - it renders the post not loved because love was deleted", context do
+    post = Map.merge(context.post, %{
+      love_from_current_user: %Love{deleted: true},
+    })
+    assert %{
+      loved: false,
+    } = render(PostView, "post.json",
+      post: post,
+      conn: context.conn
+    )
   end
 
   test "show.json - it renders post show", context do

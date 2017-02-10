@@ -25,11 +25,13 @@ defmodule Ello.Core.ContentTest do
     assert fetched_post.repost_from_current_user == nil
   end
 
-  test "post/2 - id - with user - has reposted", %{user: user, post: post} do
+  test "post/2 - id - with user - has loved and reposted", %{user: user, post: post} do
     repost = Factory.insert(:post, %{author: user, reposted_source: post})
+    love = Factory.insert(:love, %{post: post, user: user})
     fetched_post = Content.post(post.id, user)
     assert fetched_post.id == post.id
     assert fetched_post.repost_from_current_user.id == repost.id
+    assert fetched_post.love_from_current_user.id == love.id
   end
 
 end

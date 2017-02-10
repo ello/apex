@@ -4,7 +4,7 @@ defmodule Ello.V2.PostView do
     UserView,
   }
   alias Ello.V2.Util
-  alias Ello.Core.Content.Post
+  alias Ello.Core.Content.{Post,Love}
 
   @attributes [
     :token,
@@ -26,8 +26,6 @@ defmodule Ello.V2.PostView do
     }
   end
   #TODO:
-  #      :reposted,
-  #      :loved,
   #      :watching,
   #
   #      :meta_attributes,
@@ -52,6 +50,7 @@ defmodule Ello.V2.PostView do
       links: links(post, conn),
       views_count_rounded: Util.number_to_human(post.views_count),
       reposted: reposted(post.repost_from_current_user),
+      loved: loved(post.love_from_current_user),
     })
   end
 
@@ -65,6 +64,9 @@ defmodule Ello.V2.PostView do
     }
   end
 
-  defp reposted(nil), do: false
   defp reposted(%Post{}), do: true
+  defp reposted(_), do: false
+
+  defp loved(%Love{deleted: deleted}), do: !deleted
+  defp loved(_), do: false
 end

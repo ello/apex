@@ -2,7 +2,7 @@ defmodule Ello.Core.Factory do
   alias Ello.Core.{Repo, Discovery, Network, Content}
   alias Discovery.{Category, Promotional}
   alias Network.{User, Relationship}
-  alias Content.{Post}
+  alias Content.{Post,Love}
   use ExMachina.Ecto, repo: Repo
 
   def user_factory do
@@ -51,6 +51,15 @@ defmodule Ello.Core.Factory do
     |> Map.merge(%{
       reposted_source: build(:post)
     })
+  end
+
+  def love_factory do
+    %Love{
+      user: build(:user),
+      post: build(:post),
+      created_at: Ecto.DateTime.utc,
+      updated_at: Ecto.DateTime.utc,
+    }
   end
 
   def comment_factory do
