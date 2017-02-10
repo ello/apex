@@ -6,14 +6,14 @@ defmodule Ello.V2.PostView do
   alias Ello.V2.Util
 
   @attributes [
-   :token,
-   :is_adult_content,
-   :body,
-   :created_at,
-   :comments_count,
-   :loves_count,
-   :reposts_count,
-   :views_count,
+    :token,
+    :is_adult_content,
+    :body,
+    :created_at,
+    :loves_count,
+    :comments_count,
+    :reposts_count,
+    :views_count,
   ]
 
   def render("show.json", %{post: post, conn: conn}) do
