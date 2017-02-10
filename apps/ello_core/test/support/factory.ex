@@ -26,6 +26,10 @@ defmodule Ello.Core.Factory do
       is_disabled: false,
       has_nudity: false,
       is_saleable: false,
+      loves_count: 1,
+      comments_count: 2,
+      reposts_count: 3,
+      views_count: 4_123,
       body: [%{"kind" => "text", "data" => "Phrasing!"}],
       rendered_content: [%{
                            "kind" => "text",
