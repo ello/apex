@@ -7,7 +7,7 @@ defmodule Ello.V2.Util do
   def number_to_human(number, rounding \\ 2)
   def number_to_human(nil, _), do: ""
   def number_to_human(number, rounding) do
-    rounding_factor = :math.pow(10, rounding) |> round
+    rounding_factor = round(:math.pow(10, rounding))
 
     {divisor, suffix} =
       cond do
