@@ -3,7 +3,7 @@ defmodule Ello.Core.Network.User.Settings do
 
   # A required field for all embedded documents, shouldn't be an interop issue
   @primary_key {:id, :binary_id, autogenerate: true}
-  schema "" do
+  schema "settings" do
     field :is_public, :boolean, default: true
     field :is_hireable, :boolean, default: false
     field :is_collaborateable, :boolean, default: false
