@@ -112,4 +112,21 @@ defmodule Ello.Core.ContentTest do
     assert fetched_post.watch_from_current_user.id == watch.id
   end
 
+  test "post/4 - with user - has NSFW content_warning", %{user: user, nsfw_post: post} do
+    settings = Factory.build(:settings, %{views_adult_content: false})
+    user = Factory.insert(:user, %{settings: settings})
+    fetched_post = Content.post(post.id, user, true, true)
+    assert fetched_post.content_warning == "NSFW."
+  end
+
+  test "post/4 - with user - has 3rd party content_warning", %{user: user} do
+    settings = Factory.build(:settings, %{has_ad_notifications_enabled: true})
+    user = Factory.insert(:user, %{settings: settings})
+    post = Factory.insert(:post, %{body: [
+      %{"kind" => "embed"}
+    ]})
+    fetched_post = Content.post(post.id, user, true, true)
+    assert fetched_post.content_warning == "May contain 3rd party ads."
+  end
+
 end

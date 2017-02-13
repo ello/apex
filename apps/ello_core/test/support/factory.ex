@@ -17,6 +17,10 @@ defmodule Ello.Core.Factory do
     } |> User.load_images
   end
 
+  def settings_factory do
+    %User.Settings{}
+  end
+
   def post_factory do
     %Post{
       author:    build(:user),

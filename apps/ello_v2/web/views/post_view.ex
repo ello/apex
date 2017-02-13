@@ -15,6 +15,7 @@ defmodule Ello.V2.PostView do
     :comments_count,
     :reposts_count,
     :views_count,
+    :content_warning,
   ]
 
   def render("show.json", %{post: post, conn: conn}) do
@@ -27,8 +28,6 @@ defmodule Ello.V2.PostView do
   end
   #TODO:
   #      :meta_attributes,
-  #
-  #      :content_warning,
   def render("post.json", %{post: post, conn: conn}) do
     post
     |> Map.take(@attributes)

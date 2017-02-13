@@ -104,6 +104,18 @@ defmodule Ello.V2.PostViewTest do
     )
   end
 
+  test "post.json - it displays the content_warning for NSFW, 3rd Party Ads", %{post: post, conn: conn} do
+    post = Map.merge(post, %{
+      content_warning: "NSFW. May contain 3rd party ads.",
+    })
+    assert %{
+      content_warning: "NSFW. May contain 3rd party ads.",
+    } = render(PostView, "post.json",
+      post: post,
+      conn: conn
+    )
+  end
+
   test "show.json - it renders post show", %{post: post, archer: user, conn: conn} do
     user_id = "#{user.id}"
     post_id = "#{post.id}"
