@@ -17,13 +17,13 @@ defmodule Ello.Core.Content do
     Post
     |> filter_post_for_client(current_user, allow_nsfw, allow_nudity)
     |> Repo.get_by(token: slug)
-    |> post_preloads(current_user)
+    |> post_preloads(current_user, allow_nsfw, allow_nudity)
   end
   def post(id, current_user, allow_nsfw, allow_nudity) do
     Post
     |> filter_post_for_client(current_user, allow_nsfw, allow_nudity)
     |> Repo.get(id)
-    |> post_preloads(current_user)
+    |> post_preloads(current_user, allow_nsfw, allow_nudity)
   end
 
   defp filter_post_for_client(query, current_user, allow_nsfw, allow_nudity) do
@@ -79,18 +79,28 @@ defmodule Ello.Core.Content do
   end
   defp filter_private(query, _), do: query
 
-  defp post_preloads(post_or_posts, current_user) do
+  defp post_preloads(post_or_posts, current_user, allow_nsfw, allow_nudity) do
     post_or_posts
     |> prefetch_author(current_user)
+    |> prefetch_reposted_source(current_user, allow_nsfw, allow_nudity)
     |> prefetch_current_user_repost(current_user)
     |> prefetch_current_user_love(current_user)
     |> prefetch_current_user_watch(current_user)
     |> prefetch_post_counts
   end
 
+  defp prefetch_author(nil, _), do: nil
   defp prefetch_author([], _), do: []
   defp prefetch_author(post_or_posts, current_user) do
     Repo.preload(post_or_posts, author: &Network.users(&1, current_user))
+  end
+
+  defp prefetch_reposted_source(nil, _, _, _), do: nil
+  defp prefetch_reposted_source([], _, _, _), do: []
+  defp prefetch_reposted_source(post_or_posts, current_user, allow_nsfw, allow_nudity) do
+    Repo.preload(post_or_posts, reposted_source: fn(ids) ->
+      Enum.map(ids, &post(&1, current_user, allow_nsfw, allow_nudity))
+      end)
   end
 
   defp prefetch_current_user_repost(post_or_posts, nil), do: post_or_posts

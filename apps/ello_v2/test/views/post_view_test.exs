@@ -9,6 +9,7 @@ defmodule Ello.V2.PostViewTest do
     post         = Factory.build(:post, %{
       id: 1,
       author: archer,
+      reposted_source: nil,
       repost_from_current_user: nil,
       love_from_current_user: nil,
       watch_from_current_user: nil,
@@ -21,9 +22,7 @@ defmodule Ello.V2.PostViewTest do
     ]}
   end
 
-  test "post.json - it renders the post", context do
-    post = context.post
-    user = context.archer
+  test "post.json - it renders the post", %{post: post, archer: user, conn: conn} do
     assert %{
       id: "#{post.id}",
       href: "/api/v2/posts/#{post.id}",
@@ -42,19 +41,43 @@ defmodule Ello.V2.PostViewTest do
       reposted: false,
       loved: false,
       watched: false,
+      repost_content: nil,
+      repost_id: nil,
       links: %{
         author: %{id: "#{user.id}",
           type: "users",
           href: "/api/v2/users/#{user.id}"}
       }
     } == render(PostView, "post.json",
-      post: context.post,
-      conn: context.conn
+      post: post,
+      conn: conn
     )
   end
 
-  test "post.json - it renders the post reposted loved watched", context do
-    post = Map.merge(context.post, %{
+  test "post.json - it renders the post repost_content", %{post: post, conn: conn} do
+    repost_id = "123"
+    repost = %{
+      id: repost_id,
+      rendered_content: [%{
+        "kind" => "text",
+        "data" => "<p>Phrasing!</p>",
+        "link_url" => nil
+      }],
+    }
+    post = Map.merge(post, %{
+      reposted_source: repost
+    })
+    assert %{
+      repost_id: ^repost_id,
+      repost_content: [%{"kind" => "text", "data" => "<p>Phrasing!</p>"}],
+    } = render(PostView, "post.json",
+      post: post,
+      conn: conn
+    )
+  end
+
+  test "post.json - it renders the post reposted loved watched", %{post: post, conn: conn} do
+    post = Map.merge(post, %{
       repost_from_current_user: %Post{},
       love_from_current_user: %Love{deleted: false},
       watch_from_current_user: %Watch{},
@@ -65,25 +88,25 @@ defmodule Ello.V2.PostViewTest do
       watched: true,
     } = render(PostView, "post.json",
       post: post,
-      conn: context.conn
+      conn: conn
     )
   end
 
-  test "post.json - it renders the post not loved because love was deleted", context do
-    post = Map.merge(context.post, %{
+  test "post.json - it renders the post not loved because love was deleted", %{post: post, conn: conn} do
+    post = Map.merge(post, %{
       love_from_current_user: %Love{deleted: true},
     })
     assert %{
       loved: false,
     } = render(PostView, "post.json",
       post: post,
-      conn: context.conn
+      conn: conn
     )
   end
 
-  test "show.json - it renders post show", context do
-    user_id = "#{context.archer.id}"
-    post_id = "#{context.post.id}"
+  test "show.json - it renders post show", %{post: post, archer: user, conn: conn} do
+    user_id = "#{user.id}"
+    post_id = "#{post.id}"
     assert %{
       posts: %{
         id: ^post_id,
@@ -92,8 +115,8 @@ defmodule Ello.V2.PostViewTest do
         users: [%{id: ^user_id}],
       }
     } = render(PostView, "show.json",
-      post: context.post,
-      conn: context.conn
+      post: post,
+      conn: conn
     )
   end
 end

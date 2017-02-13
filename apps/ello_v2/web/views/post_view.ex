@@ -28,16 +28,11 @@ defmodule Ello.V2.PostView do
   #TODO:
   #      :meta_attributes,
   #
-  #      :repost_content,
-  #      :repost_id,
-  #      :repost_path,
-  #      :repost_via_id,
-  #      :repost_via_path
-  #
   #      :content_warning,
   def render("post.json", %{post: post, conn: conn}) do
     post
     |> Map.take(@attributes)
+    |> Map.merge(reposted_attributes(post.reposted_source))
     |> Map.merge(%{
       id: "#{post.id}",
       href: "/api/v2/posts/#{post.id}",
@@ -50,6 +45,15 @@ defmodule Ello.V2.PostView do
       loved: loved(post.love_from_current_user),
       watched: watched(post.watch_from_current_user),
     })
+  end
+
+  defp reposted_attributes(nil),
+    do: %{repost_content: nil, repost_id: nil}
+  defp reposted_attributes(repost) do
+    %{
+      repost_content: repost.rendered_content,
+      repost_id: repost.id,
+    }
   end
 
   defp links(post, _conn) do

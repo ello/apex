@@ -27,6 +27,13 @@ defmodule Ello.Core.ContentTest do
     assert fetched_post.repost_from_current_user == nil
   end
 
+  test "post/4 - includes reposted_source", %{user: user, post: post} do
+    repost = Factory.insert(:post, %{reposted_source: post})
+    fetched_post = Content.post(repost.id, user, true, true)
+    assert fetched_post.id == repost.id
+    assert fetched_post.reposted_source.id == post.id
+  end
+
   test "post/4 - with user - does allow nsfw", %{user: user, nsfw_post: post} do
     fetched_post = Content.post(post.id, user, true, true)
     assert fetched_post.id == post.id
