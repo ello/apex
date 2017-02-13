@@ -12,4 +12,9 @@ defmodule Ello.PostControllerTest do
     json = json_response(conn, 200)
     assert json["posts"]["id"] == "#{post.id}"
   end
+
+  test "GET /v2/posts/:id 404s", %{conn: conn} do
+    conn = get(conn, post_path(conn, :show, "404"))
+    assert conn.status == 404
+  end
 end
