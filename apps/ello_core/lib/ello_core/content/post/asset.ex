@@ -1,7 +1,6 @@
 defmodule Ello.Core.Content.Asset do
   use Ecto.Schema
-  alias Ello.Core.Network.User
-  alias __MODULE__.Block
+  alias Ello.Core.{ Network.User, Content.Post }
 
   @type t :: %__MODULE__{}
 

@@ -34,6 +34,23 @@ defmodule Ello.Core.ContentTest do
     assert fetched_post.reposted_source.id == post.id
   end
 
+  test "post/4 - includes assets", %{user: user, post: post} do
+    asset1 = Factory.insert(:asset, %{post: post})
+    asset2 = Factory.insert(:asset, %{post: post})
+    fetched_post = Content.post(post.id, user, true, true)
+    assert Enum.any?(fetched_post.assets, &(&1.id == asset1.id))
+    assert Enum.any?(fetched_post.assets, &(&1.id == asset2.id))
+  end
+
+  test "post/4 - includes assets for reposted source", %{user: user, post: post} do
+    asset1 = Factory.insert(:asset, %{post: post})
+    asset2 = Factory.insert(:asset, %{post: post})
+    repost = Factory.insert(:post, %{reposted_source: post})
+    fetched_post = Content.post(repost.id, user, true, true)
+    assert Enum.any?(fetched_post.reposted_source.assets, &(&1.id == asset1.id))
+    assert Enum.any?(fetched_post.reposted_source.assets, &(&1.id == asset2.id))
+  end
+
   test "post/4 - with user - does allow nsfw", %{user: user, nsfw_post: post} do
     fetched_post = Content.post(post.id, user, true, true)
     assert fetched_post.id == post.id

@@ -2,7 +2,7 @@ defmodule Ello.Core.Factory do
   alias Ello.Core.{Repo, Discovery, Network, Content}
   alias Discovery.{Category, Promotional}
   alias Network.{User, Relationship}
-  alias Content.{Post,Love,Watch}
+  alias Content.{Post, Love, Watch, Asset}
   use ExMachina.Ecto, repo: Repo
 
   def user_factory do
@@ -55,6 +55,23 @@ defmodule Ello.Core.Factory do
     |> Map.merge(%{
       reposted_source: build(:post)
     })
+  end
+
+  def asset_factory do
+    %Asset{
+      user: build(:user),
+      post: build(:post),
+      attachment: "ello-a9c0ede1-aeca-45af-9723-5750babf541e.jpeg",
+      attachment_metadata: %{
+        "optimized" => %{"size"=>433286, "type"=>"image/jpeg", "width"=>1280, "height"=>1024},
+        "xhdpi" => %{"size"=>434916, "type"=>"image/jpeg", "width"=>1280, "height"=>1024},
+        "hdpi" => %{"size"=>287932, "type"=>"image/jpeg", "width"=>750, "height"=>600},
+        "mdpi" => %{"size"=>77422, "type"=>"image/jpeg", "width"=>375, "height"=>300},
+        "ldpi" => %{"size"=>19718, "type"=>"image/jpeg", "width"=>180, "height"=>144}
+      },
+      created_at: Ecto.DateTime.utc,
+      updated_at: Ecto.DateTime.utc,
+    }
   end
 
   def love_factory do

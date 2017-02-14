@@ -97,6 +97,7 @@ defmodule Ello.Core.Content do
 
   defp post_preloads(post_or_posts, current_user, allow_nsfw, allow_nudity) do
     post_or_posts
+    |> prefetch_assets
     |> prefetch_author(current_user)
     |> prefetch_reposted_source(current_user, allow_nsfw, allow_nudity)
     |> prefetch_current_user_repost(current_user)
@@ -110,6 +111,12 @@ defmodule Ello.Core.Content do
   defp prefetch_author([], _), do: []
   defp prefetch_author(post_or_posts, current_user) do
     Repo.preload(post_or_posts, author: &Network.users(&1, current_user))
+  end
+
+  defp prefetch_assets(nil), do: nil
+  defp prefetch_assets([]), do: []
+  defp prefetch_assets(post_or_posts) do
+    Repo.preload(post_or_posts, :assets)
   end
 
   defp prefetch_reposted_source(nil, _, _, _), do: nil
