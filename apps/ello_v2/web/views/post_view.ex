@@ -21,13 +21,14 @@ defmodule Ello.V2.PostView do
   def render("show.json", %{post: post, conn: conn}) do
     %{
       posts: render_one(post, __MODULE__, "post.json", conn: conn),
-      linked: %{
-        users: render_many([post.author], UserView, "user.json", conn: conn)
-      }
+      linked: Map.merge(%{
+        users: render_many([post.author], UserView, "user.json", conn: conn),
+      }, render_linked_posts(post, conn))
     }
   end
+
   #TODO:
-  #      :meta_attributes,
+  #      :meta_attributes
   def render("post.json", %{post: post, conn: conn}) do
     post
     |> Map.take(@attributes)
@@ -45,6 +46,13 @@ defmodule Ello.V2.PostView do
       links: links(post, conn),
     })
   end
+
+  def render_linked_posts(%{reposted_source: %Post{} = repost}, conn) do
+    %{
+      posts: [render_one(repost, __MODULE__, "post.json", conn: conn)]
+    }
+  end
+  def render_linked_posts(_, _), do: %{}
 
   defp reposted_attributes(nil),
     do: %{repost_content: nil, repost_id: nil}

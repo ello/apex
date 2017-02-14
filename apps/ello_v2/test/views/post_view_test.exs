@@ -5,8 +5,8 @@ defmodule Ello.V2.PostViewTest do
   alias Ello.Core.Content.{Post,Love,Watch}
 
   setup %{conn: conn} do
-    archer       = Script.build(:archer)
-    post         = Factory.build(:post, %{
+    archer = Script.build(:archer)
+    post = Factory.build(:post, %{
       id: 1,
       author: archer,
       reposted_source: nil,
@@ -14,11 +14,17 @@ defmodule Ello.V2.PostViewTest do
       love_from_current_user: nil,
       watch_from_current_user: nil,
     })
+    repost = Factory.build(:post, %{
+      id: 2,
+      author: archer,
+      reposted_source: post,
+    })
     current_user = Factory.build(:user)
     {:ok, [
         conn: user_conn(conn, current_user),
         archer: archer,
         post: post,
+        repost: repost,
     ]}
   end
 
@@ -116,7 +122,7 @@ defmodule Ello.V2.PostViewTest do
     )
   end
 
-  test "show.json - it renders post show", %{post: post, archer: user, conn: conn} do
+  test "show.json - it renders a post", %{post: post, archer: user, conn: conn} do
     user_id = "#{user.id}"
     post_id = "#{post.id}"
     assert %{
@@ -128,6 +134,22 @@ defmodule Ello.V2.PostViewTest do
       }
     } = render(PostView, "show.json",
       post: post,
+      conn: conn
+    )
+  end
+
+  test "show.json - it renders a linked repost", %{post: post, repost: repost, conn: conn} do
+    repost_id = "#{repost.id}"
+    post_id = "#{post.id}"
+    assert %{
+      posts: %{
+        id: ^repost_id,
+      },
+      linked: %{
+        posts: [%{id: ^post_id}],
+      }
+    } = render(PostView, "show.json",
+      post: repost,
       conn: conn
     )
   end
