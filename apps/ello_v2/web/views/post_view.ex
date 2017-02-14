@@ -38,11 +38,11 @@ defmodule Ello.V2.PostView do
       summary: post.rendered_summary,
       content: post.rendered_content,
       author_id: "#{post.author.id}",
-      links: links(post, conn),
       views_count_rounded: Util.number_to_human(post.views_count),
       reposted: reposted(post.repost_from_current_user),
       loved: loved(post.love_from_current_user),
       watched: watched(post.watch_from_current_user),
+      links: links(post, conn),
     })
   end
 
