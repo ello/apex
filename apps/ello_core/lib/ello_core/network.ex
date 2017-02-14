@@ -4,7 +4,7 @@ defmodule Ello.Core.Network do
   alias Network.{User,Relationship}
 
   @moduledoc """
-  Responsible for retreiving and loading users and relationships.
+  Responsible for retrieving and loading users and relationships.
 
   Handles database queryies, preloading relations, and fetching cached values.
   """

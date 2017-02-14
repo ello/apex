@@ -11,8 +11,24 @@ defmodule Ello.Core.Content do
     Watch,
   }
 
+  @moduledoc """
+  Responsible for retrieving and loading posts, comments, and related assets.
+
+  Handles database queryies, preloading reposts, and fetching cached values.
+  """
+
+  @doc """
+  Get a post by id or token.
+
+  Includes postgres info and bulk fetched redis info.
+
+  If the current_user is passed in the reposted/wathched/loved relationship will
+  also be included, and the post will be filtered based on blocked users, nsfw
+  and nudity content visibility, and posts by banned users.  If no user is
+  present, posts by private users will not be included.
+  """
   @spec post(id_or_slug :: String.t | integer, current_user :: User.t | nil, allow_nsfw :: boolean, allow_nudity :: boolean) :: Post.t
-  def post(id_or_slug, current_user \\ nil, allow_nsfw, allow_nudity)
+  def post(id_or_slug, current_user, allow_nsfw, allow_nudity)
   def post("~" <> slug, current_user, allow_nsfw, allow_nudity) do
     Post
     |> filter_post_for_client(current_user, allow_nsfw, allow_nudity)
