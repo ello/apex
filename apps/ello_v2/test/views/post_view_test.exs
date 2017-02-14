@@ -6,6 +6,7 @@ defmodule Ello.V2.PostViewTest do
 
   setup %{conn: conn} do
     archer = Script.build(:archer)
+    reposter = Factory.build(:user)
     post = Factory.build(:post, %{
       id: 1,
       author: archer,
@@ -16,7 +17,7 @@ defmodule Ello.V2.PostViewTest do
     })
     repost = Factory.build(:post, %{
       id: 2,
-      author: archer,
+      author: reposter,
       reposted_source: post,
     })
     current_user = Factory.build(:user)
@@ -25,6 +26,7 @@ defmodule Ello.V2.PostViewTest do
         archer: archer,
         post: post,
         repost: repost,
+        reposter: reposter,
     ]}
   end
 
@@ -138,7 +140,9 @@ defmodule Ello.V2.PostViewTest do
     )
   end
 
-  test "show.json - it renders a linked repost", %{post: post, repost: repost, conn: conn} do
+  test "show.json - it renders a linked repost", %{post: post, archer: archer, repost: repost, reposter: reposter, conn: conn} do
+    author_id = "#{archer.id}"
+    repost_author_id = "#{reposter.id}"
     repost_id = "#{repost.id}"
     post_id = "#{post.id}"
     assert %{
@@ -146,11 +150,18 @@ defmodule Ello.V2.PostViewTest do
         id: ^repost_id,
       },
       linked: %{
+        users: users,
         posts: [%{id: ^post_id}],
       }
     } = render(PostView, "show.json",
       post: repost,
       conn: conn
     )
+    assert Enum.reduce(users, false, fn(user, success) ->
+      success || user.id == author_id
+    end)
+    assert Enum.reduce(users, false, fn(user, success) ->
+      success || user.id == repost_author_id
+    end)
   end
 end

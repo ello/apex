@@ -4,6 +4,7 @@ defmodule Ello.V2.PostView do
     UserView,
   }
   alias Ello.V2.Util
+  alias Ello.Core.Network.{User}
   alias Ello.Core.Content.{Post,Love,Watch}
 
   @attributes [
@@ -21,9 +22,7 @@ defmodule Ello.V2.PostView do
   def render("show.json", %{post: post, conn: conn}) do
     %{
       posts: render_one(post, __MODULE__, "post.json", conn: conn),
-      linked: Map.merge(%{
-        users: render_many([post.author], UserView, "user.json", conn: conn),
-      }, render_linked_posts(post, conn))
+      linked: Map.merge(render_linked_users(post, conn), render_linked_posts(post, conn))
     }
   end
 
@@ -46,6 +45,14 @@ defmodule Ello.V2.PostView do
       links: links(post, conn),
     })
   end
+
+  def render_linked_users(%{author: %User{} = author, reposted_source: %{author: %User{} = repost_author}}, conn) do
+    %{users: render_many([author, repost_author], UserView, "user.json", conn: conn)}
+  end
+  def render_linked_users(%{author: %User{} = author}, conn) do
+    %{users: render_many([author], UserView, "user.json", conn: conn)}
+  end
+  def render_linked_users(_, _), do: %{}
 
   def render_linked_posts(%{reposted_source: %Post{} = repost}, conn) do
     %{
