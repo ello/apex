@@ -9,6 +9,7 @@ defmodule Ello.Core.Content do
     Post,
     Love,
     Watch,
+    Asset,
   }
 
   @moduledoc """
@@ -105,6 +106,7 @@ defmodule Ello.Core.Content do
     |> prefetch_current_user_watch(current_user)
     |> prefetch_post_counts
     |> populate_content_warning(current_user)
+    |> build_image_structs
   end
 
   defp prefetch_author(nil, _), do: nil
@@ -180,6 +182,7 @@ defmodule Ello.Core.Content do
     end
   end
 
+  # TODO: Move this to post_view
   defp populate_content_warning(nil, _), do: nil
   defp populate_content_warning([], _), do: []
   defp populate_content_warning(post_or_posts, nil), do: post_or_posts
@@ -205,5 +208,14 @@ defmodule Ello.Core.Content do
     Enum.reduce(post.body, false, fn(body, acc) ->
       acc || body["kind"] == "embed"
     end) || has_embedded_media(post.reposted_source)
+  end
+
+  defp build_image_structs(%Post{assets: assets} = post) when is_list(assets) do
+    Map.put(post, :assets, Enum.map(assets, &Asset.build_attachment/1))
+  end
+  defp build_image_structs(%Post{} = post), do: post
+  defp build_image_structs(nil), do: nil
+  defp build_image_structs(posts) when is_list(posts) do
+    Enum.map(posts, &build_image_structs/1)
   end
 end

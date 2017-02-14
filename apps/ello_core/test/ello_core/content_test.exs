@@ -1,6 +1,6 @@
 defmodule Ello.Core.ContentTest do
   use Ello.Core.Case
-  alias Ello.Core.Content
+  alias Ello.Core.{Content, Image}
 
   setup do
     {:ok,
@@ -40,6 +40,7 @@ defmodule Ello.Core.ContentTest do
     fetched_post = Content.post(post.id, user, true, true)
     assert Enum.any?(fetched_post.assets, &(&1.id == asset1.id))
     assert Enum.any?(fetched_post.assets, &(&1.id == asset2.id))
+    assert [%{attachment_struct: %Image{}}, %{attachment_struct: %Image{}}] = fetched_post.assets
   end
 
   test "post/4 - includes assets for reposted source", %{user: user, post: post} do
@@ -49,6 +50,7 @@ defmodule Ello.Core.ContentTest do
     fetched_post = Content.post(repost.id, user, true, true)
     assert Enum.any?(fetched_post.reposted_source.assets, &(&1.id == asset1.id))
     assert Enum.any?(fetched_post.reposted_source.assets, &(&1.id == asset2.id))
+    assert [%{attachment_struct: %Image{}}, %{attachment_struct: %Image{}}] = fetched_post.reposted_source.assets
   end
 
   test "post/4 - with user - does allow nsfw", %{user: user, nsfw_post: post} do
