@@ -157,11 +157,7 @@ defmodule Ello.V2.PostViewTest do
       post: repost,
       conn: conn
     )
-    assert Enum.reduce(users, false, fn(user, success) ->
-      success || user.id == author_id
-    end)
-    assert Enum.reduce(users, false, fn(user, success) ->
-      success || user.id == repost_author_id
-    end)
+    assert Enum.any(users, &(&1.id == author_id))
+    assert Enum.any(users, &(&1.id == repost_author_id))
   end
 end
