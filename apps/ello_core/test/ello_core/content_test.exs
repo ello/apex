@@ -3,8 +3,10 @@ defmodule Ello.Core.ContentTest do
   alias Ello.Core.{Content, Image}
 
   setup do
+    cat1 = Factory.insert(:category)
     {:ok,
-      post: Factory.insert(:post),
+      category: cat1,
+      post: Factory.insert(:post, category_ids: [cat1.id]),
       user: Factory.insert(:user),
       nsfw_post: Factory.insert(:post, %{ is_adult_content: true }),
       nudity_post: Factory.insert(:post, %{ has_nudity: true }),
@@ -51,6 +53,13 @@ defmodule Ello.Core.ContentTest do
     assert Enum.any?(fetched_post.reposted_source.assets, &(&1.id == asset1.id))
     assert Enum.any?(fetched_post.reposted_source.assets, &(&1.id == asset2.id))
     assert [%{attachment_struct: %Image{}}, %{attachment_struct: %Image{}}] = fetched_post.reposted_source.assets
+  end
+
+  test "post/4 - includes categories", %{user: user, post: post, category: cat} do
+    cat_id = cat.id
+    fetched_post = Content.post(post.id, user, true, true)
+    assert fetched_post.id == post.id
+    assert [%{id: ^cat_id}] = fetched_post.categories
   end
 
   test "post/4 - with user - does allow nsfw", %{user: user, nsfw_post: post} do
@@ -131,14 +140,14 @@ defmodule Ello.Core.ContentTest do
     assert fetched_post.watch_from_current_user.id == watch.id
   end
 
-  test "post/4 - with user - has NSFW content_warning", %{user: user, nsfw_post: post} do
+  test "post/4 - with user - has NSFW content_warning", %{nsfw_post: post} do
     settings = Factory.build(:settings, %{views_adult_content: false})
     user = Factory.insert(:user, %{settings: settings})
     fetched_post = Content.post(post.id, user, true, true)
     assert fetched_post.content_warning == "NSFW."
   end
 
-  test "post/4 - with user - has 3rd party content_warning", %{user: user} do
+  test "post/4 - with user - has 3rd party content_warning" do
     settings = Factory.build(:settings, %{has_ad_notifications_enabled: true})
     user = Factory.insert(:user, %{settings: settings})
     post = Factory.insert(:post, %{body: [

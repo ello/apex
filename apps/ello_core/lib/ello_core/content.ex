@@ -4,6 +4,7 @@ defmodule Ello.Core.Content do
     Repo,
     Redis,
     Network,
+    Discovery,
   }
   alias __MODULE__.{
     Post,
@@ -34,14 +35,14 @@ defmodule Ello.Core.Content do
     Post
     |> filter_post_for_client(current_user, allow_nsfw, allow_nudity)
     |> Repo.get_by(token: slug)
-    |> post_preloads(current_user, allow_nsfw, allow_nudity)
+    |> post_preloads(current_user)
     |> filter_blocked(current_user)
   end
   def post(id, current_user, allow_nsfw, allow_nudity) do
     Post
     |> filter_post_for_client(current_user, allow_nsfw, allow_nudity)
     |> Repo.get(id)
-    |> post_preloads(current_user, allow_nsfw, allow_nudity)
+    |> post_preloads(current_user)
     |> filter_blocked(current_user)
   end
 
@@ -62,7 +63,7 @@ defmodule Ello.Core.Content do
   defp filter_blocked(nil, _), do: nil
   defp filter_blocked([], _), do: []
   defp filter_blocked(post_or_posts, nil), do: post_or_posts
-  defp filter_blocked(post_or_posts, %{all_blocked_ids: blocked})
+  defp filter_blocked(post_or_posts, %{all_blocked_ids: %{map: blocked}})
        when map_size(blocked) == 0,
        do: post_or_posts
   defp filter_blocked(%Post{} = post, %{all_blocked_ids: blocked}),
@@ -92,11 +93,12 @@ defmodule Ello.Core.Content do
   end
   defp filter_private(query, _), do: query
 
-  defp post_preloads(post_or_posts, current_user, allow_nsfw, allow_nudity) do
+  defp post_preloads(post_or_posts, current_user) do
     post_or_posts
     |> prefetch_assets
+    |> prefetch_categories
     |> prefetch_author(current_user)
-    |> prefetch_reposted_source(current_user, allow_nsfw, allow_nudity)
+    |> prefetch_reposted_source(current_user)
     |> prefetch_current_user_repost(current_user)
     |> prefetch_current_user_love(current_user)
     |> prefetch_current_user_watch(current_user)
@@ -105,9 +107,10 @@ defmodule Ello.Core.Content do
     |> build_image_structs
   end
 
-  defp repost_preloads(reposts, current_user, allow_nsfw, allow_nudity) do
+  defp repost_preloads(reposts, current_user) do
     reposts
     |> prefetch_assets
+    |> prefetch_categories
     |> prefetch_author(current_user)
     |> prefetch_current_user_repost(current_user)
     |> prefetch_current_user_love(current_user)
@@ -128,14 +131,14 @@ defmodule Ello.Core.Content do
     Repo.preload(post_or_posts, :assets)
   end
 
-  defp prefetch_reposted_source(nil, _, _, _), do: nil
-  defp prefetch_reposted_source([], _, _, _), do: []
-  defp prefetch_reposted_source(post_or_posts, current_user, allow_nsfw, allow_nudity) do
+  defp prefetch_reposted_source(nil, _), do: nil
+  defp prefetch_reposted_source([], _), do: []
+  defp prefetch_reposted_source(post_or_posts, current_user) do
     Repo.preload post_or_posts, reposted_source: fn(ids) ->
       Post
       |> where([p], p.id in ^ids)
       |> Repo.all
-      |> repost_preloads(current_user, allow_nsfw, allow_nudity)
+      |> repost_preloads(current_user)
     end
   end
 
@@ -155,6 +158,27 @@ defmodule Ello.Core.Content do
   defp prefetch_current_user_watch(post_or_posts, %{id: id}) do
     current_user_watch_query = where(Watch, user_id: ^id)
     Repo.preload(post_or_posts, [watch_from_current_user: current_user_watch_query])
+  end
+
+  # Because categories are stored as an array on posts we can use preload.
+  # Instead we basically do what preload does ourselves manually.
+  defp prefetch_categories(nil), do: nil
+  defp prefetch_categories([]), do: []
+  defp prefetch_categories(%Post{} = post), do: hd(prefetch_categories([post]))
+  defp prefetch_categories(posts) do
+    categories = posts
+                 |> Enum.flat_map(&(&1.category_ids))
+                 |> Discovery.categories_by_ids
+                 |> Enum.group_by(&(&1.id))
+    Enum.map posts, fn
+      %{category_ids: []} = post -> post
+      post ->
+        post_categories = categories
+                          |> Map.take(post.category_ids)
+                          |> Map.values
+                          |> List.flatten
+        Map.put(post, :categories, post_categories)
+    end
   end
 
   defp prefetch_post_counts(nil), do: nil

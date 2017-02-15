@@ -17,6 +17,7 @@ defmodule Ello.Core.Content.Post do
 
     field :mentioned_usernames, {:array, :string}, default: []
     field :category_ids, {:array, :integer}, default: []
+    field :categories, {:array, :map}, default: [], virtual: true
 
     field :created_at, Ecto.DateTime
     field :updated_at, Ecto.DateTime
