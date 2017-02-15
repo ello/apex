@@ -7,9 +7,11 @@ defmodule Ello.V2.PostViewTest do
   setup %{conn: conn} do
     archer = Script.build(:archer)
     reposter = Factory.build(:user)
+    asset = Factory.build(:asset, %{id: 1})
     post = Factory.build(:post, %{
       id: 1,
       author: archer,
+      assets: [asset],
       reposted_source: nil,
       repost_from_current_user: nil,
       love_from_current_user: nil,
@@ -19,6 +21,7 @@ defmodule Ello.V2.PostViewTest do
       id: 2,
       author: reposter,
       reposted_source: post,
+      assets: []
     })
     current_user = Factory.build(:user)
     {:ok, [
@@ -54,8 +57,9 @@ defmodule Ello.V2.PostViewTest do
       links: %{
         author: %{id: "#{user.id}",
           type: "users",
-          href: "/api/v2/users/#{user.id}"}
-      }
+          href: "/api/v2/users/#{user.id}"},
+        assets: ["#{hd(post.assets).id}"]
+      },
     } == render(PostView, "post.json",
       post: post,
       conn: conn
@@ -127,12 +131,14 @@ defmodule Ello.V2.PostViewTest do
   test "show.json - it renders a post", %{post: post, archer: user, conn: conn} do
     user_id = "#{user.id}"
     post_id = "#{post.id}"
+    asset_id = "#{hd(post.assets).id}"
     assert %{
       posts: %{
         id: ^post_id,
       },
       linked: %{
         users: [%{id: ^user_id}],
+        assets: [%{id: ^asset_id}],
       }
     } = render(PostView, "show.json",
       post: post,
@@ -145,6 +151,7 @@ defmodule Ello.V2.PostViewTest do
     repost_author_id = "#{reposter.id}"
     repost_id = "#{repost.id}"
     post_id = "#{post.id}"
+    asset_id = "#{hd(post.assets).id}"
     assert %{
       posts: %{
         id: ^repost_id,
@@ -152,6 +159,7 @@ defmodule Ello.V2.PostViewTest do
       linked: %{
         users: users,
         posts: [%{id: ^post_id}],
+        assets: [%{id: ^asset_id}],
       }
     } = render(PostView, "show.json",
       post: repost,

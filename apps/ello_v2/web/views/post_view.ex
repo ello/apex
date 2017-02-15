@@ -20,9 +20,13 @@ defmodule Ello.V2.PostView do
   ]
 
   def render("show.json", %{post: post, conn: conn}) do
+    linked = %{}
+             |> render_linked_users(post, conn)
+             |> render_linked_posts(post, conn)
+             |> render_linked_assets(post, conn)
     %{
       posts: render_one(post, __MODULE__, "post.json", conn: conn),
-      linked: Map.merge(render_linked_users(post, conn), render_linked_posts(post, conn))
+      linked: linked,
     }
   end
 
@@ -46,20 +50,26 @@ defmodule Ello.V2.PostView do
     })
   end
 
-  def render_linked_users(%{author: %User{} = author, reposted_source: %{author: %User{} = repost_author}}, conn) do
-    %{users: render_many([author, repost_author], UserView, "user.json", conn: conn)}
+  def render_linked_users(linked, %{author: %User{} = author, reposted_source: %{author: %User{} = repost_author}}, conn) do
+    Map.put(linked, :users, render_many([author, repost_author], UserView, "user.json", conn: conn))
   end
-  def render_linked_users(%{author: %User{} = author}, conn) do
-    %{users: render_many([author], UserView, "user.json", conn: conn)}
+  def render_linked_users(linked, %{author: %User{} = author}, conn) do
+    Map.put(linked, :users, render_many([author], UserView, "user.json", conn: conn))
   end
-  def render_linked_users(_, _), do: %{}
+  def render_linked_users(linked, _, _), do: linked
 
-  def render_linked_posts(%{reposted_source: %Post{} = repost}, conn) do
-    %{
-      posts: [render_one(repost, __MODULE__, "post.json", conn: conn)]
-    }
+  def render_linked_posts(linked, %{reposted_source: %Post{} = repost}, conn) do
+    Map.put(linked, :posts, render_many([repost], __MODULE__, "post.json", conn: conn))
   end
-  def render_linked_posts(_, _), do: %{}
+  def render_linked_posts(linked,_, _), do: linked
+
+  def render_linked_assets(linked, %{assets: assets} = post, conn) when is_list(assets) do
+    Map.put(linked, :assets, render_many(assets, AssetView, "asset.json", conn: conn))
+  end
+  def render_linked_assets(linked, %{assets: assets, reposted_source: %Post{} = repost} = post, conn) when is_list(assets) do
+    Map.put(linked, :assets, render_many(assets ++ repost.assets, AssetView, "asset.json", conn: conn))
+  end
+  def render_linked_assets(linked, _, _), do: linked
 
   defp reposted_attributes(nil),
     do: %{repost_content: nil, repost_id: nil}
@@ -77,6 +87,7 @@ defmodule Ello.V2.PostView do
         type: "users",
         href: "/api/v2/users/#{post.author.id}",
       },
+      assets:  Enum.map(post.assets, &("#{&1.id}")),
     }
   end
 
