@@ -35,19 +35,20 @@ defmodule Ello.Core.Content do
     |> filter_post_for_client(current_user, allow_nsfw, allow_nudity)
     |> Repo.get_by(token: slug)
     |> post_preloads(current_user, allow_nsfw, allow_nudity)
+    |> filter_blocked(current_user)
   end
   def post(id, current_user, allow_nsfw, allow_nudity) do
     Post
     |> filter_post_for_client(current_user, allow_nsfw, allow_nudity)
     |> Repo.get(id)
     |> post_preloads(current_user, allow_nsfw, allow_nudity)
+    |> filter_blocked(current_user)
   end
 
   defp filter_post_for_client(query, current_user, allow_nsfw, allow_nudity) do
     query
     |> filter_nsfw(allow_nsfw)
     |> filter_nudity(allow_nudity)
-    |> filter_blocked(current_user)
     |> filter_banned
     |> filter_private(current_user)
   end
@@ -58,26 +59,21 @@ defmodule Ello.Core.Content do
   defp filter_nudity(query, true), do: query
   defp filter_nudity(query, false), do: where(query, [p], not p.has_nudity)
 
-  defp filter_blocked(query, nil), do: query
-  defp filter_blocked(query, current_user) do
-    # need:
-    #   LEFT JOIN posts AS reposted ON reposted.id = posts.reposted_source_id
-    #   LEFT OUTER JOIN (VALUES (ids) excluded(excluded_id) ON posts.author_id = excluded_id OR resposted.author_id = excluded_id)
-    #   WHERE excluded_id IS NULL
-    # ids = current_user.all_blocked_ids
-    #       |> Enum.map(&("(#{&1})"))
-    #       |> Enum.join(",")
-    #       |> IO.inspect
-    # query
-    # |> join(:left, [p, rp], fragment("(VALUES (?)) excluded(excluded_id)", ^ids), excluded_id == p.author_id or excluded_id == rp.author_id)
+  defp filter_blocked(nil, _), do: nil
+  defp filter_blocked([], _), do: []
+  defp filter_blocked(post_or_posts, nil), do: post_or_posts
+  defp filter_blocked(post_or_posts, %{all_blocked_ids: blocked})
+       when map_size(blocked) == 0,
+       do: post_or_posts
+  defp filter_blocked(%Post{} = post, %{all_blocked_ids: blocked}),
+    do: if is_blocked(post, blocked), do: nil, else: post
+  defp filter_blocked(posts, %{all_blocked_ids: blocked}),
+    do: Enum.reject(posts, &is_blocked(&1, blocked))
 
-    ids = current_user.all_blocked_ids
-    query
-    |> join(:inner, [p], a in assoc(p, :author))
-    |> join(:left, [p, a], rp in assoc(p, :reposted_source))
-    |> join(:left, [p, a, rp], rpa in assoc(rp, :author))
-    |> where([p, a, rp, rpa], not p.author_id in ^ids and not rp.author_id in ^ids)
-  end
+  defp is_blocked(%{reposted_source: %{author_id: rp_id}, author_id: id}, blocked),
+    do: id in blocked || rp_id in blocked
+  defp is_blocked(%{author_id: id}, blocked),
+    do: id in blocked
 
   defp filter_banned(query) do
     query
@@ -109,6 +105,17 @@ defmodule Ello.Core.Content do
     |> build_image_structs
   end
 
+  defp repost_preloads(reposts, current_user, allow_nsfw, allow_nudity) do
+    reposts
+    |> prefetch_assets
+    |> prefetch_author(current_user)
+    |> prefetch_current_user_repost(current_user)
+    |> prefetch_current_user_love(current_user)
+    |> prefetch_current_user_watch(current_user)
+    |> prefetch_post_counts
+    |> build_image_structs
+  end
+
   defp prefetch_author(nil, _), do: nil
   defp prefetch_author([], _), do: []
   defp prefetch_author(post_or_posts, current_user) do
@@ -124,9 +131,12 @@ defmodule Ello.Core.Content do
   defp prefetch_reposted_source(nil, _, _, _), do: nil
   defp prefetch_reposted_source([], _, _, _), do: []
   defp prefetch_reposted_source(post_or_posts, current_user, allow_nsfw, allow_nudity) do
-    Repo.preload(post_or_posts, reposted_source: fn(ids) ->
-      Enum.map(ids, &post(&1, current_user, allow_nsfw, allow_nudity))
-      end)
+    Repo.preload post_or_posts, reposted_source: fn(ids) ->
+      Post
+      |> where([p], p.id in ^ids)
+      |> Repo.all
+      |> repost_preloads(current_user, allow_nsfw, allow_nudity)
+    end
   end
 
   defp prefetch_current_user_repost(post_or_posts, nil), do: post_or_posts
@@ -203,12 +213,12 @@ defmodule Ello.Core.Content do
     Enum.map(posts, &populate_content_warning(&1, current_user))
   end
 
-  defp has_embedded_media(nil), do: false
-  defp has_embedded_media(post) do
+  defp has_embedded_media(%Post{} = post) do
     Enum.reduce(post.body, false, fn(body, acc) ->
       acc || body["kind"] == "embed"
     end) || has_embedded_media(post.reposted_source)
   end
+  defp has_embedded_media(_), do: false
 
   defp build_image_structs(%Post{assets: assets} = post) when is_list(assets) do
     Map.put(post, :assets, Enum.map(assets, &Asset.build_attachment/1))
