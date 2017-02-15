@@ -165,7 +165,7 @@ defmodule Ello.V2.PostViewTest do
       post: repost,
       conn: conn
     )
-    assert Enum.any(users, &(&1.id == author_id))
-    assert Enum.any(users, &(&1.id == repost_author_id))
+    assert Enum.any?(users, &(&1.id == author_id))
+    assert Enum.any?(users, &(&1.id == repost_author_id))
   end
 end
