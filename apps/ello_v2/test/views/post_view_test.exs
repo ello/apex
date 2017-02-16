@@ -2,12 +2,12 @@ defmodule Ello.V2.PostViewTest do
   use Ello.V2.ConnCase, async: true
   import Phoenix.View #For render/2
   alias Ello.V2.PostView
-  alias Ello.Core.Content.{Post,Love,Watch}
+  alias Ello.Core.Content.{Post,Love,Watch,Asset}
 
   setup %{conn: conn} do
     archer = Script.build(:archer)
     reposter = Factory.build(:user)
-    asset = Factory.build(:asset, %{id: 1})
+    asset = Factory.build(:asset, %{id: 1}) |> Asset.build_attachment
     post = Factory.build(:post, %{
       id: 1,
       author: archer,
@@ -54,6 +54,7 @@ defmodule Ello.V2.PostViewTest do
       watched: false,
       repost_content: nil,
       repost_id: nil,
+      content_warning: "",
       links: %{
         author: %{id: "#{user.id}",
           type: "users",
@@ -66,24 +67,13 @@ defmodule Ello.V2.PostViewTest do
     )
   end
 
-  test "post.json - it renders the post repost_content", %{post: post, conn: conn} do
-    repost_id = "123"
-    repost = %{
-      id: repost_id,
-      rendered_content: [%{
-        "kind" => "text",
-        "data" => "<p>Phrasing!</p>",
-        "link_url" => nil
-      }],
-    }
-    post = Map.merge(post, %{
-      reposted_source: repost
-    })
+  test "post.json - it renders the post repost_content", %{post: post, repost: repost, conn: conn} do
+    post_id = post.id
     assert %{
-      repost_id: ^repost_id,
+      repost_id: ^post_id,
       repost_content: [%{"kind" => "text", "data" => "<p>Phrasing!</p>"}],
     } = render(PostView, "post.json",
-      post: post,
+      post: repost,
       conn: conn
     )
   end
@@ -116,15 +106,53 @@ defmodule Ello.V2.PostViewTest do
     )
   end
 
-  test "post.json - it displays the content_warning for NSFW, 3rd Party Ads", %{post: post, conn: conn} do
-    post = Map.merge(post, %{
-      content_warning: "NSFW. May contain 3rd party ads.",
+  test "post.json - it displays the content_warning for NSFW", %{conn: conn} do
+    settings = Factory.build(:settings, %{views_adult_content: false})
+    current_user = Factory.build(:user, %{settings: settings})
+    post = Factory.build(:post, %{
+      assets: [],
+      is_adult_content: true,
+      reposted_source: nil,
     })
-    assert %{
-      content_warning: "NSFW. May contain 3rd party ads.",
-    } = render(PostView, "post.json",
+
+    assert %{content_warning: "NSFW."} = render(PostView, "post.json",
       post: post,
-      conn: conn
+      conn: assign(conn, :current_user, current_user)
+    )
+  end
+
+  test "post.json - it displays the content_warning for 3rd party ads", %{conn: conn} do
+    settings = Factory.build(:settings, %{has_ad_notifications_enabled: true})
+    current_user = Factory.build(:user, %{settings: settings})
+    post = Factory.build(:post, %{
+      assets: [],
+      reposted_source: nil,
+      body: [
+        %{"kind" => "embed"}
+      ],
+    })
+
+    assert %{content_warning: "May contain 3rd party ads."} = render(PostView, "post.json",
+      post: post,
+      conn: assign(conn, :current_user, current_user)
+    )
+  end
+
+  test "post.json - it displays the content_warning for NSFW, 3rd Party Ads", %{conn: conn} do
+    settings = Factory.build(:settings, %{views_adult_content: false, has_ad_notifications_enabled: true})
+    current_user = Factory.build(:user, %{settings: settings})
+    post = Factory.build(:post, %{
+      assets: [],
+      is_adult_content: true,
+      body: [
+        %{"kind" => "embed"}
+      ],
+      reposted_source: nil,
+    })
+
+    assert %{content_warning: "NSFW. May contain 3rd party ads."} = render(PostView, "post.json",
+      post: post,
+      conn: assign(conn, :current_user, current_user)
     )
   end
 

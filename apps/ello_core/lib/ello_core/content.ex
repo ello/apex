@@ -103,7 +103,6 @@ defmodule Ello.Core.Content do
     |> prefetch_current_user_love(current_user)
     |> prefetch_current_user_watch(current_user)
     |> prefetch_post_counts
-    |> populate_content_warning(current_user)
     |> build_image_structs
   end
 
@@ -215,34 +214,6 @@ defmodule Ello.Core.Content do
       ]
     end
   end
-
-  # TODO: Move this to post_view
-  defp populate_content_warning(nil, _), do: nil
-  defp populate_content_warning([], _), do: []
-  defp populate_content_warning(post_or_posts, nil), do: post_or_posts
-  defp populate_content_warning(%Post{} = post, current_user) do
-    nsfw = post.is_adult_content && !current_user.settings.views_adult_content
-    third_party_ads = has_embedded_media(post) && current_user.settings.has_ad_notifications_enabled
-
-    warning =
-      case {nsfw, third_party_ads} do
-        {true, true} -> "NSFW. May contain 3rd party ads."
-        {false, true} -> "May contain 3rd party ads."
-        {true, false} -> "NSFW."
-        _ -> ""
-      end
-    Map.merge(post, %{content_warning: warning})
-  end
-  defp populate_content_warning(posts, current_user) do
-    Enum.map(posts, &populate_content_warning(&1, current_user))
-  end
-
-  defp has_embedded_media(%Post{} = post) do
-    Enum.reduce(post.body, false, fn(body, acc) ->
-      acc || body["kind"] == "embed"
-    end) || has_embedded_media(post.reposted_source)
-  end
-  defp has_embedded_media(_), do: false
 
   defp build_image_structs(%Post{assets: assets} = post) when is_list(assets) do
     Map.put(post, :assets, Enum.map(assets, &Asset.build_attachment/1))

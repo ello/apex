@@ -2,6 +2,7 @@ defmodule Ello.V2.PostView do
   use Ello.V2.Web, :view
   alias Ello.V2.{
     UserView,
+    AssetView,
   }
   alias Ello.V2.Util
   alias Ello.Core.Network.{User}
@@ -16,7 +17,6 @@ defmodule Ello.V2.PostView do
     :comments_count,
     :reposts_count,
     :views_count,
-    :content_warning,
   ]
 
   def render("show.json", %{post: post, conn: conn}) do
@@ -46,6 +46,7 @@ defmodule Ello.V2.PostView do
       reposted: reposted(post.repost_from_current_user),
       loved: loved(post.love_from_current_user),
       watched: watched(post.watch_from_current_user),
+      content_warning: content_warning(post, conn),
       links: links(post, conn),
     })
   end
@@ -99,4 +100,29 @@ defmodule Ello.V2.PostView do
 
   defp watched(%Watch{}), do: true
   defp watched(_), do: false
+
+  defp content_warning(nil, _), do: nil
+  defp content_warning([], _), do: []
+  defp content_warning(post_or_posts, %{assigns: %{current_user: nil}}), do: post_or_posts
+  defp content_warning(%Post{} = post, %{assigns: %{current_user: current_user}}) do
+    include_nsfw_warning = post.is_adult_content && !current_user.settings.views_adult_content
+    include_third_party_warning = has_embedded_media(post) && current_user.settings.has_ad_notifications_enabled
+
+    case {include_nsfw_warning, include_third_party_warning} do
+      {true, true} -> "NSFW. May contain 3rd party ads."
+      {false, true} -> "May contain 3rd party ads."
+      {true, false} -> "NSFW."
+      _ -> ""
+    end
+  end
+  defp content_warning(posts, %{assigns: %{current_user: current_user}}) do
+    Enum.map(posts, &content_warning(&1, current_user))
+  end
+
+  defp has_embedded_media(%{} = post) do
+    Enum.any?(post.body, fn(body) ->
+      body["kind"] == "embed"
+    end) || has_embedded_media(post.reposted_source)
+  end
+  defp has_embedded_media(_), do: false
 end
