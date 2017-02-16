@@ -64,11 +64,11 @@ defmodule Ello.V2.PostView do
   end
   def render_linked_posts(linked,_, _), do: linked
 
-  def render_linked_assets(linked, %{assets: assets} = post, conn) when is_list(assets) do
-    Map.put(linked, :assets, render_many(assets, AssetView, "asset.json", conn: conn))
-  end
-  def render_linked_assets(linked, %{assets: assets, reposted_source: %Post{} = repost} = post, conn) when is_list(assets) do
+  def render_linked_assets(linked, %{assets: assets, reposted_source: %Post{} = repost}, conn) when is_list(assets) do
     Map.put(linked, :assets, render_many(assets ++ repost.assets, AssetView, "asset.json", conn: conn))
+  end
+  def render_linked_assets(linked, %{assets: assets}, conn) when is_list(assets) do
+    Map.put(linked, :assets, render_many(assets, AssetView, "asset.json", conn: conn))
   end
   def render_linked_assets(linked, _, _), do: linked
 
