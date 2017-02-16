@@ -51,16 +51,16 @@ defmodule Ello.V2.ClientProperties do
   defp webapp(conn, _),
     do: assign(conn, :webapp, false)
 
-  defp nudity(%{assigns: %{user: %{settings: %{views_adult_content: true}}}} = conn, _),
+  defp nudity(%{assigns: %{current_user: %{settings: %{views_adult_content: true}}}} = conn, _),
     do: assign(conn, :allow_nudity, true)
   defp nudity(%{assigns: %{webapp: true}} = conn, _),
     do: assign(conn, :allow_nudity, true)
   defp nudity(conn, _),
     do: assign(conn, :allow_nudity, false)
 
-  defp nsfw(%{assigns: %{user: %{settings: %{views_adult_content: true}}}} = conn, _),
+  defp nsfw(%{assigns: %{current_user: %{settings: %{views_adult_content: true}}}} = conn, _),
     do: assign(conn, :allow_nsfw, true)
-  defp nsfw(%{assigns: %{user: %{settings: %{views_adult_content: false}}}} = conn, _),
+  defp nsfw(%{assigns: %{current_user: %{settings: %{views_adult_content: false}}}} = conn, _),
     do: assign(conn, :allow_nsfw, false)
   defp nsfw(%{assigns: %{webapp: true}} = conn, _),
     do: assign(conn, :allow_nsfw, true)
