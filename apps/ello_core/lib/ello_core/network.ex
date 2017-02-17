@@ -114,21 +114,8 @@ defmodule Ello.Core.Network do
     end
   end
 
-  defp prefetch_categories(%User{} = user), do: hd(prefetch_categories([user]))
-  defp prefetch_categories(users) do
-    categories = users
-                 |> Enum.flat_map(&(&1.category_ids))
-                 |> Discovery.categories_by_ids
-                 |> Enum.group_by(&(&1.id))
-    Enum.map users, fn
-      %{category_ids: []} = user -> user
-      user ->
-        user_categories = categories
-                          |> Map.take(user.category_ids)
-                          |> Map.values
-                          |> List.flatten
-        Map.put(user, :categories, user_categories)
-    end
+  defp prefetch_categories(user_or_users) do
+    Discovery.put_belongs_to_many_categories(user_or_users)
   end
 
   defp build_image_structs(%User{} = user), do: User.load_images(user)

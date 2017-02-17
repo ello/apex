@@ -35,6 +35,26 @@ defmodule Ello.Core.Discovery do
     |> load_images
   end
 
+  def put_belongs_to_many_categories(nil), do: nil
+  def put_belongs_to_many_categories([]), do: []
+  def put_belongs_to_many_categories(%{} = categorizable),
+    do: hd(put_belongs_to_many_categories([categorizable]))
+  def put_belongs_to_many_categories(categorizables) do
+    categories = categorizables
+                 |> Enum.flat_map(&(&1.category_ids))
+                 |> Discovery.categories_by_ids
+                 |> Enum.group_by(&(&1.id))
+    Enum.map categorizables, fn
+      %{category_ids: []} = categorizable -> categorizable
+      categorizable ->
+        categorizable_categories = categories
+                          |> Map.take(categorizable.category_ids)
+                          |> Map.values
+                          |> List.flatten
+        Map.put(categorizable, :categories, categorizable_categories)
+    end
+  end
+
   @doc """
   Return all Categories with related promotionals their user.
 

@@ -159,23 +159,8 @@ defmodule Ello.Core.Content do
 
   # Because categories are stored as an array on posts we can use preload.
   # Instead we basically do what preload does ourselves manually.
-  defp prefetch_categories(nil), do: nil
-  defp prefetch_categories([]), do: []
-  defp prefetch_categories(%Post{} = post), do: hd(prefetch_categories([post]))
-  defp prefetch_categories(posts) do
-    categories = posts
-                 |> Enum.flat_map(&(&1.category_ids))
-                 |> Discovery.categories_by_ids
-                 |> Enum.group_by(&(&1.id))
-    Enum.map posts, fn
-      %{category_ids: []} = post -> post
-      post ->
-        post_categories = categories
-                          |> Map.take(post.category_ids)
-                          |> Map.values
-                          |> List.flatten
-        Map.put(post, :categories, post_categories)
-    end
+  defp prefetch_categories(post_or_posts) do
+    Discovery.put_belongs_to_many_categories(post_or_posts)
   end
 
   defp prefetch_post_counts(nil), do: nil
