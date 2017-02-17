@@ -30,7 +30,7 @@ defmodule Ello.Core.ImageTest do
       name: "large",
       width: 360,
       height: 360,
-      size: 220669,
+      size: 220_669,
       type: "image/png",
       filename: "ello-large-fad52e18.png",
       pixellated_filename: "ello-large-pixellated-fad52e18.png",

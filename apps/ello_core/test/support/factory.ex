@@ -63,11 +63,11 @@ defmodule Ello.Core.Factory do
       post: build(:post),
       attachment: "ello-a9c0ede1-aeca-45af-9723-5750babf541e.jpeg",
       attachment_metadata: %{
-        "optimized" => %{"size"=>433286, "type"=>"image/jpeg", "width"=>1280, "height"=>1024},
-        "xhdpi" => %{"size"=>434916, "type"=>"image/jpeg", "width"=>1280, "height"=>1024},
-        "hdpi" => %{"size"=>287932, "type"=>"image/jpeg", "width"=>750, "height"=>600},
-        "mdpi" => %{"size"=>77422, "type"=>"image/jpeg", "width"=>375, "height"=>300},
-        "ldpi" => %{"size"=>19718, "type"=>"image/jpeg", "width"=>180, "height"=>144}
+        "optimized" => %{"size"=>433_286, "type"=>"image/jpeg", "width"=>1_280, "height"=>1_024},
+        "xhdpi" => %{"size"=>434_916, "type"=>"image/jpeg", "width"=>1_280, "height"=>1_024},
+        "hdpi" => %{"size"=>287_932, "type"=>"image/jpeg", "width"=>750, "height"=>600},
+        "mdpi" => %{"size"=>77_422, "type"=>"image/jpeg", "width"=>375, "height"=>300},
+        "ldpi" => %{"size"=>19_718, "type"=>"image/jpeg", "width"=>180, "height"=>144}
       },
       created_at: Ecto.DateTime.utc,
       updated_at: Ecto.DateTime.utc,
@@ -147,7 +147,7 @@ defmodule Ello.Core.Factory do
         background_position: "50% 50%",
         short_bio: "I have been spying for a while now",
         formatted_short_bio: "<p>I have been spying for a while now</p>",
-        avatar: "ello-2274bdfe-57d8-4499-ba67-a7c003d5a962.png",
+        avatar: "ello-2274bdfe-57d8-4_499-ba67-a7c003d5a962.png",
         avatar_metadata: %{
           "large" => %{
             "size" => 220_669,
@@ -168,18 +168,18 @@ defmodule Ello.Core.Factory do
             "height" => 60
           }
         },
-        cover_image: "ello-e76606cf-44b0-48b5-9918-1efad8e0272c.jpeg",
+        cover_image: "ello-e76606cf-44b0-48b5-9_918-1efad8e0272c.jpeg",
         cover_image_metadata: %{
           "optimized" => %{
             "size" => 1_177_127,
             "type" => "image/jpeg",
-            "width" => 1880,
-            "height" => 1410
+            "width" => 1_880,
+            "height" => 1_410
           },
           "xhdpi" => %{
             "size" => 582_569,
             "type" => "image/jpeg",
-            "width" => 1116,
+            "width" => 1_116,
             "height" => 837
           },
           "hdpi" => %{
@@ -261,8 +261,8 @@ defmodule Ello.Core.Factory do
           "large" => %{
             "size"   => 855_144,
             "type"   => "image/png",
-            "width"  => 1000,
-            "height" => 1000
+            "width"  => 1_000,
+            "height" => 1_000
           },
           "regular" => %{
             "size"   => 556_821,

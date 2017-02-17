@@ -7,7 +7,7 @@ defmodule Ello.V2.PostViewTest do
   setup %{conn: conn} do
     archer = Script.build(:archer)
     reposter = Factory.build(:user)
-    asset = Factory.build(:asset, %{id: 1}) |> Asset.build_attachment
+    asset = Asset.build_attachment(Factory.build(:asset, %{id: 1}))
     post = Factory.build(:post, %{
       id: 1,
       author: archer,

@@ -21,23 +21,23 @@ defmodule Ello.V2.AssetViewTest do
         },
         "optimized" => %{
           url: "https://assets.ello.co/uploads/asset/attachment/1/ello-optimized-081e2121.jpg",
-          metadata: %{height: 1024, size: 433286, type: "image/jpeg", width: 1280},
+          metadata: %{height: 1_024, size: 433_286, type: "image/jpeg", width: 1_280},
         },
         "xhdpi" => %{
           url: "https://assets.ello.co/uploads/asset/attachment/1/ello-xhdpi-081e2121.jpg",
-          metadata: %{height: 1024, size: 434916, type: "image/jpeg", width: 1280},
+          metadata: %{height: 1_024, size: 434_916, type: "image/jpeg", width: 1_280},
         },
         "hdpi" => %{
           url: "https://assets.ello.co/uploads/asset/attachment/1/ello-hdpi-081e2121.jpg",
-          metadata: %{height: 600, size: 287932, type: "image/jpeg", width: 750},
+          metadata: %{height: 600, size: 287_932, type: "image/jpeg", width: 750},
         },
         "mdpi" => %{
           url: "https://assets.ello.co/uploads/asset/attachment/1/ello-mdpi-081e2121.jpg",
-          metadata: %{height: 300, size: 77422, type: "image/jpeg", width: 375},
+          metadata: %{height: 300, size: 77_422, type: "image/jpeg", width: 375},
         },
         "ldpi" => %{
           url: "https://assets.ello.co/uploads/asset/attachment/1/ello-ldpi-081e2121.jpg",
-          metadata: %{height: 144, size: 19718, type: "image/jpeg", width: 180},
+          metadata: %{height: 144, size: 19_718, type: "image/jpeg", width: 180},
         },
       }
     } = render(AssetView, "asset.json",

@@ -8,8 +8,8 @@ defmodule Ello.Core.ContentTest do
       category: cat1,
       post: Factory.insert(:post, category_ids: [cat1.id]),
       user: Factory.insert(:user),
-      nsfw_post: Factory.insert(:post, %{ is_adult_content: true }),
-      nudity_post: Factory.insert(:post, %{ has_nudity: true }),
+      nsfw_post: Factory.insert(:post, %{is_adult_content: true}),
+      nudity_post: Factory.insert(:post, %{has_nudity: true}),
     }
   end
 

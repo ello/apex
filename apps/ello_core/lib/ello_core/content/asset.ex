@@ -1,6 +1,6 @@
 defmodule Ello.Core.Content.Asset do
   use Ecto.Schema
-  alias Ello.Core.{ Network.User, Content.Post }
+  alias Ello.Core.{Network.User, Content.Post}
   alias __MODULE__.Attachment
 
   @type t :: %__MODULE__{}

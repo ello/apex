@@ -6,14 +6,16 @@ defmodule Ello.V2.PostMetaAttributesViewTest do
 
   setup %{conn: conn} do
     archer = Script.build(:archer)
-    asset1 = Factory.build(:asset, %{id: 1}) |> Asset.build_attachment
-    asset2 = Factory.build(:asset, %{id: 2}) |> Asset.build_attachment
+    asset1 = Asset.build_attachment(Factory.build(:asset, %{id: 1}))
+    asset2 = Asset.build_attachment(Factory.build(:asset, %{id: 2}))
     post = Factory.build(:post, %{
       id: 1,
       author: archer,
       assets: [asset1, asset2],
-      body: [ %{"kind" => "text", "data" => "Phrasing!"},
-              %{"kind" => "embed", "data" => %{"url" => "www.youtube.com/archer"}}],
+      body: [
+        %{"kind" => "text", "data" => "Phrasing!"},
+        %{"kind" => "embed", "data" => %{"url" => "www.youtube.com/archer"}},
+      ],
       reposted_source: nil,
       repost_from_current_user: nil,
       love_from_current_user: nil,
@@ -23,8 +25,10 @@ defmodule Ello.V2.PostMetaAttributesViewTest do
       id: 1,
       author: Map.put(archer, :bad_for_seo, true),
       assets: [asset1, asset2],
-      body: [ %{"kind" => "text", "data" => "Phrasing!"},
-              %{"kind" => "embed", "data" => %{"url" => "www.youtube.com/archer"}}],
+      body: [
+        %{"kind" => "text", "data" => "Phrasing!"},
+        %{"kind" => "embed", "data" => %{"url" => "www.youtube.com/archer"}},
+      ],
       reposted_source: nil,
       repost_from_current_user: nil,
       love_from_current_user: nil,
