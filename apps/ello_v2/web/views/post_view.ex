@@ -114,8 +114,6 @@ defmodule Ello.V2.PostView do
   defp watching(%Watch{}), do: true
   defp watching(_), do: false
 
-  defp content_warning(nil, _), do: nil
-  defp content_warning(post, %{assigns: %{current_user: nil}}), do: post
   defp content_warning(%Post{} = post, %{assigns: %{current_user: current_user}}) do
     include_third_party_warning = has_embedded_media(post) && current_user.settings.has_ad_notifications_enabled
 
@@ -124,6 +122,7 @@ defmodule Ello.V2.PostView do
       _ -> ""
     end
   end
+  defp content_warning(_post, _), do: ""
 
   defp has_embedded_media(%{} = post) do
     Enum.any?(post.body, fn(body) ->
