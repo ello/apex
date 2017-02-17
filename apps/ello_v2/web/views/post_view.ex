@@ -1,6 +1,7 @@
 defmodule Ello.V2.PostView do
   use Ello.V2.Web, :view
   alias Ello.V2.{
+    CategoryView,
     UserView,
     AssetView,
     PostMetaAttributesView,
@@ -22,6 +23,7 @@ defmodule Ello.V2.PostView do
 
   def render("show.json", %{post: post, conn: conn}) do
     linked = %{}
+             |> render_linked_categories(post, conn)
              |> render_linked_users(post, conn)
              |> render_linked_posts(post, conn)
              |> render_linked_assets(post, conn)
@@ -49,6 +51,11 @@ defmodule Ello.V2.PostView do
       content_warning: content_warning(post, conn),
       links: links(post, conn),
     })
+  end
+
+  def render_linked_categories(linked, %{categories: []}, _conn), do: linked
+  def render_linked_categories(linked, %{categories: categories}, conn) do
+    Map.put(linked, :categories, render_many(categories, CategoryView, "category.json", conn: conn))
   end
 
   def render_linked_users(linked, %{author: %User{} = author, reposted_source: %{author: %User{} = repost_author}}, conn) do
@@ -88,12 +95,13 @@ defmodule Ello.V2.PostView do
 
   defp links(post, _conn) do
     %{
+      categories: Enum.map(post.categories, &("#{&1.id}")),
       author: %{
         id: "#{post.author.id}",
         type: "users",
         href: "/api/v2/users/#{post.author.id}",
       },
-      assets:  Enum.map(post.assets, &("#{&1.id}")),
+      assets: Enum.map(post.assets, &("#{&1.id}")),
     }
   end
 

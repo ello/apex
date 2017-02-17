@@ -7,6 +7,7 @@ defmodule Ello.V2.PostViewTest do
   setup %{conn: conn} do
     archer = Script.build(:archer)
     reposter = Factory.build(:user)
+    category = Factory.build(:category, %{id: 3})
     asset = Asset.build_attachment(Factory.build(:asset, %{id: 1}))
     post = Factory.build(:post, %{
       id: 1,
@@ -19,6 +20,8 @@ defmodule Ello.V2.PostViewTest do
       rendered_summary: [
         %{"data" => "<p>Post</p>", "kind" => "text", "link_url" => nil}
       ],
+      categories: [category],
+      category_ids: [category.id],
     })
     repost = Factory.build(:post, %{
       id: 2,
@@ -33,13 +36,14 @@ defmodule Ello.V2.PostViewTest do
     {:ok, [
         conn: user_conn(conn, current_user),
         archer: archer,
+        category: category,
         post: post,
         repost: repost,
         reposter: reposter,
     ]}
   end
 
-  test "post.json - it renders the post", %{post: post, archer: user, conn: conn} do
+  test "post.json - it renders the post", %{category: category, post: post, archer: user, conn: conn} do
     assert %{
       id: "#{post.id}",
       href: "/api/v2/posts/#{post.id}",
@@ -62,9 +66,12 @@ defmodule Ello.V2.PostViewTest do
       repost_id: "",
       content_warning: "",
       links: %{
-        author: %{id: "#{user.id}",
+        categories: ["#{category.id}"],
+        author: %{
+          id: "#{user.id}",
           type: "users",
-          href: "/api/v2/users/#{user.id}"},
+          href: "/api/v2/users/#{user.id}"
+        },
         assets: ["#{hd(post.assets).id}"]
       },
     } == render(PostView, "post.json",
@@ -130,8 +137,9 @@ defmodule Ello.V2.PostViewTest do
     )
   end
 
-  test "show.json - it renders a post", %{post: post, archer: user, conn: conn} do
+  test "show.json - it renders a post", %{category: category, post: post, archer: user, conn: conn} do
     user_id = "#{user.id}"
+    category_id = "#{category.id}"
     post_id = "#{post.id}"
     post_token = post.token
     asset_id = "#{hd(post.assets).id}"
@@ -149,6 +157,7 @@ defmodule Ello.V2.PostViewTest do
         },
       },
       linked: %{
+        categories: [%{id: ^category_id}],
         users: [%{id: ^user_id}],
         assets: [%{id: ^asset_id}],
       }
