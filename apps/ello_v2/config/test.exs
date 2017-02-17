@@ -8,7 +8,8 @@ config :ello_v2, Ello.V2.Endpoint,
 
 config :ello_v2,
   social_icons_url: "https://social-icons.ello.co",
-  asset_host: "https://assets.ello.co"
+  asset_host: "https://assets.ello.co",
+  webapp_domain: "https://ello.co"
 
 # Print only warnings and errors during test
 config :logger, level: :warn

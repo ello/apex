@@ -3,6 +3,7 @@ defmodule Ello.V2.PostView do
   alias Ello.V2.{
     UserView,
     AssetView,
+    PostMetaAttributesView,
   }
   alias Ello.V2.Util
   alias Ello.Core.Network.{User}
@@ -25,17 +26,18 @@ defmodule Ello.V2.PostView do
              |> render_linked_posts(post, conn)
              |> render_linked_assets(post, conn)
     %{
-      posts: render_one(post, __MODULE__, "post.json", conn: conn),
+      posts: render_one(post, __MODULE__, "post.json", conn: conn, meta: true),
       linked: linked,
     }
   end
 
   #TODO:
   #      :meta_attributes
-  def render("post.json", %{post: post, conn: conn}) do
+  def render("post.json", %{post: post, conn: conn} = opts) do
     post
     |> Map.take(@attributes)
     |> Map.merge(reposted_attributes(post.reposted_source))
+    |> add_meta(post, opts[:meta])
     |> Map.merge(%{
       id: "#{post.id}",
       href: "/api/v2/posts/#{post.id}",
@@ -125,4 +127,9 @@ defmodule Ello.V2.PostView do
     end) || has_embedded_media(post.reposted_source)
   end
   defp has_embedded_media(_), do: false
+
+  defp add_meta(resp, post, true) do
+    Map.put(resp, :meta_attributes, render(PostMetaAttributesView, "post.json", post: post))
+  end
+  defp add_meta(resp, _, _), do: resp
 end
