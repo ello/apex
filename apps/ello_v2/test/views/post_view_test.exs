@@ -126,6 +126,7 @@ defmodule Ello.V2.PostViewTest do
   test "show.json - it renders a post", %{post: post, archer: user, conn: conn} do
     user_id = "#{user.id}"
     post_id = "#{post.id}"
+    post_token = post.token
     asset_id = "#{hd(post.assets).id}"
     assert %{
       posts: %{
@@ -133,10 +134,10 @@ defmodule Ello.V2.PostViewTest do
         meta_attributes: %{
           description: "Phrasing!",
           images: ["https://assets.ello.co/uploads/asset/attachment/1/ello-hdpi-081e2121.jpg"],
-          embeds: [],
+          embeds: nil,
           robots: "index, follow",
           title: "test post",
-          url: "https://ello.co/archer/post/#{post.token}",
+          url: "https://ello.co/archer/post/" <> ^post_token,
           canonical_url: nil,
         },
       },
