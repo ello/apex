@@ -1,7 +1,10 @@
 defmodule Ello.PostControllerTest do
   use Ello.V2.ConnCase
+  alias Ello.Core.Repo
 
   setup %{conn: conn} do
+    Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
+
     post = Factory.insert(:post)
     user = Factory.insert(:user)
     {:ok, conn: auth_conn(conn, user), post: post}

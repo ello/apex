@@ -26,6 +26,7 @@ defmodule Ello.Core.Discovery do
     |> load_images
   end
 
+  def categories_by_ids([]), do: []
   def categories_by_ids(ids) when is_list(ids) do
     Category
     |> where([c], c.id in ^ids)

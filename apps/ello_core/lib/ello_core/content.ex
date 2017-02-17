@@ -106,26 +106,17 @@ defmodule Ello.Core.Content do
 
   defp post_and_repost_preloads(posts, current_user) do
     posts
-    |> prefetch_assets
     |> prefetch_categories
-    |> prefetch_author(current_user)
-    |> prefetch_current_user_repost(current_user)
-    |> prefetch_current_user_love(current_user)
-    |> prefetch_current_user_watch(current_user)
+    |> prefetch_assets_and_author(current_user)
+    |> prefetch_current_user_relationships(current_user)
     |> prefetch_post_counts
     |> build_image_structs
   end
 
-  defp prefetch_author(nil, _), do: nil
-  defp prefetch_author([], _), do: []
-  defp prefetch_author(post_or_posts, current_user) do
-    Repo.preload(post_or_posts, author: &Network.users(&1, current_user))
-  end
-
-  defp prefetch_assets(nil), do: nil
-  defp prefetch_assets([]), do: []
-  defp prefetch_assets(post_or_posts) do
-    Repo.preload(post_or_posts, :assets)
+  defp prefetch_assets_and_author(nil, _), do: nil
+  defp prefetch_assets_and_author([], _), do: []
+  defp prefetch_assets_and_author(post_or_posts, current_user) do
+    Repo.preload(post_or_posts, [assets: [], author: &Network.users(&1, current_user)])
   end
 
   defp prefetch_reposted_source(nil, _), do: nil
@@ -139,22 +130,18 @@ defmodule Ello.Core.Content do
     end
   end
 
-  defp prefetch_current_user_repost(post_or_posts, nil), do: post_or_posts
-  defp prefetch_current_user_repost(post_or_posts, %{id: id}) do
+  defp prefetch_current_user_relationships(post_or_posts, nil), do: post_or_posts
+  defp prefetch_current_user_relationships(nil, _), do: nil
+  defp prefetch_current_user_relationships([], _), do: []
+  defp prefetch_current_user_relationships(post_or_posts, %{id: id}) do
     current_user_repost_query = where(Post, author_id: ^id)
-    Repo.preload(post_or_posts, [repost_from_current_user: current_user_repost_query])
-  end
-
-  defp prefetch_current_user_love(post_or_posts, nil), do: post_or_posts
-  defp prefetch_current_user_love(post_or_posts, %{id: id}) do
     current_user_love_query = where(Love, user_id: ^id)
-    Repo.preload(post_or_posts, [love_from_current_user: current_user_love_query])
-  end
-
-  defp prefetch_current_user_watch(post_or_posts, nil), do: post_or_posts
-  defp prefetch_current_user_watch(post_or_posts, %{id: id}) do
     current_user_watch_query = where(Watch, user_id: ^id)
-    Repo.preload(post_or_posts, [watch_from_current_user: current_user_watch_query])
+    Repo.preload(post_or_posts, [
+      repost_from_current_user: current_user_repost_query,
+      love_from_current_user:   current_user_love_query,
+      watch_from_current_user:  current_user_watch_query,
+    ])
   end
 
   # Because categories are stored as an array on posts we can use preload.

@@ -1,8 +1,9 @@
 defmodule Ello.Core.ContentTest do
   use Ello.Core.Case
-  alias Ello.Core.{Content, Image}
+  alias Ello.Core.{Content, Image, Repo}
 
   setup do
+    Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
     cat1 = Factory.insert(:category)
     {:ok,
       category: cat1,
