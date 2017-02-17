@@ -102,21 +102,14 @@ defmodule Ello.V2.PostView do
   defp watched(_), do: false
 
   defp content_warning(nil, _), do: nil
-  defp content_warning([], _), do: []
-  defp content_warning(post_or_posts, %{assigns: %{current_user: nil}}), do: post_or_posts
+  defp content_warning(post, %{assigns: %{current_user: nil}}), do: post
   defp content_warning(%Post{} = post, %{assigns: %{current_user: current_user}}) do
-    include_nsfw_warning = post.is_adult_content && !current_user.settings.views_adult_content
     include_third_party_warning = has_embedded_media(post) && current_user.settings.has_ad_notifications_enabled
 
-    case {include_nsfw_warning, include_third_party_warning} do
-      {true, true} -> "NSFW. May contain 3rd party ads."
-      {false, true} -> "May contain 3rd party ads."
-      {true, false} -> "NSFW."
+    case include_third_party_warning do
+      true -> "May contain 3rd party ads."
       _ -> ""
     end
-  end
-  defp content_warning(posts, %{assigns: %{current_user: current_user}}) do
-    Enum.map(posts, &content_warning(&1, current_user))
   end
 
   defp has_embedded_media(%{} = post) do
