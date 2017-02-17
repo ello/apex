@@ -25,6 +25,12 @@ defmodule Ello.PostControllerTest do
     assert json["posts"]["id"] == "#{post.id}"
   end
 
+  @tag :json_schema
+  test "GET /v2/posts/:id - json schema", %{conn: conn, post: post} do
+    conn = get(conn, post_path(conn, :show, post))
+    assert :ok = validate_json("post", json_response(conn, 200))
+  end
+
   test "GET /v2/posts/:id, user_id - failure", %{conn: conn, post: post} do
     conn = get(conn, post_path(conn, :show, post), %{"user_id" => "#{post.author.id + 1}"})
     assert conn.status == 404
