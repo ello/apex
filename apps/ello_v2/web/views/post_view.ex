@@ -31,8 +31,6 @@ defmodule Ello.V2.PostView do
     }
   end
 
-  #TODO:
-  #      :meta_attributes
   def render("post.json", %{post: post, conn: conn} = opts) do
     post
     |> Map.take(@attributes)
