@@ -51,9 +51,9 @@ defmodule Ello.V2.PostViewTest do
       created_at: post.created_at,
       reposted: false,
       loved: false,
-      watched: false,
-      repost_content: nil,
-      repost_id: nil,
+      watching: false,
+      repost_content: [],
+      repost_id: "",
       content_warning: "",
       links: %{
         author: %{id: "#{user.id}",
@@ -78,7 +78,7 @@ defmodule Ello.V2.PostViewTest do
     )
   end
 
-  test "post.json - it renders the post reposted loved watched", %{post: post, conn: conn} do
+  test "post.json - it renders the post reposted loved watching", %{post: post, conn: conn} do
     post = Map.merge(post, %{
       repost_from_current_user: %Post{},
       love_from_current_user: %Love{deleted: false},
@@ -87,7 +87,7 @@ defmodule Ello.V2.PostViewTest do
     assert %{
       reposted: true,
       loved: true,
-      watched: true,
+      watching: true,
     } = render(PostView, "post.json",
       post: post,
       conn: conn

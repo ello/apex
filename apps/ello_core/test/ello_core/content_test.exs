@@ -129,7 +129,7 @@ defmodule Ello.Core.ContentTest do
     refute fetched_post
   end
 
-  test "post/4 - with user - has reposted loved watched", %{user: user, post: post} do
+  test "post/4 - with user - has reposted loved watching", %{user: user, post: post} do
     repost = Factory.insert(:post, %{author: user, reposted_source: post})
     love = Factory.insert(:love, %{post: post, user: user})
     watch = Factory.insert(:watch, %{post: post, user: user})

@@ -45,7 +45,7 @@ defmodule Ello.V2.PostView do
       views_count_rounded: Util.number_to_human(post.views_count),
       reposted: reposted(post.repost_from_current_user),
       loved: loved(post.love_from_current_user),
-      watched: watched(post.watch_from_current_user),
+      watching: watching(post.watch_from_current_user),
       content_warning: content_warning(post, conn),
       links: links(post, conn),
     })
@@ -73,7 +73,7 @@ defmodule Ello.V2.PostView do
   def render_linked_assets(linked, _, _), do: linked
 
   defp reposted_attributes(nil),
-    do: %{repost_content: nil, repost_id: nil}
+    do: %{repost_content: [], repost_id: ""}
   defp reposted_attributes(repost) do
     %{
       repost_content: repost.rendered_content,
@@ -98,8 +98,8 @@ defmodule Ello.V2.PostView do
   defp loved(%Love{deleted: deleted}), do: !deleted
   defp loved(_), do: false
 
-  defp watched(%Watch{}), do: true
-  defp watched(_), do: false
+  defp watching(%Watch{}), do: true
+  defp watching(_), do: false
 
   defp content_warning(nil, _), do: nil
   defp content_warning(post, %{assigns: %{current_user: nil}}), do: post
