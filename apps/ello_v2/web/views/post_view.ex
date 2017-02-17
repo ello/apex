@@ -39,7 +39,7 @@ defmodule Ello.V2.PostView do
     |> Map.merge(%{
       id: "#{post.id}",
       href: "/api/v2/posts/#{post.id}",
-      summary: post.rendered_summary,
+      summary: summary(post),
       content: post.rendered_content,
       author_id: "#{post.author.id}",
       views_count_rounded: Util.number_to_human(post.views_count),
@@ -80,6 +80,11 @@ defmodule Ello.V2.PostView do
       repost_id: repost.id,
     }
   end
+
+  defp summary(%{reposted_source: %{rendered_summary: repost_summary}}),
+    do: repost_summary
+  defp summary(%{rendered_summary: post_summary}),
+    do: post_summary
 
   defp links(post, _conn) do
     %{

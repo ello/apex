@@ -16,12 +16,18 @@ defmodule Ello.V2.PostViewTest do
       repost_from_current_user: nil,
       love_from_current_user: nil,
       watch_from_current_user: nil,
+      rendered_summary: [
+        %{"data" => "<p>Post</p>", "kind" => "text", "link_url" => nil}
+      ],
     })
     repost = Factory.build(:post, %{
       id: 2,
       author: reposter,
       reposted_source: post,
-      assets: []
+      assets: [],
+      rendered_summary: [
+        %{"data" => "<p>Repost</p>", "kind" => "text", "link_url" => nil}
+      ],
     })
     current_user = Factory.build(:user)
     {:ok, [
@@ -38,7 +44,7 @@ defmodule Ello.V2.PostViewTest do
       id: "#{post.id}",
       href: "/api/v2/posts/#{post.id}",
       token: post.token,
-      summary: [%{"data" => "<p>Phrasing!</p>", "kind" => "text", "link_url" => nil}],
+      summary: [%{"data" => "<p>Post</p>", "kind" => "text", "link_url" => nil}],
       content: [%{"data" => "<p>Phrasing!</p>", "kind" => "text", "link_url" => nil}],
       author_id: "#{user.id}",
       is_adult_content: post.is_adult_content,
@@ -67,11 +73,12 @@ defmodule Ello.V2.PostViewTest do
     )
   end
 
-  test "post.json - it renders the post repost_content", %{post: post, repost: repost, conn: conn} do
+  test "post.json - it renders a repost", %{post: post, repost: repost, conn: conn} do
     post_id = post.id
     assert %{
       repost_id: ^post_id,
       repost_content: [%{"kind" => "text", "data" => "<p>Phrasing!</p>"}],
+      summary: [%{"kind" => "text", "data" => "<p>Post</p>"}],
     } = render(PostView, "post.json",
       post: repost,
       conn: conn
