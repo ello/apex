@@ -2,7 +2,6 @@ defmodule Ello.Core.Content.Post do
   use Ecto.Schema
   alias Ello.Core.Network.User
   alias Ello.Core.Content.{Love, Watch, Asset}
-  alias __MODULE__.Block
 
   @type t :: %__MODULE__{}
 
@@ -34,7 +33,6 @@ defmodule Ello.Core.Content.Post do
     has_many :comments, __MODULE__, foreign_key: :parent_post_id
 
     field :body, {:array, :map}
-    # embeds_many :body, Block
 
     has_many :assets, Asset
 
