@@ -95,19 +95,17 @@ defmodule Ello.Core.Content do
 
   defp post_preloads(post_or_posts, current_user) do
     post_or_posts
-    |> prefetch_assets
-    |> prefetch_categories
-    |> prefetch_author(current_user)
+    |> post_and_repost_preloads(current_user)
     |> prefetch_reposted_source(current_user)
-    |> prefetch_current_user_repost(current_user)
-    |> prefetch_current_user_love(current_user)
-    |> prefetch_current_user_watch(current_user)
-    |> prefetch_post_counts
-    |> build_image_structs
   end
 
   defp repost_preloads(reposts, current_user) do
     reposts
+    |> post_and_repost_preloads(current_user)
+  end
+
+  defp post_and_repost_preloads(posts, current_user) do
+    posts
     |> prefetch_assets
     |> prefetch_categories
     |> prefetch_author(current_user)
