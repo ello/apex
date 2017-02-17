@@ -147,7 +147,7 @@ defmodule Ello.Core.Factory do
         background_position: "50% 50%",
         short_bio: "I have been spying for a while now",
         formatted_short_bio: "<p>I have been spying for a while now</p>",
-        avatar: "ello-2274bdfe-57d8-4_499-ba67-a7c003d5a962.png",
+        avatar: "ello-2274bdfe-57d8-4499-ba67-a7c003d5a962.png",
         avatar_metadata: %{
           "large" => %{
             "size" => 220_669,
@@ -168,7 +168,7 @@ defmodule Ello.Core.Factory do
             "height" => 60
           }
         },
-        cover_image: "ello-e76606cf-44b0-48b5-9_918-1efad8e0272c.jpeg",
+        cover_image: "ello-e76606cf-44b0-48b5-9918-1efad8e0272c.jpeg",
         cover_image_metadata: %{
           "optimized" => %{
             "size" => 1_177_127,
