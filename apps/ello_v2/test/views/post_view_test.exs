@@ -163,6 +163,15 @@ defmodule Ello.V2.PostViewTest do
     assert %{
       posts: %{
         id: ^post_id,
+        meta_attributes: %{
+          description: "Phrasing!",
+          images: ["https://assets.ello.co/uploads/asset/attachment/1/ello-hdpi-081e2121.jpg"],
+          embeds: [],
+          robots: "index, follow",
+          title: "test post",
+          url: "https://ello.co/archer/post/#{post.token}",
+          canonical_url: nil,
+        },
       },
       linked: %{
         users: [%{id: ^user_id}],
