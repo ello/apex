@@ -38,6 +38,7 @@ defmodule Ello.V2.Web do
       plug Ello.V2.ClientProperties
       import Ello.Auth
       import Ello.V2.PostViewTracking
+      import PhoenixETag, only: [render_if_stale: 4, render_if_stale: 3, render_if_stale: 2]
     end
   end
 
@@ -47,6 +48,7 @@ defmodule Ello.V2.Web do
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_csrf_token: 0, get_flash: 2, view_module: 1]
+      import PhoenixETag, only: [schema_etag: 1, schema_last_modified: 1]
 
       import Ello.V2.Router.Helpers
       import Ello.V2.ErrorHelpers

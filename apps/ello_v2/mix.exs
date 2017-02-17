@@ -41,6 +41,7 @@ defmodule Ello.V2.Mixfile do
       {:httpoison, "~> 0.11.0"},
       {:html_sanitize_ex, "~> 1.0.0"},
       {:curtail, "~> 0.1"},
+      {:phoenix_etag, "~> 0.1.0"},
 
       {:ello_core, in_umbrella: true},
       {:ello_auth, in_umbrella: true},

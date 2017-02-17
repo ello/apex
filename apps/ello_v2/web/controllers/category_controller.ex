@@ -10,7 +10,7 @@ defmodule Ello.V2.CategoryController do
   Supports `meta=true` and `all=true` params.
   """
   def index(conn, params) do
-    render(conn, categories: categories(params, conn))
+    render_if_stale(conn, categories: categories(params, conn))
   end
 
   @doc """
