@@ -4,15 +4,11 @@ defmodule Ello.Events do
   """
 
   @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Ello.Events.hello
-      :world
-
+  Publish an event to Sidekiq or Kinesis.
   """
-  def hello do
-    :world
+  def publish(%{__struct__: module} = in) do
+    handler = module.__handler()
+    handler.publish(module, in)
   end
+
 end
