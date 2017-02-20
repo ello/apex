@@ -1,19 +1,26 @@
 # Ello.Events
 
-**TODO: Add description**
+Responsible for tasks that need to be processed in the background.  The public
+API is `Ello.Events.publish(%Event{})`, where `%Event{}` implements the
+`Ello.Event` behavior.  In this way, we can support multiple background queueing
+mechanisms, e.g. Sidekiq or a simple Elixir `Task`.
 
-## Installation
+# Creating New Events
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `ello_events` to your list of dependencies in `mix.exs`:
+Take a look at `Ello.Events.CountPostView` and `Ello.Events.Sidekiq`.  This is
+an example of implementing an event that is pushed to the redis/sidekiq event
+queue.  If you create another event handler, just implement a suitable `publish`
+function and start your background process/queueing there.
+
+# Events
+
+### `CountPostView`
 
 ```elixir
-def deps do
-  [{:ello_events, "~> 0.1.0"}]
-end
+Ello.Events.publish(%CountPostView{
+  post_ids: [1, 2, 3],
+  current_user_id: 666,
+  stream_kind: "following",
+  stream_id: nil,
+})
 ```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/ello_events](https://hexdocs.pm/ello_events).
-
