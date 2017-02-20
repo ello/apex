@@ -24,19 +24,15 @@ defmodule Ello.Events.Sidekiq do
 
   def publish(module, struct) do
     Task.async fn ->
-      jid = UUID.uuid4
-      queue = module.queue()
-      worker = module.worker()
-      args = module.args(struct)
       now = DateTime.to_unix(DateTime.utc_now(), :microseconds) / 1_000_000
 
       retries = 10 # max_retries
       job = %{
-        queue: queue,
+        queue: module.queue(),
         retry: retries,
-        class: worker,
-        args: args,
-        jid: jid,
+        class: module.worker(),
+        args: module.args(struct),
+        jid: UUID.uuid4,
         enqueued_at: now,
       }
       job_serialized = Poison.encode!(job)
@@ -46,8 +42,7 @@ defmodule Ello.Events.Sidekiq do
   end
 
   defp redis(args) do
-    handler = Application.get_env(:ello_events, :redis, {Ello.Core.Redis, :command})
-    case handler do
+    case Application.get_env(:ello_events, :redis, {Ello.Core.Redis, :command}) do
       {mod, fun}                   -> apply(mod, fun, [args])
       fun when is_function(fun, 1) -> fun.(args)
     end
