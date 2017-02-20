@@ -24,21 +24,29 @@ defmodule Ello.Events.Sidekiq do
 
   def publish(module, struct) do
     Task.async fn ->
-      now = DateTime.to_unix(DateTime.utc_now(), :microseconds) / 1_000_000
+      payload = module
+                |> build_job(struct)
+                |> Poison.encode!()
 
-      retries = 10 # max_retries
-      job = %{
-        queue: module.queue(),
-        retry: retries,
-        class: module.worker(),
-        args: module.args(struct),
-        jid: UUID.uuid4,
-        enqueued_at: now,
-      }
-      job_serialized = Poison.encode!(job)
-
-      redis(["LPUSH", "queue:#{queue}", job_serialized])
+      redis(["LPUSH", "queue:#{module.queue()}", payload])
     end
+  end
+
+  @max_retries 10
+
+  defp build_job(module, struct) do
+    %{
+      queue: module.queue,
+      retry: @max_retries,
+      class: module.worker,
+      args: module.args(struct),
+      jid: UUID.uuid4,
+      enqueued_at: unix_now_float(),
+    }
+  end
+
+  defp unix_now_float do
+    DateTime.to_unix(DateTime.utc_now(), :microseconds) / 1_000_000
   end
 
   defp redis(args) do
