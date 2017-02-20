@@ -1,33 +1,48 @@
-# Ello
+#<img src="http://d324imu86q1bqn.cloudfront.net/uploads/user/avatar/641/large_Ello.1000x1000.png" width="200px" height="200px" />
 
-An Elixir implementation of the Ello Mothership API.
+# Ello Apex
+
+[![Build Status](https://travis-ci.org/ello/apex.svg?branch=master)](https://travis-ci.org/ello/apex)
+
+A collection of endpoint serving some of the API for [ello.co](http://ello.co).
+
+The primary Ello API (referred to as the Ello Mothership) is a Ruby on Rails
+application. Apex is an effort to increase rendering performance on heavily
+used read API endpoints. It is expected that the responsibility of Apex may
+grow to take over write responsibility in the future.
+
+While the Ruby Ello Mothership is not (yet) open source, the
+[Swift based iOS app](https://github.com/ello/webapp) and
+[React based webapp](https://github.com/ello/webapp) API consumers are OSS.
+You can check out all of Ello's OSS on [Ello's github profile](https://github.com/ello)
+and our philosophy on OSS is written up in @jayzes's
+[blog post](https://ello.co/jayzes/post/tqll-z8u8gfbdysrk6wbkg).
 
 ## Organization
 
-The Elixir Mothership, hereafter referred to as `Ello` is an Elixir Umbrella
-application wrapping several Elixir/OTP apps. Each app is fundamentally
-independent and could be broken into external repositories if desired.
+Apex, (module name `Ello`) is an Elixir Umbrella application wrapping several
+Elixir/OTP apps. Each app is intended to manage a particular domain concern.
 
 ### `Ello.Core`
 
 This OTP app is the core service for working with Postgres and Redis data
-historically managed by the Rails Mothership. [README]()
+historically managed by the Rails Mothership. [README](/apps/ello_core/)
 
 ### `Ello.Dispatch`
 
 Dispatch is a simple Phoenix app with no controllers of it's own. The only job
 of dispatch is to delegate HTTP and Websocket requests to the proper app.
-[README]()
+[README](/apps/ello_dispatch/)
 
 ### `Ello.V2`
 
 V2 is a Phoenix app serving the Ello V2 JSON API. It queries `Core` and `Auth`
-as needed. [README]()
+as needed. [README](/apps/ello_v2/)
 
 ### `Ello.Auth`
 
 Auth provides plugs for authenticating requests and verifying JWTs. It depends
-on `Core` to lookup users.
+on `Core` to lookup users. [README](/apps/ello_auth/)
 
 ## Getting Started
 
@@ -48,3 +63,17 @@ own config options in it's README.
 * To start a console run `iex -S mix`
 * To start a console and webserver run `iex -S mix phoenix.server`
 * To run tests `mix test`
+
+## Code of Conduct
+Ello was created by idealists who believe that the essential nature of all
+human beings is to be kind, considerate, helpful, intelligent, responsible,
+and respectful of others. To that end, we will be enforcing
+[the Ello rules](https://ello.co/wtf/policies/rules/) within all of our open
+source projects. If you don’t follow the rules, you risk being ignored, banned,
+or reported for abuse.
+
+## Contributing
+Bug reports and pull requests are welcome on GitHub at https://github.com/ello/apex.
+
+## License
+Ello Apex is released under the [MIT License](/LICENSE.txt)
