@@ -23,7 +23,11 @@ defmodule Ello.Events.Exq do
   end
 
   def publish(module, struct) do
-    Exq.enqueue(Exq, module.queue(), module.worker(), module.args(struct))
+    Exq.enqueue(exq_process, module.queue(), module.worker(), module.args(struct))
+  end
+
+  defp exq_process do
+    Application.get_env(:ello_events, :exq_process, Exq)
   end
 
 end
