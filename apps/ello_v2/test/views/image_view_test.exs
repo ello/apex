@@ -115,7 +115,7 @@ defmodule Ello.V2.ImageViewTest do
   end
 
   test "image.json - rendering an image given the image- with domain sharding" do
-    Application.put_env(:ello_v2, :asset_host, "https://assets%d.ello.co")
+    Application.put_env(:ello_v2, :asset_host, "assets%d.ello.co")
     assert render(ImageView, "image.json", image: image(), conn: build_conn()) ==
       %{
         "original" => %{
@@ -149,7 +149,7 @@ defmodule Ello.V2.ImageViewTest do
           }
         }
       }
-    Application.put_env(:ello_v2, :asset_host, "https://assets.ello.co")
+    Application.put_env(:ello_v2, :asset_host, "assets.ello.co")
   end
 
 

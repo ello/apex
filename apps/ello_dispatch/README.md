@@ -18,7 +18,7 @@ Ello.Dispatch expects the following environmental variables in production
 (like) environments:
 
 * PORT - the port to run the http server on, typically provided by Heroku. Defaults to 5000
-* ELLO_DOMAIN - the domain the app is running on as accessed by user, eg: ello.ninja. Defaults to localhost
+* WEBAPP_HOST - the domain the app is running on as accessed by user, eg: ello.ninja. Defaults to localhost
 * ENVIRONMENT_NAME - the name of the environment (eg ninja, stage1, production, etc). Used in honeybadger and new relic to seperate environment reporting. Defaults to the Mix.env
 * NEW_RELIC_LICENSE_KEY - If not present new relic data is not reported.
 * HONEYBADGER_API_KEY - If not present exceptions are not reported.

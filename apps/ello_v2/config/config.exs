@@ -8,7 +8,7 @@ use Mix.Config
 # General application configuration
 config :ello_v2,
   namespace: Ello.V2,
-  webapp_domain: System.get_env("BASE_DOMAIN"),
+  webapp_host: System.get_env("WEBAPP_HOST"),
   ecto_repos: []
 
 # Configures the endpoint

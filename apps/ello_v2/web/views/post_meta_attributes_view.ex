@@ -48,11 +48,11 @@ defmodule Ello.V2.PostMetaAttributesView do
   defp robots(_), do: "index, follow"
 
   defp post_url(post) do
-    "#{base_domain()}/#{post.author.username}/post/#{post.token}"
+    "https://#{webapp_host()}/#{post.author.username}/post/#{post.token}"
   end
 
-  defp base_domain do
-    Application.get_env(:ello_v2, :webapp_domain, "https://ello.co")
+  defp webapp_host do
+    Application.get_env(:ello_v2, :webapp_host, "ello.co")
   end
 
   defp canonical_url(%{reposted_source: %Post{} = repost}) do
