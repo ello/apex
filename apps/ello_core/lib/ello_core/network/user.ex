@@ -32,11 +32,11 @@ defmodule Ello.Core.Network.User do
     field :category_ids, {:array, :integer}, default: []
     field :categories, {:array, :map}, default: [], virtual: true
 
-    field :locked_at, Ecto.DateTime
+    field :locked_at, :utc_datetime
     field :locked_reason, :string
 
-    field :created_at, Ecto.DateTime
-    field :updated_at, Ecto.DateTime
+    field :created_at, :utc_datetime
+    field :updated_at, :utc_datetime
 
     embeds_one :settings, Settings
     has_many :relationships, Relationship, foreign_key: :owner_id

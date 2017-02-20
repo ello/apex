@@ -18,8 +18,8 @@ defmodule Ello.Core.Content.Post do
     field :category_ids, {:array, :integer}, default: []
     field :categories, {:array, :map}, default: [], virtual: true
 
-    field :created_at, Ecto.DateTime
-    field :updated_at, Ecto.DateTime
+    field :created_at, :utc_datetime
+    field :updated_at, :utc_datetime
 
     field :rendered_content, {:array, :map}
     field :rendered_summary, {:array, :map}

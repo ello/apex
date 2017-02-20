@@ -11,7 +11,7 @@ defmodule Ello.Core.Content.Love do
     belongs_to :post, Post
     belongs_to :user, User
     field :deleted, :boolean, default: false
-    field :created_at, Ecto.DateTime
-    field :updated_at, Ecto.DateTime
+    field :created_at, :utc_datetime
+    field :updated_at, :utc_datetime
   end
 end

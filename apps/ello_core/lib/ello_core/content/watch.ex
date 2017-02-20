@@ -10,7 +10,7 @@ defmodule Ello.Core.Content.Watch do
   schema "watches" do
     belongs_to :post, Post
     belongs_to :user, User
-    field :created_at, Ecto.DateTime
-    field :updated_at, Ecto.DateTime
+    field :created_at, :utc_datetime
+    field :updated_at, :utc_datetime
   end
 end

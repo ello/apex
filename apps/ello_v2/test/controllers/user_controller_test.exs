@@ -59,7 +59,7 @@ defmodule Ello.V2.UserControllerTest do
 
   test "GET /v2/users/:id - when locked", context do
     context.archer
-    |> Ecto.Changeset.change(locked_at: Ecto.DateTime.utc)
+    |> Ecto.Changeset.change(locked_at: DateTime.utc_now)
     |> Ello.Core.Repo.update!
 
     conn = auth_conn(context.unauth_conn, context.user)

@@ -10,8 +10,8 @@ defmodule Ello.Core.Discovery.Category do
     field :slug, :string
     field :level, :string
     field :order, :integer
-    field :created_at, Ecto.DateTime
-    field :updated_at, Ecto.DateTime
+    field :created_at, :utc_datetime
+    field :updated_at, :utc_datetime
     field :tile_image, :string
     field :tile_image_metadata, :map
     field :tile_image_struct, :map, virtual: true

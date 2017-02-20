@@ -101,14 +101,14 @@ defmodule Ello.Core.ContentTest do
   end
 
   test "post/4 - does not return banned author" do
-    banned_author = Factory.insert(:user, %{locked_at: Ecto.DateTime.utc})
+    banned_author = Factory.insert(:user, %{locked_at: DateTime.utc_now})
     banned_post = Factory.insert(:post, %{author: banned_author})
     fetched_post = Content.post(banned_post.id, nil, true, true)
     refute fetched_post
   end
 
   test "post/4 - does not return banned repost author" do
-    banned_author = Factory.insert(:user, %{locked_at: Ecto.DateTime.utc})
+    banned_author = Factory.insert(:user, %{locked_at: DateTime.utc_now})
     banned_post = Factory.insert(:post, %{author: banned_author})
     banned_repost = Factory.insert(:post, %{reposted_source: banned_post})
     fetched_post = Content.post(banned_repost.id, nil, true, true)

@@ -12,8 +12,8 @@ defmodule Ello.Core.Factory do
       email_hash: sequence(:user_email_hash, &"emailhash#{&1}"),
       settings:   %User.Settings{},
 
-      created_at: Ecto.DateTime.utc,
-      updated_at: Ecto.DateTime.utc,
+      created_at: DateTime.utc_now,
+      updated_at: DateTime.utc_now,
     } |> User.load_images
   end
 
@@ -45,8 +45,8 @@ defmodule Ello.Core.Factory do
                            "data" => "<p>Phrasing!</p>",
                            "link_url" => nil
                          }],
-      created_at: Ecto.DateTime.utc,
-      updated_at: Ecto.DateTime.utc,
+      created_at: DateTime.utc_now,
+      updated_at: DateTime.utc_now,
     }
   end
 
@@ -69,8 +69,8 @@ defmodule Ello.Core.Factory do
         "mdpi" => %{"size"=>77_422, "type"=>"image/jpeg", "width"=>375, "height"=>300},
         "ldpi" => %{"size"=>19_718, "type"=>"image/jpeg", "width"=>180, "height"=>144}
       },
-      created_at: Ecto.DateTime.utc,
-      updated_at: Ecto.DateTime.utc,
+      created_at: DateTime.utc_now,
+      updated_at: DateTime.utc_now,
     }
   end
 
@@ -78,8 +78,8 @@ defmodule Ello.Core.Factory do
     %Love{
       user: build(:user),
       post: build(:post),
-      created_at: Ecto.DateTime.utc,
-      updated_at: Ecto.DateTime.utc,
+      created_at: DateTime.utc_now,
+      updated_at: DateTime.utc_now,
     }
   end
 
@@ -87,8 +87,8 @@ defmodule Ello.Core.Factory do
     %Watch{
       user: build(:user),
       post: build(:post),
-      created_at: Ecto.DateTime.utc,
-      updated_at: Ecto.DateTime.utc,
+      created_at: DateTime.utc_now,
+      updated_at: DateTime.utc_now,
     }
   end
 
@@ -108,8 +108,8 @@ defmodule Ello.Core.Factory do
       level:       "Primary",
       order:        Enum.random(0..10),
       promotionals: [build(:promotional)],
-      created_at:   Ecto.DateTime.utc,
-      updated_at:   Ecto.DateTime.utc,
+      created_at:   DateTime.utc_now,
+      updated_at:   DateTime.utc_now,
     } |> Category.load_images
   end
 
@@ -118,8 +118,8 @@ defmodule Ello.Core.Factory do
       image: "ello-optimized-da955f87.jpg",
       image_metadata: %{},
       user: build(:user),
-      created_at: Ecto.DateTime.utc,
-      updated_at: Ecto.DateTime.utc,
+      created_at: DateTime.utc_now,
+      updated_at: DateTime.utc_now,
     } |> Promotional.load_images
   end
 
@@ -219,8 +219,8 @@ defmodule Ello.Core.Factory do
         level: "meta",
         order: 0,
         uses_page_promotionals: true,
-        created_at: Ecto.DateTime.utc,
-        updated_at: Ecto.DateTime.utc,
+        created_at: DateTime.utc_now,
+        updated_at: DateTime.utc_now,
       } |> Category.load_images
     end
 
@@ -236,8 +236,8 @@ defmodule Ello.Core.Factory do
         level: nil,
         order: 0,
         uses_page_promotionals: false,
-        created_at: Ecto.DateTime.utc,
-        updated_at: Ecto.DateTime.utc,
+        created_at: DateTime.utc_now,
+        updated_at: DateTime.utc_now,
         promotionals: [],
       } |> Category.load_images
     end
@@ -254,8 +254,8 @@ defmodule Ello.Core.Factory do
         level: "Primary",
         order: 0,
         uses_page_promotionals: false,
-        created_at: Ecto.DateTime.utc,
-        updated_at: Ecto.DateTime.utc,
+        created_at: DateTime.utc_now,
+        updated_at: DateTime.utc_now,
         tile_image: "ello-optimized-8bcedb76.jpg",
         tile_image_metadata: %{
           "large" => %{

@@ -10,8 +10,8 @@ defmodule Ello.Core.Content.Asset do
     field :attachment, :string
     field :attachment_metadata, :map
 
-    field :created_at, Ecto.DateTime
-    field :updated_at, Ecto.DateTime
+    field :created_at, :utc_datetime
+    field :updated_at, :utc_datetime
 
     belongs_to :user, User
     belongs_to :post, Post
