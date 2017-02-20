@@ -16,7 +16,7 @@ defmodule Ello.V2.PostController do
       conn.assigns[:current_user],
       conn.assigns[:allow_nsfw],
       conn.assigns[:allow_nudity]
-      )
+    )
   end
 
   defp owned_by_user(post, %{"user_id" => "~" <> username}),
