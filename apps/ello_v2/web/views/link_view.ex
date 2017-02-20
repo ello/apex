@@ -38,7 +38,7 @@ defmodule Ello.V2.LinkView do
 
   defp social_icon_url(icon_type) do
     social_icons_host = Application.get_env(:ello_v2, :social_icons_host)
-    Map.put(icon_type, :icon, "//#{social_icons_host}/#{icon_type.icon}")
+    Map.put(icon_type, :icon, "https://#{social_icons_host}/#{icon_type.icon}")
   end
 
   defp icon_types do

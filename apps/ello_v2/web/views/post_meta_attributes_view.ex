@@ -48,7 +48,7 @@ defmodule Ello.V2.PostMetaAttributesView do
   defp robots(_), do: "index, follow"
 
   defp post_url(post) do
-    "//#{webapp_host()}/#{post.author.username}/post/#{post.token}"
+    "https://#{webapp_host()}/#{post.author.username}/post/#{post.token}"
   end
 
   defp webapp_host do
