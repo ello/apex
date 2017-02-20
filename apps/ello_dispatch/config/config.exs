@@ -3,7 +3,7 @@
 use Mix.Config
 
 config :ello_dispatch, Ello.Dispatch.Endpoint,
-  url:  [host: System.get_env("ELLO_DOMAIN") || "localhost"],
+  url:  [host: System.get_env("WEBAPP_HOST") || "localhost"],
   http: [port: System.get_env("PORT") || 5000],
   render_errors: [view: Ello.Dispatch.ErrorView, accepts: ~w(json)],
   instrumenters: [NewRelicPhoenix.Endpoint]
