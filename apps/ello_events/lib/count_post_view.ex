@@ -1,5 +1,5 @@
 defmodule Ello.Events.CountPostView do
-  use Ello.Events.Exq
+  use Ello.Events.Sidekiq
 
   defstruct [
     post_ids: [],

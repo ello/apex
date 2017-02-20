@@ -21,7 +21,8 @@ defmodule Ello.Events.Mixfile do
 
   defp deps do
     [
-      {:exq, "~> 0.8.3"},
+      {:uuid,   "~> 1.0"},
+      {:poison, "~> 2.2"},
     ]
   end
 end

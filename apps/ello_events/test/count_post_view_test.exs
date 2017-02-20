@@ -3,46 +3,29 @@ defmodule Ello.Events.CountPostViewTest do
   alias Ello.Events.CountPostView
   doctest Ello.Events
 
-  test "Exq implementation" do
+  test "Sidekiq implementation" do
     assert CountPostView.queue == "count"
     assert CountPostView.worker == "CountPostView"
-    assert CountPostView.handler == Ello.Events.Exq
-  end
-
-  defmacro with_test_env(app, key, value, do: tests) do
-    quote do
-      restore_env = Application.get_env(unquote(app), unquote(key))
-      Application.put_env(unquote(app), unquote(key), unquote(value))
-      unquote(tests)
-      Application.put_env(unquote(app), unquote(key), restore_env)
-    end
+    assert CountPostView.handler == Ello.Events.Sidekiq
   end
 
   test "Event.publish/1 - publishes a CountPostView" do
-    with_test_env(:ello_events, :exq_process, self()) do
-      spawn fn ->
-        Ello.Events.publish(%CountPostView{
-          post_ids: [1, 2, 3],
-          current_user_id: 666,
-          stream_kind: "following",
-          stream_id: nil,
-        })
-      end
-
-      assert_receive {_, _, {
-        :enqueue,
-        "count",
-        "CountPostView",
-        [
-          %{
-            current_user_id: 666,
-            post_ids: [1, 2, 3],
-            stream_id: nil,
-            stream_kind: "following"
-          }
-        ],
-        _
-      }}
+    pid = self()
+    listener = fn(command) ->
+      send pid, command
     end
+
+    Application.put_env(:ello_events, :redis, listener)
+    Ello.Events.publish(%CountPostView{
+      post_ids: [1, 2, 3],
+      current_user_id: 666,
+      stream_kind: "following",
+      stream_id: nil,
+    })
+
+    assert_receive ["LPUSH", "queue:count", json]
+    assert %{"args" => [%{"post_ids" => [1, 2, 3]}]} = Poison.decode!(json)
+
+    Application.delete_env(:ello_events, :redis)
   end
 end

@@ -5,7 +5,7 @@ defmodule Ello.Events do
   """
 
   @doc """
-  What module handles publishing this event - should be Ello.Event.Exq or
+  What module handles publishing this event - should be Ello.Event.Sidekiq or
   any other event module.
   """
   @callback handler() :: module
