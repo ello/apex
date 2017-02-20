@@ -14,3 +14,5 @@ Ello.V2 expects the following environmental variables in production
   profile. Defaults to "https://social-icons.ello.co".
 * ASSET_HOST - The URL used for user uploaded assets. In order to utilize domain
   sharding, there is a "%d" that gets overridden with an integer value of 0-3.
+* WEBAPP_HOST - The public domain name, e.g. `https://ello.co` or
+  `https://ello-fg-rainbow.herokuapp.com`.
