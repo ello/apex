@@ -4,8 +4,8 @@ defmodule Ello.Core.Network.Relationship do
 
   schema "followerships" do
     field :priority, :string
-    field :created_at, Ecto.DateTime
-    field :updated_at, Ecto.DateTime
+    field :created_at, :utc_datetime
+    field :updated_at, :utc_datetime
 
     belongs_to :owner,   User
     belongs_to :subject, User

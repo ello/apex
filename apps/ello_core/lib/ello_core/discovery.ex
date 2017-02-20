@@ -26,6 +26,7 @@ defmodule Ello.Core.Discovery do
     |> load_images
   end
 
+  def categories_by_ids([]), do: []
   def categories_by_ids(ids) when is_list(ids) do
     Category
     |> where([c], c.id in ^ids)
@@ -33,6 +34,35 @@ defmodule Ello.Core.Discovery do
     |> include_meta_categories(false)
     |> Repo.all
     |> load_images
+  end
+
+  @type categorizable :: User.t | Post.t | [User.t | Post.t]
+
+  @doc """
+  Fetches the categories for a user or post
+
+  Given a user or post struct (or list of users or posts), this function will
+  fetch all the categories and include them in the struct (or list of structs).
+  """
+  @spec put_belongs_to_many_categories(categorizables :: categorizable | nil) :: categorizable | nil
+  def put_belongs_to_many_categories(nil), do: nil
+  def put_belongs_to_many_categories([]), do: []
+  def put_belongs_to_many_categories(%{} = categorizable),
+    do: hd(put_belongs_to_many_categories([categorizable]))
+  def put_belongs_to_many_categories(categorizables) do
+    categories = categorizables
+                 |> Enum.flat_map(&(&1.category_ids))
+                 |> Discovery.categories_by_ids
+                 |> Enum.group_by(&(&1.id))
+    Enum.map categorizables, fn
+      %{category_ids: []} = categorizable -> categorizable
+      categorizable ->
+        categorizable_categories = categories
+                          |> Map.take(categorizable.category_ids)
+                          |> Map.values
+                          |> List.flatten
+        Map.put(categorizable, :categories, categorizable_categories)
+    end
   end
 
   @doc """

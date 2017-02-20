@@ -19,7 +19,6 @@ defmodule Ello.V2.UserControllerTest do
            |> public_conn
            |> get(user_path(conn, :show, archer))
     assert %{"name" => "Sterling Archer"} = json_response(conn, 200)["users"]
-    assert :ok = validate_json("user", json_response(conn, 200))
   end
 
   test "GET /v2/users/:id - user token", %{conn: conn, archer: archer} do
@@ -30,6 +29,11 @@ defmodule Ello.V2.UserControllerTest do
   test "GET /v2/users/~:username - user token", %{conn: conn, archer: archer} do
     conn = get(conn, user_path(conn, :show, "~#{archer.username}"))
     assert %{"name" => "Sterling Archer"} = json_response(conn, 200)["users"]
+  end
+
+  @tag :json_schema
+  test "GET /v2/users/:id - json schema", %{conn: conn, archer: archer} do
+    conn = get(conn, user_path(conn, :show, archer))
     assert :ok = validate_json("user", json_response(conn, 200))
   end
 
@@ -55,7 +59,7 @@ defmodule Ello.V2.UserControllerTest do
 
   test "GET /v2/users/:id - when locked", context do
     context.archer
-    |> Ecto.Changeset.change(locked_at: Ecto.DateTime.utc)
+    |> Ecto.Changeset.change(locked_at: DateTime.utc_now)
     |> Ello.Core.Repo.update!
 
     conn = auth_conn(context.unauth_conn, context.user)

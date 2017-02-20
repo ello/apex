@@ -1,7 +1,8 @@
 defmodule Ello.Core.Factory do
-  alias Ello.Core.{Repo, Discovery, Network}
+  alias Ello.Core.{Repo, Discovery, Network, Content}
   alias Discovery.{Category, Promotional}
   alias Network.{User, Relationship}
+  alias Content.{Post, Love, Watch, Asset}
   use ExMachina.Ecto, repo: Repo
 
   def user_factory do
@@ -11,9 +12,91 @@ defmodule Ello.Core.Factory do
       email_hash: sequence(:user_email_hash, &"emailhash#{&1}"),
       settings:   %User.Settings{},
 
-      created_at: Ecto.DateTime.utc,
-      updated_at: Ecto.DateTime.utc,
+      created_at: DateTime.utc_now,
+      updated_at: DateTime.utc_now,
     } |> User.load_images
+  end
+
+  def settings_factory do
+    %User.Settings{}
+  end
+
+  def post_factory do
+    %Post{
+      author:    build(:user),
+      token:     sequence(:post_token, &"testtoken#{&1}wouldberandom"),
+      seo_title: "test post",
+      is_adult_content: false,
+      is_disabled: false,
+      has_nudity: false,
+      is_saleable: false,
+      loves_count: 1,
+      comments_count: 2,
+      reposts_count: 3,
+      views_count: 4_123,
+      body: [%{"kind" => "text", "data" => "Phrasing!"}],
+      rendered_content: [%{
+                           "kind" => "text",
+                           "data" => "<p>Phrasing!</p>",
+                           "link_url" => nil
+                         }],
+      rendered_summary: [%{
+                           "kind" => "text",
+                           "data" => "<p>Phrasing!</p>",
+                           "link_url" => nil
+                         }],
+      created_at: DateTime.utc_now,
+      updated_at: DateTime.utc_now,
+    }
+  end
+
+  def repost_factory do
+    post_factory()
+    |> Map.merge(%{
+      reposted_source: build(:post)
+    })
+  end
+
+  def asset_factory do
+    %Asset{
+      user: build(:user),
+      post: build(:post),
+      attachment: "ello-a9c0ede1-aeca-45af-9723-5750babf541e.jpeg",
+      attachment_metadata: %{
+        "optimized" => %{"size"=>433_286, "type"=>"image/jpeg", "width"=>1_280, "height"=>1_024},
+        "xhdpi" => %{"size"=>434_916, "type"=>"image/jpeg", "width"=>1_280, "height"=>1_024},
+        "hdpi" => %{"size"=>287_932, "type"=>"image/jpeg", "width"=>750, "height"=>600},
+        "mdpi" => %{"size"=>77_422, "type"=>"image/jpeg", "width"=>375, "height"=>300},
+        "ldpi" => %{"size"=>19_718, "type"=>"image/jpeg", "width"=>180, "height"=>144}
+      },
+      created_at: DateTime.utc_now,
+      updated_at: DateTime.utc_now,
+    }
+  end
+
+  def love_factory do
+    %Love{
+      user: build(:user),
+      post: build(:post),
+      created_at: DateTime.utc_now,
+      updated_at: DateTime.utc_now,
+    }
+  end
+
+  def watch_factory do
+    %Watch{
+      user: build(:user),
+      post: build(:post),
+      created_at: DateTime.utc_now,
+      updated_at: DateTime.utc_now,
+    }
+  end
+
+  def comment_factory do
+    post_factory()
+    |> Map.merge(%{
+      parent_post: build(:post)
+    })
   end
 
   def category_factory do
@@ -25,8 +108,8 @@ defmodule Ello.Core.Factory do
       level:       "Primary",
       order:        Enum.random(0..10),
       promotionals: [build(:promotional)],
-      created_at:   Ecto.DateTime.utc,
-      updated_at:   Ecto.DateTime.utc,
+      created_at:   DateTime.utc_now,
+      updated_at:   DateTime.utc_now,
     } |> Category.load_images
   end
 
@@ -35,8 +118,8 @@ defmodule Ello.Core.Factory do
       image: "ello-optimized-da955f87.jpg",
       image_metadata: %{},
       user: build(:user),
-      created_at: Ecto.DateTime.utc,
-      updated_at: Ecto.DateTime.utc,
+      created_at: DateTime.utc_now,
+      updated_at: DateTime.utc_now,
     } |> Promotional.load_images
   end
 
@@ -90,13 +173,13 @@ defmodule Ello.Core.Factory do
           "optimized" => %{
             "size" => 1_177_127,
             "type" => "image/jpeg",
-            "width" => 1880,
-            "height" => 1410
+            "width" => 1_880,
+            "height" => 1_410
           },
           "xhdpi" => %{
             "size" => 582_569,
             "type" => "image/jpeg",
-            "width" => 1116,
+            "width" => 1_116,
             "height" => 837
           },
           "hdpi" => %{
@@ -136,8 +219,8 @@ defmodule Ello.Core.Factory do
         level: "meta",
         order: 0,
         uses_page_promotionals: true,
-        created_at: Ecto.DateTime.utc,
-        updated_at: Ecto.DateTime.utc,
+        created_at: DateTime.utc_now,
+        updated_at: DateTime.utc_now,
       } |> Category.load_images
     end
 
@@ -153,8 +236,8 @@ defmodule Ello.Core.Factory do
         level: nil,
         order: 0,
         uses_page_promotionals: false,
-        created_at: Ecto.DateTime.utc,
-        updated_at: Ecto.DateTime.utc,
+        created_at: DateTime.utc_now,
+        updated_at: DateTime.utc_now,
         promotionals: [],
       } |> Category.load_images
     end
@@ -171,15 +254,15 @@ defmodule Ello.Core.Factory do
         level: "Primary",
         order: 0,
         uses_page_promotionals: false,
-        created_at: Ecto.DateTime.utc,
-        updated_at: Ecto.DateTime.utc,
+        created_at: DateTime.utc_now,
+        updated_at: DateTime.utc_now,
         tile_image: "ello-optimized-8bcedb76.jpg",
         tile_image_metadata: %{
           "large" => %{
             "size"   => 855_144,
             "type"   => "image/png",
-            "width"  => 1000,
-            "height" => 1000
+            "width"  => 1_000,
+            "height" => 1_000
           },
           "regular" => %{
             "size"   => 556_821,

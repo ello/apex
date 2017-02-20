@@ -18,8 +18,8 @@ config :ello_v2, Ello.V2.Endpoint,
   server: false
 
 config :ello_v2,
-  social_icons_url: System.get_env("SOCIAL_ICONS_URL") || "https://social-icons.ello.co",
-  asset_host: System.get_env("ASSET_HOST") || "https://assets%d.ello.co"
+  social_icons_host: System.get_env("SOCIAL_ICONS_HOST") || "social-icons.ello.co",
+  asset_host: System.get_env("ASSET_HOST") || "assets%d.ello.co"
 
 # Do not print debug messages in production
 config :logger, level: :info

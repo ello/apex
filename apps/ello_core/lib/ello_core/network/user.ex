@@ -32,11 +32,11 @@ defmodule Ello.Core.Network.User do
     field :category_ids, {:array, :integer}, default: []
     field :categories, {:array, :map}, default: [], virtual: true
 
-    field :locked_at, Ecto.DateTime
+    field :locked_at, :utc_datetime
     field :locked_reason, :string
 
-    field :created_at, Ecto.DateTime
-    field :updated_at, Ecto.DateTime
+    field :created_at, :utc_datetime
+    field :updated_at, :utc_datetime
 
     embeds_one :settings, Settings
     has_many :relationships, Relationship, foreign_key: :owner_id
@@ -52,9 +52,9 @@ defmodule Ello.Core.Network.User do
     field :followers_count, :integer, virtual: true
 
     # Used to hold blocked ids retreived from Redis
-    field :inverse_blocked_ids, {:array, :integer}, default: [], virtual: true
-    field :blocked_ids, {:array, :integer}, default: [], virtual: true
-    field :all_blocked_ids, {:array, :integer}, default: [], virtual: true
+    field :inverse_blocked_ids, {:array, :integer}, default: %MapSet{}, virtual: true
+    field :blocked_ids, {:array, :integer}, default: %MapSet{}, virtual: true
+    field :all_blocked_ids, {:array, :integer}, default: %MapSet{}, virtual: true
   end
 
   @doc """
@@ -79,16 +79,20 @@ defmodule Ello.Core.Network.User do
            |> Map.put(:inverse_blocked_ids, inverse_blocked_ids(user))
            |> Map.put(:blocked_ids, blocked_ids(user))
 
-    Map.put(user, :all_blocked_ids, user.inverse_blocked_ids ++ user.blocked_ids)
+    Map.put(user, :all_blocked_ids, MapSet.union(user.inverse_blocked_ids, user.blocked_ids))
   end
 
   defp blocked_ids(%__MODULE__{id: id}) do
     {:ok, ids} = Redis.command(["SMEMBERS", "user:#{id}:block_id_cache"], name: :blocked_ids)
-    Enum.map(ids, &String.to_integer/1)
+    ids
+    |> Enum.map(&String.to_integer/1)
+    |> MapSet.new
   end
 
   defp inverse_blocked_ids(%__MODULE__{id: id}) do
     {:ok, ids} = Redis.command(["SMEMBERS", "user:#{id}:inverse_block_id_cache"], name: :inverse_blocked_ids)
-    Enum.map(ids, &String.to_integer/1)
+    ids
+    |> Enum.map(&String.to_integer/1)
+    |> MapSet.new
   end
 end

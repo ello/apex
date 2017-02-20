@@ -10,8 +10,8 @@ defmodule Ello.Core.Discovery.Promotional do
     field :image, :string
     field :image_metadata, :map
     field :image_struct, :map, virtual: true
-    field :created_at, Ecto.DateTime
-    field :updated_at, Ecto.DateTime
+    field :created_at, :utc_datetime
+    field :updated_at, :utc_datetime
 
     belongs_to :category, Category
     belongs_to :user, User
