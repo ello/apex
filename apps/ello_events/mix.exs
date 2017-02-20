@@ -23,6 +23,8 @@ defmodule Ello.Events.Mixfile do
     [
       {:uuid,   "~> 1.0"},
       {:poison, "~> 2.2"},
+
+      {:ello_core, in_umbrella: true},
     ]
   end
 end
