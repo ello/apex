@@ -36,6 +36,15 @@ defmodule Ello.Core.Discovery do
     |> load_images
   end
 
+  @type categorizable :: User.t | Post.t | [User.t | Post.t]
+
+  @doc """
+  Fetches the categories for a user or post
+
+  Given a user or post struct (or list of users or posts), this function will
+  fetch all the categories and include them in the struct (or list of structs).
+  """
+  @spec put_belongs_to_many_categories(categorizables :: categorizable | nil) :: categorizable | nil
   def put_belongs_to_many_categories(nil), do: nil
   def put_belongs_to_many_categories([]), do: []
   def put_belongs_to_many_categories(%{} = categorizable),
