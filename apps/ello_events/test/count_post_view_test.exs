@@ -6,6 +6,6 @@ defmodule Ello.Events.CountPostViewTest do
   test "Exq implementation" do
     assert CountPostView.queue == "count"
     assert CountPostView.worker == "CountPostView"
-    assert CountPostView.__handler == Ello.Events.Exq
+    assert CountPostView.handler == Ello.Events.Exq
   end
 end

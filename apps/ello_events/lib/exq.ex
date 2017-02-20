@@ -7,22 +7,23 @@ defmodule Ello.Events.Exq do
   @callback worker() :: String.t
 
   @doc "List of arguments to pass into Sidekiq"
-  @callback args() :: [any()]
-
-  @doc "What module handles publishing this event - should be Ello.Event.Exq"
-  @callback __handler() :: module
+  @callback args(opts :: struct) :: [any()]
 
   defmacro __using__(_) do
     quote do
       @behaviour Ello.Events
-      def __handler, do: Ello.Events.Exq
+      @behaviour Ello.Events.Exq
+
+      def handler, do: Ello.Events.Exq
       def queue, do: "default"
-      def worker, do: "#{__MODULE__}"
-      @overridable [queue: 0, worker: 0, __handler: 0]
+      def worker, do: List.last(Module.split(__MODULE__))
+
+      defoverridable [queue: 0, worker: 0, handler: 0]
     end
   end
 
   def publish(module, struct) do
     Exq.enqueue(Exq, module.queue(), module.worker(), module.args(struct))
   end
+
 end

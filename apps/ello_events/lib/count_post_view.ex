@@ -8,7 +8,6 @@ defmodule Ello.Events.CountPostView do
     stream_id: nil
   ]
 
-  @override
   def queue, do: "count"
   def args(post_view) do
     [
@@ -20,4 +19,5 @@ defmodule Ello.Events.CountPostView do
       }
     ]
   end
+
 end
