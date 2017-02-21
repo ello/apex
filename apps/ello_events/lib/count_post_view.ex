@@ -3,7 +3,7 @@ defmodule Ello.Events.CountPostView do
 
   defstruct [
     post_ids: [],
-    current_user_id: nil,
+    user_id: nil,
     stream_kind: nil,
     stream_id: nil
   ]

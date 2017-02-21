@@ -23,14 +23,14 @@ defmodule Ello.V2.PostController do
   end
 
   defp track_post_view(%{assigns: assigns}, post) do
-    current_user_id = case assigns[:current_user] do
+    user_id = case assigns[:current_user] do
       %{id: id} -> id
       _ -> nil
     end
 
     event = %CountPostView{
       post_ids: [post.id],
-      current_user_id: current_user_id,
+      user_id: user_id,
       stream_kind: "post",
     }
     Events.publish(event)

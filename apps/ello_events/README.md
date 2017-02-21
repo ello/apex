@@ -19,7 +19,7 @@ function and start your background process/queueing there.
 ```elixir
 Ello.Events.publish(%CountPostView{
   post_ids: [1, 2, 3],
-  current_user_id: 666,
+  user_id: 666,
   stream_kind: "following",
   stream_id: nil,
 })

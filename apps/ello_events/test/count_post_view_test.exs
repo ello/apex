@@ -18,7 +18,7 @@ defmodule Ello.Events.CountPostViewTest do
     Application.put_env(:ello_events, :redis, listener)
     Ello.Events.publish(%CountPostView{
       post_ids: [1, 2, 3],
-      current_user_id: 666,
+      user_id: 666,
       stream_kind: "following",
       stream_id: nil,
     })
