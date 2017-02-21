@@ -22,7 +22,7 @@ defmodule Ello.V2.PostController do
     )
   end
 
-  defp track_post_view(%{assigns: assigns} = conn, post) do
+  defp track_post_view(%{assigns: assigns}, post) do
     current_user_id = case assigns[:current_user] do
       %{id: id} -> id
       _ -> nil
@@ -33,7 +33,7 @@ defmodule Ello.V2.PostController do
       current_user_id: current_user_id,
       stream_kind: "post",
     }
-    Ello.Events.publish(event)
+    Events.publish(event)
   end
 
   defp owned_by_user(post, %{"user_id" => "~" <> username}),
