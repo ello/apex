@@ -81,7 +81,7 @@ defmodule Ello.V2.PostViewTest do
   end
 
   test "post.json - it renders a repost", %{post: post, repost: repost, conn: conn} do
-    post_id = post.id
+    post_id = "#{post.id}"
     assert %{
       repost_id: ^post_id,
       repost_content: [%{"kind" => "text", "data" => "<p>Phrasing!</p>"}],

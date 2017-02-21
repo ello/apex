@@ -17,7 +17,9 @@ defmodule Ello.V2.JSONAPI do
     Map.put(resp, name, render_one(data, view, template_name(view), opts))
   end
 
+  def include_resource(resp, _name, nil, _view, _opts), do: resp
   def include_resource(resp, _name, [], _view, _opts), do: resp
+  def include_resource(resp, _name, [nil], _view, _opts), do: resp
   def include_resource(resp, name, data, view, opts) when is_list(data) do
     data = Enum.uniq_by(data, &(&1.id))
     resp
