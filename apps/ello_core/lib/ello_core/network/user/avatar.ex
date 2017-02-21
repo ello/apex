@@ -24,9 +24,12 @@ defmodule Ello.Core.Network.User.Avatar do
     }
   end
 
-  @default_avatar_images 48
+  @default_avatar_images 47
   defp default_image_id(nil), do: 1
   defp default_image_id(id) do
-    Integer.mod(id, @default_avatar_images)
+    case Integer.mod(id, @default_avatar_images) do
+      0 -> 1
+      n -> n
+    end
   end
 end

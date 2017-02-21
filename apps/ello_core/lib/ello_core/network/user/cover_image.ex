@@ -26,9 +26,12 @@ defmodule Ello.Core.Network.User.CoverImage do
     }
   end
 
-  @default_cover_images 30
+  @default_cover_images 33
   defp default_image_id(nil), do: 1
   defp default_image_id(id) do
-    Integer.mod(id, @default_cover_images)
+    case Integer.mod(id, @default_cover_images) do
+      0 -> 1
+      n -> n
+    end
   end
 end
