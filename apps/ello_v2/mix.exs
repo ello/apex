@@ -44,6 +44,7 @@ defmodule Ello.V2.Mixfile do
 
       {:ello_core, in_umbrella: true},
       {:ello_auth, in_umbrella: true},
+      {:ello_events, in_umbrella: true},
     ]
   end
 end
