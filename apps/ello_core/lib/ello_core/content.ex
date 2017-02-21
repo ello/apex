@@ -54,8 +54,8 @@ defmodule Ello.Core.Content do
   def posts_by_user(user_id, opts) when is_list(opts), do: posts_by_user(user_id, Enum.into(opts, %{}))
 
   @spec posts_by_user(user_id :: integer, filters :: any) :: PostsPage.t
-  def posts_by_user(user_id, %{per_page: per_page, current_user: current_user, allow_nsfw: allow_nsfw, allow_nudity: allow_nudity} = filters) do
-    per_page = per_page || 25
+  def posts_by_user(user_id, %{} = filters) do
+    per_page = filters[:per_page] || 25
     total_query = Post
             |> filter_post_for_client(filters)
             |> where([p], p.author_id == ^user_id and is_nil(p.parent_post_id))
@@ -78,9 +78,9 @@ defmodule Ello.Core.Content do
 
     %PostsPage{
       posts: posts,
-      total_pages: Float.ceil(total_count / per_page),
+      total_pages: round(Float.ceil(total_count / per_page)),
       total_count: total_count,
-      total_pages_remaining: Float.ceil(remaining_count / per_page),
+      total_pages_remaining: round(Float.ceil(remaining_count / per_page)),
       before: last_post_date,
     }
   end

@@ -1,4 +1,5 @@
 defmodule Ello.V2.UserPostController do
+  import Plug.Conn
   use Ello.V2.Web, :controller
   alias Ello.Core.Content
   alias Ello.Core.Network
@@ -24,8 +25,19 @@ defmodule Ello.V2.UserPostController do
       allow_nsfw: conn.assigns[:allow_nsfw],
       allow_nudity: conn.assigns[:allow_nudity],
       per_page: params["per_page"], before: params["before"])
-    # conn = add_page_headers(conn, posts_page)
+    conn = add_page_headers(conn, posts_page)
     render(conn, PostView, :index, posts: posts)
+  end
+
+  defp add_page_headers(conn, %{
+    total_pages: total_pages,
+    total_count: total_count,
+    total_pages_remaining: total_pages_remaining} = _posts_page
+  ) do
+    conn
+    |> put_resp_header("x-total-pages", "#{total_pages}")
+    |> put_resp_header("x-total-count", "#{total_count}")
+    |> put_resp_header("x-total-pages-remaining", "#{total_pages_remaining}")
   end
 
 end
