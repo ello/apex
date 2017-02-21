@@ -59,8 +59,9 @@ defmodule Ello.Core.Content do
     total_query = Post
             |> filter_post_for_client(filters)
             |> where([p], p.author_id == ^user_id and is_nil(p.parent_post_id))
-    total_count = select(total_query, [p], count(p.id))
-                |> Repo.one
+    total_count = total_query
+                  |> select([p], count(p.id))
+                  |> Repo.one
 
     remaining_query = case filters[:before] do
       nil  -> total_query
@@ -68,12 +69,13 @@ defmodule Ello.Core.Content do
     end
     remaining_count = Repo.aggregate(remaining_query, :count, :id)
 
-    query = order_by(remaining_query, [p], [desc: p.created_at])
+    query = remaining_query
+            |> order_by([p], [desc: p.created_at])
             |> limit(^per_page)
     posts = Repo.all(query)
     last_post_date = case List.last(posts) do
       nil -> nil
-      post -> post.created_at
+      last_post -> last_post.created_at
     end
 
     %PostsPage{
