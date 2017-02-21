@@ -7,6 +7,7 @@ defmodule Ello.Core.Content do
     Discovery,
   }
   alias __MODULE__.{
+    PostsPage,
     Post,
     Love,
     Watch,
@@ -48,6 +49,40 @@ defmodule Ello.Core.Content do
     |> Repo.get(id)
     |> post_preloads(current_user)
     |> filter_blocked(current_user)
+  end
+
+  def posts_by_user(user_id, opts) when is_list(opts), do: posts_by_user(user_id, Enum.into(opts, %{}))
+
+  @spec posts_by_user(user_id :: integer, filters :: any) :: PostsPage.t
+  def posts_by_user(user_id, %{per_page: per_page, current_user: current_user, allow_nsfw: allow_nsfw, allow_nudity: allow_nudity} = filters) do
+    per_page = per_page || 25
+    total_query = Post
+            |> filter_post_for_client(filters)
+            |> where([p], p.author_id == ^user_id and is_nil(p.parent_post_id))
+    total_count = select(total_query, [p], count(p.id))
+                |> Repo.one
+
+    remaining_query = case filters[:before] do
+      nil  -> total_query
+      date -> where(total_query, [p], p.created_at < ^date)
+    end
+    remaining_count = Repo.aggregate(remaining_query, :count, :id)
+
+    query = order_by(remaining_query, [p], [desc: p.created_at])
+            |> limit(^per_page)
+    posts = Repo.all(query)
+    last_post_date = case List.last(posts) do
+      nil -> nil
+      post -> post.created_at
+    end
+
+    %PostsPage{
+      posts: posts,
+      total_pages: Float.ceil(total_count / per_page),
+      total_count: total_count,
+      total_pages_remaining: Float.ceil(remaining_count / per_page),
+      before: last_post_date,
+    }
   end
 
   defp filter_post_for_client(query, %{current_user: current_user, allow_nsfw: allow_nsfw, allow_nudity: allow_nudity}) do

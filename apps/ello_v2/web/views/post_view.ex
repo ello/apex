@@ -11,6 +11,20 @@ defmodule Ello.V2.PostView do
   alias Ello.Core.Network.{User}
   alias Ello.Core.Content.{Post,Love,Watch}
 
+  @doc "Render a list of posts and relations for /api/v2/user/:id/posts"
+  def render("index.json", %{posts: posts, conn: conn}) do
+    # linked = %{}
+    #          |> render_linked_categories(posts, conn)
+    #          |> render_linked_users(posts, conn)
+    #          |> render_linked_posts(posts, conn)
+    #          |> render_linked_assets(posts, conn)
+    # %{
+    #   posts: render_many(posts, __MODULE__, "post.json", conn: conn, meta: false),
+    #   linked: linked,
+    # }
+    %{}
+  end
+
   @doc "Render a post and relations for /api/v2/posts/:id"
   def render("show.json", %{post: post} = opts) do
     users      = post_users(post, post.reposted_source)
