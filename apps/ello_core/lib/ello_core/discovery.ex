@@ -55,12 +55,13 @@ defmodule Ello.Core.Discovery do
                  |> Discovery.categories_by_ids
                  |> Enum.group_by(&(&1.id))
     Enum.map categorizables, fn
+      %{category_ids: nil} = categorizable -> categorizable
       %{category_ids: []} = categorizable -> categorizable
       categorizable ->
         categorizable_categories = categories
-                          |> Map.take(categorizable.category_ids)
-                          |> Map.values
-                          |> List.flatten
+                                   |> Map.take(categorizable.category_ids)
+                                   |> Map.values
+                                   |> List.flatten
         Map.put(categorizable, :categories, categorizable_categories)
     end
   end
