@@ -36,7 +36,7 @@ defmodule Ello.V2.Web do
       unquote(public_controller())
       plug Ello.Auth.RequireToken
       plug Ello.V2.ClientProperties
-      import Ello.Auth, only: [current_user: 1]
+      import Ello.Auth
       import Ello.V2.PostViewTracking
     end
   end
