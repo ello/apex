@@ -14,9 +14,9 @@ defmodule Ello.V2.PostController do
 
   defp load_post(conn, %{"id" => id_or_slug}) do
     Content.post(id_or_slug,
-      conn.assigns[:current_user],
-      conn.assigns[:allow_nsfw],
-      conn.assigns[:allow_nudity]
+      current_user: conn.assigns[:current_user],
+      allow_nsfw: conn.assigns[:allow_nsfw],
+      allow_nudity: conn.assigns[:allow_nudity]
     )
   end
 

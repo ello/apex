@@ -29,24 +29,28 @@ defmodule Ello.Core.Content do
   and nudity content visibility, and posts by banned users.  If no user is
   present, posts by private users will not be included.
   """
-  @spec post(id_or_slug :: String.t | integer, current_user :: User.t | nil, allow_nsfw :: boolean, allow_nudity :: boolean) :: Post.t
-  def post(id_or_slug, current_user, allow_nsfw, allow_nudity)
-  def post("~" <> slug, current_user, allow_nsfw, allow_nudity) do
+
+  @type filter_opts :: %{current_user: User.t | nil, allow_nsfw: boolean, allow_nudity: boolean}
+
+  def post(id_or_slug, opts) when is_list(opts), do: post(id_or_slug, Enum.into(opts, %{}))
+
+  @spec post(id_or_slug :: String.t | integer, filters :: filter_opts) :: Post.t
+  def post("~" <> slug, %{current_user: current_user} = filters) do
     Post
-    |> filter_post_for_client(current_user, allow_nsfw, allow_nudity)
+    |> filter_post_for_client(filters)
     |> Repo.get_by(token: slug)
     |> post_preloads(current_user)
     |> filter_blocked(current_user)
   end
-  def post(id, current_user, allow_nsfw, allow_nudity) do
+  def post(id, %{current_user: current_user} = filters) do
     Post
-    |> filter_post_for_client(current_user, allow_nsfw, allow_nudity)
+    |> filter_post_for_client(filters)
     |> Repo.get(id)
     |> post_preloads(current_user)
     |> filter_blocked(current_user)
   end
 
-  defp filter_post_for_client(query, current_user, allow_nsfw, allow_nudity) do
+  defp filter_post_for_client(query, %{current_user: current_user, allow_nsfw: allow_nsfw, allow_nudity: allow_nudity}) do
     query
     |> filter_nsfw(allow_nsfw)
     |> filter_nudity(allow_nudity)
