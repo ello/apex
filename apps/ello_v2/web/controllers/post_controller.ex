@@ -1,8 +1,6 @@
 defmodule Ello.V2.PostController do
   use Ello.V2.Web, :controller
   alias Ello.Core.{Content, Content.Post}
-  alias Ello.Events
-  alias Ello.Events.CountPostView
 
   def show(conn, params) do
     with %Post{} = post <- load_post(conn, params),
@@ -20,20 +18,6 @@ defmodule Ello.V2.PostController do
       conn.assigns[:allow_nsfw],
       conn.assigns[:allow_nudity]
     )
-  end
-
-  defp track_post_view(%{assigns: assigns}, post) do
-    user_id = case assigns[:current_user] do
-      %{id: id} -> id
-      _ -> nil
-    end
-
-    event = %CountPostView{
-      post_ids: [post.id],
-      user_id: user_id,
-      stream_kind: "post",
-    }
-    Events.publish(event)
   end
 
   defp owned_by_user(post, %{"user_id" => "~" <> username}),
