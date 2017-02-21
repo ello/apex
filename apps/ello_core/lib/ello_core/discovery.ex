@@ -51,7 +51,7 @@ defmodule Ello.Core.Discovery do
     do: hd(put_belongs_to_many_categories([categorizable]))
   def put_belongs_to_many_categories(categorizables) do
     categories = categorizables
-                 |> Enum.flat_map(&(&1.category_ids))
+                 |> Enum.flat_map(&(&1.category_ids || []))
                  |> Discovery.categories_by_ids
                  |> Enum.group_by(&(&1.id))
     Enum.map categorizables, fn
