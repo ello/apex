@@ -102,6 +102,11 @@ defmodule Ello.Core.Content do
   defp repost_preloads(reposts, current_user) do
     reposts
     |> post_and_repost_preloads(current_user)
+    |> Enum.map(&(nilify_reposted_source(&1)))
+  end
+
+  defp nilify_reposted_source(repost) do
+    Map.put(repost, :reposted_source, nil)
   end
 
   defp post_and_repost_preloads(posts, current_user) do
