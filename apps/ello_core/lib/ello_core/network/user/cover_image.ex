@@ -3,17 +3,16 @@ defmodule Ello.Core.Network.User.CoverImage do
 
   @spec from_user(user :: User.t) :: Image.t
   def from_user(%{cover_image: nil} = user) do
-    path = "images/fallback/user/cover_image/#{default_image_id(user.id)}"
     %Image{
       user:     user,
-      filename: "ello-default.png",
+      filename: "ello-default.jpg",
       path:     "images/fallback/user/cover_image/#{default_image_id(user.id)}",
       versions: Image.Version.from_metadata(%{
-        "optimized" => %{"filename" => "#{path}/ello-default-optimized.png"},
-        "xhdpi"     => %{"filename" => "#{path}/ello-default-xhdpi.png"},
-        "hdpi"      => %{"filename" => "#{path}/ello-default-hdpi.png"},
-        "ldpi"      => %{"filename" => "#{path}/ello-default-ldpi.png"},
-        "mdpi"      => %{"filename" => "#{path}/ello-default-mdpi.png"},
+        "optimized" => %{"filename" => "ello-default-optimized.jpg"},
+        "xhdpi"     => %{"filename" => "ello-default-xhdpi.jpg"},
+        "hdpi"      => %{"filename" => "ello-default-hdpi.jpg"},
+        "ldpi"      => %{"filename" => "ello-default-ldpi.jpg"},
+        "mdpi"      => %{"filename" => "ello-default-mdpi.jpg"},
       }, nil)
     }
   end

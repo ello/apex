@@ -3,6 +3,11 @@ defmodule Ello.V2.ImageViewTest do
   import Phoenix.View #For render/2
   alias Ello.V2.ImageView
   alias Ello.Core.Image
+  alias Ello.Core.Network.{
+    User,
+    User.CoverImage,
+    User.Avatar,
+  }
 
   test "image.json - rendering an image given an image struct" do
     assert render(ImageView, "image.json", image: image(), conn: build_conn()) ==
@@ -150,6 +155,58 @@ defmodule Ello.V2.ImageViewTest do
         }
       }
     Application.put_env(:ello_v2, :asset_host, "assets.ello.co")
+  end
+
+  test "image.json - rendering the default cover image" do
+    cover_image = CoverImage.from_user(%User{})
+    assert render(ImageView, "image.json", image: cover_image, conn: build_conn()) ==
+      %{
+        "original" => %{
+          url: "https://assets.ello.co/images/fallback/user/cover_image/1/ello-default.jpg",
+        },
+        "hdpi" => %{
+          url: "https://assets.ello.co/images/fallback/user/cover_image/1/ello-default-hdpi.jpg",
+          metadata: nil,
+        },
+        "ldpi" => %{
+          url: "https://assets.ello.co/images/fallback/user/cover_image/1/ello-default-ldpi.jpg",
+          metadata: nil,
+        },
+        "mdpi" => %{
+          url: "https://assets.ello.co/images/fallback/user/cover_image/1/ello-default-mdpi.jpg",
+          metadata: nil,
+        },
+        "xhdpi" => %{
+          url: "https://assets.ello.co/images/fallback/user/cover_image/1/ello-default-xhdpi.jpg",
+          metadata: nil,
+        },
+        "optimized" => %{
+          url: "https://assets.ello.co/images/fallback/user/cover_image/1/ello-default-optimized.jpg",
+          metadata: nil,
+        }
+      }
+  end
+
+  test "image.json - rendering the default avatar" do
+    avatar = Avatar.from_user(%User{})
+    assert render(ImageView, "image.json", image: avatar, conn: build_conn()) ==
+      %{
+        "original" => %{
+          url: "https://assets.ello.co/images/fallback/user/avatar/1/ello-default.png",
+        },
+        "large" => %{
+          url: "https://assets.ello.co/images/fallback/user/avatar/1/ello-default-large.png",
+          metadata: nil,
+        },
+        "regular" => %{
+          url: "https://assets.ello.co/images/fallback/user/avatar/1/ello-default-regular.png",
+          metadata: nil,
+        },
+        "small" => %{
+          url: "https://assets.ello.co/images/fallback/user/avatar/1/ello-default-small.png",
+          metadata: nil,
+        },
+      }
   end
 
 

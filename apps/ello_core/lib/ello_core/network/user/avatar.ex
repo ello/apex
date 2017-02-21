@@ -3,15 +3,14 @@ defmodule Ello.Core.Network.User.Avatar do
 
   @spec from_user(user :: User.t) :: Image.t
   def from_user(%{avatar: nil} = user) do
-    path = "images/fallback/user/avatar/#{default_image_id(user.id)}"
     %Image{
       user:     user,
       filename: "ello-default.png",
       path:     "images/fallback/user/avatar/#{default_image_id(user.id)}",
       versions: Image.Version.from_metadata(%{
-        "large"   => %{"filename" => "#{path}/ello-default-large.png"},
-        "regular" => %{"filename" => "#{path}/ello-default-regular.png"},
-        "small"   => %{"filename" => "#{path}/ello-default-small.png"},
+        "large"   => %{"filename" => "ello-default-large.png"},
+        "regular" => %{"filename" => "ello-default-regular.png"},
+        "small"   => %{"filename" => "ello-default-small.png"},
       }, nil)
     }
   end
