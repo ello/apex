@@ -2,21 +2,30 @@ defmodule Ello.V2.CategoryView do
   use Ello.V2.Web, :view
   alias Ello.V2.{ImageView,PromotionalView,UserView}
 
+  @doc "Render categories and relations for /api/v2/categories"
   def render("index.json", %{categories: categories} = opts) do
     promotionals = Enum.flat_map(categories, &(&1.promotionals))
     users = Enum.map(promotionals, &(&1.user))
 
-    render_resource(:categories, categories, __MODULE__, opts)
+    json_response()
+    |> render_resource(:categories, categories, __MODULE__, opts)
     |> include_resource(:promotionals, promotionals, PromotionalView, opts)
     |> include_resource(:users, users, UserView, opts)
   end
 
+  @doc "Render categories and relations for /api/v2/categories/:id"
   def render("show.json", %{category: category} = opts) do
     users = Enum.map(category.promotionals, &(&1.user))
 
-    render_resource(:categories, category, __MODULE__, opts)
+    json_response()
+    |> render_resource(:categories, category, __MODULE__, opts)
     |> include_resource(:promotionals, category.promotionals, PromotionalView, opts)
     |> include_resource(:users, users, UserView, opts)
+  end
+
+  @doc "Render a single category as included in other reponses"
+  def render("category.json", %{category: category} = opts) do
+    render_self(category, __MODULE__, opts)
   end
 
   def attributes, do: [
@@ -33,14 +42,11 @@ defmodule Ello.V2.CategoryView do
   ]
 
   def computed_attributes, do: [
-    :header, :tile_image, :links
+    :header,
+    :tile_image
   ]
 
-  def render("category.json", %{category: category} = opts) do
-    render_self(category, __MODULE__, opts)
-  end
-
-  def tile_image(category, %{conn: conn}) do
+  def tile_image(category, conn) do
     render(ImageView, "image.json", image: category.tile_image_struct, conn: conn)
   end
 

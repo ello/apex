@@ -7,9 +7,8 @@ defmodule Ello.V2.JSONAPI do
 
   import Phoenix.View, only: [render_many: 4, render_one: 4]
 
-  def render_resource(name, data, view, opts) do
-    render_resource(%{}, name, data, view, opts)
-  end
+  def json_response, do: %{}
+
   def render_resource(resp, _name, [], _view, _opts), do: resp
   def render_resource(resp, name, data, view, opts) when is_list(data) do
     Map.put(resp, name, render_many(data, view, template_name(view), opts))
@@ -44,12 +43,13 @@ defmodule Ello.V2.JSONAPI do
 
   def render_self(data, view, opts) do
     computed_attributes = Enum.reduce view.computed_attributes, %{}, fn(attr, resp) ->
-      Map.put(resp, attr, apply(view, attr, [data, opts]))
+      Map.put(resp, attr, apply(view, attr, [data, opts[:conn]]))
     end
     data
     |> Map.take(view.attributes)
     |> Map.put(:id, "#{data.id}")
     |> Map.merge(computed_attributes)
+    |> Map.put(:links, view.links(data, opts[:conn]))
   end
 
 end
