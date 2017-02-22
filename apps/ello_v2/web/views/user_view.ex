@@ -1,5 +1,6 @@
 defmodule Ello.V2.UserView do
   use Ello.V2.Web, :view
+  use Ello.V2.JSONAPI
   alias Ello.V2.{
     CategoryView,
     ImageView,
@@ -7,16 +8,22 @@ defmodule Ello.V2.UserView do
     UserMetaAttributesView,
   }
 
-  def render("show.json", %{user: user, conn: conn}) do
-    %{
-      users: render_one(user, __MODULE__, "user.json", conn: conn, meta: true),
-      linked: %{
-        categories: render_many(user.categories, CategoryView, "category.json", conn: conn),
-      }
-    }
+  @doc "Render user and relations for /api/v2/users/:id"
+  def render("show.json", %{user: user} = opts) do
+    json_response()
+    |> render_resource(:users, user, __MODULE__, Map.merge(opts, %{meta: true}))
+    |> include_linked(:categories, user.categories, CategoryView, opts)
   end
 
-  @attributes [
+  @doc "Render a single user as included in other reponses"
+  def render("user.json", %{user: user} = opts) do
+    user
+    |> render_self(__MODULE__, opts)
+    |> add_meta(user, opts[:meta])
+    |> settings_attributes(user)
+  end
+
+  def attributes, do: [
     :username,
     :name,
     :location,
@@ -26,6 +33,17 @@ defmodule Ello.V2.UserView do
     :following_count,
     :loves_count,
     :posts_count,
+  ]
+
+  def computed_attributes, do: [
+    :name,
+    :href,
+    :experimental_features,
+    :relationship_priority,
+    :bad_for_seo,
+    :external_links_list,
+    :avatar,
+    :cover_image,
   ]
 
   @settings_attributes [
@@ -40,29 +58,16 @@ defmodule Ello.V2.UserView do
     :is_collaborateable,
   ]
 
-  def render("user.json", %{user: user, conn: conn} = opts) do
-    user
-    |> Map.take(@attributes)
-    |> Map.merge(Map.take(user.settings, @settings_attributes))
-    |> add_meta(user, opts[:meta])
-    |> Map.merge(%{
-      id: "#{user.id}",
-      name: name(user, conn),
-      href: "/api/v2/users/#{user.id}",
-      experimental_features: experimental_features(user),
-      relationship_priority: relationship(user, conn),
-      bad_for_seo: user.bad_for_seo?,
-      external_links_list: render(LinkView, "links.json", links: user.links),
-      avatar: render(ImageView, "image.json", conn: conn, image: user.avatar_struct),
-      cover_image: render(ImageView, "image.json", conn: conn, image: user.cover_image_struct),
-      links: links(user, conn),
-    })
-  end
-
   defp add_meta(resp, user, true) do
     Map.put(resp, :meta_attributes, render(UserMetaAttributesView, "user.json", user: user))
   end
   defp add_meta(resp, _, _), do: resp
+
+  defp settings_attributes(resp, user) do
+    user.settings
+    |> Map.take(@settings_attributes)
+    |> Map.merge(resp)
+  end
 
   def links(user, _conn) do
     %{
@@ -70,24 +75,37 @@ defmodule Ello.V2.UserView do
     }
   end
 
-  defp relationship(%{id: id}, %{assigns: %{current_user: %{id: id}}}), do: "self"
-  defp relationship(%{relationship_to_current_user: nil}, _), do: nil
-  defp relationship(%{relationship_to_current_user: %{priority: p}}, _), do: p
-  defp relationship(_user, _conn), do: nil
+  def href(%{id: id}, _conn), do: "/api/v2/users/#{id}"
 
-  defp experimental_features(%{is_staff: true}), do: true
-  defp experimental_features(%{has_experimental_features: true}), do: true
-  defp experimental_features(_), do: false
+  def relationship_priority(%{id: id}, %{assigns: %{current_user: %{id: id}}}), do: "self"
+  def relationship_priority(%{relationship_to_current_user: nil}, _), do: nil
+  def relationship_priority(%{relationship_to_current_user: %{priority: p}}, _), do: p
+  def relationship_priority(_user, _conn), do: nil
 
-  defp name(user, %{assigns: %{current_user: nil}}), do: user.name
-  defp name(user, conn) do
+  def experimental_features(%{is_staff: true}, _), do: true
+  def experimental_features(%{has_experimental_features: true}, _), do: true
+  def experimental_features(_, _), do: false
+
+  def external_links_list(user, _conn),
+    do: render(LinkView, "links.json", links: user.links)
+
+  def avatar(user, conn),
+    do: render(ImageView, "image.json", conn: conn, image: user.avatar_struct)
+
+  def cover_image(user, conn),
+    do: render(ImageView, "image.json", conn: conn, image: user.cover_image_struct)
+
+  def name(user, %{assigns: %{current_user: nil}}), do: user.name
+  def name(user, conn) do
     if blocked?(user, conn), do: "- blocked -", else: user.name
   end
 
-  defp blocked?(_, %{assigns: %{current_user: nil}}), do: false
-  defp blocked?(_, %{assigns: %{current_user: %{is_staff: true}}}), do: false
-  defp blocked?(user, conn) do
-    case relationship(user, conn) do
+  def bad_for_seo(%{bad_for_seo?: bad_for_seo}, _), do: bad_for_seo
+
+  def blocked?(_, %{assigns: %{current_user: nil}}), do: false
+  def blocked?(_, %{assigns: %{current_user: %{is_staff: true}}}), do: false
+  def blocked?(user, conn) do
+    case relationship_priority(user, conn) do
       "blocked" -> true
       _ -> false
     end

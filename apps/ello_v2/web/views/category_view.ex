@@ -1,31 +1,35 @@
 defmodule Ello.V2.CategoryView do
   use Ello.V2.Web, :view
+  use Ello.V2.JSONAPI
   alias Ello.V2.{ImageView,PromotionalView,UserView}
 
-  def render("index.json", %{categories: categories, conn: conn}) do
+  @doc "Render categories and relations for /api/v2/categories"
+  def render("index.json", %{categories: categories} = opts) do
     promotionals = Enum.flat_map(categories, &(&1.promotionals))
-    users = promotionals |> Enum.map(&(&1.user)) |> Enum.uniq_by(&(&1.id))
-    %{
-      categories: render_many(categories, __MODULE__, "category.json", conn: conn),
-      linked: %{
-        promotionals: render_many(promotionals, PromotionalView, "promotional.json", conn: conn),
-        users: render_many(users, UserView, "user.json", conn: conn),
-      }
-    }
+    users = Enum.map(promotionals, &(&1.user))
+
+    json_response()
+    |> render_resource(:categories, categories, __MODULE__, opts)
+    |> include_linked(:promotionals, promotionals, PromotionalView, opts)
+    |> include_linked(:users, users, UserView, opts)
   end
 
-  def render("show.json", %{category: category, conn: conn}) do
-    users = category.promotionals |> Enum.map(&(&1.user)) |> Enum.uniq_by(&(&1.id))
-    %{
-      categories: render_one(category, __MODULE__, "category.json", conn: conn),
-      linked: %{
-        promotionals: render_many(category.promotionals, PromotionalView, "promotional.json", conn: conn),
-        users: render_many(users, UserView, "user.json", conn: conn),
-      }
-    }
+  @doc "Render categories and relations for /api/v2/categories/:id"
+  def render("show.json", %{category: category} = opts) do
+    users = Enum.map(category.promotionals, &(&1.user))
+
+    json_response()
+    |> render_resource(:categories, category, __MODULE__, opts)
+    |> include_linked(:promotionals, category.promotionals, PromotionalView, opts)
+    |> include_linked(:users, users, UserView, opts)
   end
 
-  @attributes [
+  @doc "Render a single category as included in other reponses"
+  def render("category.json", %{category: category} = opts) do
+    render_self(category, __MODULE__, opts)
+  end
+
+  def attributes, do: [
     :name,
     :cta_caption,
     :cta_href,
@@ -38,26 +42,24 @@ defmodule Ello.V2.CategoryView do
     :allow_in_onboarding,
   ]
 
-  def render("category.json", %{category: category, conn: conn}) do
-    category
-    |> Map.take(@attributes)
-    |> Map.merge(%{
-      id: "#{category.id}",
-      header: header(category),
-      tile_image: render(ImageView, "image.json", image: category.tile_image_struct, conn: conn),
-      links: links(category)
-    })
+  def computed_attributes, do: [
+    :header,
+    :tile_image
+  ]
+
+  def tile_image(category, conn) do
+    render(ImageView, "image.json", image: category.tile_image_struct, conn: conn)
   end
 
   # Only link promotionals if they are preloaded - this does not happen when
   # sideloading categories with users.
-  defp links(%{promotionals: promos} = category) when is_list(promos) do
+  def links(%{promotionals: promos} = category, _) when is_list(promos) do
     %{
       promotionals: Enum.map(promos, &("#{&1.id}")),
       recent: %{related: related_link(category)},
     }
   end
-  defp links(category) do
+  def links(category, _) do
     %{
       recent: %{related: related_link(category)},
     }
@@ -67,8 +69,7 @@ defmodule Ello.V2.CategoryView do
     "/api/v2/categories/#{slug}/posts/recent"
   end
 
-
-  defp header(%{header: nil, name: name}), do: name
-  defp header(%{header: "", name: name}),  do: name
-  defp header(%{header: header, name: _}), do: header
+  def header(%{header: nil, name: name}, _), do: name
+  def header(%{header: "", name: name}, _),  do: name
+  def header(%{header: header, name: _}, _), do: header
 end

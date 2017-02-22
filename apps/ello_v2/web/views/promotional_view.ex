@@ -1,19 +1,33 @@
 defmodule Ello.V2.PromotionalView do
   use Ello.V2.Web, :view
+  use Ello.V2.JSONAPI
   alias Ello.V2.ImageView
 
-  def render("promotional.json", %{promotional: promo, conn: conn}) do
+  @doc "Render a single promotional as included in other reponses"
+  def render("promotional.json", %{promotional: promo} = opts) do
+    render_self(promo, __MODULE__, opts)
+  end
+
+  def attributes, do: []
+  def computed_attributes, do: [
+    :image,
+    :category_id,
+    :user_id
+  ]
+
+  def image(promo, conn),
+    do: render(ImageView, "image.json", image: promo.image_struct, conn: conn)
+
+  def category_id(%{category_id: cat_id}, _), do: "#{cat_id}"
+
+  def user_id(%{user_id: user_id}, _), do: "#{user_id}"
+
+  def links(promo, _) do
     %{
-      id: "#{promo.id}",
-      image: render(ImageView, "image.json", image: promo.image_struct, conn: conn),
-      category_id: "#{promo.category_id}",
-      user_id: "#{promo.user_id}",
-      links: %{
-        user: %{
-          href: "/api/v2/users/#{promo.user_id}",
-          id: "#{promo.user_id}",
-          type: "users",
-        },
+      user: %{
+        href: "/api/v2/users/#{promo.user_id}",
+        id:   "#{promo.user_id}",
+        type: "users",
       },
     }
   end
