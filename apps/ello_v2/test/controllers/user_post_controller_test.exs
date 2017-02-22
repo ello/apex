@@ -27,18 +27,22 @@ defmodule Ello.V2.UserPostControllerTest do
   end
 
   test "GET /v2/users/:id/posts", %{conn: conn, author: author} do
-    conn = get(conn, user_post_path(conn, :index, author))
-    assert conn.status == 200
+    response = get(conn, user_post_path(conn, :index, author))
+    assert response.status == 200
   end
 
   test "GET /v2/users/:id/posts - returns page headers", %{conn: conn, author: author} do
-    conn = get(conn, user_post_path(conn, :index, author), %{per_page: 2})
-    assert get_resp_header(conn, "x-total-pages") == ["5"]
-    assert get_resp_header(conn, "x-total-count") == ["9"]
-    assert get_resp_header(conn, "x-total-pages-remaining") == ["5"]
+    response = get(conn, user_post_path(conn, :index, author), %{per_page: 2})
+    assert get_resp_header(response, "x-total-pages") == ["5"]
+    assert get_resp_header(response, "x-total-count") == ["9"]
+    assert get_resp_header(response, "x-total-pages-remaining") == ["5"]
+
+    assert [link] = get_resp_header(response, "link")
+    link_regex = ~r/(^|, *)<(.*?)>; rel="next"(,|$)/
+    assert Regex.match?(link_regex, link)
   end
 
-  test "GET /v2/users/:id/posts - returns page headers with before date", %{conn: conn, author: author} do
+  test "GET /v2/users/:id/posts - returns correct page headers with before date", %{conn: conn, author: author} do
     {:ok, one_sec_ago} = DateTime.utc_now |> DateTime.to_unix |> Kernel.-(1) |> DateTime.from_unix
     %{
       year: year, month: month, day: day,
@@ -53,15 +57,27 @@ defmodule Ello.V2.UserPostControllerTest do
     second = String.pad_leading("#{second}", 2, "0")
 
     before = "#{year}-#{month}-#{day}T#{hour}:#{minute}:#{second}Z"
-    conn = get(conn, user_post_path(conn, :index, author), %{per_page: 2, before: before})
-    assert get_resp_header(conn, "x-total-pages") == ["5"]
-    assert get_resp_header(conn, "x-total-count") == ["9"]
-    assert get_resp_header(conn, "x-total-pages-remaining") == ["3"]
+    response = get(conn, user_post_path(conn, :index, author), %{per_page: 2, before: before})
+    assert get_resp_header(response, "x-total-pages") == ["5"]
+    assert get_resp_header(response, "x-total-count") == ["9"]
+    assert get_resp_header(response, "x-total-pages-remaining") == ["3"]
+  end
+
+  test "GET /v2/users/:id/posts - using link headers to fetch next page returns results", %{conn: conn, author: author} do
+    response = get(conn, user_post_path(conn, :index, author), %{per_page: 2})
+    assert [link] = get_resp_header(response, "link")
+    [_, url | _] = Regex.run(~r/<(.*?)>; rel="next"/, link)
+    [_, before | _] = Regex.run(~r/[?&]before=(.*?)(&|$)/, url)
+    [_, per_page | _] = Regex.run(~r/[?&]per_page=(.*?)(&|$)/, url)
+    response = get(conn, user_post_path(conn, :index, author), %{before: before, per_page: per_page})
+    assert get_resp_header(response, "x-total-pages") == ["5"]
+    assert get_resp_header(response, "x-total-count") == ["9"]
+    assert get_resp_header(response, "x-total-pages-remaining") == ["4"]
   end
 
   test "GET /v2/users/:id/posts 404s", %{conn: conn} do
-    conn = get(conn, user_post_path(conn, :index, "404"))
-    assert conn.status == 404
+    response = get(conn, user_post_path(conn, :index, "404"))
+    assert response.status == 404
   end
 
 end

@@ -54,41 +54,71 @@ defmodule Ello.Core.Content do
   def posts_by_user(user_id, opts) when is_list(opts), do: posts_by_user(user_id, Enum.into(opts, %{}))
 
   @spec posts_by_user(user_id :: integer, filters :: any) :: PostsPage.t
-  def posts_by_user(user_id, %{current_user: current_user} = filters) do
-    total_query = Post
-                  |> filter_post_for_client(filters)
-                  |> where([p], p.author_id == ^user_id and is_nil(p.parent_post_id))
+  def posts_by_user(user_id, %{} = filters) do
+    per_page = parse_per_page(filters[:per_page])
+    before = parse_before(filters[:before])
 
-    remaining_query = case DateTime.from_iso8601(filters[:before]) do
-      {:ok, date, _} -> where(total_query, [p], p.created_at < ^date)
-      _  -> total_query
-    end
-
-    per_page = filters[:per_page] || 25
-    query = remaining_query
-            |> order_by([p], [desc: p.created_at])
-            |> limit(^per_page)
-
-    total_count = Repo.aggregate(total_query, :count, :id)
-    remaining_count = Repo.aggregate(remaining_query, :count, :id)
-    posts = query
-            |> Repo.all
-            |> post_preloads(current_user)
-            |> filter_blocked(current_user)
-
-    last_post_date = case List.last(posts) do
-      nil -> nil
-      last_post -> last_post.created_at
-    end
-    # last_post_date = List.last(posts)?.created_at
+    total_query = total_posts_by_user_query(user_id, filters)
+    remaining_query = remaining_posts_by_user_query(total_query, before)
+    posts = page_of_posts_by_user_query(remaining_query, per_page, filters)
+    last_post_date = get_last_post_created_at(posts)
+    {total_count, total_pages} = count_and_pages_calc(total_query, per_page)
+    {_, remaining_pages} = count_and_pages_calc(remaining_query, per_page)
 
     %PostsPage{
       posts: posts,
-      total_pages: round(Float.ceil(total_count / per_page)),
+      total_pages: total_pages,
       total_count: total_count,
-      total_pages_remaining: round(Float.ceil(remaining_count / per_page)),
+      total_pages_remaining: remaining_pages,
+      per_page: per_page,
       before: last_post_date,
     }
+  end
+
+  defp parse_per_page(per_page) when is_binary(per_page) do
+    case Integer.parse(per_page) do
+      {val, _} -> val
+      _        -> parse_per_page(nil)
+    end
+  end
+  defp parse_per_page(per_page) when is_integer(per_page), do: per_page
+  defp parse_per_page(_), do: 25
+
+  defp parse_before(before) do
+    case DateTime.from_iso8601(before) do
+      {:ok, date, _} -> date
+      _  -> nil
+    end
+  end
+
+  defp total_posts_by_user_query(user_id, %{} = filters) do
+    Post
+    |> filter_post_for_client(filters)
+    |> where([p], p.author_id == ^user_id and is_nil(p.parent_post_id))
+  end
+
+  defp remaining_posts_by_user_query(total_query, nil), do: total_query
+  defp remaining_posts_by_user_query(total_query, date) do
+    where(total_query, [p], p.created_at < ^date)
+  end
+
+  defp page_of_posts_by_user_query(remaining_query, per_page, %{current_user: current_user} = _filters) do
+    remaining_query
+    |> order_by([p], [desc: p.created_at])
+    |> limit(^per_page)
+    |> Repo.all
+    |> post_preloads(current_user)
+    |> filter_blocked(current_user)
+  end
+
+  defp get_last_post_created_at([]), do: nil
+  defp get_last_post_created_at(posts) do
+    List.last(posts).created_at
+  end
+
+  defp count_and_pages_calc(query, per_page) do
+    count = Repo.aggregate(query, :count, :id)
+    {count, round(Float.ceil(count / per_page))}
   end
 
   defp filter_post_for_client(query, %{current_user: current_user, allow_nsfw: allow_nsfw, allow_nudity: allow_nudity}) do

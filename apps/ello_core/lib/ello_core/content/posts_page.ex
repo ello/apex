@@ -6,6 +6,7 @@ defmodule Ello.Core.Content.PostsPage do
     :total_pages,
     :total_count,
     :total_pages_remaining,
+    :per_page,
     :before,
   ]
 end
