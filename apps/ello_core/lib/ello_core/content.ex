@@ -54,29 +54,33 @@ defmodule Ello.Core.Content do
   def posts_by_user(user_id, opts) when is_list(opts), do: posts_by_user(user_id, Enum.into(opts, %{}))
 
   @spec posts_by_user(user_id :: integer, filters :: any) :: PostsPage.t
-  def posts_by_user(user_id, %{} = filters) do
-    per_page = filters[:per_page] || 25
+  def posts_by_user(user_id, %{current_user: current_user} = filters) do
     total_query = Post
-            |> filter_post_for_client(filters)
-            |> where([p], p.author_id == ^user_id and is_nil(p.parent_post_id))
-    total_count = total_query
-                  |> select([p], count(p.id))
-                  |> Repo.one
+                  |> filter_post_for_client(filters)
+                  |> where([p], p.author_id == ^user_id and is_nil(p.parent_post_id))
 
-    remaining_query = case filters[:before] do
-      nil  -> total_query
-      date -> where(total_query, [p], p.created_at < ^date)
+    remaining_query = case DateTime.from_iso8601(filters[:before]) do
+      {:ok, date, _} -> where(total_query, [p], p.created_at < ^date)
+      _  -> total_query
     end
-    remaining_count = Repo.aggregate(remaining_query, :count, :id)
 
+    per_page = filters[:per_page] || 25
     query = remaining_query
             |> order_by([p], [desc: p.created_at])
             |> limit(^per_page)
-    posts = Repo.all(query)
+
+    total_count = Repo.aggregate(total_query, :count, :id)
+    remaining_count = Repo.aggregate(remaining_query, :count, :id)
+    posts = query
+            |> Repo.all
+            |> post_preloads(current_user)
+            |> filter_blocked(current_user)
+
     last_post_date = case List.last(posts) do
       nil -> nil
       last_post -> last_post.created_at
     end
+    # last_post_date = List.last(posts)?.created_at
 
     %PostsPage{
       posts: posts,
