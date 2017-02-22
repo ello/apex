@@ -37,7 +37,10 @@ defmodule Ello.Auth.RequireToken do
   end
 
   defp assign_user_if_user(conn, %{"data" => %{"id" => id}}) do
-    assign(conn, :current_user, load_user(id))
+    case load_user(id) do
+      nil  -> halt send_resp(conn, 401, "Invalid user token")
+      user -> assign(conn, :current_user, user)
+    end
   end
   defp assign_user_if_user(conn, _), do: conn
 
