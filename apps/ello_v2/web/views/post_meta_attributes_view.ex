@@ -28,10 +28,13 @@ defmodule Ello.V2.PostMetaAttributesView do
   end
 
   defp images(post) do
-    Enum.map post.assets, fn(asset) ->
-      version = Enum.find(asset.attachment_struct.versions, &(&1.name == "hdpi"))
-      image_url(asset.attachment_struct.path, version.filename)
+    images = Enum.map post.assets, fn(asset) ->
+      case Enum.find(asset.attachment_struct.versions, &(&1.name == "hdpi")) do
+        nil     -> nil
+        version -> image_url(asset.attachment_struct.path, version.filename)
+      end
     end
+    Enum.reject(images, &(is_nil(&1)))
   end
 
   defp embeds(post) do
