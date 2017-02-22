@@ -41,4 +41,11 @@ defmodule Ello.Auth.RequireTokenTest do
     assert resp.status == 200
     assert resp.assigns[:current_user] == user
   end
+
+  test "with a valid user token - but missing user", %{conn: conn} do
+    resp = conn
+           |> put_req_header("authorization", "Bearer " <> JWT.generate(%{id: 404}))
+           |> Example.call([])
+    assert resp.status == 401
+  end
 end

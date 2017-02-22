@@ -72,8 +72,9 @@ defmodule Ello.Core.Network.User do
 
   Typically used on current user to ensure no blocked users/posts are returned.
   """
-  @spec preload_blocked_ids(user :: t) :: t
+  @spec preload_blocked_ids(user :: t | nil) :: t | nil
   def preload_blocked_ids(%__MODULE__{id: nil} = user), do: user
+  def preload_blocked_ids(nil), do: nil
   def preload_blocked_ids(%__MODULE__{} = user) do
     user = user
            |> Map.put(:inverse_blocked_ids, inverse_blocked_ids(user))

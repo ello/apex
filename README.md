@@ -44,6 +44,12 @@ as needed. [README](/apps/ello_v2/)
 Auth provides plugs for authenticating requests and verifying JWTs. It depends
 on `Core` to lookup users. [README](/apps/ello_auth/)
 
+### `Ello.Events`
+
+This app is responsible for processing background events, either by sending the
+event to a worker queue (e.g. the `CountPostView` event) or by processing the
+event in the background (or any other asynchronous processing).
+
 ## Getting Started
 
 ### Requirements

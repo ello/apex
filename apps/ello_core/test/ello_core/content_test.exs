@@ -35,6 +35,7 @@ defmodule Ello.Core.ContentTest do
     fetched_post = Content.post(repost.id, user, true, true)
     assert fetched_post.id == repost.id
     assert fetched_post.reposted_source.id == post.id
+    assert fetched_post.reposted_source.reposted_source == nil
   end
 
   test "post/4 - includes assets", %{user: user, post: post} do
