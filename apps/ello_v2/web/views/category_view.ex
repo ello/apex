@@ -1,5 +1,6 @@
 defmodule Ello.V2.CategoryView do
   use Ello.V2.Web, :view
+  use Ello.V2.JSONAPI
   alias Ello.V2.{ImageView,PromotionalView,UserView}
 
   @doc "Render categories and relations for /api/v2/categories"
@@ -9,8 +10,8 @@ defmodule Ello.V2.CategoryView do
 
     json_response()
     |> render_resource(:categories, categories, __MODULE__, opts)
-    |> include_resource(:promotionals, promotionals, PromotionalView, opts)
-    |> include_resource(:users, users, UserView, opts)
+    |> include_linked(:promotionals, promotionals, PromotionalView, opts)
+    |> include_linked(:users, users, UserView, opts)
   end
 
   @doc "Render categories and relations for /api/v2/categories/:id"
@@ -19,8 +20,8 @@ defmodule Ello.V2.CategoryView do
 
     json_response()
     |> render_resource(:categories, category, __MODULE__, opts)
-    |> include_resource(:promotionals, category.promotionals, PromotionalView, opts)
-    |> include_resource(:users, users, UserView, opts)
+    |> include_linked(:promotionals, category.promotionals, PromotionalView, opts)
+    |> include_linked(:users, users, UserView, opts)
   end
 
   @doc "Render a single category as included in other reponses"

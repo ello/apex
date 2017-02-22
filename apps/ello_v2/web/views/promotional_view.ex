@@ -1,5 +1,6 @@
 defmodule Ello.V2.PromotionalView do
   use Ello.V2.Web, :view
+  use Ello.V2.JSONAPI
   alias Ello.V2.ImageView
 
   @doc "Render a single promotional as included in other reponses"

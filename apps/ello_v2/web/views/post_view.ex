@@ -1,5 +1,6 @@
 defmodule Ello.V2.PostView do
   use Ello.V2.Web, :view
+  use Ello.V2.JSONAPI
   alias Ello.V2.{
     CategoryView,
     UserView,
@@ -19,10 +20,10 @@ defmodule Ello.V2.PostView do
 
     json_response()
     |> render_resource(:posts, post, __MODULE__, Map.merge(opts, %{meta: true}))
-    |> include_resource(:categories, categories, CategoryView, opts)
-    |> include_resource(:users, users, UserView, opts)
-    |> include_resource(:posts, [post.reposted_source], __MODULE__, opts)
-    |> include_resource(:assets, assets, AssetView, opts)
+    |> include_linked(:categories, categories, CategoryView, opts)
+    |> include_linked(:users, users, UserView, opts)
+    |> include_linked(:posts, [post.reposted_source], __MODULE__, opts)
+    |> include_linked(:assets, assets, AssetView, opts)
   end
 
   @doc "Render a single post as included in other reponses"

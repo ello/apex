@@ -47,8 +47,6 @@ defmodule Ello.V2.Web do
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_csrf_token: 0, get_flash: 2, view_module: 1]
 
-      import Ello.V2.JSONAPI
-
       import Ello.V2.Router.Helpers
       import Ello.V2.ErrorHelpers
       import Ello.V2.Gettext

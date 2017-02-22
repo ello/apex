@@ -1,5 +1,6 @@
 defmodule Ello.V2.UserView do
   use Ello.V2.Web, :view
+  use Ello.V2.JSONAPI
   alias Ello.V2.{
     CategoryView,
     ImageView,
@@ -11,7 +12,7 @@ defmodule Ello.V2.UserView do
   def render("show.json", %{user: user} = opts) do
     json_response()
     |> render_resource(:users, user, __MODULE__, Map.merge(opts, %{meta: true}))
-    |> include_resource(:categories, user.categories, CategoryView, opts)
+    |> include_linked(:categories, user.categories, CategoryView, opts)
   end
 
   @doc "Render a single user as included in other reponses"
