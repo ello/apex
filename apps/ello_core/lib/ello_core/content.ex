@@ -84,6 +84,7 @@ defmodule Ello.Core.Content do
   defp parse_per_page(per_page) when is_integer(per_page), do: per_page
   defp parse_per_page(_), do: 25
 
+  defp parse_before(%DateTime{} = before), do: before
   defp parse_before(before) do
     case DateTime.from_iso8601(before) do
       {:ok, date, _} -> date

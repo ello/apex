@@ -34,8 +34,13 @@ defmodule Ello.V2.UserPostController do
     total_count: total_count,
     total_pages_remaining: total_pages_remaining,
     per_page: per_page,
-    before: before,
+    before: date,
   } = _posts_page) do
+    before = case date do
+      nil -> ""
+      date -> DateTime.to_iso8601(date)
+    end
+
     conn
     |> put_resp_header("x-total-pages", "#{total_pages}")
     |> put_resp_header("x-total-count", "#{total_count}")

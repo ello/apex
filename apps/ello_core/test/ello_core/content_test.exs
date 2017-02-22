@@ -1,6 +1,7 @@
 defmodule Ello.Core.ContentTest do
   use Ello.Core.Case
   alias Ello.Core.{Content, Image, Repo}
+  alias Ello.Core.Content.{PostsPage}
 
   setup do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
@@ -140,6 +141,43 @@ defmodule Ello.Core.ContentTest do
     assert fetched_post.repost_from_current_user.id == repost.id
     assert fetched_post.love_from_current_user.id == love.id
     assert fetched_post.watch_from_current_user.id == watch.id
+  end
+
+  @tag :focus
+  test "posts_by_user/2 - returns a page of results, and paginates", %{user: user} do
+    author = Factory.insert(:user)
+    now_date = DateTime.utc_now
+    {:ok, earlier_date} = now_date
+                  |> DateTime.to_unix
+                  |> Kernel.-(3600)
+                  |> DateTime.from_unix
+    _posts = [
+      Factory.insert(:post, %{author: author, created_at: earlier_date}),
+      Factory.insert(:post, %{author: author, created_at: earlier_date}),
+      Factory.insert(:post, %{author: author, created_at: earlier_date}),
+      Factory.insert(:post, %{author: author, created_at: earlier_date}),
+      Factory.insert(:post, %{author: author, created_at: earlier_date}),
+      Factory.insert(:post, %{author: author, created_at: earlier_date}),
+      Factory.insert(:post, %{author: author, created_at: DateTime.utc_now}),
+      Factory.insert(:post, %{author: author, created_at: DateTime.utc_now}),
+      Factory.insert(:post, %{author: author, created_at: DateTime.utc_now}),
+    ]
+
+    posts_page = Content.posts_by_user(author.id, current_user: user, allow_nsfw: true, allow_nudity: true, per_page: 3)
+    assert %PostsPage{} = posts_page
+    assert posts_page.total_pages == 3
+    assert posts_page.total_count == 9
+    assert posts_page.total_pages_remaining == 3
+    assert posts_page.per_page == 3
+    assert (Map.put(posts_page.before, :microsecond, 0)) == (Map.put(now_date, :microsecond, 0))
+
+    posts_page = Content.posts_by_user(author.id, current_user: user, allow_nsfw: true, allow_nudity: true, per_page: 3, before: now_date)
+    assert %PostsPage{} = posts_page
+    assert posts_page.total_pages == 3
+    assert posts_page.total_count == 9
+    assert posts_page.total_pages_remaining == 2
+    assert posts_page.per_page == 3
+    assert (Map.put(posts_page.before, :microsecond, 0)) == (Map.put(earlier_date, :microsecond, 0))
   end
 
 end
