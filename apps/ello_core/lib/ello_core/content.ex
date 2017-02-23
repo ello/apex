@@ -191,7 +191,10 @@ defmodule Ello.Core.Content do
   end
 
   defp build_image_structs(%Post{assets: assets} = post) when is_list(assets) do
-    Map.put(post, :assets, Enum.map(assets, &Asset.build_attachment/1))
+    built_assets = assets
+                   |> Enum.reject(&(is_nil(&1.attachment)))
+                   |> Enum.map(&Asset.build_attachment/1)
+    Map.put(post, :assets, built_assets)
   end
   defp build_image_structs(%Post{} = post), do: post
   defp build_image_structs(nil), do: nil
