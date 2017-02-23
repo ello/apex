@@ -143,7 +143,6 @@ defmodule Ello.Core.ContentTest do
     assert fetched_post.watch_from_current_user.id == watch.id
   end
 
-  @tag :focus
   test "posts_by_user/2 - returns a page of results, and paginates", %{user: user} do
     author = Factory.insert(:user)
     now_date = DateTime.utc_now
