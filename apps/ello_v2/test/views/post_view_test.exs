@@ -197,4 +197,84 @@ defmodule Ello.V2.PostViewTest do
     assert Enum.any?(users, &(&1.id == author_id))
     assert Enum.any?(users, &(&1.id == repost_author_id))
   end
+
+  test "index.json - it renders a list of posts", %{archer: archer, conn: conn} do
+    user_id = "#{archer.id}"
+    id1 = "1"
+    id2 = "2"
+    posts = [
+      Factory.build(:post, %{id: id1, author: archer, assets: [], reposted_source: nil}),
+      Factory.build(:post, %{id: id2, author: archer, assets: [], reposted_source: nil}),
+    ]
+    assert %{
+      posts: [
+        %{id: ^id1, author_id: ^user_id},
+        %{id: ^id2, author_id: ^user_id},
+      ],
+      linked: %{
+        users: [%{id: ^user_id}],
+      }
+    } = render(PostView, "index.json",
+      posts: posts,
+      conn: conn
+    )
+  end
+
+  test "index.json - it renders a list of posts with linked reposts and assets", %{archer: archer, reposter: reposter, conn: conn} do
+    user_id1 = "#{archer.id}"
+    user_id2 = "#{reposter.id}"
+
+    post_id1 = "1"
+    asset_id1 = "11"
+    post_id2 = "2"
+    asset_id2 = "22"
+    reposted_source_id = "3"
+    asset_id3 = "33"
+
+    post1 = Factory.build(:post, %{
+      id: post_id1,
+      author: archer,
+      assets: [Asset.build_attachment(Factory.build(:asset, %{id: asset_id1}))],
+      reposted_source: nil,
+    })
+    post2 = Factory.build(:post, %{
+      id: post_id2,
+      author: archer,
+      assets: [Asset.build_attachment(Factory.build(:asset, %{id: asset_id2}))],
+      reposted_source: Factory.build(:post, %{
+        id: reposted_source_id,
+        author: reposter,
+        assets: [Asset.build_attachment(Factory.build(:asset, %{id: asset_id3}))],
+        reposted_source: nil,
+      }),
+    })
+
+    posts = [
+      post1,
+      post2,
+    ]
+    assert %{
+      posts: [
+        %{id: ^post_id1, author_id: ^user_id1},
+        %{id: ^post_id2, author_id: ^user_id1},
+      ],
+      linked: %{
+        users: users,
+        posts: [%{id: ^reposted_source_id}],
+        assets: assets,
+      }
+    } = render(PostView, "index.json",
+      posts: posts,
+      conn: conn
+    )
+
+    assert length(users) == 2
+    assert Enum.any?(users, &(&1.id == user_id1))
+    assert Enum.any?(users, &(&1.id == user_id2))
+
+    assert length(assets) == 3
+    assert Enum.any?(assets, &(&1.id == asset_id1))
+    assert Enum.any?(assets, &(&1.id == asset_id2))
+    assert Enum.any?(assets, &(&1.id == asset_id3))
+  end
 end

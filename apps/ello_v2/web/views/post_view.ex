@@ -12,24 +12,26 @@ defmodule Ello.V2.PostView do
   alias Ello.Core.Content.{Post,Love,Watch}
 
   @doc "Render a list of posts and relations for /api/v2/user/:id/posts"
-  def render("index.json", %{posts: posts, conn: conn}) do
-    # linked = %{}
-    #          |> render_linked_categories(posts, conn)
-    #          |> render_linked_users(posts, conn)
-    #          |> render_linked_posts(posts, conn)
-    #          |> render_linked_assets(posts, conn)
-    # %{
-    #   posts: render_many(posts, __MODULE__, "post.json", conn: conn, meta: false),
-    #   linked: linked,
-    # }
-    %{}
+  def render("index.json", %{posts: posts} = opts) do
+    users     = post_users(posts)
+    assets    = post_assets(posts)
+    reposts   = Enum.map(posts, &(&1.reposted_source))
+    all_posts = post_and_reposts(posts)
+    categories = Enum.flat_map(all_posts ++ users, &(&1.categories))
+
+    json_response()
+    |> render_resource(:posts, posts, __MODULE__, opts)
+    |> include_linked(:categories, categories, CategoryView, opts)
+    |> include_linked(:users, users, UserView, opts)
+    |> include_linked(:posts, reposts, __MODULE__, opts)
+    |> include_linked(:assets, assets, AssetView, opts)
   end
 
   @doc "Render a post and relations for /api/v2/posts/:id"
   def render("show.json", %{post: post} = opts) do
     users      = post_users(post, post.reposted_source)
     assets     = post_assets(post, post.reposted_source)
-    posts      = post_posts(post, post.reposted_source)
+    posts      = post_and_reposts(post, post.reposted_source)
     categories = Enum.flat_map(posts ++ users, &(&1.categories))
 
     json_response()
@@ -72,14 +74,17 @@ defmodule Ello.V2.PostView do
     :views_count,
   ]
 
+  defp post_users(posts) when is_list(posts), do: Enum.flat_map(posts, &(post_users(&1, &1.reposted_source)))
   defp post_users(%{author: %User{} = a}, %{author: %User{} = ra}), do: [a, ra]
   defp post_users(%{author: %User{} = author}, _), do: [author]
 
+  defp post_assets(posts) when is_list(posts), do: Enum.flat_map(posts, &(post_assets(&1, &1.reposted_source)))
   defp post_assets(%{assets: a}, %Post{assets: ra}), do: a ++ ra
   defp post_assets(%{assets: assets}, _), do: assets
 
-  defp post_posts(post, %Post{} = repost), do: [post, repost]
-  defp post_posts(post, _), do: [post]
+  defp post_and_reposts(posts) when is_list(posts), do: Enum.flat_map(posts, &(post_and_reposts(&1, &1.reposted_source)))
+  defp post_and_reposts(post, %Post{} = repost), do: [post, repost]
+  defp post_and_reposts(post, _), do: [post]
 
   def href(%{id: id}, _), do: "/api/v2/posts/#{id}"
 
