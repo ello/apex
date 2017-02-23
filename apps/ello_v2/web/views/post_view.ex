@@ -103,6 +103,23 @@ defmodule Ello.V2.PostView do
 
   def views_count_rounded(post, _), do: Util.number_to_human(post.views_count)
 
+  def links(%{reposted_source: %Post{} = reposted} = post, conn) do
+    post
+    |> Map.put(:reposted_source, nil)
+    |> links(conn)
+    |> Map.merge(%{
+      repost_author: %{
+        href: "/api/v2/users/#{reposted.author.id}",
+        id: "#{reposted.author.id}",
+        type: "users",
+      },
+      reposted_source: %{
+        href: "/api/v2/posts/#{reposted.id}",
+        id: "#{reposted.id}",
+        type: "posts",
+      }
+    })
+  end
   def links(post, _conn) do
     %{
       categories: Enum.map(post.categories, &("#{&1.id}")),
