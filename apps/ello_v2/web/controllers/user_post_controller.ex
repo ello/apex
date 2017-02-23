@@ -25,6 +25,7 @@ defmodule Ello.V2.UserPostController do
       allow_nsfw: conn.assigns[:allow_nsfw],
       allow_nudity: conn.assigns[:allow_nudity],
       per_page: params["per_page"], before: params["before"])
+    track_post_view(conn, posts)
     conn = add_page_headers(conn, user.id, posts_page)
     render(conn, PostView, :index, posts: posts)
   end
