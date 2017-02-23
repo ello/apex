@@ -6,9 +6,9 @@ defmodule Ello.V2.PostViewTest do
 
   setup %{conn: conn} do
     archer = Script.build(:archer)
-    reposter = Factory.build(:user)
-    category = Factory.build(:category, %{id: 3})
-    asset = Asset.build_attachment(Factory.build(:asset, %{id: 1}))
+    reposter = Factory.build(:user, id: 12)
+    category = Factory.build(:category, id: 3)
+    asset = Asset.build_attachment(Factory.build(:asset, id: 1))
     post = Factory.build(:post, %{
       id: 1,
       author: archer,
@@ -85,15 +85,37 @@ defmodule Ello.V2.PostViewTest do
   end
 
   test "post.json - it renders a repost", %{post: post, repost: repost, conn: conn} do
-    post_id = "#{post.id}"
+    reposted_id = "#{post.id}"
+    reposted_author_id = "#{post.author.id}"
+    repost_id = "#{repost.id}"
+    repost_author_id = "#{repost.author.id}"
     assert %{
-      repost_id: ^post_id,
+      id: ^repost_id,
+      repost_id: ^reposted_id,
+      author_id: ^repost_author_id,
       repost_content: [%{"kind" => "text", "data" => "<p>Phrasing!</p>"}],
       summary: [%{"kind" => "text", "data" => "<p>Post</p>"}],
       loves_count: 1,
       comments_count: 2,
       reposts_count: 3,
       views_count: 4_123,
+      links: %{
+        author: %{
+          id: ^repost_author_id,
+          type: "users",
+          href: "/api/v2/users/" <> ^repost_author_id,
+        },
+        reposted_source: %{
+          href: "/api/v2/posts/" <> ^reposted_id,
+          id: ^reposted_id,
+          type: "posts",
+        },
+        repost_author: %{
+          href: "/api/v2/users/" <> ^reposted_author_id,
+          id: ^reposted_author_id,
+          type: "users",
+        },
+      },
     } = render(PostView, "post.json",
       post: repost,
       conn: conn
