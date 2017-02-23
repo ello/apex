@@ -38,10 +38,6 @@ defmodule Ello.V2.PostView do
     :is_adult_content,
     :body,
     :created_at,
-    :loves_count,
-    :comments_count,
-    :reposts_count,
-    :views_count,
   ]
 
   def computed_attributes, do: [
@@ -56,6 +52,10 @@ defmodule Ello.V2.PostView do
     :content_warning,
     :repost_content,
     :repost_id,
+    :loves_count,
+    :comments_count,
+    :reposts_count,
+    :views_count,
   ]
 
   defp post_users(%{author: %User{} = a}, %{author: %User{} = ra}), do: [a, ra]
@@ -104,6 +104,18 @@ defmodule Ello.V2.PostView do
 
   def watching(%{watch_from_current_user: %Watch{}}, _), do: true
   def watching(_, _), do: false
+
+  def loves_count(%{reposted_source: %{loves_count: count}}, _), do: count
+  def loves_count(%{loves_count: count}, _), do: count
+
+  def comments_count(%{reposted_source: %{comments_count: count}}, _), do: count
+  def comments_count(%{comments_count: count}, _), do: count
+
+  def reposts_count(%{reposted_source: %{reposts_count: count}}, _), do: count
+  def reposts_count(%{reposts_count: count}, _), do: count
+
+  def views_count(%{reposted_source: %{views_count: count}}, _), do: count
+  def views_count(%{views_count: count}, _), do: count
 
   def content_warning(%Post{} = post, %{assigns: %{current_user: current_user}}) do
     include_third_party_warning = has_embedded_media(post) &&

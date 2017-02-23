@@ -27,6 +27,10 @@ defmodule Ello.V2.PostViewTest do
       id: 2,
       author: reposter,
       reposted_source: post,
+      comments_count: 0,
+      loves_count: 0,
+      reposts_count: 0,
+      views_count: 0,
       assets: [],
       rendered_summary: [
         %{"data" => "<p>Repost</p>", "kind" => "text", "link_url" => nil}
@@ -86,6 +90,10 @@ defmodule Ello.V2.PostViewTest do
       repost_id: ^post_id,
       repost_content: [%{"kind" => "text", "data" => "<p>Phrasing!</p>"}],
       summary: [%{"kind" => "text", "data" => "<p>Post</p>"}],
+      loves_count: 1,
+      comments_count: 2,
+      reposts_count: 3,
+      views_count: 4_123,
     } = render(PostView, "post.json",
       post: repost,
       conn: conn
