@@ -1,4 +1,5 @@
 defmodule Ello.Core.Content do
+  import NewRelicPhoenix, only: [measure_segment: 2]
   import Ecto.Query
   alias Ello.Core.{
     Repo,
@@ -61,14 +62,17 @@ defmodule Ello.Core.Content do
     total_query = total_posts_by_user_query(user_id, filters)
     remaining_query = remaining_posts_by_user_query(total_query, before)
 
-    posts_task = Task.async(__MODULE__, :page_of_posts_by_user_query, [remaining_query, per_page, filters])
-    total_count_task = Task.async(__MODULE__, :count_and_pages_calc, [total_query, per_page])
-    remaining_count_task = Task.async(__MODULE__, :count_and_pages_calc, [remaining_query, per_page])
+    measure_segment {:db, "Ecto.UserPostsQuery"} do
+      posts_task = Task.async(__MODULE__, :page_of_posts_by_user_query, [remaining_query, per_page, filters])
+      total_count_task = Task.async(__MODULE__, :count_and_pages_calc, [total_query, per_page])
+      remaining_count_task = Task.async(__MODULE__, :count_and_pages_calc, [remaining_query, per_page])
 
-    posts = Task.await(posts_task)
+      posts = Task.await(posts_task)
+      {total_count, total_pages} = Task.await(total_count_task)
+      {_, remaining_pages} = Task.await(remaining_count_task)
+    end
+
     last_post_date = get_last_post_created_at(posts)
-    {total_count, total_pages} = Task.await(total_count_task)
-    {_, remaining_pages} = Task.await(remaining_count_task)
 
     %PostsPage{
       posts: posts,
