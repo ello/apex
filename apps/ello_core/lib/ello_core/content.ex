@@ -227,11 +227,14 @@ defmodule Ello.Core.Content do
     current_user_repost_query = where(Post, author_id: ^id)
     current_user_love_query = where(Love, user_id: ^id)
     current_user_watch_query = where(Watch, user_id: ^id)
-    Repo.preload(post_or_posts, [
-      repost_from_current_user: current_user_repost_query,
-      love_from_current_user:   current_user_love_query,
-      watch_from_current_user:  current_user_watch_query,
-    ])
+
+    measure_segment({:db, "Ecto.CurrentUserPostRelationships"}) do
+      Repo.preload(post_or_posts, [
+        repost_from_current_user: current_user_repost_query,
+        love_from_current_user:   current_user_love_query,
+        watch_from_current_user:  current_user_watch_query,
+      ])
+    end
   end
 
   # Because categories are stored as an array on posts we can use preload.
