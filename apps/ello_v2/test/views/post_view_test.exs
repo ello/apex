@@ -61,7 +61,6 @@ defmodule Ello.V2.PostViewTest do
       comments_count: 2,
       reposts_count: 3,
       views_count: 4_123,
-      views_count_rounded: "4.12K",
       created_at: post.created_at,
       reposted: false,
       loved: false,
