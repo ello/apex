@@ -60,10 +60,15 @@ defmodule Ello.Core.Content do
 
     total_query = total_posts_by_user_query(user_id, filters)
     remaining_query = remaining_posts_by_user_query(total_query, before)
-    posts = page_of_posts_by_user_query(remaining_query, per_page, filters)
+
+    posts_task = Task.async(__MODULE__, :page_of_posts_by_user_query, [remaining_query, per_page, filters])
+    total_count_task = Task.async(__MODULE__, :count_and_pages_calc, [total_query, per_page])
+    remaining_count_task = Task.async(__MODULE__, :count_and_pages_calc, [remaining_query, per_page])
+
+    posts = Task.await(posts_task)
     last_post_date = get_last_post_created_at(posts)
-    {total_count, total_pages} = count_and_pages_calc(total_query, per_page)
-    {_, remaining_pages} = count_and_pages_calc(remaining_query, per_page)
+    {total_count, total_pages} = Task.await(total_count_task)
+    {_, remaining_pages} = Task.await(remaining_count_task)
 
     %PostsPage{
       posts: posts,
@@ -103,7 +108,7 @@ defmodule Ello.Core.Content do
     where(total_query, [p], p.created_at < ^date)
   end
 
-  defp page_of_posts_by_user_query(remaining_query, per_page, %{current_user: current_user} = _filters) do
+  def page_of_posts_by_user_query(remaining_query, per_page, %{current_user: current_user} = _filters) do
     remaining_query
     |> order_by([p], [desc: p.created_at])
     |> limit(^per_page)
@@ -117,7 +122,7 @@ defmodule Ello.Core.Content do
     List.last(posts).created_at
   end
 
-  defp count_and_pages_calc(query, per_page) do
+  def count_and_pages_calc(query, per_page) do
     count = Repo.aggregate(query, :count, :id)
     {count, round(Float.ceil(count / per_page))}
   end
