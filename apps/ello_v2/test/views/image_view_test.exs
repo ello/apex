@@ -41,7 +41,16 @@ defmodule Ello.V2.ImageViewTest do
             width:  360,
             height: 360
           }
-        }
+        },
+        "video" => %{
+          url: "https://assets.ello.co/uploads/category/tile_image/2/ello-video-23cb59fe.mp4",
+          metadata: %{
+            size:   123,
+            type:   "video/mp4",
+            width:  400,
+            height: 400
+          },
+        },
       }
   end
 
@@ -152,7 +161,16 @@ defmodule Ello.V2.ImageViewTest do
             width:  360,
             height: 360
           }
-        }
+        },
+        "video" => %{
+          url: "https://assets0.ello.co/uploads/category/tile_image/2/ello-video-23cb59fe.mp4",
+          metadata: %{
+            size:   123,
+            type:   "video/mp4",
+            width:  400,
+            height: 400
+          },
+        },
       }
     Application.put_env(:ello_v2, :asset_host, "assets.ello.co")
   end
@@ -232,6 +250,12 @@ defmodule Ello.V2.ImageViewTest do
           "type"   => "image/png",
           "width"  => 360,
           "height" => 360
+        },
+        "video" => %{
+          "size"   => 123,
+          "type"   => "video/mp4",
+          "width"  => 400,
+          "height" => 400,
         },
       }, "ello-optimized-8bcedb76.jpg"),
     }

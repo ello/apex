@@ -40,6 +40,7 @@ defmodule Ello.Core.Image do
     defp extension("image/png"), do: ".png"
     defp extension("image/jpeg"), do: ".jpg"
     defp extension("image/gif"), do: ".gif"
+    defp extension("video/mp4"), do: ".mp4"
     defp extension(_), do: ".png"
   end
 end
