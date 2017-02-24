@@ -100,7 +100,10 @@ defmodule Ello.V2.PostMetaAttributesViewTest do
   test "post.json - it renders the canonical_url correctly if the post is a repost", %{repost: repost, post: post} do
     assert %{
       description: "Phrasing!",
-      images: [],
+      images: [
+        "https://assets.ello.co/uploads/asset/attachment/1/ello-hdpi-081e2121.jpg",
+        "https://assets.ello.co/uploads/asset/attachment/2/ello-hdpi-081e2121.jpg",
+        ],
       embeds: nil,
       robots: "index, follow",
       title: "test post",
