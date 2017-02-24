@@ -12,7 +12,9 @@ defmodule Ello.V2.Router do
 
     get "/ping", StatusController, :ping
     resources "/categories", CategoryController, only: @read
-    resources "/users", UserController, only: [:show]
+    resources "/users", UserController, only: [:show] do
+      resources "/posts", UserPostController, only: [:index], name: "post"
+    end
     resources "/posts", PostController, only: [:show]
   end
 end

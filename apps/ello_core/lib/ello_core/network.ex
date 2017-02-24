@@ -17,16 +17,24 @@ defmodule Ello.Core.Network do
   If the current_user is passed in the user relationship will also be included.
   """
   @spec user(id :: integer | String.t, current_user :: User.t | nil) :: User.t
-  def user(id_or_username, current_user \\ nil)
-  def user("~" <> username, current_user) do
-    User
-    |> Repo.get_by(username: username)
-    |> user_preloads(current_user)
+  def user(id_or_username, current_user \\ nil, preload \\ true)
+  def user("~" <> username, current_user, preload) do
+    user = User
+           |> Repo.get_by(username: username)
+    if preload do
+      user_preloads(user, current_user)
+    else
+      user
+    end
   end
-  def user(id, current_user) do
-    User
-    |> Repo.get(id)
-    |> user_preloads(current_user)
+  def user(id, current_user, preload) do
+    user = User
+           |> Repo.get(id)
+    if preload do
+      user_preloads(user, current_user)
+    else
+      user
+    end
   end
 
   @doc """

@@ -1,4 +1,5 @@
 defmodule Ello.Core.Content do
+  import NewRelicPhoenix, only: [measure_segment: 2]
   import Ecto.Query
   alias Ello.Core.{
     Repo,
@@ -7,6 +8,7 @@ defmodule Ello.Core.Content do
     Discovery,
   }
   alias __MODULE__.{
+    PostsPage,
     Post,
     Love,
     Watch,
@@ -29,24 +31,107 @@ defmodule Ello.Core.Content do
   and nudity content visibility, and posts by banned users.  If no user is
   present, posts by private users will not be included.
   """
-  @spec post(id_or_slug :: String.t | integer, current_user :: User.t | nil, allow_nsfw :: boolean, allow_nudity :: boolean) :: Post.t
-  def post(id_or_slug, current_user, allow_nsfw, allow_nudity)
-  def post("~" <> slug, current_user, allow_nsfw, allow_nudity) do
+
+  @type filter_opts :: %{current_user: User.t | nil, allow_nsfw: boolean, allow_nudity: boolean}
+
+  def post(id_or_slug, opts) when is_list(opts), do: post(id_or_slug, Enum.into(opts, %{}))
+
+  @spec post(id_or_slug :: String.t | integer, filters :: filter_opts) :: Post.t
+  def post("~" <> slug, %{current_user: current_user} = filters) do
     Post
-    |> filter_post_for_client(current_user, allow_nsfw, allow_nudity)
+    |> filter_post_for_client(filters)
     |> Repo.get_by(token: slug)
     |> post_preloads(current_user)
     |> filter_blocked(current_user)
   end
-  def post(id, current_user, allow_nsfw, allow_nudity) do
+  def post(id, %{current_user: current_user} = filters) do
     Post
-    |> filter_post_for_client(current_user, allow_nsfw, allow_nudity)
+    |> filter_post_for_client(filters)
     |> Repo.get(id)
     |> post_preloads(current_user)
     |> filter_blocked(current_user)
   end
 
-  defp filter_post_for_client(query, current_user, allow_nsfw, allow_nudity) do
+  def posts_by_user(user_id, opts) when is_list(opts), do: posts_by_user(user_id, Enum.into(opts, %{}))
+
+  @spec posts_by_user(user_id :: integer, filters :: any) :: PostsPage.t
+  def posts_by_user(user_id, %{} = filters) do
+    per_page = parse_per_page(filters[:per_page])
+    before = parse_before(filters[:before])
+
+    total_query = total_posts_by_user_query(user_id, filters)
+    remaining_query = remaining_posts_by_user_query(total_query, before)
+
+    measure_segment {:db, "Ecto.UserPostsQuery"} do
+      posts_task = Task.async(__MODULE__, :page_of_posts_by_user_query, [remaining_query, per_page, filters])
+      total_count_task = Task.async(__MODULE__, :count_and_pages_calc, [total_query, per_page])
+      remaining_count_task = Task.async(__MODULE__, :count_and_pages_calc, [remaining_query, per_page])
+
+      posts = Task.await(posts_task)
+      {total_count, total_pages} = Task.await(total_count_task)
+      {_, remaining_pages} = Task.await(remaining_count_task)
+    end
+
+    last_post_date = get_last_post_created_at(posts)
+
+    %PostsPage{
+      posts: posts,
+      total_pages: total_pages,
+      total_count: total_count,
+      total_pages_remaining: remaining_pages,
+      per_page: per_page,
+      before: last_post_date,
+    }
+  end
+
+  defp parse_per_page(per_page) when is_binary(per_page) do
+    case Integer.parse(per_page) do
+      {val, _} -> val
+      _        -> parse_per_page(nil)
+    end
+  end
+  defp parse_per_page(per_page) when is_integer(per_page), do: per_page
+  defp parse_per_page(_), do: 25
+
+  defp parse_before(%DateTime{} = before), do: before
+  defp parse_before(before) do
+    case DateTime.from_iso8601(before) do
+      {:ok, date, _} -> date
+      _  -> nil
+    end
+  end
+
+  defp total_posts_by_user_query(user_id, %{} = filters) do
+    Post
+    |> filter_post_for_client(filters)
+    |> where([p], p.author_id == ^user_id and is_nil(p.parent_post_id))
+  end
+
+  defp remaining_posts_by_user_query(total_query, nil), do: total_query
+  defp remaining_posts_by_user_query(total_query, date) do
+    where(total_query, [p], p.created_at < ^date)
+  end
+
+  def page_of_posts_by_user_query(remaining_query, per_page, %{current_user: current_user} = _filters) do
+    remaining_query
+    |> order_by([p], [desc: p.created_at])
+    |> limit(^per_page)
+    |> Repo.all
+    |> post_preloads(current_user)
+    |> filter_blocked(current_user)
+  end
+
+  defp get_last_post_created_at([]), do: nil
+  defp get_last_post_created_at(posts) do
+    List.last(posts).created_at
+  end
+
+  def count_and_pages_calc(query, per_page) do
+    count = Repo.aggregate(query, :count, :id)
+    {count, round(Float.ceil(count / per_page))}
+  end
+
+  defp filter_post_for_client(query, %{current_user: current_user, allow_nsfw: allow_nsfw, allow_nudity: allow_nudity}) do
     query
     |> filter_nsfw(allow_nsfw)
     |> filter_nudity(allow_nudity)
@@ -142,11 +227,14 @@ defmodule Ello.Core.Content do
     current_user_repost_query = where(Post, author_id: ^id)
     current_user_love_query = where(Love, user_id: ^id)
     current_user_watch_query = where(Watch, user_id: ^id)
-    Repo.preload(post_or_posts, [
-      repost_from_current_user: current_user_repost_query,
-      love_from_current_user:   current_user_love_query,
-      watch_from_current_user:  current_user_watch_query,
-    ])
+
+    measure_segment {:db, "Ecto.CurrentUserPostRelationships"} do
+      Repo.preload(post_or_posts, [
+        repost_from_current_user: current_user_repost_query,
+        love_from_current_user:   current_user_love_query,
+        watch_from_current_user:  current_user_watch_query,
+      ])
+    end
   end
 
   # Because categories are stored as an array on posts we can use preload.

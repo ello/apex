@@ -37,9 +37,10 @@ defmodule Ello.V2.JSONAPI do
 
   def include_linked(resp, _name, nil, _view, _opts), do: resp
   def include_linked(resp, _name, [], _view, _opts), do: resp
-  def include_linked(resp, _name, [nil], _view, _opts), do: resp
   def include_linked(resp, name, data, view, opts) when is_list(data) do
-    data = Enum.uniq_by(data, &(&1.id))
+    data = data
+           |> Enum.reject(&is_nil/1)
+           |> Enum.uniq_by(&(&1.id))
     resp
     |> Map.put_new(:linked, %{})
     |> put_in([:linked, name], render_many(data, view, template_name(view), opts))
