@@ -13,21 +13,23 @@ defmodule Ello.V2.UserPostController do
   def index(conn, %{"user_id" => id_or_username} = params) do
     user = Network.user(id_or_username, current_user(conn), false)
     if can_view_user?(conn, user) do
-      user_posts(conn, user, params)
+      posts_page = fetch_posts_page(conn, user, params)
+
+      conn
+      |> track_post_view(posts_page.posts)
+      |> add_page_headers(user.id, posts_page)
+      |> render(PostView, :index, posts: posts_page.posts)
     else
       send_resp(conn, 404, "")
     end
   end
 
-  defp user_posts(conn, user, params) do
-    %{posts: posts} = posts_page = Content.posts_by_user(user.id,
+  defp fetch_posts_page(conn, user, params) do
+    Content.posts_by_user(user.id,
       current_user: conn.assigns[:current_user],
       allow_nsfw: conn.assigns[:allow_nsfw],
       allow_nudity: conn.assigns[:allow_nudity],
       per_page: params["per_page"], before: params["before"])
-    track_post_view(conn, posts)
-    conn = add_page_headers(conn, user.id, posts_page)
-    render(conn, PostView, :index, posts: posts)
   end
 
   defp add_page_headers(conn, user_id, %{

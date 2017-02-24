@@ -4,7 +4,7 @@ defmodule Ello.V2.PostViewTracking do
 
   def track_post_view(conn, %{} = post),
     do: track_post_view(conn, [post])
-  def track_post_view(%{assigns: assigns}, posts) do
+  def track_post_view(%{assigns: assigns} = conn, posts) do
     user_id = case assigns[:current_user] do
       %{id: id} -> id
       _ -> nil
@@ -16,6 +16,8 @@ defmodule Ello.V2.PostViewTracking do
       stream_kind: "post",
     }
     Events.publish(event)
+
+    conn
   end
 
 end
