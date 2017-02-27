@@ -74,7 +74,6 @@ defmodule Ello.V2.UserViewTest do
           "icon" => "https://social-icons.ello.co/twitter.png"
         },
       ],
-      background_position: "50% 50%",
       avatar: %{
         "original" => %{
           url: "https://assets.ello.co/uploads/user/avatar/42/ello-2274bdfe-57d8-4499-ba67-a7c003d5a962.png"

@@ -24,7 +24,6 @@ defmodule Ello.Core.Network.User do
     field :cover_image_struct, :map, virtual: true
     field :cover_image, :string
     field :cover_image_metadata, :map
-    field :background_position, :string
 
     field :is_system_user, :boolean, default: false
     field :is_public, :boolean, default: true
