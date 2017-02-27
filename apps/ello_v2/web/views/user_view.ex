@@ -4,7 +4,6 @@ defmodule Ello.V2.UserView do
   alias Ello.V2.{
     CategoryView,
     ImageView,
-    LinkView,
     UserMetaAttributesView,
   }
 
@@ -86,8 +85,7 @@ defmodule Ello.V2.UserView do
   def experimental_features(%{has_experimental_features: true}, _), do: true
   def experimental_features(_, _), do: false
 
-  def external_links_list(user, _conn),
-    do: render(LinkView, "links.json", links: user.links)
+  def external_links_list(%{rendered_links: links}, _conn), do: links
 
   def avatar(user, conn),
     do: render(ImageView, "image.json", conn: conn, image: user.avatar_struct)
