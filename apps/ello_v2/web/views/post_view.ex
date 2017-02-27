@@ -7,7 +7,6 @@ defmodule Ello.V2.PostView do
     AssetView,
     PostMetaAttributesView,
   }
-  alias Ello.V2.Util
   alias Ello.Core.Network.{User}
   alias Ello.Core.Content.{Post,Love,Watch}
 
@@ -61,7 +60,6 @@ defmodule Ello.V2.PostView do
     :summary,
     :content,
     :author_id,
-    :views_count_rounded,
     :reposted,
     :loved,
     :watching,
@@ -100,8 +98,6 @@ defmodule Ello.V2.PostView do
   def repost_id(_, _), do: ""
 
   def author_id(post, _), do: "#{post.author.id}"
-
-  def views_count_rounded(post, _), do: Util.number_to_human(post.views_count)
 
   def links(%{reposted_source: %Post{} = reposted} = post, conn) do
     post
