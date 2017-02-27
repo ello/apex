@@ -7,7 +7,7 @@ defmodule Ello.Core.Content.Asset.Attachment do
     %Image{
       filename: asset.attachment,
       path:     "/uploads/asset/attachment/#{asset.id}",
-      versions: Image.Version.from_metadata(asset.attachment_metadata, asset.attachment),
+      versions: Image.Version.from_metadata(asset.attachment_metadata, asset.attachment, [:optimized, :xhdpi, :hdpi]),
     }
   end
 end
