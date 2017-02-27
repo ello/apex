@@ -68,10 +68,10 @@ defmodule Ello.V2.UserViewTest do
       formatted_short_bio: "<p>I have been spying for a while now</p>",
       external_links_list: [
         %{
-          url: "http://twitter.com/ArcherFX",
-          text: "twitter.com/ArcherFX",
-          type: "Twitter",
-          icon: "https://social-icons.ello.co/twitter.png"
+          "url" => "http://www.twitter.com/ArcherFX",
+          "text" => "twitter.com/ArcherFX",
+          "type" => "Twitter",
+          "icon" => "https://social-icons.ello.co/twitter.png"
         },
       ],
       background_position: "50% 50%",

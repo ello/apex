@@ -32,6 +32,8 @@ defmodule Ello.Repo.Migrations.CreateUser do
 
       add :settings, :json
 
+      add :rendered_links, :json
+
       add :created_at, :utc_datetime
       add :updated_at, :utc_datetime
 
