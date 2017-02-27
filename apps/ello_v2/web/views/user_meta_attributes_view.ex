@@ -18,8 +18,10 @@ defmodule Ello.V2.UserMetaAttributesView do
   defp robots(_), do: "index, follow"
 
   defp image(user) do
-    version = Enum.find(user.cover_image_struct.versions, &(&1.name == "optimized"))
-    image_url(user.cover_image_struct.path, version.filename)
+    case Enum.find(user.cover_image_struct.versions, &(&1.name == "optimized")) do
+      nil     -> nil
+      version -> image_url(user.cover_image_struct.path, version.filename)
+    end
   end
 
   defp description(%{formatted_short_bio: nil} = user), do: default_description(user)
