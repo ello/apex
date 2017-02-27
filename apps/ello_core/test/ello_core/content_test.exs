@@ -39,22 +39,27 @@ defmodule Ello.Core.ContentTest do
     assert fetched_post.reposted_source.reposted_source == nil
   end
 
+  @tag :wip
   test "post/2 - includes assets", %{user: user, post: post} do
-    asset1 = Factory.insert(:asset, %{post: post})
-    asset2 = Factory.insert(:asset, %{post: post})
+    post = Factory.add_assets(post)
+    [asset1, asset2] = post.assets
+    unlinked_asset = Factory.insert(:asset, %{post: post})
     fetched_post = Content.post(post.id, current_user: user, allow_nsfw: true, allow_nudity: true)
     assert Enum.any?(fetched_post.assets, &(&1.id == asset1.id))
     assert Enum.any?(fetched_post.assets, &(&1.id == asset2.id))
+    refute Enum.any?(fetched_post.assets, &(&1.id == unlinked_asset.id))
     assert [%{attachment_struct: %Image{}}, %{attachment_struct: %Image{}}] = fetched_post.assets
   end
 
   test "post/2 - includes assets for reposted source", %{user: user, post: post} do
-    asset1 = Factory.insert(:asset, %{post: post})
-    asset2 = Factory.insert(:asset, %{post: post})
+    post = Factory.add_assets(post)
+    [asset1, asset2] = post.assets
+    unlinked_asset = Factory.insert(:asset, %{post: post})
     repost = Factory.insert(:post, %{reposted_source: post})
     fetched_post = Content.post(repost.id, current_user: user, allow_nsfw: true, allow_nudity: true)
     assert Enum.any?(fetched_post.reposted_source.assets, &(&1.id == asset1.id))
     assert Enum.any?(fetched_post.reposted_source.assets, &(&1.id == asset2.id))
+    refute Enum.any?(fetched_post.reposted_source.assets, &(&1.id == unlinked_asset.id))
     assert [%{attachment_struct: %Image{}}, %{attachment_struct: %Image{}}] = fetched_post.reposted_source.assets
   end
 

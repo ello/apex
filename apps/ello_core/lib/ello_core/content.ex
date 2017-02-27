@@ -206,7 +206,16 @@ defmodule Ello.Core.Content do
   defp prefetch_assets_and_author(nil, _), do: nil
   defp prefetch_assets_and_author([], _), do: []
   defp prefetch_assets_and_author(post_or_posts, current_user) do
-    Repo.preload(post_or_posts, [assets: [], author: &Network.users(&1, current_user)])
+    post_or_posts
+    |> Repo.preload([assets: [], author: &Network.users(&1, current_user)])
+    |> filter_assets
+  end
+
+  defp filter_assets(nil), do: nil
+  defp filter_assets([]), do: []
+  defp filter_assets(%Post{} = post), do: Post.filter_assets(post)
+  defp filter_assets(posts) do
+    Enum.map(posts, &filter_assets/1)
   end
 
   defp prefetch_reposted_source(nil, _), do: nil
@@ -279,10 +288,7 @@ defmodule Ello.Core.Content do
   end
 
   defp build_image_structs(%Post{assets: assets} = post) when is_list(assets) do
-    built_assets = assets
-                   |> Enum.reject(&(is_nil(&1.attachment)))
-                   |> Enum.map(&Asset.build_attachment/1)
-    Map.put(post, :assets, built_assets)
+    Map.put(post, :assets, Enum.map(assets, &Asset.build_attachment/1))
   end
   defp build_image_structs(%Post{} = post), do: post
   defp build_image_structs(nil), do: nil
