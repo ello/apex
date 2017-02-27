@@ -35,6 +35,8 @@ defmodule Ello.Core.Network.User do
     field :locked_at, :utc_datetime
     field :locked_reason, :string
 
+    field :rendered_links, {:array, :map}
+
     field :created_at, :utc_datetime
     field :updated_at, :utc_datetime
 
