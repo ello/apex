@@ -52,9 +52,22 @@ defmodule Ello.Core.Content do
     |> filter_blocked(current_user)
   end
 
-  def posts_by_user(user_id, opts) when is_list(opts), do: posts_by_user(user_id, Enum.into(opts, %{}))
+  def posts_by_ids(ids, opts) when is_list(opts),
+    do: posts_by_ids(ids, Enum.into(opts, %{}))
+
+  def posts_by_id(ids, filters) do
+    Post
+    |> where([p], p.id in ^ids)
+      # order = ActiveRecord::Base.send(:sanitize_sql_array, ['position(posts.id::text in ?)', @post_ids.join(',')])
+      # scope.where(id: @post_ids).order(order)
+    |> filter_post_for_client(filters)
+    |> Repo.all
+    |> post_preloads(current_user)
+    |> filter_blocked(current_user)
+  end
 
   @spec posts_by_user(user_id :: integer, filters :: any) :: PostsPage.t
+  def posts_by_user(user_id, opts) when is_list(opts), do: posts_by_user(user_id, Enum.into(opts, %{}))
   def posts_by_user(user_id, %{} = filters) do
     per_page = parse_per_page(filters[:per_page])
     before = parse_before(filters[:before])

@@ -27,8 +27,8 @@ defmodule Ello.Stream.Client.Roshi do
     # resp
   end
 
-  @stream_prefix Application.get_env(Ello.Stream, :prefix)
-  @stream_env    Application.get_env(Ello.Stream, :env)
+  @stream_prefix Application.get_env(:ello_stream, :prefix)
+  @stream_env    Application.get_env(:ello_stream, :env)
 
   defp format_stream_id(key) do
     [@stream_prefix, @stream_env, key]
