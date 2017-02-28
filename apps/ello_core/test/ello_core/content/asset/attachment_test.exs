@@ -18,4 +18,14 @@ defmodule Ello.Core.AttachmentTest do
     end)
   end
 
+  test "Attachment.from_asset/1 - builds required versions when meta missing" do
+    asset = Factory.build(:asset, attachment_metadata: %{})
+    image = Attachment.from_asset(asset)
+
+    assert %Image{versions: versions} = image
+    version_names = Enum.map(versions, &(&1.name))
+    assert "optimized" in version_names
+    assert "xhdpi" in version_names
+    assert "hdpi" in version_names
+  end
 end

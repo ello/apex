@@ -6,8 +6,11 @@ defmodule Ello.Core.Image do
   defmodule Version do
     defstruct [name: nil, width: nil, height: nil, size: nil, type: nil, filename: nil, pixellated_filename: nil]
 
-    def from_metadata(metadata, original_filename) do
-      Enum.map metadata, fn({name, properties}) ->
+    def from_metadata(metadata, original_filename, required_versions \\ []) do
+      required_versions
+      |> Enum.reduce(%{}, &Map.put(&2, Atom.to_string(&1), %{}))
+      |> Map.merge(metadata)
+      |> Enum.map(fn({name, properties}) ->
         %__MODULE__{
           name: name,
           width: properties["width"],
@@ -17,7 +20,7 @@ defmodule Ello.Core.Image do
           filename: properties["filename"] || filename(original_filename, name, properties["type"]),
           pixellated_filename: properties["filename"] || filename(original_filename, name <> "-pixellated", properties["type"]),
         }
-      end
+      end)
     end
 
     defp filename(original_filename, version_name, type) do
