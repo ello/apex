@@ -22,16 +22,16 @@ defmodule Ello.Core.Image do
 
     defp filename(original_filename, version_name, type) do
       version_name = String.replace(version_name, "_", "-")
-      hash         = hash_name(original_filename)
       ext          = extension(type)
+      hash         = hash_name(original_filename)
       Enum.join(["ello", version_name, hash], "-") <> ext
     end
 
     # MD5 of value stored in db, minus the file extension
     defp hash_name(name) do
-      name
-      |> String.split(".")
-      |> hd
+      ~r/(.*)\.([^.]*)$/
+      |> Regex.run(name)
+      |> Enum.at(1)
       |> :erlang.md5
       |> Base.encode16(case: :lower)
       |> String.slice(0..7)
