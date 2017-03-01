@@ -11,7 +11,7 @@ defmodule Ello.Core.Content.Asset.Attachment do
         metadata: asset.attachment_metadata,
         original: asset.attachment,
         required_versions: [:optimized, :xhdpi, :hdpi],
-        default_type: "image/jpg",
+        default_type: "image/jpeg",
       }),
     }
   end
