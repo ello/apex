@@ -1,4 +1,4 @@
-defmodule Ello.PostControllerTest do
+defmodule Ello.V2.PostControllerTest do
   use Ello.V2.ConnCase
   alias Ello.Core.Repo
 

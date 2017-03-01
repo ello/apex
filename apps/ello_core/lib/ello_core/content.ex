@@ -34,13 +34,12 @@ defmodule Ello.Core.Content do
 
   @type filter_opts :: %{current_user: User.t | nil, allow_nsfw: boolean, allow_nudity: boolean}
 
-  def post(id_or_slug, opts) when is_list(opts), do: post(id_or_slug, Enum.into(opts, %{}))
-
   @spec post(id_or_slug :: String.t | integer, filters :: filter_opts) :: Post.t
-  def post("~" <> slug, %{current_user: current_user} = filters) do
+  def post(id_or_slug, opts) when is_list(opts), do: post(id_or_slug, Enum.into(opts, %{}))
+  def post("~" <> token, %{current_user: current_user} = filters) do
     Post
     |> filter_post_for_client(filters)
-    |> Repo.get_by(token: slug)
+    |> Repo.get_by(token: token)
     |> post_preloads(current_user)
     |> filter_blocked(current_user)
   end
@@ -52,9 +51,39 @@ defmodule Ello.Core.Content do
     |> filter_blocked(current_user)
   end
 
-  def posts_by_user(user_id, opts) when is_list(opts), do: posts_by_user(user_id, Enum.into(opts, %{}))
+  @type related_filter_opts :: %{current_user: User.t | nil, allow_nsfw: boolean, allow_nudity: boolean, per_page: String.t | integer}
+  @spec related_posts(id_or_token :: String.t | integer, filters :: related_filter_opts) :: [Post.t]
+  def related_posts(post_id, opts) when is_list(opts), 
+    do: related_posts(post_id, Enum.into(opts, %{}))
+  def related_posts("~" <> token, %{current_user: current_user} = filters) do
+    related = Repo.get_by(Post, token: token)
+    Post
+    |> filter_post_for_client(filters)
+    |> related_query(related, filters[:per_page])
+    |> Repo.all
+    |> post_preloads(current_user)
+    |> filter_blocked(current_user)
+  end
+  def related_posts(id, %{current_user: current_user} = filters) do
+    related = Repo.get(Post, id)
+    Post
+    |> filter_post_for_client(filters)
+    |> related_query(related, filters[:per_page])
+    |> Repo.all
+    |> post_preloads(current_user)
+    |> filter_blocked(current_user)
+  end
+
+  defp related_query(q, %Post{id: related_id, author_id: author_id}, per_page) do
+    q
+    |> where([p], p.author_id == ^author_id)
+    |> where([p], p.id != ^related_id)
+    |> order_by(fragment("random()"))
+    |> limit(^per_page)
+  end
 
   @spec posts_by_user(user_id :: integer, filters :: any) :: PostsPage.t
+  def posts_by_user(user_id, opts) when is_list(opts), do: posts_by_user(user_id, Enum.into(opts, %{}))
   def posts_by_user(user_id, %{} = filters) do
     per_page = parse_per_page(filters[:per_page])
     before = parse_before(filters[:before])
