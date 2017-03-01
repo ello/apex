@@ -27,7 +27,6 @@ defmodule Ello.V2.UserView do
     :name,
     :location,
     :formatted_short_bio,
-    :background_position,
     :followers_count,
     :following_count,
     :loves_count,

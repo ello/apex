@@ -160,7 +160,6 @@ defmodule Ello.Core.Factory do
         email_hash: "archerelloco",
         bad_for_seo?: false,
         location: "New York, NY",
-        background_position: "50% 50%",
         short_bio: "I have been spying for a while now",
         formatted_short_bio: "<p>I have been spying for a while now</p>",
         links: "http://www.twitter.com/ArcherFX",
