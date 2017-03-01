@@ -22,7 +22,12 @@ defmodule Ello.Core.Network.User.CoverImage do
       user:     user,
       filename: user.cover_image,
       path:     "/uploads/user/cover_image/#{user.id}",
-      versions: Image.Version.from_metadata(user.cover_image_metadata, user.cover_image, [:optimized, :xhdpi, :hdpi]),
+      versions: Image.Version.from_metadata_with_defaults(%{
+        metadata: user.cover_image_metadata,
+        original: user.cover_image,
+        required_versions: [:optimized, :xhdpi, :hdpi],
+        default_type: "image/jpg",
+      }),
     }
   end
 
