@@ -27,5 +27,8 @@ defmodule Ello.Core.AttachmentTest do
     assert "optimized" in version_names
     assert "xhdpi" in version_names
     assert "hdpi" in version_names
+    optimized = Enum.find(versions, &(&1.name == "optimized"))
+    assert optimized.type == "image/jpeg"
+    assert String.match?(optimized.filename, ~r/ello-optimized-.*\.jpg/)
   end
 end

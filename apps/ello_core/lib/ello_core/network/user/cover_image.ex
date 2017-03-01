@@ -26,7 +26,7 @@ defmodule Ello.Core.Network.User.CoverImage do
         metadata: user.cover_image_metadata,
         original: user.cover_image,
         required_versions: [:optimized, :xhdpi, :hdpi],
-        default_type: "image/jpg",
+        default_type: "image/jpeg",
       }),
     }
   end
