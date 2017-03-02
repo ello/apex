@@ -191,7 +191,7 @@ defmodule Ello.Core.ContentTest do
     end
     other_post = Factory.insert(:post)
     post = Enum.random(posts)
-    related = Content.related_posts(post.id, %{
+    {related_to, related} = Content.related_posts(post.id, %{
       current_user: nil,
       allow_nsfw: true,
       allow_nudity: true,
@@ -201,6 +201,7 @@ defmodule Ello.Core.ContentTest do
     related_ids = Enum.map(related, &(&1.id))
     assert [r1, r2, r3, r4, r5] = related_ids
 
+    assert post.id == related_to.id
     refute post.id in related_ids
     refute other_post.id in related_ids
 
@@ -218,7 +219,7 @@ defmodule Ello.Core.ContentTest do
     end
     other_post = Factory.insert(:post)
     post = Enum.random(posts)
-    related = Content.related_posts("~#{post.token}", %{
+    {related_to, related} = Content.related_posts("~#{post.token}", %{
       current_user: nil,
       allow_nsfw: true,
       allow_nudity: true,
@@ -227,6 +228,7 @@ defmodule Ello.Core.ContentTest do
     post_ids = Enum.map(posts, &(&1.id))
     related_ids = Enum.map(related, &(&1.id))
     assert [r1, r2, r3] = related_ids
+    assert post.id == related_to.id
 
     refute post.id in related_ids
     refute other_post.id in related_ids

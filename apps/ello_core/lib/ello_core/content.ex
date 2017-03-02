@@ -56,22 +56,24 @@ defmodule Ello.Core.Content do
   def related_posts(post_id, opts) when is_list(opts), 
     do: related_posts(post_id, Enum.into(opts, %{}))
   def related_posts("~" <> token, %{current_user: current_user} = filters) do
-    related = Repo.get_by(Post, token: token)
-    Post
-    |> filter_post_for_client(filters)
-    |> related_query(related, filters[:per_page])
-    |> Repo.all
-    |> post_preloads(current_user)
-    |> filter_blocked(current_user)
+    related_to = Repo.get_by(Post, token: token)
+    posts = Post
+            |> filter_post_for_client(filters)
+            |> related_query(related_to, filters[:per_page])
+            |> Repo.all
+            |> post_preloads(current_user)
+            |> filter_blocked(current_user)
+    {related_to, posts}
   end
   def related_posts(id, %{current_user: current_user} = filters) do
-    related = Repo.get(Post, id)
-    Post
-    |> filter_post_for_client(filters)
-    |> related_query(related, filters[:per_page])
-    |> Repo.all
-    |> post_preloads(current_user)
-    |> filter_blocked(current_user)
+    related_to = Repo.get(Post, id)
+    posts = Post
+            |> filter_post_for_client(filters)
+            |> related_query(related_to, filters[:per_page])
+            |> Repo.all
+            |> post_preloads(current_user)
+            |> filter_blocked(current_user)
+    {related_to, posts}
   end
 
   defp related_query(q, %Post{id: related_id, author_id: author_id}, per_page) do
