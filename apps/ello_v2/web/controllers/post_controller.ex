@@ -6,7 +6,7 @@ defmodule Ello.V2.PostController do
     with %Post{} = post <- load_post(conn, params),
          true           <- owned_by_user(post, params) do
       conn
-      |> track_post_view(post, stream_kind: "post", stream_id: nil)
+      |> track_post_view(post, stream_kind: "post", stream_id: post.id)
       |> render(post: post)
     else
       _ -> send_resp(conn, 404, "")
