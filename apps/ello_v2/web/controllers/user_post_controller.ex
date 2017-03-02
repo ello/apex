@@ -16,7 +16,7 @@ defmodule Ello.V2.UserPostController do
       posts_page = fetch_posts_page(conn, user, params)
 
       conn
-      |> track_post_view(posts_page.posts)
+      |> track_post_view(posts_page.posts, stream_kind: "user", stream_id: user.id)
       |> add_page_headers(user.id, posts_page)
       |> render(PostView, :index, posts: posts_page.posts)
     else
