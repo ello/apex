@@ -3,9 +3,8 @@ defmodule Ello.V2.CategoryView do
   use Ello.V2.JSONAPI
   alias Ello.V2.{ImageView,PromotionalView,UserView}
 
-  def stale_checks("index.json", %{data: categories}) do
-    # 304 categories based on promos
-    [etag: schema_etag(Enum.flat_map(categories, &(&1.promotionals)))]
+  def stale_checks(_, %{data: categories}) do
+    [etag: etag(categories)]
   end
 
   def render("index.json", %{data: categories} = opts) do

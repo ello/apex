@@ -27,4 +27,16 @@ defmodule Ello.V2.Render do
       render(conn, view, template, opts)
     end
   end
+
+  def api_render_if_stale(conn, opts) do
+    with_data conn, opts do
+      render_if_stale(conn, opts)
+    end
+  end
+
+  def api_render_if_stale(conn, view, template, opts) do
+    with_data conn, opts do
+      render_if_stale(conn, view, template, opts)
+    end
+  end
 end
