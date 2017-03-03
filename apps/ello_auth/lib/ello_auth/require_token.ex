@@ -19,6 +19,7 @@ defmodule Ello.Auth.RequireToken do
 
   plug :get_jwt
   plug :verify_jwt
+  plug :set_honeybadger_context
 
   @doc "Get JWT from headers, assign to :jwt or 401"
   def get_jwt(conn, _opts) do
@@ -48,4 +49,10 @@ defmodule Ello.Auth.RequireToken do
     {module, fun} = Application.get_env(:ello_auth, :user_lookup_mfa)
     apply(module, fun, [id])
   end
+
+  def set_honeybadger_context(%{assigns: %{current_user: user}} = conn, _) do
+    Honeybadger.context(user_id: user.id)
+    conn
+  end
+  def set_honeybadger_context(conn, _), do: conn
 end
