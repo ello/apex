@@ -31,6 +31,23 @@ defmodule Ello.V2.UserControllerTest do
     assert %{"name" => "Sterling Archer"} = json_response(conn, 200)["users"]
   end
 
+  test "GET /v2/users/:id - 304", %{conn: conn, archer: archer} do
+    resp = get(conn, user_path(conn, :show, archer))
+    assert resp.status == 200
+    [etag] = get_resp_header(resp, "etag")
+    resp2 = conn
+            |> put_req_header("if-none-match", etag)
+            |> get(user_path(conn, :show, archer))
+    assert resp2.status == 304
+    archer
+    |> Ecto.Changeset.change(%{updated_at: DateTime.utc_now})
+    |> Ello.Core.Repo.update!
+    resp3 = conn
+            |> put_req_header("if-none-match", etag)
+            |> get(user_path(conn, :show, archer))
+    assert resp3.status == 200
+  end
+
   @tag :json_schema
   test "GET /v2/users/:id - json schema", %{conn: conn, archer: archer} do
     conn = get(conn, user_path(conn, :show, archer))

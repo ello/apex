@@ -170,6 +170,8 @@ defmodule Ello.Core.Factory do
             "icon"=>"https://social-icons.ello.co/twitter.png"},
         ],
         avatar: "ello-2274bdfe-57d8-4499-ba67-a7c003d5a962.png",
+        created_at: DateTime.utc_now,
+        updated_at: DateTime.utc_now,
         avatar_metadata: %{
           "large" => %{
             "size" => 220_669,

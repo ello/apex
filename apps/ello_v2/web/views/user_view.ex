@@ -7,8 +7,12 @@ defmodule Ello.V2.UserView do
     UserMetaAttributesView,
   }
 
+  def stale_checks(_, %{data: user}) do
+    [etag: etag(user)]
+  end
+
   @doc "Render user and relations for /api/v2/users/:id"
-  def render("show.json", %{user: user} = opts) do
+  def render("show.json", %{data: user} = opts) do
     json_response()
     |> render_resource(:users, user, __MODULE__, Map.merge(opts, %{meta: true}))
     |> include_linked(:categories, user.categories, CategoryView, opts)

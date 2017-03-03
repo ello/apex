@@ -10,8 +10,12 @@ defmodule Ello.V2.PostView do
   alias Ello.Core.Network.{User}
   alias Ello.Core.Content.{Post,Love,Watch}
 
+  def stale_checks(_, %{data: posts}) do
+    [etag: etag(posts)]
+  end
+
   @doc "Render a list of posts and relations for /api/v2/user/:id/posts"
-  def render("index.json", %{posts: posts} = opts) do
+  def render("index.json", %{data: posts} = opts) do
     users     = post_users(posts)
     assets    = post_assets(posts)
     reposts   = Enum.map(posts, &(&1.reposted_source))
@@ -27,7 +31,7 @@ defmodule Ello.V2.PostView do
   end
 
   @doc "Render a post and relations for /api/v2/posts/:id"
-  def render("show.json", %{post: post} = opts) do
+  def render("show.json", %{data: post} = opts) do
     users      = post_users(post, post.reposted_source)
     assets     = post_assets(post, post.reposted_source)
     posts      = post_and_reposts(post, post.reposted_source)

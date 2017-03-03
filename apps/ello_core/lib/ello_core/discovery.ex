@@ -15,13 +15,13 @@ defmodule Ello.Core.Discovery do
   def category(id_or_slug, current_user \\ nil)
   def category(slug, current_user) when is_binary(slug) do
     Category
-    |> Repo.get_by!(slug: slug)
+    |> Repo.get_by(slug: slug)
     |> include_promotionals(current_user)
     |> load_images
   end
   def category(id, current_user) when is_number(id) do
     Category
-    |> Repo.get!(id)
+    |> Repo.get(id)
     |> include_promotionals(current_user)
     |> load_images
   end
@@ -95,10 +95,14 @@ defmodule Ello.Core.Discovery do
   defp include_meta_categories(q, _),
     do: where(q, [c], c.level != "meta" or is_nil(c.level))
 
+  defp include_promotionals(nil, _current_user), do: nil
+  defp include_promotionals([], _current_user), do: []
   defp include_promotionals(categories, current_user) do
     Repo.preload(categories, promotionals: [user: &Network.users(&1, current_user)])
   end
 
+  defp load_images([]), do: []
+  defp load_images(nil), do: nil
   defp load_images(categories) when is_list(categories) do
     Enum.map(categories, &load_images/1)
   end

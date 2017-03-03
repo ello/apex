@@ -17,7 +17,7 @@ defmodule Ello.V2.CategoryViewTest do
         users: [_],
       }
     } = render(CategoryView, "index.json",
-      categories: [context.cat1, context.cat2],
+      data: [context.cat1, context.cat2],
       conn: context.conn
     )
   end
@@ -30,7 +30,7 @@ defmodule Ello.V2.CategoryViewTest do
         users: [_],
       }
     } = render(CategoryView, "show.json",
-      category: context.cat2,
+      data: context.cat2,
       conn: context.conn
     )
   end

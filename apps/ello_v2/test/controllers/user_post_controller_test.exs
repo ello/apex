@@ -31,6 +31,27 @@ defmodule Ello.V2.UserPostControllerTest do
     assert response.status == 200
   end
 
+  test "GET /v2/users/:id/posts - no posts", %{conn: conn} do
+    user = Factory.insert(:user)
+    response = get(conn, user_post_path(conn, :index, user))
+    assert response.status == 204
+  end
+
+  test "GET /v2/user/:id/posts - 304", %{conn: conn, author: author} do
+    resp = get(conn, user_post_path(conn, :index, author))
+    assert resp.status == 200
+    [etag] = get_resp_header(resp, "etag")
+    resp2 = conn
+            |> put_req_header("if-none-match", etag)
+            |> get(user_post_path(conn, :index, author))
+    assert resp2.status == 304
+    Factory.insert(:post, author: author)
+    resp3 = conn
+            |> put_req_header("if-none-match", etag)
+            |> get(user_post_path(conn, :index, author))
+    assert resp3.status == 200
+  end
+
   test "GET /v2/users/:id/posts - returns page headers", %{conn: conn, author: author} do
     response = get(conn, user_post_path(conn, :index, author), %{per_page: 2})
     assert get_resp_header(response, "x-total-pages") == ["5"]

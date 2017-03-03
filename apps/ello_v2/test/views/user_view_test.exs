@@ -37,7 +37,7 @@ defmodule Ello.V2.UserViewTest do
         categories: [%{id: ^spying_id}],
       }
     } = render(UserView, "show.json",
-      user: context.archer,
+      data: context.archer,
       conn: context.conn
     )
   end
