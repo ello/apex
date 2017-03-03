@@ -7,7 +7,7 @@ defmodule Ello.V2.PostController do
          true           <- owned_by_user(post, params) do
       conn
       |> track_post_view(post, stream_kind: "post", stream_id: post.id)
-      |> api_render(data: post)
+      |> api_render_if_stale(data: post)
     else
       _ -> send_resp(conn, 404, "")
     end

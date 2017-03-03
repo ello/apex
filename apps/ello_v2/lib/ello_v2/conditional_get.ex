@@ -48,3 +48,31 @@ defimpl Ello.V2.ConditionalGet, for: Ello.Core.Network.User do
     |> Ello.V2.ConditionalGet.etag
   end
 end
+
+defimpl Ello.V2.ConditionalGet, for: Ello.Core.Content.Post do
+  def etag(%{reposted_source: %Ello.Core.Content.Post{} = reposted} = post) do
+    [gen_etag(reposted), gen_etag(post)]
+    |> Enum.join("")
+    |> Ello.V2.ConditionalGet.etag
+  end
+
+  def etag(not_repost) do
+    not_repost
+    |> gen_etag
+    |> Ello.V2.ConditionalGet.etag
+  end
+
+  def gen_etag(post) do
+    values = [
+      :post,
+      post.id,
+      post.updated_at,
+      post.loves_count,
+      post.comments_count,
+      post.reposts_count,
+      post.author.updated_at
+    ]
+    values
+    |> :erlang.term_to_binary
+  end
+end

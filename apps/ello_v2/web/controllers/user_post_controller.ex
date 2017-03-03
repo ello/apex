@@ -18,7 +18,7 @@ defmodule Ello.V2.UserPostController do
       conn
       |> track_post_view(posts_page.posts, stream_kind: "user", stream_id: user.id)
       |> add_page_headers(user.id, posts_page)
-      |> api_render(PostView, :index, data: posts_page.posts)
+      |> api_render_if_stale(PostView, :index, data: posts_page.posts)
     else
       send_resp(conn, 404, "")
     end

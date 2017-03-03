@@ -16,6 +16,23 @@ defmodule Ello.PostControllerTest do
     assert json["posts"]["id"] == "#{post.id}"
   end
 
+  test "GET /v2/posts/:id - 304", %{conn: conn, post: post} do
+    resp = get(conn, post_path(conn, :show, post))
+    assert resp.status == 200
+    [etag] = get_resp_header(resp, "etag")
+    resp2 = conn
+            |> put_req_header("if-none-match", etag)
+            |> get(post_path(conn, :show, post))
+    assert resp2.status == 304
+    post
+    |> Ecto.Changeset.change(%{updated_at: DateTime.utc_now})
+    |> Ello.Core.Repo.update!
+    resp3 = conn
+            |> put_req_header("if-none-match", etag)
+            |> get(post_path(conn, :show, post))
+    assert resp3.status == 200
+  end
+
   test "GET /v2/posts/:id, user_id - success", %{conn: conn, post: post} do
     conn = get(conn, post_path(conn, :show, post), %{"user_id" => "#{post.author.id}"})
     json = json_response(conn, 200)

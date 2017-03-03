@@ -10,6 +10,10 @@ defmodule Ello.V2.PostView do
   alias Ello.Core.Network.{User}
   alias Ello.Core.Content.{Post,Love,Watch}
 
+  def stale_checks(_, %{data: posts}) do
+    [etag: etag(posts)]
+  end
+
   @doc "Render a list of posts and relations for /api/v2/user/:id/posts"
   def render("index.json", %{data: posts} = opts) do
     users     = post_users(posts)
