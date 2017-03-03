@@ -7,8 +7,8 @@ defmodule Ello.V2.UserView do
     UserMetaAttributesView,
   }
 
-  def stale_checks("show.json", %{data: user}) do
-    [etag: schema_etag(user)]
+  def stale_checks(_, %{data: user}) do
+    [etag: etag(user)]
   end
 
   @doc "Render user and relations for /api/v2/users/:id"

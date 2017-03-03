@@ -10,7 +10,7 @@ defmodule Ello.V2.UserController do
   def show(conn, %{"id" => id_or_username}) do
     user = Network.user(id_or_username, current_user(conn))
     if can_view_user?(conn, user) do
-      api_render(conn, data: user)
+      api_render_if_stale(conn, data: user)
     else
       send_resp(conn, 404, "")
     end
