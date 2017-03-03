@@ -26,6 +26,7 @@ defmodule Ello.Auth.Mixfile do
     [
       {:ello_core, in_umbrella: true},
 
+      {:honeybadger, "~> 0.6"},
       {:joken, "~> 1.3.0"},
       {:poison, "~> 2.0"},
       {:plug, "~> 1.3.0"},
