@@ -10,7 +10,7 @@ defmodule Ello.V2.CategoryController do
   Supports `meta=true` and `all=true` params.
   """
   def index(conn, params) do
-    render_if_stale(conn, categories: categories(params, conn))
+    api_render(conn, data: categories(params, conn))
   end
 
   @doc """
@@ -19,7 +19,7 @@ defmodule Ello.V2.CategoryController do
   Render a single category by slug
   """
   def show(conn, %{"id" => id_or_slug}) do
-    render(conn, category: Discovery.category(id_or_slug, current_user(conn)))
+    api_render(conn, data: Discovery.category(id_or_slug, current_user(conn)))
   end
 
   defp categories(%{"all" => _}, conn),  do: Discovery.categories(current_user(conn), meta: true, inactive: true)

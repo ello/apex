@@ -3,12 +3,12 @@ defmodule Ello.V2.CategoryView do
   use Ello.V2.JSONAPI
   alias Ello.V2.{ImageView,PromotionalView,UserView}
 
-  def stale_checks("index.json", %{categories: categories}) do
+  def stale_checks("index.json", %{data: categories}) do
     # 304 categories based on promos
     [etag: schema_etag(Enum.flat_map(categories, &(&1.promotionals)))]
   end
 
-  def render("index.json", %{categories: categories, conn: conn}) do
+  def render("index.json", %{data: categories} = opts) do
     promotionals = Enum.flat_map(categories, &(&1.promotionals))
     users = Enum.map(promotionals, &(&1.user))
 
@@ -19,7 +19,7 @@ defmodule Ello.V2.CategoryView do
   end
 
   @doc "Render categories and relations for /api/v2/categories/:id"
-  def render("show.json", %{category: category} = opts) do
+  def render("show.json", %{data: category} = opts) do
     users = Enum.map(category.promotionals, &(&1.user))
 
     json_response()

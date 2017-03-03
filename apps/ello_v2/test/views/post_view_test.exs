@@ -191,7 +191,7 @@ defmodule Ello.V2.PostViewTest do
         assets: [%{id: ^asset_id}],
       }
     } = render(PostView, "show.json",
-      post: post,
+      data: post,
       conn: conn
     )
   end
@@ -212,7 +212,7 @@ defmodule Ello.V2.PostViewTest do
         assets: [%{id: ^asset_id}],
       }
     } = render(PostView, "show.json",
-      post: repost,
+      data: repost,
       conn: conn
     )
     assert Enum.any?(users, &(&1.id == author_id))
@@ -236,7 +236,7 @@ defmodule Ello.V2.PostViewTest do
         users: [%{id: ^user_id}],
       }
     } = render(PostView, "index.json",
-      posts: posts,
+      data: posts,
       conn: conn
     )
   end
@@ -285,7 +285,7 @@ defmodule Ello.V2.PostViewTest do
         assets: assets,
       }
     } = render(PostView, "index.json",
-      posts: posts,
+      data: posts,
       conn: conn
     )
 

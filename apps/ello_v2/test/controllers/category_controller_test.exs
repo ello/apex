@@ -19,6 +19,11 @@ defmodule Ello.V2.CategoryControllerTest do
     assert %{"name" => "Featured"} = json_response(conn, 200)["categories"]
   end
 
+  test "GET /v2/categories/:slug - 404", %{conn: conn} do
+    conn = get(conn, category_path(conn, :show, "nopenopenope"))
+    assert conn.status == 404
+  end
+
   test "GET /v2/categories?all=true", %{conn: conn} do
     conn = get(conn, category_path(conn, :index), %{all: true})
     assert %{"categories" => categories} = json_response(conn, 200)

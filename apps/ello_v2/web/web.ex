@@ -38,7 +38,7 @@ defmodule Ello.V2.Web do
       plug Ello.V2.ClientProperties
       import Ello.Auth
       import Ello.V2.PostViewTracking
-      import PhoenixETag, only: [render_if_stale: 4, render_if_stale: 3, render_if_stale: 2]
+      import Ello.V2.Render
     end
   end
 
