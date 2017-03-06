@@ -164,4 +164,9 @@ defmodule Ello.V2.UserViewTest do
   test "user.json - knows user relationship", %{conn: conn, user: user} do
     assert render(UserView, "user.json", user: user, conn: conn).relationship_priority == "friend"
   end
+
+  test "user.json - renders infinate count for system users", %{conn: conn} do
+    user = Factory.build(:user, is_system_user: true)
+    assert render(UserView, "user.json", user: user, conn: conn).followers_count == "∞"
+  end
 end
