@@ -62,7 +62,7 @@ defimpl Ello.V2.ConditionalGet, for: Ello.Core.Content.Post do
     |> Ello.V2.ConditionalGet.etag
   end
 
-  def gen_etag(post) do
+  defp gen_etag(post) do
     values = [
       :post,
       post.id,
