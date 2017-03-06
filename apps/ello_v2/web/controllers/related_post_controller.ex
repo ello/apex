@@ -7,7 +7,7 @@ defmodule Ello.V2.RelatedPostController do
     {related_to, posts} = fetch_related_posts(conn, params)
     conn
     |> track_post_view(posts, stream_kind: "related", stream_id: related_to.id)
-    |> render(PostView, :index, posts: posts)
+    |> api_render(PostView, :index, data: posts)
   end
 
   defp fetch_related_posts(conn, %{"post_id" => id_or_token} = params) do
