@@ -184,4 +184,57 @@ defmodule Ello.Core.ContentTest do
     assert (Map.put(posts_page.before, :microsecond, 0)) == (Map.put(earlier_date, :microsecond, 0))
   end
 
+  test "related_posts/2 - id", _context do
+    author = Factory.insert(:user)
+    posts = Enum.map 1..10, fn (_) ->
+      Factory.insert(:post, author: author)
+    end
+    other_post = Factory.insert(:post)
+    post = Enum.random(posts)
+    {related_to, related} = Content.related_posts(post.id, %{
+      current_user: nil,
+      allow_nsfw: true,
+      allow_nudity: true,
+      per_page: 5,
+    })
+    post_ids = Enum.map(posts, &(&1.id))
+    related_ids = Enum.map(related, &(&1.id))
+    assert [r1, r2, r3, r4, r5] = related_ids
+
+    assert post.id == related_to.id
+    refute post.id in related_ids
+    refute other_post.id in related_ids
+
+    assert r1 in post_ids
+    assert r2 in post_ids
+    assert r3 in post_ids
+    assert r4 in post_ids
+    assert r5 in post_ids
+  end
+
+  test "related_posts/2 - token", _context do
+    author = Factory.insert(:user)
+    posts = Enum.map 1..10, fn (_) ->
+      Factory.insert(:post, author: author)
+    end
+    other_post = Factory.insert(:post)
+    post = Enum.random(posts)
+    {related_to, related} = Content.related_posts("~#{post.token}", %{
+      current_user: nil,
+      allow_nsfw: true,
+      allow_nudity: true,
+      per_page: 3,
+    })
+    post_ids = Enum.map(posts, &(&1.id))
+    related_ids = Enum.map(related, &(&1.id))
+    assert [r1, r2, r3] = related_ids
+    assert post.id == related_to.id
+
+    refute post.id in related_ids
+    refute other_post.id in related_ids
+
+    assert r1 in post_ids
+    assert r2 in post_ids
+    assert r3 in post_ids
+  end
 end
