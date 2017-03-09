@@ -51,13 +51,13 @@ defmodule Ello.Stream do
     slop_factor = slop_factor(stream)
     stream
     |> Map.put(:__slop_factor, slop_factor)
-    |> Map.put(:__limit, slop_factor * stream.per_page)
+    |> Map.put(:__limit, trunc(slop_factor * stream.per_page))
   end
 
   def slop_factor(stream) do
-    Application.get_env(:ello_stream, :base_slop_factor) *
-      nsfw_slop_factor(stream) *
-      nudity_slop_factor(stream) *
+    Application.get_env(:ello_stream, :base_slop_factor) +
+      nsfw_slop_factor(stream) +
+      nudity_slop_factor(stream) +
       blocked_users_slop_factor(stream)
   end
 
@@ -83,6 +83,6 @@ defmodule Ello.Stream do
   end
 
   defp fetch_filtered_posts(stream) do
-    stream
+    IO.inspect stream
   end
 end
