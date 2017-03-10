@@ -190,6 +190,9 @@ defmodule Ello.Core.ContentTest do
       Factory.insert(:post, author: author)
     end
     other_post = Factory.insert(:post)
+    comment1 = Factory.insert(:post, author: author, parent_post_id: other_post.id)
+    comment2 = Factory.insert(:post, author: author, parent_post_id: other_post.id)
+    comment3 = Factory.insert(:post, author: author, parent_post_id: other_post.id)
     post = Enum.random(posts)
     {related_to, related} = Content.related_posts(post.id, %{
       current_user: nil,
@@ -204,6 +207,9 @@ defmodule Ello.Core.ContentTest do
     assert post.id == related_to.id
     refute post.id in related_ids
     refute other_post.id in related_ids
+    refute comment1.id in related_ids
+    refute comment2.id in related_ids
+    refute comment3.id in related_ids
 
     assert r1 in post_ids
     assert r2 in post_ids

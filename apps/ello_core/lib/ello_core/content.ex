@@ -80,6 +80,7 @@ defmodule Ello.Core.Content do
     q
     |> where([p], p.author_id == ^author_id)
     |> where([p], p.id != ^related_id)
+    |> where([p], is_nil(p.parent_post_id))
     |> order_by(fragment("random()"))
     |> limit(^per_page)
   end
