@@ -18,8 +18,11 @@ defmodule Ello.Dispatch.Endpoint do
     json_decoder: Poison
 
   plug Plug.Head
-  @corsheaders ["Etag", "X-Total-Count", "X-Total-Pages", "X-Total-Pages-Remaining", "Link"]
-  plug CORSPlug, headers: CORSPlug.defaults[:headers] ++ @corsheaders
+  plug CORSPlug, [
+    headers: ["If-None-Match" | CORSPlug.defaults[:headers]],
+    expose:  ["Etag", "X-Total-Count", "X-Total-Pages", "Link",
+              "X-Total-Pages-Remaining", "X-Request-Url"]
+  ]
 
   plug Ello.Dispatch
 end
