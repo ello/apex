@@ -42,11 +42,17 @@ defimpl Ello.V2.ConditionalGet, for: Ello.Core.Network.User do
       user.loves_count,
       user.followers_count,
       user.following_count,
+      relationship(user.relationship_to_current_user)
     ]
     values
     |> :erlang.term_to_binary
     |> Ello.V2.ConditionalGet.etag
   end
+
+  defp relationship(%Ello.Core.Network.Relationship{} = relationship) do
+    relationship.priority
+  end
+  defp relationship(_), do: "nil"
 end
 
 defimpl Ello.V2.ConditionalGet, for: Ello.Core.Content.Post do
