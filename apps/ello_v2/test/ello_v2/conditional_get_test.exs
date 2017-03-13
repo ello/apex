@@ -12,10 +12,6 @@ defmodule Ello.V2.ConditionalGetTest do
     {:ok, date: date, other_date: other_date}
   end
 
-  test "returns consistent strings" do
-    assert etag("test") == etag("test")
-  end
-
   test "returns unique strings" do
     refute etag("testa") == etag("testb")
   end
@@ -40,10 +36,9 @@ defmodule Ello.V2.ConditionalGetTest do
       %{promotionals: [%{}, %{}, %{}]}
     ]
 
-    assert etag(category) == etag(category)
     for change <- changes do
       new_category = Map.merge(category, change)
-      assert etag(category) != etag(new_category)
+      refute etag(category) == etag(new_category)
     end
   end
 
@@ -68,10 +63,9 @@ defmodule Ello.V2.ConditionalGetTest do
       %{relationship_to_current_user: nil},
     ]
 
-    assert etag(user) == etag(user)
     for change <- changes do
       new_user = Map.merge(user, change)
-      assert etag(user) != etag(new_user)
+      refute etag(user) == etag(new_user)
     end
   end
 
@@ -93,10 +87,9 @@ defmodule Ello.V2.ConditionalGetTest do
       %{author: Factory.build(:user, %{updated_at: other_date})},
     ]
 
-    assert etag(post) == etag(post)
     for change <- changes do
       new_post = Map.merge(post, change)
-      assert etag(post) != etag(new_post)
+      refute etag(post) == etag(new_post)
     end
   end
 
