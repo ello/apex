@@ -33,9 +33,10 @@ defmodule Ello.Stream do
        when length(p) >= per,
        do: stream
 
-  # When stream items present but less then limit we are on the last page
-  defp do_fetch(%{__stream_items: items, __limit: limit} = stream)
-       when length(items) < limit and length(items) > 0,
+  # When we have made at least one request (batches > 0) but the number of items
+  # is less then the limit, we are on the last page
+  defp do_fetch(%{__stream_items: items, __limit: limit, __batches: batches} = stream)
+       when length(items) < limit and batches > 0,
        do: stream
 
   defp do_fetch(stream) do
