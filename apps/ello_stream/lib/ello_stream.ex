@@ -1,4 +1,5 @@
 defmodule Ello.Stream do
+  alias __MODULE__.Slop
   alias __MODULE__.Client
 
   defstruct [
@@ -49,34 +50,11 @@ defmodule Ello.Stream do
   end
 
   defp set_slop(stream) do
-    slop_factor = slop_factor(stream)
+    slop_factor = Slop.slop_factor(stream)
     stream
     |> Map.put(:__slop_factor, slop_factor)
     |> Map.put(:__limit, trunc(slop_factor * stream.per_page))
   end
-
-  def slop_factor(stream) do
-    Application.get_env(:ello_stream, :base_slop_factor) +
-      nsfw_slop_factor(stream) +
-      nudity_slop_factor(stream) +
-      blocked_users_slop_factor(stream)
-  end
-
-  @block_multiplier Application.get_env(:ello_stream, :block_slop_multiplier)
-  @max_block_slop   Application.get_env(:ello_stream, :max_block_slop_factor)
-  defp blocked_users_slop_factor(%{current_user: nil}), do: 0.0
-  defp blocked_users_slop_factor(%{current_user: %{all_blocked_ids: []}}), do: 0.0
-  defp blocked_users_slop_factor(%{current_user: %{all_blocked_ids: blocked}}) do
-    min(length(blocked) * @block_multiplier, @max_block_slop)
-  end
-
-  @nsfw_slop_factor Application.get_env(:ello_stream, :nsfw_slop_factor)
-  defp nsfw_slop_factor(%{allow_nsfw: true}), do: 0.0
-  defp nsfw_slop_factor(%{allow_nsfw: false}), do: @nsfw_slop_factor
-
-  @nudity_slop_factor Application.get_env(:ello_stream, :nudity_slop_factor)
-  defp nudity_slop_factor(%{allow_nudity: true}), do: 0.0
-  defp nudity_slop_factor(%{allow_nudity: false}), do: @nudity_slop_factor
 
   defp fetch_stream_items(stream) do
     stream_items = Client.get_coalesced_stream(stream.keys, stream.before, stream.__limit)
