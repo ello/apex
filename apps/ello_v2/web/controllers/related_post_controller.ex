@@ -6,7 +6,7 @@ defmodule Ello.V2.RelatedPostController do
   def index(conn, params) do
     {related_to, posts} = fetch_related_posts(conn, params)
     conn
-    |> track_post_view(posts, stream_kind: "related", stream_id: related_to.id)
+    |> track_post_view(posts, stream_opts(related_to))
     |> api_render(PostView, :index, data: posts)
   end
 
@@ -18,4 +18,7 @@ defmodule Ello.V2.RelatedPostController do
       per_page:     params["per_page"] || 5,
     ])
   end
+
+  defp stream_opts(%{id: id}), do: [stream_kind: "related", stream_id: id]
+  defp stream_opts(_), do: [stream_kind: "related"]
 end
