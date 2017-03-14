@@ -28,4 +28,15 @@ defmodule Ello.V2.RelatedPostControllerTest do
     assert MapSet.subset?(returned_ids, created_ids)
     refute post.id in returned_ids
   end
+
+  test "GET /v2/posts/:id/related - no related posts", %{conn: conn} do
+    post = Factory.insert(:post)
+    resp = get(conn, post_related_path(conn, :index, post))
+    assert resp.status == 204
+  end
+
+  test "GET /v2/posts/:id/related - no post", %{conn: conn} do
+    resp = get(conn, post_related_path(conn, :index, "0"))
+    assert resp.status == 204
+  end
 end
