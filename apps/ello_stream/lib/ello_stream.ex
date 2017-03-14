@@ -1,6 +1,7 @@
 defmodule Ello.Stream do
   alias __MODULE__.Slop
   alias __MODULE__.Client
+  alias Ello.Core.Content
 
   defstruct [
     keys:           [],
@@ -12,8 +13,8 @@ defmodule Ello.Stream do
     posts:          [],
     __batches:      0,
     __stream_items: [],
-    __slop_factor:  0.0,
-    __limit:        25,
+    __limit:        nil,
+    __slop_factor:  nil,
   ]
 
   def fetch(opts) do
@@ -42,26 +43,34 @@ defmodule Ello.Stream do
 
   defp do_fetch(stream) do
     stream
-    |> IO.inspect
     |> fetch_stream_items
     |> fetch_filtered_posts
     |> Map.update!(:__batches, &(&1 + 1))
     |> do_fetch
   end
 
+  defp set_slop(%{__slop_factor: nil} = stream), do: set_slop(Map.delete(stream, :__slop_factor))
+  defp set_slop(%{__limit: nil} = stream), do: set_slop(Map.delete(stream, :__limit))
   defp set_slop(stream) do
     slop_factor = Slop.slop_factor(stream)
     stream
-    |> Map.put(:__slop_factor, slop_factor)
-    |> Map.put(:__limit, trunc(slop_factor * stream.per_page))
+    |> Map.put_new(:__slop_factor, slop_factor)
+    |> Map.put_new(:__limit, trunc(slop_factor * stream.per_page))
   end
 
   defp fetch_stream_items(stream) do
-    stream_items = Client.get_coalesced_stream(stream.keys, stream.before, stream.__limit)
-    Map.put(stream, :__stream_items, stream_items)
+    %{items: stream_items, next_link: next_link} = Client.get_coalesced_stream(stream.keys, stream.before, stream.__limit)
+
+    stream
+    |> Map.put(:__stream_items, stream_items)
+    |> Map.put(:before, next_link)
   end
 
   defp fetch_filtered_posts(stream) do
-    IO.inspect stream
+    post_ids = Enum.map(stream.__stream_items, &(String.to_integer(&1.id)))
+    filters = Map.take(stream, [:current_user, :allow_nsfw, :allow_nudity])
+    posts = Content.posts_by_ids(post_ids, filters)
+    Map.put(stream, :posts, stream.posts ++ posts)
   end
+
 end

@@ -20,7 +20,7 @@ defmodule Ello.Stream.Client.Roshi do
   @spec delete_items([Item.t]) :: :ok
   def delete_items(items) do
     body = Poison.encode!(Enum.map(items, &Item.format_stream_id/1))
-    case delete!("/streams", body) |> IO.inspect do
+    case request!(:delete, "/streams", body) do
       %{status_code: 200} -> :ok
     end
   end
@@ -28,13 +28,32 @@ defmodule Ello.Stream.Client.Roshi do
   @doc """
   Get %Items{} from roshi for given keys, slug, limit.
   """
-  @spec get_coalesced_stream([String.t], String.t, integer) :: Item.t
+  @spec get_coalesced_stream([String.t], String.t, integer) :: %{items: [Item.t], next_link: String.t}
   def get_coalesced_stream(keys, pagination_slug, limit) do
     params = [{"limit", limit}, {"pagination_slug", pagination_slug}]
     body = Poison.encode!(%{streams: Enum.map(keys, &Item.format_stream_id/1)})
     case post!("/streams/coalesce", body, [], [params: params]) do
-      %{status_code: 200, body: "[]"} -> []
-      %{status_code: 200, body: resp} -> Poison.decode!(resp, as: [%Item{}])
+      %{status_code: 200, body: "[]"} -> %{items: [], next_link: ""}
+      %{status_code: 200, body: resp, headers: headers} ->
+        %{items: Poison.decode!(resp, as: [%Item{}]), next_link: next_link(headers)}
+    end
+  end
+
+  defp next_link(headers) do
+    Enum.find_value headers, fn
+      {"Link", value} -> extract_link_from_header(value)
+      _ -> nil
+    end
+  end
+
+  defp extract_link_from_header(link) do
+    case Regex.run(~r/^<.*\?(.*)>; rel="next"$/, link) do
+      [_, query_string | _] ->
+        query_string
+        |> URI.query_decoder
+        |> Enum.into(%{})
+        |> Map.get("from")
+      _ -> nil
     end
   end
 
