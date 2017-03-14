@@ -34,13 +34,12 @@ defmodule Ello.Core.Content do
 
   @type filter_opts :: %{current_user: User.t | nil, allow_nsfw: boolean, allow_nudity: boolean}
 
-  def post(id_or_slug, opts) when is_list(opts), do: post(id_or_slug, Enum.into(opts, %{}))
-
   @spec post(id_or_slug :: String.t | integer, filters :: filter_opts) :: Post.t
-  def post("~" <> slug, %{current_user: current_user} = filters) do
+  def post(id_or_slug, opts) when is_list(opts), do: post(id_or_slug, Enum.into(opts, %{}))
+  def post("~" <> token, %{current_user: current_user} = filters) do
     Post
     |> filter_post_for_client(filters)
-    |> Repo.get_by(token: slug)
+    |> Repo.get_by(token: token)
     |> post_preloads(current_user)
     |> filter_blocked(current_user)
   end
@@ -52,10 +51,8 @@ defmodule Ello.Core.Content do
     |> filter_blocked(current_user)
   end
 
-  def posts_by_ids(ids, opts) when is_list(opts),
-    do: posts_by_ids(ids, Enum.into(opts, %{}))
-
-  def posts_by_id(ids, filters) do
+  def posts_by_ids(ids, opts) when is_list(opts), do: posts_by_ids(ids, Enum.into(opts, %{}))
+  def posts_by_ids(ids, %{current_user: current_user} = filters) do
     Post
     |> where([p], p.id in ^ids)
       # order = ActiveRecord::Base.send(:sanitize_sql_array, ['position(posts.id::text in ?)', @post_ids.join(',')])
@@ -64,6 +61,32 @@ defmodule Ello.Core.Content do
     |> Repo.all
     |> post_preloads(current_user)
     |> filter_blocked(current_user)
+  end
+
+  @type related_filter_opts :: %{current_user: User.t | nil, allow_nsfw: boolean, allow_nudity: boolean, per_page: String.t | integer}
+  @spec related_posts(id_or_token :: String.t | integer, filters :: related_filter_opts) :: [Post.t]
+  def related_posts(post_id, opts) when is_list(opts),
+    do: related_posts(post_id, Enum.into(opts, %{}))
+  def related_posts("~" <> token, filters),
+    do: get_related_posts(Repo.get_by(Post, token: token), filters)
+  def related_posts(id, filters),
+    do: get_related_posts(Repo.get(Post, id), filters)
+
+  defp get_related_posts(nil, _), do: {nil, []}
+  defp get_related_posts(%Post{id: related_id, author_id: author_id} = related_to,
+                         %{current_user: current_user, per_page: per_page} = filters) do
+    posts = Post
+            |> filter_post_for_client(filters)
+            |> where([p], p.author_id == ^author_id)
+            |> where([p], p.id != ^related_id)
+            |> where([p], is_nil(p.parent_post_id))
+            |> order_by(fragment("random()"))
+            |> limit(^per_page)
+            |> Repo.all
+            |> post_preloads(current_user)
+            |> filter_blocked(current_user)
+
+    {related_to, posts}
   end
 
   @spec posts_by_user(user_id :: integer, filters :: any) :: PostsPage.t

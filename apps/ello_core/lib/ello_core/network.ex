@@ -20,7 +20,7 @@ defmodule Ello.Core.Network do
   def user(id_or_username, current_user \\ nil, preload \\ true)
   def user("~" <> username, current_user, preload) do
     user = User
-           |> Repo.get_by(username: username)
+           |> Repo.get_by(username: String.downcase(username))
     if preload do
       user_preloads(user, current_user)
     else
