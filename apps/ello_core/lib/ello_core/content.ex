@@ -55,12 +55,18 @@ defmodule Ello.Core.Content do
   def posts_by_ids(ids, %{current_user: current_user} = filters) do
     Post
     |> where([p], p.id in ^ids)
-      # order = ActiveRecord::Base.send(:sanitize_sql_array, ['position(posts.id::text in ?)', @post_ids.join(',')])
-      # scope.where(id: @post_ids).order(order)
     |> filter_post_for_client(filters)
     |> Repo.all
+    |> post_sorting(ids)
     |> post_preloads(current_user)
     |> filter_blocked(current_user)
+  end
+
+  defp post_sorting(posts, ids) do
+    mapped = Enum.group_by(posts, &(&1.id))
+    Enum.flat_map(ids, fn(id) ->
+      mapped[id] || []
+    end)
   end
 
   @type related_filter_opts :: %{current_user: User.t | nil, allow_nsfw: boolean, allow_nudity: boolean, per_page: String.t | integer}
