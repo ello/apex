@@ -33,7 +33,7 @@ defmodule Ello.Stream.Client.Roshi do
     params = [{"limit", limit}, {"from", pagination_slug}]
     body = Poison.encode!(%{streams: Enum.map(keys, &Item.format_stream_id/1)})
     case post!("/streams/coalesce", body, [], [params: params]) do
-      %{status_code: 200, body: "[]"} -> %{items: [], next_link: ""}
+      %{status_code: 200, body: "[]"} -> %{items: [], next_link: pagination_slug}
       %{status_code: 200, body: resp, headers: headers} ->
         %{items: Poison.decode!(resp, as: [%Item{}]), next_link: next_link(headers)}
     end

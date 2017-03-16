@@ -6,6 +6,8 @@ defmodule Ello.StreamTest do
 
   setup do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
+    Stream.Client.Test.start
+    :ok
   end
 
   test "returns 0 items when zero items in stream" do
@@ -98,7 +100,6 @@ defmodule Ello.StreamTest do
     assert stream.__batches == 1
   end
 
-  @tag :focus
   test "paginates" do
     num_posts = 100
     per_page = 10
