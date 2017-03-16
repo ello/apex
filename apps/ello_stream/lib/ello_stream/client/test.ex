@@ -20,16 +20,22 @@ defmodule Ello.Stream.Client.Test do
   def delete_items(items) do
     Agent.update(__MODULE__, fn(state) ->
       Enum.reduce(items, state, fn(item, state) ->
-        Map.update(state, item.stream_id, [], fn(stream_items) ->
-          Enum.reject(stream_items, &(&1.id == item.id))
-        end)
+        new_items = filter_items(state[item.stream_id], item)
+        Map.put(state, item.stream_id, new_items)
       end)
     end)
   end
 
+  defp filter_items(nil, _), do: []
+  defp filter_items([], _), do: []
+  defp filter_items(stream_items, remove_item) do
+    Enum.reject(stream_items, &(&1.id == item.id))
+  end
+
   def get_coalesced_stream(keys, pagination_post_id, limit) do
     Agent.get(__MODULE__, fn(state) ->
-      all_items = Enum.flat_map(keys, &(state[&1] || []))
+      all_items = keys
+                  |> Enum.flat_map(&(state[&1] || []))
                   |> Enum.sort_by(&(&1.ts), &>=/2)
                   |> drop_until_item(pagination_post_id)
                   |> Enum.take(limit)
