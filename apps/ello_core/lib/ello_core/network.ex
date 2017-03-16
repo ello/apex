@@ -72,6 +72,18 @@ defmodule Ello.Core.Network do
     |> user_preloads(current_user)
   end
 
+  @following_ids_limit 10_000
+
+  @doc """
+  Gets all the user ids that are followed by a user.
+  """
+  @spec following_ids(user :: User.t) :: [integer]
+  def following_ids(user) do
+    redis_key = "user:#{user.id}:followed_users_id_cache"
+    {:ok, [_, following_ids]} = Redis.command(["SSCAN", redis_key, 0, "COUNT", @following_ids_limit], name: :following_ids)
+    following_ids
+  end
+
   defp user_preloads(nil, _), do: nil
   defp user_preloads([], _), do: []
   defp user_preloads(user_or_users, current_user) do
