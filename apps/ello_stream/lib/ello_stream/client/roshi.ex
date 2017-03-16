@@ -30,7 +30,7 @@ defmodule Ello.Stream.Client.Roshi do
   """
   @spec get_coalesced_stream([String.t], String.t, integer) :: %{items: [Item.t], next_link: String.t}
   def get_coalesced_stream(keys, pagination_slug, limit) do
-    params = [{"limit", limit}, {"pagination_slug", pagination_slug}]
+    params = [{"limit", limit}, {"from", pagination_slug}]
     body = Poison.encode!(%{streams: Enum.map(keys, &Item.format_stream_id/1)})
     case post!("/streams/coalesce", body, [], [params: params]) do
       %{status_code: 200, body: "[]"} -> %{items: [], next_link: ""}
