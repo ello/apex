@@ -2,7 +2,7 @@ defmodule Ello.V2.FollowingPostControllerTest do
   use Ello.V2.ConnCase, async: false
   alias Ello.Core.Repo
 
-  setup %{conn: conn} do
+  setup do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
   end
 

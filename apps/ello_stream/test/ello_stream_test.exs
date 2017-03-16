@@ -7,6 +7,7 @@ defmodule Ello.StreamTest do
   setup do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
     Stream.Client.Test.start
+    Stream.Client.Test.reset
     :ok
   end
 
