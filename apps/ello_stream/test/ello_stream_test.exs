@@ -26,34 +26,39 @@ defmodule Ello.StreamTest do
       %Item{id: "#{post2.id}", stream_id: "test:1", ts: DateTime.utc_now},
       %Item{id: "#{post3.id}", stream_id: "test:2", ts: DateTime.utc_now},
     ]
-
     Stream.Client.add_items(roshi_items)
+
     stream = Stream.fetch(
       keys: ["test:1", "test:2"]
     )
-    Stream.Client.delete_items(roshi_items)
 
     assert [_, _, _] = stream.posts
     assert Enum.any?(stream.posts, &(&1.id == post1.id))
     assert Enum.any?(stream.posts, &(&1.id == post2.id))
     assert Enum.any?(stream.posts, &(&1.id == post3.id))
+    assert stream.per_page
+    assert stream.before
   end
 
   test "only fetches [max] number of batches" do
     max_batches = Application.get_env(:ello_stream, :batches_per_request)
-    num_posts = max_batches + 1
-    roshi_items = Enum.reduce(1..num_posts, [], fn(_, items) ->
+    num_good_posts = 10
+    num_bad_posts = 1_000
+    roshi_items = Enum.reduce(1..num_bad_posts, [], fn(_, items) ->
+      id = Factory.insert(:post, %{is_adult_content: true, has_nudity: true}).id
+      items ++ [%Item{id: "#{id}", stream_id: "test", ts: DateTime.utc_now}]
+    end)
+    Stream.Client.add_items(roshi_items)
+    roshi_items = Enum.reduce(1..num_good_posts, [], fn(_, items) ->
       id = Factory.insert(:post).id
       items ++ [%Item{id: "#{id}", stream_id: "test", ts: DateTime.utc_now}]
     end)
-
     Stream.Client.add_items(roshi_items)
+
     stream = Stream.fetch(
       keys: ["test"],
-      __slop_factor: 1,
-      __limit: 1,
+      per_page: 10,
     )
-    Stream.Client.delete_items(roshi_items)
 
     assert stream.__batches == max_batches
   end
@@ -65,13 +70,12 @@ defmodule Ello.StreamTest do
       id = Factory.insert(:post).id
       items ++ [%Item{id: "#{id}", stream_id: "test", ts: DateTime.utc_now}]
     end)
-
     Stream.Client.add_items(roshi_items)
+
     stream = Stream.fetch(
       keys: ["test"],
       per_page: per_page,
     )
-    Stream.Client.delete_items(roshi_items)
 
     assert Enum.count(stream.posts) >= per_page
   end
@@ -83,13 +87,12 @@ defmodule Ello.StreamTest do
       id = Factory.insert(:post).id
       items ++ [%Item{id: "#{id}", stream_id: "test", ts: DateTime.utc_now}]
     end)
-
     Stream.Client.add_items(roshi_items)
+
     stream = Stream.fetch(
       keys: ["test"],
       per_page: per_page,
     )
-    Stream.Client.delete_items(roshi_items)
 
     assert Enum.count(stream.posts) == num_posts
     assert stream.__batches == 1
@@ -103,8 +106,8 @@ defmodule Ello.StreamTest do
       id = Factory.insert(:post).id
       items ++ [%Item{id: "#{id}", stream_id: "test", ts: DateTime.utc_now}]
     end)
-
     Stream.Client.add_items(roshi_items)
+
     page1 = Stream.fetch(
       keys: ["test"],
       per_page: per_page,
@@ -114,7 +117,6 @@ defmodule Ello.StreamTest do
       per_page: per_page,
       before: page1.before,
     )
-    Stream.Client.delete_items(roshi_items)
 
     assert Enum.count(page1.posts) >= per_page
     assert Enum.count(page2.posts) >= per_page

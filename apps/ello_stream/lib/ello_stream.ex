@@ -49,13 +49,11 @@ defmodule Ello.Stream do
     |> do_fetch
   end
 
-  defp set_slop(%{__slop_factor: nil} = stream), do: set_slop(Map.delete(stream, :__slop_factor))
-  defp set_slop(%{__limit: nil} = stream), do: set_slop(Map.delete(stream, :__limit))
   defp set_slop(stream) do
     slop_factor = Slop.slop_factor(stream)
     stream
-    |> Map.put_new(:__slop_factor, slop_factor)
-    |> Map.put_new(:__limit, trunc(slop_factor * stream.per_page))
+    |> Map.put(:__slop_factor, slop_factor)
+    |> Map.put(:__limit, trunc(slop_factor * stream.per_page))
   end
 
   defp fetch_stream_items(stream) do
