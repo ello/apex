@@ -23,7 +23,7 @@ defmodule Ello.V2.UserView do
     user
     |> render_self(__MODULE__, opts)
     |> add_meta(user, opts[:meta])
-    |> settings_attributes(user)
+    |> add_settings_attributes(user)
   end
 
   def attributes, do: [
@@ -46,6 +46,7 @@ defmodule Ello.V2.UserView do
     :avatar,
     :cover_image,
     :followers_count,
+    :total_views_count,
   ]
 
   @settings_attributes [
@@ -65,7 +66,7 @@ defmodule Ello.V2.UserView do
   end
   defp add_meta(resp, _, _), do: resp
 
-  defp settings_attributes(resp, user) do
+  defp add_settings_attributes(resp, user) do
     user.settings
     |> Map.take(@settings_attributes)
     |> Map.merge(resp)
@@ -114,4 +115,7 @@ defmodule Ello.V2.UserView do
 
   def followers_count(%{is_system_user: true}, _), do: "∞"
   def followers_count(%{followers_count: count}, _), do: count
+
+  def total_views_count(%{total_views_count: 0}, _), do: nil
+  def total_views_count(%{total_views_count: count}, _), do: count
 end

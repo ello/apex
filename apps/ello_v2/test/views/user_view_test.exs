@@ -5,12 +5,12 @@ defmodule Ello.V2.UserViewTest do
 
   setup %{conn: conn} do
     spying = Script.insert(:espionage_category)
-    archer = Script.build(:archer, categories: [spying])
+    archer = Script.build(:archer, categories: [spying], total_views_count: 2500)
     user = Factory.build(:user, %{
       id: 1234,
       relationship_to_current_user: Factory.build(:relationship,
                                                   owner: archer,
-                                                  priority: "friend")
+                                                  priority: "friend"),
     })
     {:ok, [
         conn: user_conn(conn, archer),
@@ -65,6 +65,7 @@ defmodule Ello.V2.UserViewTest do
       followers_count: nil,
       following_count: nil,
       loves_count: nil,
+      total_views_count: 2500,
       formatted_short_bio: "<p>I have been spying for a while now</p>",
       external_links_list: [
         %{
@@ -165,8 +166,13 @@ defmodule Ello.V2.UserViewTest do
     assert render(UserView, "user.json", user: user, conn: conn).relationship_priority == "friend"
   end
 
-  test "user.json - renders infinate count for system users", %{conn: conn} do
+  test "user.json - renders infinite count for system users", %{conn: conn} do
     user = Factory.build(:user, is_system_user: true)
     assert render(UserView, "user.json", user: user, conn: conn).followers_count == "∞"
+  end
+
+  test "user.json - renders nil for total_post_views attribute for users with 0 views", %{conn: conn} do
+    user = Factory.build(:user, is_system_user: true, total_views_count: 0)
+    assert render(UserView, "user.json", user: user, conn: conn).total_views_count == nil
   end
 end
