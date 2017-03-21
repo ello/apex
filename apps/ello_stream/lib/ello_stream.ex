@@ -1,4 +1,5 @@
 defmodule Ello.Stream do
+  import NewRelicPhoenix, only: [measure_segment: 2]
   alias __MODULE__.Slop
   alias __MODULE__.Client
   alias Ello.Core.Content
@@ -57,7 +58,9 @@ defmodule Ello.Stream do
   end
 
   defp fetch_stream_items(stream) do
-    %{items: stream_items, next_link: next_link} = Client.get_coalesced_stream(stream.keys, stream.before, stream.__limit)
+    measure_segment {:ext, "Stream.get_coalesced_stream"} do
+      %{items: stream_items, next_link: next_link} = Client.get_coalesced_stream(stream.keys, stream.before, stream.__limit)
+    end
 
     stream
     |> Map.put(:__stream_items, stream_items)
