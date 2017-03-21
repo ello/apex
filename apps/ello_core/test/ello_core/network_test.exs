@@ -22,11 +22,13 @@ defmodule Ello.Core.NetworkTest do
     user_id = context.friend1.id
     Redis.command(["SET", "user:#{user_id}:posts_counter", "11"])
     Redis.command(["SET", "user:#{user_id}:loves_counter", "12"])
+    Redis.command(["SET", "user:#{user_id}:total_post_views_counter", "13"])
 
     assert %User{} = user = Network.user(user_id)
 
     assert user.posts_count == 11
     assert user.loves_count == 12
+    assert user.total_views_count == 13
     assert user.relationship_to_current_user.__struct__ == NotLoaded
     assert %Image{} = user.avatar_struct
     assert %Image{} = user.cover_image_struct
@@ -36,11 +38,13 @@ defmodule Ello.Core.NetworkTest do
     user_id = context.friend1.id
     Redis.command(["SET", "user:#{user_id}:posts_counter", "11"])
     Redis.command(["SET", "user:#{user_id}:loves_counter", "12"])
+    Redis.command(["SET", "user:#{user_id}:total_post_views_counter", "13"])
 
     assert %User{} = user = Network.user("~#{context.friend1.username}")
 
     assert user.posts_count == 11
     assert user.loves_count == 12
+    assert user.total_views_count == 13
     assert user.relationship_to_current_user.__struct__ == NotLoaded
     assert %Image{} = user.avatar_struct
     assert %Image{} = user.cover_image_struct
@@ -50,11 +54,13 @@ defmodule Ello.Core.NetworkTest do
     user_id = context.friend1.id
     Redis.command(["SET", "user:#{user_id}:posts_counter", "11"])
     Redis.command(["SET", "user:#{user_id}:loves_counter", "12"])
+    Redis.command(["SET", "user:#{user_id}:total_post_views_counter", "13"])
 
     assert %User{} = user = Network.user(user_id, context.current)
 
     assert user.posts_count == 11
     assert user.loves_count == 12
+    assert user.total_views_count == 13
     assert user.relationship_to_current_user.priority == "friend"
     assert %Image{} = user.avatar_struct
     assert %Image{} = user.cover_image_struct
@@ -65,22 +71,26 @@ defmodule Ello.Core.NetworkTest do
     Enum.each user_ids, fn(id) ->
       Redis.command(["SET", "user:#{id}:posts_counter", "11"])
       Redis.command(["SET", "user:#{id}:loves_counter", "12"])
+      Redis.command(["SET", "user:#{id}:total_post_views_counter", "13"])
     end
 
     assert [u1, u2, u3] = Network.users(user_ids, context.current)
 
     assert u1.posts_count == 11
     assert u1.loves_count == 12
+    assert u1.total_views_count == 13
     assert u1.relationship_to_current_user.priority == "friend"
     assert u1.categories == []
 
     assert u2.posts_count == 11
     assert u2.loves_count == 12
+    assert u2.total_views_count == 13
     assert u2.relationship_to_current_user.priority == "noise"
     assert u2.categories == []
 
     assert u3.posts_count == 11
     assert u3.loves_count == 12
+    assert u3.total_views_count == 13
     assert u3.relationship_to_current_user == nil
     assert context.category.id in Enum.map(u3.categories, &(&1.id))
     assert %Image{} = u3.avatar_struct
@@ -89,6 +99,7 @@ defmodule Ello.Core.NetworkTest do
     Enum.each user_ids, fn(id) ->
       Redis.command(["DEL", "user:#{id}:posts_counter"])
       Redis.command(["DEL", "user:#{id}:loves_counter"])
+      Redis.command(["DEL", "user:#{id}:total_post_views_counter"])
     end
   end
 
@@ -97,12 +108,14 @@ defmodule Ello.Core.NetworkTest do
     Enum.each user_ids, fn(id) ->
       Redis.command(["SET", "user:#{id}:posts_counter", "11"])
       Redis.command(["SET", "user:#{id}:loves_counter", "12"])
+      Redis.command(["SET", "user:#{id}:total_post_views_counter", "13"])
     end
 
     assert [u1, u2, u3] = Network.users(user_ids)
 
     assert u1.posts_count == 11
     assert u1.loves_count == 12
+    assert u1.total_views_count == 13
     assert u1.relationship_to_current_user.__struct__ == NotLoaded
     assert u1.categories == []
     assert %Image{} = u1.avatar_struct
@@ -110,17 +123,20 @@ defmodule Ello.Core.NetworkTest do
 
     assert u2.posts_count == 11
     assert u2.loves_count == 12
+    assert u2.total_views_count == 13
     assert u2.relationship_to_current_user.__struct__ == NotLoaded
     assert u2.categories == []
 
     assert u3.posts_count == 11
     assert u3.loves_count == 12
+    assert u3.total_views_count == 13
     assert u3.relationship_to_current_user.__struct__ == NotLoaded
     assert context.category.id in Enum.map(u3.categories, &(&1.id))
 
     Enum.each user_ids, fn(id) ->
       Redis.command(["DEL", "user:#{id}:posts_counter"])
       Redis.command(["DEL", "user:#{id}:loves_counter"])
+      Redis.command(["DEL", "user:#{id}:total_post_views_counter"])
     end
   end
 

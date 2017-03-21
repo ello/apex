@@ -110,14 +110,15 @@ defmodule Ello.Core.Network do
     # Add counts to users
     counts
     |> Enum.map(&(String.to_integer(&1 || "0")))
-    |> Enum.chunk(4)
+    |> Enum.chunk(5)
     |> Enum.zip(users)
-    |> Enum.map(fn({[followers, following, loves, posts], user}) ->
+    |> Enum.map(fn({[followers, following, loves, posts, total_views], user}) ->
       Map.merge user, %{
-        loves_count:     loves,
-        posts_count:     posts,
-        following_count: following,
-        followers_count: followers,
+        loves_count:        loves,
+        posts_count:        posts,
+        following_count:    following,
+        followers_count:    followers,
+        total_views_count:  total_views
       }
     end)
   end
@@ -130,6 +131,7 @@ defmodule Ello.Core.Network do
         "user:#{id}:followed_users_counter",
         "user:#{id}:loves_counter",
         "user:#{id}:posts_counter",
+        "user:#{id}:total_post_views_counter",
       ]
     end
   end

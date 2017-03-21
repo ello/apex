@@ -51,6 +51,7 @@ defmodule Ello.Core.Network.User do
     field :posts_count, :integer, virtual: true
     field :following_count, :integer, virtual: true
     field :followers_count, :integer, virtual: true
+    field :total_views_count, :integer, virtual: true
 
     # Used to hold blocked ids retreived from Redis
     field :inverse_blocked_ids, {:array, :integer}, default: %MapSet{}, virtual: true
