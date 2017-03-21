@@ -10,7 +10,7 @@ services:
 script:
 - mix compile --warnings-as-errors
 - mix credo -a
-- mix test
+- mix test --exclude skip_on_travis
 notifications:
   email: false
   slack:
