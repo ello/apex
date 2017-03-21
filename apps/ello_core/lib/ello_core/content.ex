@@ -57,9 +57,9 @@ defmodule Ello.Core.Content do
     |> where([p], p.id in ^ids)
     |> filter_post_for_client(filters)
     |> Repo.all
-    |> post_sorting(ids)
     |> post_preloads(current_user)
     |> filter_blocked(current_user)
+    |> post_sorting(ids)
   end
 
   defp post_sorting(posts, ids) do
