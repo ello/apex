@@ -139,4 +139,21 @@ defmodule Ello.Core.NetworkTest do
       Redis.command(["DEL", "user:#{id}:total_post_views_counter"])
     end
   end
+
+  test "following_ids/1 - returns folling user ids", %{current: current} do
+    redis_key = "user:#{current.id}:followed_users_id_cache"
+    user1 = Factory.insert(:user)
+    user2 = Factory.insert(:user)
+    user3 = Factory.insert(:user)
+    user_ids = [user1.id, user2.id, user3.id]
+    for id <- user_ids do
+      Redis.command(["SADD", redis_key, id])
+    end
+    following_ids = Network.following_ids(current)
+    Redis.command(["DEL", redis_key])
+
+    assert Enum.member?(following_ids, "#{user1.id}")
+    assert Enum.member?(following_ids, "#{user2.id}")
+    assert Enum.member?(following_ids, "#{user3.id}")
+  end
 end

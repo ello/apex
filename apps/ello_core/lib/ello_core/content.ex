@@ -51,6 +51,24 @@ defmodule Ello.Core.Content do
     |> filter_blocked(current_user)
   end
 
+  def posts_by_ids(ids, opts) when is_list(opts), do: posts_by_ids(ids, Enum.into(opts, %{}))
+  def posts_by_ids(ids, %{current_user: current_user} = filters) do
+    Post
+    |> where([p], p.id in ^ids)
+    |> filter_post_for_client(filters)
+    |> Repo.all
+    |> post_preloads(current_user)
+    |> filter_blocked(current_user)
+    |> post_sorting(ids)
+  end
+
+  defp post_sorting(posts, ids) do
+    mapped = Enum.group_by(posts, &(&1.id))
+    Enum.flat_map(ids, fn(id) ->
+      mapped[id] || []
+    end)
+  end
+
   @type related_filter_opts :: %{current_user: User.t | nil, allow_nsfw: boolean, allow_nudity: boolean, per_page: String.t | integer}
   @spec related_posts(id_or_token :: String.t | integer, filters :: related_filter_opts) :: [Post.t]
   def related_posts(post_id, opts) when is_list(opts),

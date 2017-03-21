@@ -8,15 +8,13 @@ defmodule Ello.Auth.RequireUser do
 
   To use drop in any controller, router, endpoint or other plug.
 
+      plug Ello.Auth.RequireToken
       plug Ello.Auth.RequireUser
 
   Everything after the call will only be hit if a user is present.
   """
 
   use Plug.Builder
-  alias Ello.Auth.RequireToken
-
-  plug RequireToken
   plug :require_user
 
   def require_user(%{assigns: %{current_user: user}} = conn, _)

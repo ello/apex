@@ -17,7 +17,7 @@ defmodule Ello.V2.Router do
     end
     resources "/posts", PostController, only: [:show] do
       resources "/related", RelatedPostController, only: [:index], name: :related
-
     end
+    resources "/following/posts/recent", FollowingPostController, only: [:index]
   end
 end

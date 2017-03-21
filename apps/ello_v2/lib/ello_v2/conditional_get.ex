@@ -76,7 +76,7 @@ defimpl Ello.V2.ConditionalGet, for: Ello.Core.Content.Post do
       post.loves_count,
       post.comments_count,
       post.reposts_count,
-      post.author.updated_at
+      Ello.V2.ConditionalGet.etag(post.author),
     ]
     values
     |> :erlang.term_to_binary
