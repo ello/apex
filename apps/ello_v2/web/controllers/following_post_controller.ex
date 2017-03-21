@@ -15,7 +15,8 @@ defmodule Ello.V2.FollowingPostController do
   end
 
   defp fetch_stream(conn, params) do
-    user_ids = Network.following_ids(current_user(conn))
+    current_user = current_user(conn)
+    user_ids = ["#{current_user.id}" | Network.following_ids(current_user)]
 
     before = params["before"]
     per_page = String.to_integer(params["per_page"] || "25")
