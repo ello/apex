@@ -29,7 +29,7 @@ defmodule Ello.Stream.Client.Test do
   defp filter_items(nil, _), do: []
   defp filter_items([], _), do: []
   defp filter_items(stream_items, remove_item) do
-    Enum.reject(stream_items, &(&1.id == item.id))
+    Enum.reject(stream_items, &(&1.id == remove_item.id))
   end
 
   def get_coalesced_stream(keys, pagination_post_id, limit) do
