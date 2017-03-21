@@ -2,6 +2,8 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
+config :ello_stream, ecto_repos: []
+
 config :ello_stream,
   prefix: System.get_env("STREAM_SERVICE_PREFIX"),
   service_url:           System.get_env("STREAM_SERVICE_URL") || "http://localhost:8080",
