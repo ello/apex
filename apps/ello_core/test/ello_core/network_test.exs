@@ -150,9 +150,7 @@ defmodule Ello.Core.NetworkTest do
       Redis.command(["SADD", redis_key, id])
     end
     following_ids = Network.following_ids(current)
-    for id <- user_ids do
-      Redis.command(["DEL", redis_key, id])
-    end
+    Redis.command(["DEL", redis_key])
 
     assert Enum.member?(following_ids, "#{user1.id}")
     assert Enum.member?(following_ids, "#{user2.id}")
