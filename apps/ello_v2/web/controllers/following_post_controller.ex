@@ -23,7 +23,7 @@ defmodule Ello.V2.FollowingPostController do
   end
 
   defp add_page_headers(conn, %{per_page: per_page, before: before}) do
-    put_resp_header(conn, "link", "<https://#{webapp_host()}/following/posts/recent?before=#{before}&per_page=#{per_page}>; rel=\"next\"")
+    put_resp_header(conn, "link", "<https://#{webapp_host()}/api/v2/following/posts/recent?before=#{before}&per_page=#{per_page}>; rel=\"next\"")
   end
 
   defp webapp_host do
