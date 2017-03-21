@@ -4,7 +4,7 @@ defmodule Ello.Stream.Item do
 
   @prefix    Application.get_env(:ello_stream, :prefix)
   @env       Application.get_env(:ello_stream, :env)
-  @id_prefix [@prefix, @env]
+  @id_prefix [@env, @prefix]
              |> Enum.reject(&is_nil/1)
              |> Enum.join(":")
 
