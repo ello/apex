@@ -2,6 +2,8 @@ defmodule Ello.V2.FollowingPostController do
   use Ello.V2.Web, :controller
   alias Ello.Stream
   alias Ello.Core.{Network}
+  alias Ello.V2.PostView
+  plug Ello.Auth.RequireUser
 
   def index(conn, params) do
     stream = fetch_stream(conn, params)
