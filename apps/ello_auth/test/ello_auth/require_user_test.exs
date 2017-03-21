@@ -1,9 +1,10 @@
 defmodule Ello.Auth.RequireUserTest do
   use Ello.Auth.Case
-  alias Ello.Auth.{RequireUser, JWT}
+  alias Ello.Auth.{RequireUser, RequireToken, JWT}
 
   defmodule Example do
     use Plug.Builder
+    plug RequireToken
     plug RequireUser
     plug :foo
     def foo(conn, _), do: send_resp(conn, 200, "bar")
