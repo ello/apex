@@ -25,12 +25,16 @@ defmodule Ello.V2.FollowingPostControllerTest do
       Redis.command(["DEL", redis_key])
     end
 
-    {:ok, conn: auth_conn(conn, user), unauth_conn: conn, user: user}
+    {:ok, conn: auth_conn(conn, user), unauth_conn: conn, user: user, post: post}
   end
 
-  test "GET /v2/following/posts/recent", %{conn: conn} do
+  test "GET /v2/following/posts/recent", %{conn: conn, post: post} do
     response = get(conn, following_post_path(conn, :index))
     assert response.status == 200
+    json = json_response(response, 200)
+    returned_ids = json["posts"]
+                   |> Enum.map(&(String.to_integer(&1["id"])))
+    assert post.id in returned_ids
   end
 
   test "GET /v2/following/posts/recent - fails for unauth requests", %{unauth_conn: conn} do
