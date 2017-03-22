@@ -51,6 +51,7 @@ defmodule Ello.V2.ClientProperties do
   defp webapp(conn, _),
     do: assign(conn, :webapp, false)
 
+  defp nudity(%{assigns: %{allow_nudity: _preset}} = conn, _), do: conn
   defp nudity(%{assigns: %{current_user: %{settings: %{views_adult_content: true}}}} = conn, _),
     do: assign(conn, :allow_nudity, true)
   defp nudity(%{assigns: %{webapp: true}} = conn, _),
@@ -58,6 +59,7 @@ defmodule Ello.V2.ClientProperties do
   defp nudity(conn, _),
     do: assign(conn, :allow_nudity, false)
 
+  defp nsfw(%{assigns: %{allow_nsfw: _preset}} = conn, _), do: conn
   defp nsfw(%{assigns: %{current_user: %{settings: %{views_adult_content: allow_nsfw}}}} = conn, _),
     do: assign(conn, :allow_nsfw, allow_nsfw)
   defp nsfw(%{assigns: %{webapp: true}} = conn, _),

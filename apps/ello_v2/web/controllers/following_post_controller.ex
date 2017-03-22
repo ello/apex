@@ -16,11 +16,13 @@ defmodule Ello.V2.FollowingPostController do
 
   defp fetch_stream(conn, params) do
     current_user = current_user(conn)
-    user_ids = ["#{current_user.id}" | Network.following_ids(current_user)]
-
-    before = params["before"]
-    per_page = String.to_integer(params["per_page"] || "25")
-    Stream.fetch(keys: user_ids, before: before, per_page: per_page)
+    Stream.fetch(
+      keys:         ["#{current_user.id}" | Network.following_ids(current_user)],
+      before:       params["before"],
+      per_page:     String.to_integer(params["per_page"] || "25"),
+      allow_nsfw:   conn.assigns[:allow_nsfw],
+      allow_nudity: conn.assigns[:allow_nudity],
+    )
   end
 
   defp add_page_headers(conn, %{per_page: per_page, before: before}) do
