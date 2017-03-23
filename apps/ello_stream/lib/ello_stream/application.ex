@@ -1,6 +1,4 @@
 defmodule Ello.Stream.Application do
-  # See http://elixir-lang.org/docs/stable/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   use Application
@@ -8,15 +6,15 @@ defmodule Ello.Stream.Application do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
-    # Define workers and child supervisors to be supervised
     children = [
-      # Starts a worker by calling: Ello.Stream.Worker.start_link(arg1, arg2, arg3)
-      # worker(Ello.Stream.Worker, [arg1, arg2, arg3]),
+      :hackney_pool.child_spec(:roshi, [timeout: 15_000, max_connections: roshi_pool()])
     ]
 
-    # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Ello.Stream.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  defp roshi_pool do
+    Application.get_env(:ello_stream, :roshi_pool_size)
   end
 end
