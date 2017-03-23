@@ -9,6 +9,7 @@ use Mix.Config
 config :ello_v2,
   namespace: Ello.V2,
   webapp_host: System.get_env("WEBAPP_HOST"),
+  parallel_render_threshold: String.to_integer(System.get_env("PARALLEL_RENDER_THRESHOLD") || "10"),
   ecto_repos: []
 
 # Configures the endpoint
