@@ -63,7 +63,7 @@ defmodule Ello.Core.Content do
   end
 
   defp post_sorting(posts, ids) do
-    measure_segment {__MODULE__, "SortPostsById"} do
+    measure_segment {__MODULE__, "post_sorting"} do
       mapped = Enum.group_by(posts, &(&1.id))
       Enum.flat_map(ids, fn(id) ->
         mapped[id] || []
@@ -334,13 +334,13 @@ defmodule Ello.Core.Content do
   end
 
   defp build_image_structs(%Post{assets: assets} = post) when is_list(assets) do
-    measure_segment {__MODULE__, "BuildImageAssetImageStructs"} do
-      Map.put(post, :assets, Enum.map(assets, &Asset.build_attachment/1))
-    end
+    Map.put(post, :assets, Enum.map(assets, &Asset.build_attachment/1))
   end
   defp build_image_structs(%Post{} = post), do: post
   defp build_image_structs(nil), do: nil
   defp build_image_structs(posts) when is_list(posts) do
-    Enum.map(posts, &build_image_structs/1)
+    measure_segment {__MODULE__, "build_image_structs"} do
+      Enum.map(posts, &build_image_structs/1)
+    end
   end
 end
