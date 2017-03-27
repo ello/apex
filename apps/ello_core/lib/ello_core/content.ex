@@ -63,10 +63,12 @@ defmodule Ello.Core.Content do
   end
 
   defp post_sorting(posts, ids) do
-    mapped = Enum.group_by(posts, &(&1.id))
-    Enum.flat_map(ids, fn(id) ->
-      mapped[id] || []
-    end)
+    measure_segment {__MODULE__, "post_sorting"} do
+      mapped = Enum.group_by(posts, &(&1.id))
+      Enum.flat_map(ids, fn(id) ->
+        mapped[id] || []
+      end)
+    end
   end
 
   @type related_filter_opts :: %{current_user: User.t | nil, allow_nsfw: boolean, allow_nudity: boolean, per_page: String.t | integer}
@@ -248,9 +250,11 @@ defmodule Ello.Core.Content do
   defp prefetch_assets_and_author(nil, _), do: nil
   defp prefetch_assets_and_author([], _), do: []
   defp prefetch_assets_and_author(post_or_posts, current_user) do
-    post_or_posts
-    |> Repo.preload([assets: [], author: &Network.users(&1, current_user)])
-    |> filter_assets
+    measure_segment {:db, "Ecto.PostAssetAndAuthorPreload"} do
+      post_or_posts
+      |> Repo.preload([assets: [], author: &Network.users(&1, current_user)])
+      |> filter_assets
+    end
   end
 
   defp filter_assets(nil), do: nil
@@ -335,6 +339,8 @@ defmodule Ello.Core.Content do
   defp build_image_structs(%Post{} = post), do: post
   defp build_image_structs(nil), do: nil
   defp build_image_structs(posts) when is_list(posts) do
-    Enum.map(posts, &build_image_structs/1)
+    measure_segment {__MODULE__, "build_image_structs"} do
+      Enum.map(posts, &build_image_structs/1)
+    end
   end
 end
