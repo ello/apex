@@ -16,6 +16,7 @@ defmodule Ello.V2.FollowingPostControllerTest do
     nudity_post = Factory.insert(:post, author: following_user, has_nudity: true)
     nsfw_post = Factory.insert(:post, author: following_user, is_adult_content: true)
     my_post = Factory.insert(:post, author: user)
+    Factory.insert(:love, post: post, user: user)
     roshi_items = [
       %Item{id: "#{post.id}", stream_id: "#{following_user.id}", ts: DateTime.utc_now},
       %Item{id: "#{my_post.id}", stream_id: "#{user.id}", ts: DateTime.utc_now},
@@ -54,6 +55,7 @@ defmodule Ello.V2.FollowingPostControllerTest do
     assert my_post.id in returned_ids
     assert nsfw_post.id in returned_ids
     assert nudity_post.id in returned_ids
+    assert Enum.find(json["posts"], &(&1["id"] == "#{post.id}"))["loved"]
   end
 
   test "GET /v2/following/posts/recent - fails for unauth requests", %{unauth_conn: conn} do

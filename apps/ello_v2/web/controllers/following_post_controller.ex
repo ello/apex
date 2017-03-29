@@ -20,6 +20,7 @@ defmodule Ello.V2.FollowingPostController do
       keys:         ["#{current_user.id}" | Network.following_ids(current_user)],
       before:       params["before"],
       per_page:     String.to_integer(params["per_page"] || "25"),
+      current_user: current_user,
       allow_nsfw:   conn.assigns[:allow_nsfw],
       allow_nudity: conn.assigns[:allow_nudity],
     )
