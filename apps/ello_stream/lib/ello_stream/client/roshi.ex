@@ -32,7 +32,7 @@ defmodule Ello.Stream.Client.Roshi do
   def get_coalesced_stream(keys, pagination_slug, limit) do
     params = [{"limit", limit}, {"from", pagination_slug}]
     body = Poison.encode!(%{streams: Enum.map(keys, &Item.format_stream_id/1)})
-    case post!("/streams/coalesce", body, [], [params: params, hackney: [pool: :roshi]]) do
+    case post!("/streams/coalesce", body, [], [params: params, hackney: [pool: :roshi, recv_timeout: timeout()]]) do
       %{status_code: 200, body: "[]"} -> %{items: [], next_link: pagination_slug}
       %{status_code: 200, body: resp, headers: headers} ->
         %{items: Poison.decode!(resp, as: [%Item{}]), next_link: next_link(headers)}
@@ -62,5 +62,9 @@ defmodule Ello.Stream.Client.Roshi do
   @doc false
   def process_url(url) do
     @stream_service_url <> url
+  end
+
+  defp timeout do
+    Application.get_env(:ello_stream, :roshi_timeout)
   end
 end
