@@ -37,6 +37,9 @@ defmodule Ello.Search.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:elastix, "~> 0.3.2"},
+      {:poison, "~> 3.1", override: true},
+    ]
   end
 end
