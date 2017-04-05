@@ -166,11 +166,6 @@ defmodule Ello.V2.UserViewTest do
     assert render(UserView, "user.json", user: user, conn: conn).relationship_priority == "friend"
   end
 
-  test "user.json - renders infinite count for system users", %{conn: conn} do
-    user = Factory.build(:user, is_system_user: true)
-    assert render(UserView, "user.json", user: user, conn: conn).followers_count == "∞"
-  end
-
   test "user.json - renders nil for total_post_views attribute for users with 0 views", %{conn: conn} do
     user = Factory.build(:user, is_system_user: true, total_views_count: 0)
     assert render(UserView, "user.json", user: user, conn: conn).total_views_count == nil

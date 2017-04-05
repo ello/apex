@@ -32,6 +32,7 @@ defmodule Ello.V2.UserView do
     :location,
     :formatted_short_bio,
     :following_count,
+    :followers_count,
     :loves_count,
     :posts_count,
   ]
@@ -45,7 +46,6 @@ defmodule Ello.V2.UserView do
     :external_links_list,
     :avatar,
     :cover_image,
-    :followers_count,
     :total_views_count,
   ]
 
@@ -112,9 +112,6 @@ defmodule Ello.V2.UserView do
       _ -> false
     end
   end
-
-  def followers_count(%{is_system_user: true}, _), do: "∞"
-  def followers_count(%{followers_count: count}, _), do: count
 
   def total_views_count(%{total_views_count: 0}, _), do: nil
   def total_views_count(%{total_views_count: count}, _), do: count
