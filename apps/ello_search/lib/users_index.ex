@@ -28,8 +28,16 @@ defmodule Ello.Search.UsersIndex do
     elastic_url = "http://192.168.99.100:9200"
     index_name  = "test_users"
     search_in   = ["user"]
-    search_payload = %{}
-    Elastix.Search.search(elastic_url, index_name, search_in, search_payload) |> IO.inspect()
+    search_payload = %{
+      filter: %{
+        bool: %{
+          must_not: [
+            %{exists: %{field: :locked_at}}
+          ]
+        }
+      }
+    }
+    Elastix.Search.search(elastic_url, index_name, search_in, search_payload) |> IO.inspect
   end
 
 end
