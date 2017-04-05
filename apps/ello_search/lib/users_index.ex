@@ -32,7 +32,8 @@ defmodule Ello.Search.UsersIndex do
       filter: %{
         bool: %{
           must_not: [
-            %{exists: %{field: :locked_at}}
+            %{exists: %{field: :locked_at}},
+            %{term: %{is_spammer: true}},
           ]
         }
       }
