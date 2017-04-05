@@ -18,3 +18,8 @@ streams:
     ROSHI_URL: "http://roshi:6302"
   ports:
     - "8080:8080"
+
+elasticsearch:
+  image: elasticsearch:1.5.2
+  ports:
+    - "9200:9200"
