@@ -1,7 +1,7 @@
 defmodule Ello.Search.UsersIndex do
   alias Ello.Core.Repo
 
-  def username_search(username) do
+  def username_search(username, %{allow_nsfw: allow_nsfw}) do
       # term = termify_operators(URI.decode(options[:term]).strip)
 
       # exclude_nsfw   = options.fetch(:exclude_nsfw, false)
@@ -29,7 +29,7 @@ defmodule Ello.Search.UsersIndex do
     index_name  = "test_users"
     search_in   = ["user"]
     search_payload = %{
-      filter: %{
+      query: %{
         bool: %{
           must_not: [
             %{exists: %{field: :locked_at}},
@@ -37,8 +37,12 @@ defmodule Ello.Search.UsersIndex do
           ]
         }
       }
-    }
+    } |> filter_nsfw(allow_nsfw)
     Elastix.Search.search(elastic_url, index_name, search_in, search_payload) |> IO.inspect
   end
 
+  defp filter_nsfw(payload, true), do: payload
+  defp filter_nsfw(payload, false) do
+    update_in(payload[:query][:bool][:must_not], &([%{term: %{is_nsfw_user: true}} | &1]))
+  end
 end
