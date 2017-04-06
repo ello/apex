@@ -113,11 +113,11 @@ defmodule Ello.Search.UsersIndexTest do
     refute to_string(context.locked_user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
   end
 
-  test "username_search - does not include spamified users", context do
+  test "username_search - includes spamified users", context do
     response = UsersIndex.username_search(context.user.username, %{allow_nsfw: false, allow_nudity: false})
     assert response.status_code == 200
     assert to_string(context.user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
-    refute to_string(context.spam_user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
+    assert to_string(context.spam_user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
   end
 
   test "username_search - does not include nsfw users if client settings do not allow", context do

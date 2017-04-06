@@ -33,7 +33,6 @@ defmodule Ello.Search.UsersIndex do
         bool: %{
           must_not: [
             %{exists: %{field: :locked_at}},
-            %{term: %{is_spammer: true}},
           ]
         }
       }
@@ -50,5 +49,9 @@ defmodule Ello.Search.UsersIndex do
   defp filter_nudity(payload, true), do: payload
   defp filter_nudity(payload, false) do
     update_in(payload[:query][:bool][:must_not], &([%{term: %{posts_nudity: true}} | &1]))
+  end
+
+  defp filter_spam(payload) do
+    update_in(payload[:query][:bool][:must_not], &([%{term: %{is_spammer: true}} | &1]))
   end
 end
