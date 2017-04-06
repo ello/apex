@@ -1,7 +1,7 @@
 defmodule Ello.Search.UsersIndex do
-  alias Ello.Core.Repo
+  alias Ello.Core.{Repo, Network}
 
-  def username_search(username, %{allow_nsfw: allow_nsfw, allow_nudity: allow_nudity}) do
+  def username_search(username, %{current_user: current_user, allow_nsfw: allow_nsfw, allow_nudity: allow_nudity}) do
       # term = termify_operators(URI.decode(options[:term]).strip)
 
       # exclude_nsfw   = options.fetch(:exclude_nsfw, false)
@@ -45,6 +45,7 @@ defmodule Ello.Search.UsersIndex do
     elastic_url = "http://192.168.99.100:9200"
     index_name  = "test_users"
     search_in   = ["user"]
+    following_ids = Network.following_ids(current_user)
     search_payload = %{
       query: %{
         bool: %{
@@ -55,12 +56,14 @@ defmodule Ello.Search.UsersIndex do
             %{fuzzy: %{username: username}},
           ],
           should: [
-            %{term: %{username: %{value: username, boost: 3.0}}}
+            %{term: %{username: %{value: username, boost: 3.0}}},
+            %{terms: %{id: following_ids}},
           ],
         }
       }
     } |> filter_nsfw(allow_nsfw)
-      |> filter_nudity(allow_nudity) |> IO.inspect
+      |> filter_nudity(allow_nudity)
+      |> filter_blocked(current_user)
     Elastix.Search.search(elastic_url, index_name, search_in, search_payload) |> IO.inspect
   end
 
@@ -72,6 +75,10 @@ defmodule Ello.Search.UsersIndex do
   defp filter_nudity(payload, true), do: payload
   defp filter_nudity(payload, false) do
     update_in(payload[:query][:bool][:must_not], &([%{term: %{posts_nudity: true}} | &1]))
+  end
+
+  defp filter_blocked(payload, user) do
+    update_in(payload[:query][:bool][:must_not], &([ %{terms: %{id: user.all_blocked_ids}} | &1]))
   end
 
   defp filter_spam(payload) do

@@ -1,15 +1,17 @@
 defmodule Ello.Search.UsersIndexTest do
   use Ello.Search.Case
   alias Ello.Search.UsersIndex
-  alias Ello.Core.{Repo, Factory}
+  alias Ello.Core.{Repo, Factory, Network}
 
   setup do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
+    current_user = Factory.insert(:user)
     user        = Factory.insert(:user)
     locked_user = Factory.insert(:user, %{locked_at: DateTime.utc_now})
     spam_user   = Factory.insert(:user)
     nsfw_user   = Factory.insert(:user, settings: %{posts_adult_content: true})
     nudity_user = Factory.insert(:user, settings: %{posts_nudity: true})
+
     elastic_url = "http://192.168.99.100:9200"
     index_name  = "test_users"
     doc_type    = "user"
@@ -125,54 +127,80 @@ defmodule Ello.Search.UsersIndexTest do
     Elastix.Document.index(elastic_url, index_name, doc_type, nsfw_user.id, nsfw_index_data)
     Elastix.Document.index(elastic_url, index_name, doc_type, nudity_user.id, nudity_index_data)
     Elastix.Index.refresh(elastic_url, index_name)
-    {:ok, user: user, locked_user: locked_user, spam_user: spam_user, nsfw_user: nsfw_user, nudity_user: nudity_user}
+    {:ok, user: user, locked_user: locked_user, spam_user: spam_user, nsfw_user: nsfw_user, nudity_user: nudity_user, current_user: current_user}
   end
 
-  test "username_search - searches successfully", context do
-    response = UsersIndex.username_search("username", %{allow_nsfw: false, allow_nudity: false})
+  test "username_search - scores more exact matches higher", context do
+    response = UsersIndex.username_search(context.user.username, %{current_user: context.current_user, allow_nsfw: false, allow_nudity: false})
     assert response.status_code == 200
-    assert to_string(context.user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
+    assert [to_string(context.user.id), to_string(context.spam_user.id)] == Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
   end
 
   test "username_search - does not include locked users", context do
-    response = UsersIndex.username_search(context.user.username, %{allow_nsfw: false, allow_nudity: false})
+    response = UsersIndex.username_search(context.user.username, %{current_user: context.current_user, allow_nsfw: false, allow_nudity: false})
     assert response.status_code == 200
     assert to_string(context.user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
     refute to_string(context.locked_user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
   end
 
   test "username_search - includes spamified users", context do
-    response = UsersIndex.username_search(context.user.username, %{allow_nsfw: false, allow_nudity: false})
+    response = UsersIndex.username_search(context.user.username, %{current_user: context.current_user, allow_nsfw: false, allow_nudity: false})
     assert response.status_code == 200
     assert to_string(context.user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
     assert to_string(context.spam_user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
   end
 
-  test "username_search - does not include nsfw users if client settings do not allow", context do
-    response = UsersIndex.username_search(context.user.username, %{allow_nsfw: false, allow_nudity: false})
+  test "username_search - does not include nsfw users if client disallows nsfw", context do
+    response = UsersIndex.username_search(context.user.username, %{current_user: context.current_user, allow_nsfw: false, allow_nudity: false})
     assert response.status_code == 200
     assert to_string(context.user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
     refute to_string(context.nsfw_user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
   end
 
-  test "username_search - includes nsfw users if client settings allow nsfw", context do
-    response = UsersIndex.username_search(context.user.username, %{allow_nsfw: true, allow_nudity: false})
+  test "username_search - includes nsfw users if client allows nsfw", context do
+    response = UsersIndex.username_search(context.user.username, %{current_user: context.current_user, allow_nsfw: true, allow_nudity: false})
     assert response.status_code == 200
     assert to_string(context.user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
     assert to_string(context.nsfw_user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
   end
 
-  test "username_search - does not include nudity users if client settings do not allow", context do
-    response = UsersIndex.username_search(context.user.username, %{allow_nsfw: false, allow_nudity: false})
+  test "username_search - does not include nudity users if client disallows nudity", context do
+    response = UsersIndex.username_search(context.user.username, %{current_user: context.current_user, allow_nsfw: false, allow_nudity: false})
     assert response.status_code == 200
     assert to_string(context.user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
     refute to_string(context.nudity_user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
   end
 
-  test "username_search - includes nudity users if client settings allow nudity", context do
-    response = UsersIndex.username_search(context.user.username, %{allow_nsfw: false, allow_nudity: true})
+  test "username_search - includes nudity users if client allows nudity", context do
+    response = UsersIndex.username_search(context.spam_user.username, %{current_user: context.current_user, allow_nsfw: false, allow_nudity: true})
     assert response.status_code == 200
     assert to_string(context.user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
     assert to_string(context.nudity_user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
+  end
+
+  test "username_search - following users should be given a higher score", context do
+    Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.spam_user.id])
+
+    response = UsersIndex.username_search("username", %{current_user: context.current_user, allow_nsfw: false, allow_nudity: false})
+    assert response.status_code == 200
+    assert [to_string(context.spam_user.id), to_string(context.user.id)] == Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
+  end
+
+  test "username_search - does not include blocked users", context do
+    Redis.command(["SADD", "user:#{context.current_user.id}:block_id_cache", context.spam_user.id])
+    current_user = Network.User.preload_blocked_ids(context.current_user)
+
+    response = UsersIndex.username_search("username", %{current_user: current_user, allow_nsfw: false, allow_nudity: false})
+    assert to_string(context.user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
+    refute to_string(context.spam_user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
+  end
+
+  test "username_search - does not include inverse blocked users", context do
+    Redis.command(["SADD", "user:#{context.current_user.id}:inverse_block_id_cache", context.spam_user.id])
+    current_user = Network.User.preload_blocked_ids(context.current_user)
+
+    response = UsersIndex.username_search("username", %{current_user: current_user, allow_nsfw: false, allow_nudity: false})
+    assert to_string(context.user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
+    refute to_string(context.spam_user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
   end
 end
