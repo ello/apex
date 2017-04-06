@@ -1,7 +1,7 @@
 defmodule Ello.Search.UsersIndex do
   alias Ello.Core.Repo
 
-  def username_search(username, %{allow_nsfw: allow_nsfw}) do
+  def username_search(username, %{allow_nsfw: allow_nsfw, allow_nudity: allow_nudity}) do
       # term = termify_operators(URI.decode(options[:term]).strip)
 
       # exclude_nsfw   = options.fetch(:exclude_nsfw, false)
@@ -38,11 +38,17 @@ defmodule Ello.Search.UsersIndex do
         }
       }
     } |> filter_nsfw(allow_nsfw)
+      |> filter_nudity(allow_nudity)
     Elastix.Search.search(elastic_url, index_name, search_in, search_payload) |> IO.inspect
   end
 
   defp filter_nsfw(payload, true), do: payload
   defp filter_nsfw(payload, false) do
     update_in(payload[:query][:bool][:must_not], &([%{term: %{is_nsfw_user: true}} | &1]))
+  end
+
+  defp filter_nudity(payload, true), do: payload
+  defp filter_nudity(payload, false) do
+    update_in(payload[:query][:bool][:must_not], &([%{term: %{posts_nudity: true}} | &1]))
   end
 end
