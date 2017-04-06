@@ -24,7 +24,24 @@ defmodule Ello.Search.UsersIndex do
     # |> build_username_query
     # |> ES.search
     # |> Enum.map(&(&1.id))
-    # |> Core.users_by_name
+    # |> Core.users_by_name{
+    #
+        # filtered: {
+        #   query: {
+        #     bool: {
+        #       should: queries
+        #     }
+        #   },
+        #   filter: common_filters(current_user, exclude_nsfw, exclude_nudity)
+        # }
+      # }
+          # must: [
+          #   %{match: %{username: username}}
+          # ]
+            # %{match: %{username: username}}
+          # must: [
+          #   %{multi_match: %{query: username, type: "most_fields", fields: ["username"]}}
+          # ]
     elastic_url = "http://192.168.99.100:9200"
     index_name  = "test_users"
     search_in   = ["user"]
@@ -33,11 +50,17 @@ defmodule Ello.Search.UsersIndex do
         bool: %{
           must_not: [
             %{exists: %{field: :locked_at}},
-          ]
+          ],
+          must: [
+            %{fuzzy: %{username: username}},
+          ],
+          should: [
+            %{term: %{username: %{value: username, boost: 3.0}}}
+          ],
         }
       }
     } |> filter_nsfw(allow_nsfw)
-      |> filter_nudity(allow_nudity)
+      |> filter_nudity(allow_nudity) |> IO.inspect
     Elastix.Search.search(elastic_url, index_name, search_in, search_payload) |> IO.inspect
   end
 

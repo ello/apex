@@ -16,6 +16,7 @@ defmodule Ello.Search.UsersIndexTest do
     index_data  = %{
       id:         user.id,
       username:   user.username,
+      raw_username: user.username,
       short_bio:  user.short_bio,
       links:      user.links,
       is_spammer: false,
@@ -28,6 +29,7 @@ defmodule Ello.Search.UsersIndexTest do
     locked_index_data = %{
       id:         locked_user.id,
       username:   locked_user.username,
+      raw_username: locked_user.username,
       short_bio:  locked_user.short_bio,
       links:      locked_user.links,
       is_spammer: false,
@@ -40,6 +42,7 @@ defmodule Ello.Search.UsersIndexTest do
     spam_index_data = %{
       id:         spam_user.id,
       username:   spam_user.username,
+      raw_username: spam_user.username,
       short_bio:  spam_user.short_bio,
       links:      spam_user.links,
       is_spammer: true,
@@ -52,6 +55,7 @@ defmodule Ello.Search.UsersIndexTest do
     nsfw_index_data = %{
       id:         nsfw_user.id,
       username:   nsfw_user.username,
+      raw_username: nsfw_user.username,
       short_bio:  nsfw_user.short_bio,
       links:      nsfw_user.links,
       is_spammer: false,
@@ -64,6 +68,7 @@ defmodule Ello.Search.UsersIndexTest do
     nudity_index_data = %{
       id:         nudity_user.id,
       username:   nudity_user.username,
+      raw_username: nudity_user.username,
       short_bio:  nudity_user.short_bio,
       links:      nudity_user.links,
       is_spammer: false,
@@ -77,6 +82,7 @@ defmodule Ello.Search.UsersIndexTest do
       properties: %{
         id:         %{type: "text"},
         username:   %{type: "text"},
+        raw_username: %{type: "text", index: false},
         short_bio:  %{type: "text"},
         links:      %{type: "text"},
         is_spammer: %{type: "boolean"},
@@ -89,7 +95,29 @@ defmodule Ello.Search.UsersIndexTest do
     }
 
     Elastix.Index.delete(elastic_url, index_name)
-    Elastix.Index.create(elastic_url, index_name, %{})
+    Elastix.Index.create(elastic_url, index_name, %{
+                           settings: %{
+                             analysis: %{
+                               analyzer: %{
+                                 username_autocomplete: %{
+                                   type: "custom",
+                                   tokenizer: "keyword",
+                                   filter: [
+                                     "lowercase",
+                                     "autocomplete"
+                                   ]
+    }
+    },
+    filter: %{
+      autocomplete: %{
+        type: 'edge_ngram',
+        min_gram: 1,
+        max_gram: 20
+      }
+    }
+    }
+    }
+    })
     Elastix.Mapping.put(elastic_url, index_name, doc_type, mapping)
     Elastix.Document.index(elastic_url, index_name, doc_type, user.id, index_data)
     Elastix.Document.index(elastic_url, index_name, doc_type, locked_user.id, locked_index_data)
@@ -101,7 +129,7 @@ defmodule Ello.Search.UsersIndexTest do
   end
 
   test "username_search - searches successfully", context do
-    response = UsersIndex.username_search(context.user.username, %{allow_nsfw: false, allow_nudity: false})
+    response = UsersIndex.username_search("username", %{allow_nsfw: false, allow_nudity: false})
     assert response.status_code == 200
     assert to_string(context.user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
   end
