@@ -13,7 +13,7 @@ defmodule Ello.Search.UsersIndexTest do
     nudity_user = Factory.insert(:user, settings: %{posts_nudity: true})
 
     elastic_url = "http://192.168.99.100:9200"
-    index_name  = "test_users"
+    index_name  = "users"
     doc_type    = "user"
     index_data  = %{
       id:         user.id,
