@@ -12,7 +12,7 @@ defmodule Ello.Search.UsersIndex do
             |> filter_blocked(current_user)
             |> filter_locked
 
-    Client.search(index_name, doc_types, query)
+    Client.search(index_name(), doc_types(), query)
   end
 
   defp index_name, do: "users"
@@ -24,7 +24,7 @@ defmodule Ello.Search.UsersIndex do
         bool: %{
           must_not: [],
           must: [],
-          should: []
+          should: [],
         }
       }
     }
@@ -33,13 +33,13 @@ defmodule Ello.Search.UsersIndex do
   defp build_username_query(query, username) do
     query
     |> update_in([:query, :bool, :must], &([%{fuzzy: %{username: username}} | &1]))
-    |> update_in([:query, :bool, :should], &([%{term: %{username: %{value: username, boost: 3.0}}} | &1]))
+    |> update_in([:query, :bool, :should], &([%{term: %{username: %{value: username, boost: 5.0}}} | &1]))
   end
 
   defp build_relationship_query(query, []), do: query
   defp build_relationship_query(query, relationship_ids) do
     limit = Application.get_env(:ello_search, :es_prefix) || 1000
-    update_in(query[:query][:bool][:should], &([%{terms: %{id: Enum.take(relationship_ids, limit)}} | &1]))
+    update_in(query[:query][:bool][:should], &([%{constant_score: %{filter: %{terms: %{id: Enum.take(relationship_ids, limit)}}, boost: 10.0}} | &1]))
   end
 
   defp filter_locked(query) do

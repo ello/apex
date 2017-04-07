@@ -7,6 +7,9 @@ defmodule Ello.Search.UsersIndexTest do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
     current_user = Factory.insert(:user)
     user        = Factory.insert(:user)
+    lana32d      = Factory.insert(:user, %{id: 1, username: "lanakane32d"})
+    lanakane     = Factory.insert(:user, %{id: 2, username: "lanakane"})
+    lanabandero  = Factory.insert(:user, %{id: 3, username: "lana-bandero"})
     locked_user = Factory.insert(:user, %{locked_at: DateTime.utc_now})
     spam_user   = Factory.insert(:user)
     nsfw_user   = Factory.insert(:user, settings: %{posts_adult_content: true})
@@ -15,6 +18,45 @@ defmodule Ello.Search.UsersIndexTest do
     elastic_url = "http://192.168.99.100:9200"
     index_name  = "users"
     doc_type    = "user"
+    lana32d_data  = %{
+      id:         lana32d.id,
+      username:   lana32d.username,
+      raw_username: lana32d.username,
+      short_bio:  lana32d.short_bio,
+      links:      lana32d.links,
+      is_spammer: false,
+      is_nsfw_user: false,
+      posts_nudity: false,
+      locked_at:  lana32d.locked_at,
+      created_at: lana32d.created_at,
+      updated_at: lana32d.updated_at
+    }
+    lanakane_data  = %{
+      id:         lanakane.id,
+      username:   lanakane.username,
+      raw_username: lanakane.username,
+      short_bio:  lanakane.short_bio,
+      links:      lanakane.links,
+      is_spammer: false,
+      is_nsfw_user: false,
+      posts_nudity: false,
+      locked_at:  lanakane.locked_at,
+      created_at: lanakane.created_at,
+      updated_at: lanakane.updated_at
+    }
+    lanabandero_data  = %{
+      id:         lanabandero.id,
+      username:   lanabandero.username,
+      raw_username: lanabandero.username,
+      short_bio:  lanabandero.short_bio,
+      links:      lanabandero.links,
+      is_spammer: false,
+      is_nsfw_user: false,
+      posts_nudity: false,
+      locked_at:  lanabandero.locked_at,
+      created_at: lanabandero.created_at,
+      updated_at: lanabandero.updated_at
+    }
     index_data  = %{
       id:         user.id,
       username:   user.username,
@@ -83,7 +125,7 @@ defmodule Ello.Search.UsersIndexTest do
     mapping = %{
       properties: %{
         id:         %{type: "text"},
-        username:   %{type: "text"},
+        username:   %{type: "text", analyzer: "username_autocomplete"},
         raw_username: %{type: "text", index: false},
         short_bio:  %{type: "text"},
         links:      %{type: "text"},
@@ -100,22 +142,22 @@ defmodule Ello.Search.UsersIndexTest do
     Elastix.Index.create(elastic_url, index_name, %{
                            settings: %{
                              analysis: %{
-                               analyzer: %{
-                                 username_autocomplete: %{
-                                   type: "custom",
-                                   tokenizer: "keyword",
-                                   filter: [
-                                     "lowercase",
-                                     "autocomplete"
-                                   ]
-    }
+                               filter: %{
+                                 autocomplete: %{
+                                   type: "edge_ngram",
+                                   min_gram: 1,
+                                   max_gram: 20
+                                 }
     },
-    filter: %{
-      autocomplete: %{
-        type: 'edge_ngram',
-        min_gram: 1,
-        max_gram: 20
-      }
+    analyzer: %{
+      username_autocomplete: %{
+        type: "custom",
+        tokenizer: "keyword",
+        filter: [
+          "lowercase",
+          "autocomplete"
+        ]
+    }
     }
     }
     }
@@ -126,8 +168,11 @@ defmodule Ello.Search.UsersIndexTest do
     Elastix.Document.index(elastic_url, index_name, doc_type, spam_user.id, spam_index_data)
     Elastix.Document.index(elastic_url, index_name, doc_type, nsfw_user.id, nsfw_index_data)
     Elastix.Document.index(elastic_url, index_name, doc_type, nudity_user.id, nudity_index_data)
+    Elastix.Document.index(elastic_url, index_name, doc_type, lana32d.id, lana32d_data)
+    Elastix.Document.index(elastic_url, index_name, doc_type, lanakane.id, lanakane_data)
+    Elastix.Document.index(elastic_url, index_name, doc_type, lanabandero.id, lanabandero_data)
     Elastix.Index.refresh(elastic_url, index_name)
-    {:ok, user: user, locked_user: locked_user, spam_user: spam_user, nsfw_user: nsfw_user, nudity_user: nudity_user, current_user: current_user}
+    {:ok, user: user, locked_user: locked_user, spam_user: spam_user, nsfw_user: nsfw_user, nudity_user: nudity_user, current_user: current_user, lana32d: lana32d, lanakane: lanakane, lanabandero: lanabandero}
   end
 
   test "username_search - scores more exact matches higher", context do
@@ -202,5 +247,15 @@ defmodule Ello.Search.UsersIndexTest do
     response = UsersIndex.username_search("username", %{current_user: current_user, allow_nsfw: false, allow_nudity: false})
     assert to_string(context.user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
     refute to_string(context.spam_user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
+  end
+
+  test "username_search - lana test", context do
+    Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.lana32d.id])
+
+    response = UsersIndex.username_search("lana", %{current_user: context.current_user, allow_nsfw: false, allow_nudity: false})
+    assert response.status_code == 200
+    assert to_string(context.lana32d.id) == hd(Enum.map(response.body["hits"]["hits"], &(&1["_id"])))
+    assert to_string(context.lanakane.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
+    assert to_string(context.lanabandero.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
   end
 end
