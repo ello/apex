@@ -43,9 +43,10 @@ defmodule Ello.V2.Mixfile do
       {:curtail, "~> 0.1"},
       {:phoenix_etag, "~> 0.1.0"},
 
-      {:ello_core, in_umbrella: true},
-      {:ello_auth, in_umbrella: true},
+      {:ello_core,   in_umbrella: true},
+      {:ello_auth,   in_umbrella: true},
       {:ello_events, in_umbrella: true},
+      {:ello_stream, in_umbrella: true},
     ]
   end
 end

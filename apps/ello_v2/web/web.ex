@@ -39,6 +39,7 @@ defmodule Ello.V2.Web do
       import Ello.Auth
       import Ello.V2.PostViewTracking
       import Ello.V2.Render
+      import Ello.V2.Pagination
     end
   end
 
