@@ -18,7 +18,7 @@ defmodule Ello.V2.Router do
     # Discovery
     get "/categories/:slug/posts/recent", CategoryPostController, :recent
     get "/categories/posts/recent", CategoryPostController, :featured
-    # get "/discover/posts/recent", DiscoverPostController, :recent
+    get "/discover/posts/recent", DiscoverPostController, :recent
 
     # Users And Posts
     resources "/users", UserController, only: [:show] do
