@@ -9,8 +9,8 @@ defmodule Ello.V2.CategoryPostControllerTest do
     Stream.Client.Test.start
     Stream.Client.Test.reset
 
-    Factory.insert(:category, slug: "cat1")
-    Factory.insert(:category, slug: "cat2")
+    Factory.insert(:category, slug: "cat1", level: "primary")
+    Factory.insert(:category, slug: "cat2", level: "primary")
 
     user = Factory.insert(:user)
     post1 = Factory.insert(:post)
@@ -71,8 +71,48 @@ defmodule Ello.V2.CategoryPostControllerTest do
   end
 
   @tag :json_schema
-  test "GET /v2/following/posts/recent - json schema", %{conn: conn} do
+  test "GET /v2/categoreis/:slug/posts/recent - json schema", %{conn: conn} do
     conn = get(conn, category_post_path(conn, :recent, "cat1"))
+    assert :ok = validate_json("post", json_response(conn, 200))
+  end
+
+  test "GET /v2/categories/posts/recent", %{conn: conn, posts: posts} do
+    response = conn
+               |> assign(:allow_nudity, true)
+               |> get(category_post_path(conn, :featured))
+    assert response.status == 200
+    json = json_response(response, 200)
+    returned_ids = Enum.map(json["posts"], &(String.to_integer(&1["id"])))
+    [p1, p2, p3, p4, p5, p6] = posts
+    assert p1.id in returned_ids
+    assert p2.id in returned_ids
+    assert p3.id in returned_ids
+    assert p4.id in returned_ids
+    assert p5.id in returned_ids
+    assert p6.id in returned_ids
+    assert Enum.find(json["posts"], &(&1["loved"] == true))
+  end
+
+  test "GET /v2/categories/posts/recent - no nudity", %{conn: conn, posts: posts} do
+    response = conn
+               |> assign(:allow_nudity, false)
+               |> get(category_post_path(conn, :featured))
+    assert response.status == 200
+    json = json_response(response, 200)
+    returned_ids = Enum.map(json["posts"], &(String.to_integer(&1["id"])))
+    [p1, p2, p3, p4, p5, p6] = posts
+    assert p1.id in returned_ids
+    assert p2.id in returned_ids
+    refute p3.id in returned_ids
+    assert p4.id in returned_ids
+    assert p5.id in returned_ids
+    refute p6.id in returned_ids
+    assert Enum.find(json["posts"], &(&1["loved"] == true))
+  end
+
+  @tag :json_schema
+  test "GET /v2/categories/posts/recent - json schema", %{conn: conn} do
+    conn = get(conn, category_post_path(conn, :featured))
     assert :ok = validate_json("post", json_response(conn, 200))
   end
 end
