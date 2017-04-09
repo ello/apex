@@ -1,4 +1,4 @@
-#<img src="http://d324imu86q1bqn.cloudfront.net/uploads/user/avatar/641/large_Ello.1000x1000.png" width="200px" height="200px" />
+<img src="http://d324imu86q1bqn.cloudfront.net/uploads/user/avatar/641/large_Ello.1000x1000.png" width="200px" height="200px" />
 
 # Ello Apex
 
@@ -49,6 +49,16 @@ on `Core` to lookup users. [README](/apps/ello_auth/)
 This app is responsible for processing background events, either by sending the
 event to a worker queue (e.g. the `CountPostView` event) or by processing the
 event in the background (or any other asynchronous processing).
+[README](/apps/ello_events/)
+
+### `Ello.Stream`
+
+Ello Stream provides and real and test APIs for fetching our temporal post
+streams.  [README](/apps/ello_stream/)
+
+To learn more
+about how we handle and serve time ordered streams check out or Go and Roshi
+based 
 
 ## Getting Started
 
