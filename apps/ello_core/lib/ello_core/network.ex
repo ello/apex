@@ -112,15 +112,26 @@ defmodule Ello.Core.Network do
     |> Enum.map(&(String.to_integer(&1 || "0")))
     |> Enum.chunk(5)
     |> Enum.zip(users)
-    |> Enum.map(fn({[followers, following, loves, posts, total_views], user}) ->
-      Map.merge user, %{
-        loves_count:        loves,
-        posts_count:        posts,
-        following_count:    following,
-        followers_count:    followers,
-        total_views_count:  total_views
-      }
-    end)
+    |> Enum.map(&merge_user_counts/1)
+  end
+
+  defp merge_user_counts({[_, _, loves, posts, total_views], %{is_system_user: true} = user}) do
+    Map.merge user, %{
+      loves_count:        loves,
+      posts_count:        posts,
+      following_count:    0,
+      followers_count:    0,
+      total_views_count:  total_views
+    }
+  end
+  defp merge_user_counts({[followers, following, loves, posts, total_views], user}) do
+    Map.merge user, %{
+      loves_count:        loves,
+      posts_count:        posts,
+      following_count:    following,
+      followers_count:    followers,
+      total_views_count:  total_views
+    }
   end
 
   defp count_keys_for_users(users) do

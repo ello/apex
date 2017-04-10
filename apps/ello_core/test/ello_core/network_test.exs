@@ -26,12 +26,36 @@ defmodule Ello.Core.NetworkTest do
 
     assert %User{} = user = Network.user(user_id)
 
+    Redis.command(["DEL", "user:#{user_id}:posts_counter"])
+    Redis.command(["DEL", "user:#{user_id}:loves_counter"])
+    Redis.command(["DEL", "user:#{user_id}:total_post_views_counter"])
+
     assert user.posts_count == 11
     assert user.loves_count == 12
     assert user.total_views_count == 13
     assert user.relationship_to_current_user.__struct__ == NotLoaded
     assert %Image{} = user.avatar_struct
     assert %Image{} = user.cover_image_struct
+  end
+
+  test "user/2 - system user" do
+    system = Factory.insert(:user, is_system_user: true)
+    Redis.command(["SET", "user:#{system.id}:followed_users_counter", "11"])
+    Redis.command(["SET", "user:#{system.id}:followers_counter", "12"])
+    Redis.command(["SET", "user:#{system.id}:loves_counter", "12"])
+    Redis.command(["SET", "user:#{system.id}:total_post_views_counter", "13"])
+
+    assert %User{} = user = Network.user(system.id)
+
+    Redis.command(["DEL", "user:#{system.id}:followed_users_counter"])
+    Redis.command(["DEL", "user:#{system.id}:followers_counter"])
+    Redis.command(["DEL", "user:#{system.id}:loves_counter"])
+    Redis.command(["DEL", "user:#{system.id}:total_post_views_counter"])
+
+    assert user.followers_count == 0
+    assert user.following_count == 0
+    assert user.loves_count == 12
+    assert user.total_views_count == 13
   end
 
   test "user/2 - username- without current user", context do
@@ -41,6 +65,10 @@ defmodule Ello.Core.NetworkTest do
     Redis.command(["SET", "user:#{user_id}:total_post_views_counter", "13"])
 
     assert %User{} = user = Network.user("~#{context.friend1.username}")
+
+    Redis.command(["DEL", "user:#{user_id}:posts_counter"])
+    Redis.command(["DEL", "user:#{user_id}:loves_counter"])
+    Redis.command(["DEL", "user:#{user_id}:total_post_views_counter"])
 
     assert user.posts_count == 11
     assert user.loves_count == 12
@@ -57,6 +85,10 @@ defmodule Ello.Core.NetworkTest do
     Redis.command(["SET", "user:#{user_id}:total_post_views_counter", "13"])
 
     assert %User{} = user = Network.user(user_id, context.current)
+
+    Redis.command(["DEL", "user:#{user_id}:posts_counter"])
+    Redis.command(["DEL", "user:#{user_id}:loves_counter"])
+    Redis.command(["DEL", "user:#{user_id}:total_post_views_counter"])
 
     assert user.posts_count == 11
     assert user.loves_count == 12
