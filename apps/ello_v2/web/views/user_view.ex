@@ -26,6 +26,27 @@ defmodule Ello.V2.UserView do
     |> add_settings_attributes(user)
   end
 
+  @doc "Renders users for autocomplete results"
+  def render("autocomplete.json", %{users: users, conn: conn}) do
+    Enum.map(users, fn(user) ->
+      conn
+      |> get_avatar_filename(user)
+      |> get_image_url(user)
+      |> build_autocomplete_response(user)
+    end)
+  end
+
+  defp get_avatar_filename(%{assigns: %{allow_nsfw: false}}, %{settings: %{posts_adult_content: true}} = user), do: small_avatar_version(user).pixellated_filename
+  defp get_avatar_filename(%{assigns: %{allow_nudity: false}}, %{settings: %{posts_nudity: true}} = user), do: small_avatar_version(user).pixellated_filename
+  defp get_avatar_filename(_, user), do: small_avatar_version(user).filename
+
+  defp small_avatar_version(user), do: Enum.find(user.avatar_struct.versions, &(&1.name == "small"))
+
+  defp get_image_url(filename, user), do: ImageView.image_url(user.avatar_struct.path, filename)
+
+  defp build_autocomplete_response(image_url, user), do: %{name: user.username, image_url: image_url}
+
+
   def attributes, do: [
     :username,
     :name,
