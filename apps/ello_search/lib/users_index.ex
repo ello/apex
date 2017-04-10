@@ -2,13 +2,11 @@ defmodule Ello.Search.UsersIndex do
   alias Ello.Search.Client
   alias Ello.Core.Network
 
-  def username_search(username, %{current_user: current_user, allow_nsfw: allow_nsfw, allow_nudity: allow_nudity}) do
+  def username_search(username, %{current_user: current_user}) do
     following_ids  = Network.following_ids(current_user)
     query = base_query()
             |> build_username_query(username)
             |> build_relationship_query(following_ids)
-            |> filter_nsfw(allow_nsfw)
-            |> filter_nudity(allow_nudity)
             |> filter_blocked(current_user)
             |> filter_locked
 
@@ -31,15 +29,17 @@ defmodule Ello.Search.UsersIndex do
   end
 
   defp build_username_query(query, username) do
+    boost = Application.get_env(:ello_search, :username_match_boost_value) || 5.0
     query
     |> update_in([:query, :bool, :must], &([%{fuzzy: %{username: username}} | &1]))
-    |> update_in([:query, :bool, :should], &([%{term: %{username: %{value: username, boost: 5.0}}} | &1]))
+    |> update_in([:query, :bool, :should], &([%{term: %{username: %{value: username, boost: boost}}} | &1]))
   end
 
   defp build_relationship_query(query, []), do: query
   defp build_relationship_query(query, relationship_ids) do
     limit = Application.get_env(:ello_search, :es_prefix) || 1000
-    update_in(query[:query][:bool][:should], &([%{constant_score: %{filter: %{terms: %{id: Enum.take(relationship_ids, limit)}}, boost: 10.0}} | &1]))
+    boost = Application.get_env(:ello_search, :following_search_boost_value) || 15.0
+    update_in(query[:query][:bool][:should], &([%{constant_score: %{filter: %{terms: %{id: Enum.take(relationship_ids, limit)}}, boost: boost}} | &1]))
   end
 
   defp filter_locked(query) do
