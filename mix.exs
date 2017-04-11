@@ -11,7 +11,8 @@ defmodule Ello.Mixfile do
 
   defp deps do
     [
-      {:credo, "~> 0.5.3", only: :dev}
+      {:credo, "~> 0.5.3", only: :dev},
+      {:poison, ">= 2.2.0", override: true}
     ]
   end
 

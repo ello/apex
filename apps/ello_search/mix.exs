@@ -43,7 +43,7 @@ defmodule Ello.Search.Mixfile do
   defp deps do
     [
       {:elastix, "~> 0.3.2"},
-      {:poison,    ">= 2.2.0", override: true},
+      {:poison, "~> 3.1", override: true},
 
       {:ello_core, in_umbrella: true},
     ]
