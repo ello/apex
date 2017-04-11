@@ -1,7 +1,7 @@
 use Mix.Config
 
 config :ello_search,
-  es_url: "http://192.168.99.100:9200",
+  es_url: System.get_env("ES_URL"),
   es_prefix: System.get_env("ES_PREFIX"),
   following_search_boost_limit: System.get_env("FOLLOWING_SEARCH_BOOST_LIMIT"),
   following_search_boost_value: System.get_env("FOLLOWING_SEARCH_BOOST"),
