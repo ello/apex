@@ -109,7 +109,6 @@ defmodule Ello.V2.UserControllerTest do
   end
 
   test "GET /v2/users/autocomplete - user token", %{conn: conn, archer: archer} do
-    elastic_url = "http://192.168.99.100:9200"
     index_name  = "users"
     doc_type    = "user"
     index_data  = %{
@@ -141,8 +140,8 @@ defmodule Ello.V2.UserControllerTest do
       }
     }
 
-    Elastix.Index.delete(elastic_url, index_name)
-    Elastix.Index.create(elastic_url, index_name, %{
+    Client.delete_index(index_name)
+    Client.create_index(index_name, %{
                            settings: %{
                              analysis: %{
                                filter: %{
@@ -165,9 +164,9 @@ defmodule Ello.V2.UserControllerTest do
     }
     }
     })
-    Elastix.Mapping.put(elastic_url, index_name, doc_type, mapping)
-    Elastix.Document.index(elastic_url, index_name, doc_type, archer.id, index_data)
-    Elastix.Index.refresh(elastic_url, index_name)
+    Client.put_mapping(index_name, doc_type, mapping)
+    Client.index_document(index_name, doc_type, archer.id, index_data)
+    Client.refresh_index(index_name)
     conn = get(conn, user_path(conn, :autocomplete, %{"username" => archer.username}))
     assert conn.status == 200
     assert [%{"image_url" => "https://assets.ello.co/uploads/user/avatar/42/ello-small-fad52e18.png",

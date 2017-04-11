@@ -1,24 +1,22 @@
 defmodule Ello.Search.UsersIndexTest do
   use Ello.Search.Case
-  alias Ello.Search.UsersIndex
+  alias Ello.Search.{UsersIndex, Client}
   alias Ello.Core.{Repo, Factory, Network}
 
   setup do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
     current_user = Factory.insert(:user)
-    user        = Factory.insert(:user)
+    user         = Factory.insert(:user)
     lana32d      = Factory.insert(:user, %{id: 1, username: "lanakane32d"})
     lanakane     = Factory.insert(:user, %{id: 2, username: "lanakane"})
     lanabandero  = Factory.insert(:user, %{id: 3, username: "lana-bandero"})
-    locked_user = Factory.insert(:user, %{locked_at: DateTime.utc_now})
-    spam_user   = Factory.insert(:user)
-    nsfw_user   = Factory.insert(:user, settings: %{posts_adult_content: true})
-    nudity_user = Factory.insert(:user, settings: %{posts_nudity: true})
-
-    elastic_url = "http://192.168.99.100:9200"
-    index_name  = "users"
-    doc_type    = "user"
-    lana32d_data  = %{
+    locked_user  = Factory.insert(:user, %{locked_at: DateTime.utc_now})
+    spam_user    = Factory.insert(:user)
+    nsfw_user    = Factory.insert(:user, settings: %{posts_adult_content: true})
+    nudity_user  = Factory.insert(:user, settings: %{posts_nudity: true})
+    index_name   = "users"
+    doc_type     = "user"
+    lana32d_data = %{
       id:         lana32d.id,
       username:   lana32d.username,
       raw_username: lana32d.username,
@@ -137,17 +135,16 @@ defmodule Ello.Search.UsersIndexTest do
         updated_at: %{type: "date"}
       }
     }
-
-    Elastix.Index.delete(elastic_url, index_name)
-    Elastix.Index.create(elastic_url, index_name, %{
-                           settings: %{
-                             analysis: %{
-                               filter: %{
-                                 autocomplete: %{
-                                   type: "edge_ngram",
-                                   min_gram: 1,
-                                   max_gram: 20
-                                 }
+    Client.delete_index(index_name)
+    Client.create_index(index_name, %{
+                          settings: %{
+                            analysis: %{
+                              filter: %{
+                                autocomplete: %{
+                                  type: "edge_ngram",
+                                  min_gram: 1,
+                                  max_gram: 20
+                                }
     },
     analyzer: %{
       username_autocomplete: %{
@@ -162,16 +159,16 @@ defmodule Ello.Search.UsersIndexTest do
     }
     }
     })
-    Elastix.Mapping.put(elastic_url, index_name, doc_type, mapping)
-    Elastix.Document.index(elastic_url, index_name, doc_type, user.id, index_data)
-    Elastix.Document.index(elastic_url, index_name, doc_type, locked_user.id, locked_index_data)
-    Elastix.Document.index(elastic_url, index_name, doc_type, spam_user.id, spam_index_data)
-    Elastix.Document.index(elastic_url, index_name, doc_type, nsfw_user.id, nsfw_index_data)
-    Elastix.Document.index(elastic_url, index_name, doc_type, nudity_user.id, nudity_index_data)
-    Elastix.Document.index(elastic_url, index_name, doc_type, lana32d.id, lana32d_data)
-    Elastix.Document.index(elastic_url, index_name, doc_type, lanakane.id, lanakane_data)
-    Elastix.Document.index(elastic_url, index_name, doc_type, lanabandero.id, lanabandero_data)
-    Elastix.Index.refresh(elastic_url, index_name)
+    Client.put_mapping(index_name, doc_type, mapping)
+    Client.index_document(index_name, doc_type, user.id, index_data)
+    Client.index_document(index_name, doc_type, locked_user.id, locked_index_data)
+    Client.index_document(index_name, doc_type, spam_user.id, spam_index_data)
+    Client.index_document(index_name, doc_type, nsfw_user.id, nsfw_index_data)
+    Client.index_document(index_name, doc_type, nudity_user.id, nudity_index_data)
+    Client.index_document(index_name, doc_type, lana32d.id, lana32d_data)
+    Client.index_document(index_name, doc_type, lanakane.id, lanakane_data)
+    Client.index_document(index_name, doc_type, lanabandero.id, lanabandero_data)
+    Client.refresh_index(index_name)
     {:ok, user: user, locked_user: locked_user, spam_user: spam_user, nsfw_user: nsfw_user, nudity_user: nudity_user, current_user: current_user, lana32d: lana32d, lanakane: lanakane, lanabandero: lanabandero}
   end
 
