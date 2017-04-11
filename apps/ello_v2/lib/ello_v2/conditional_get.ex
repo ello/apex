@@ -24,7 +24,20 @@ defimpl Ello.V2.ConditionalGet, for: Ello.Core.Discovery.Category do
       :category,
       category.id,
       category.updated_at,
-      length(category.promotionals)
+      Ello.V2.ConditionalGet.etag(category.promotionals),
+    ]
+    values
+    |> :erlang.term_to_binary
+    |> Ello.V2.ConditionalGet.etag
+  end
+end
+
+defimpl Ello.V2.ConditionalGet, for: Ello.Core.Discovery.Promotional do
+  def etag(promo) do
+    values = [
+      :promotional,
+      promo.id,
+      promo.updated_at,
     ]
     values
     |> :erlang.term_to_binary

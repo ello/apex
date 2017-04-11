@@ -28,12 +28,12 @@ defmodule Ello.V2.ConditionalGetTest do
     category = Factory.build(:category, %{
       id: "123",
       updated_at: date,
-      promotionals: [%{}, %{}]
+      promotionals: Factory.build_list(2, :promotional),
     })
     changes = [
       %{id: "124"},
       %{updated_at: other_date},
-      %{promotionals: [%{}, %{}, %{}]}
+      %{promotionals: Factory.build_list(2, :promotional)}
     ]
 
     for change <- changes do
