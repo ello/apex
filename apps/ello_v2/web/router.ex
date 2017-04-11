@@ -21,6 +21,7 @@ defmodule Ello.V2.Router do
     get "/discover/posts/recent", DiscoverPostController, :recent
 
     # Users And Posts
+    get "/users/autocomplete", UserController, :autocomplete
     resources "/users", UserController, only: [:show] do
       resources "/posts", UserPostController, only: [:index], name: :post
     end

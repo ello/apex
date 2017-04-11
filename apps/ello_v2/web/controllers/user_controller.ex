@@ -1,6 +1,10 @@
 defmodule Ello.V2.UserController do
   use Ello.V2.Web, :controller
   alias Ello.Core.Network
+  alias Ello.V2.UserView
+  alias Ello.Search.UsersIndex
+
+  plug Ello.Auth.RequireUser, "before autocomplete" when action in [:autocomplete]
 
   @doc """
   GET /v2/users/:id, GET /v2/users/~:username
@@ -16,4 +20,11 @@ defmodule Ello.V2.UserController do
     end
   end
 
+  def autocomplete(conn, %{"username" => username}) do
+    users = UsersIndex.username_search(username, %{current_user: current_user(conn)}).body["hits"]["hits"]
+            |> Enum.map(&(&1["_id"]))
+            |> Network.users
+
+    api_render(conn, UserView, "autocomplete.json", data: users)
+  end
 end

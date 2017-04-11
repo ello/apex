@@ -177,7 +177,7 @@ defmodule Ello.V2.UserViewTest do
     assert [
       %{name: user1.username, image_url: "https://assets.ello.co/images/fallback/user/avatar/1/ello-default-small.png"},
       %{name: archer.username, image_url: "https://assets.ello.co/uploads/user/avatar/#{archer.id}/ello-small-fad52e18.png"}
-    ] == render(UserView, "autocomplete.json", users: users, conn: conn)
+    ] == render(UserView, "autocomplete.json", data: users, conn: conn)
   end
 
   test "autocomplete.json - returns pixelated avatars if client disallows NSFW", %{conn: conn, archer: archer} do
@@ -187,7 +187,7 @@ defmodule Ello.V2.UserViewTest do
     assert [
       %{name: user1.username, image_url: "https://assets.ello.co/uploads/user/avatar/#{archer.id}/ello-small-pixellated-fad52e18.png"},
       %{name: archer.username, image_url: "https://assets.ello.co/uploads/user/avatar/#{archer.id}/ello-small-fad52e18.png"}
-    ] == render(UserView, "autocomplete.json", users: users, conn: conn)
+    ] == render(UserView, "autocomplete.json", data: users, conn: conn)
   end
 
   test "autocomplete.json - returns pixelated avatars if client disallows nudity", %{conn: conn, archer: archer} do
@@ -197,6 +197,6 @@ defmodule Ello.V2.UserViewTest do
     assert [
       %{name: user1.username, image_url: "https://assets.ello.co/uploads/user/avatar/#{archer.id}/ello-small-pixellated-fad52e18.png"},
       %{name: archer.username, image_url: "https://assets.ello.co/uploads/user/avatar/#{archer.id}/ello-small-fad52e18.png"}
-    ] == render(UserView, "autocomplete.json", users: users, conn: conn)
+    ] == render(UserView, "autocomplete.json", data: users, conn: conn)
   end
 end

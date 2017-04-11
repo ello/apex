@@ -27,7 +27,7 @@ defmodule Ello.V2.UserView do
   end
 
   @doc "Renders users for autocomplete results"
-  def render("autocomplete.json", %{users: users, conn: conn}) do
+  def render("autocomplete.json", %{conn: conn, data: users}) do
     Enum.map(users, fn(user) ->
       conn
       |> get_avatar_filename(user)

@@ -47,6 +47,7 @@ defmodule Ello.V2.Mixfile do
       {:ello_auth,   in_umbrella: true},
       {:ello_events, in_umbrella: true},
       {:ello_stream, in_umbrella: true},
+      {:ello_search, in_umbrella: true},
     ]
   end
 end
