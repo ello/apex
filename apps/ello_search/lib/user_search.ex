@@ -1,28 +1,25 @@
-defmodule Ello.Search.UsersIndex do
-  alias Ello.Search.Client
+defmodule Ello.Search.UserSearch do
   alias Ello.Core.Network
+  alias Ello.Search.{Client, UserIndex}
 
   def username_search(username, %{current_user: current_user}) do
-    following_ids  = Network.following_ids(current_user)
+    following_ids = Network.following_ids(current_user)
     query = base_query()
             |> build_username_query(username)
             |> build_relationship_query(following_ids)
             |> filter_blocked(current_user)
             |> filter_locked
 
-    Client.search(index_name(), doc_types(), query)
+    Client.search(UserIndex.index_name(), UserIndex.doc_types(), query)
   end
-
-  defp index_name, do: "users"
-  defp doc_types, do: ["user"]
 
   defp base_query do
     %{
       query: %{
         bool: %{
           must_not: [],
-          must: [],
-          should: [],
+          must:     [],
+          should:   [],
         }
       }
     }

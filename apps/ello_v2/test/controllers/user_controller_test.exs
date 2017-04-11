@@ -1,7 +1,7 @@
 defmodule Ello.V2.UserControllerTest do
   use Ello.V2.ConnCase, async: false
   alias Ello.Core.Redis
-  alias Ello.Search.Client
+  alias Ello.Search.UserIndex
 
   setup %{conn: conn} do
     user = Factory.insert(:user)
@@ -110,64 +110,9 @@ defmodule Ello.V2.UserControllerTest do
   end
 
   test "GET /v2/users/autocomplete - user token", %{conn: conn, archer: archer} do
-    index_name  = "users"
-    doc_type    = "user"
-    index_data  = %{
-      id:         archer.id,
-      username:   archer.username,
-      raw_username: archer.username,
-      short_bio:  archer.short_bio,
-      links:      archer.links,
-      is_spammer: false,
-      is_nsfw_user: false,
-      posts_nudity: false,
-      locked_at:  archer.locked_at,
-      created_at: archer.created_at,
-      updated_at: archer.updated_at
-    }
-    mapping = %{
-      properties: %{
-        id:         %{type: "text"},
-        username:   %{type: "text", analyzer: "username_autocomplete"},
-        raw_username: %{type: "text", index: false},
-        short_bio:  %{type: "text"},
-        links:      %{type: "text"},
-        is_spammer: %{type: "boolean"},
-        is_nsfw_user: %{type: "boolean"},
-        posts_nudity: %{type: "boolean"},
-        locked_at:  %{type: "date"},
-        created_at: %{type: "date"},
-        updated_at: %{type: "date"}
-      }
-    }
-
-    Client.delete_index(index_name)
-    Client.create_index(index_name, %{
-                           settings: %{
-                             analysis: %{
-                               filter: %{
-                                 autocomplete: %{
-                                   type: "edge_ngram",
-                                   min_gram: 1,
-                                   max_gram: 20
-                                 }
-    },
-    analyzer: %{
-      username_autocomplete: %{
-        type: "custom",
-        tokenizer: "keyword",
-        filter: [
-          "lowercase",
-          "autocomplete"
-        ]
-    }
-    }
-    }
-    }
-    })
-    Client.put_mapping(index_name, doc_type, mapping)
-    Client.index_document(index_name, doc_type, archer.id, index_data)
-    Client.refresh_index(index_name)
+    UserIndex.delete
+    UserIndex.create
+    UserIndex.add(archer)
     conn = get(conn, user_path(conn, :autocomplete, %{"username" => archer.username}))
     assert conn.status == 200
     assert [%{"image_url" => "https://assets.ello.co/uploads/user/avatar/42/ello-small-fad52e18.png",

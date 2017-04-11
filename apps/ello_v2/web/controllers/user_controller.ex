@@ -2,7 +2,7 @@ defmodule Ello.V2.UserController do
   use Ello.V2.Web, :controller
   alias Ello.Core.Network
   alias Ello.V2.UserView
-  alias Ello.Search.UsersIndex
+  alias Ello.Search.UserSearch
 
   plug Ello.Auth.RequireUser, "before autocomplete" when action in [:autocomplete]
 
@@ -21,7 +21,7 @@ defmodule Ello.V2.UserController do
   end
 
   def autocomplete(conn, %{"username" => username}) do
-    users = UsersIndex.username_search(username, %{current_user: current_user(conn)}).body["hits"]["hits"]
+    users = UserSearch.username_search(username, %{current_user: current_user(conn)}).body["hits"]["hits"]
             |> Enum.map(&(&1["_id"]))
             |> Network.users
 
