@@ -1,6 +1,7 @@
 defmodule Ello.V2.UserControllerTest do
   use Ello.V2.ConnCase, async: false
   alias Ello.Core.Redis
+  alias Ello.Search.Client
 
   setup %{conn: conn} do
     user = Factory.insert(:user)
