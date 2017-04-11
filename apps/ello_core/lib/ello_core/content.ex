@@ -138,10 +138,14 @@ defmodule Ello.Core.Content do
   defp parse_per_page(_), do: 25
 
   defp parse_before(%DateTime{} = before), do: before
+  defp parse_before(nil), do: nil
   defp parse_before(before) do
-    case DateTime.from_iso8601(before) do
+    before
+    |> URI.decode
+    |> DateTime.from_iso8601
+    |> case do
       {:ok, date, _} -> date
-      _  -> nil
+      _ -> nil
     end
   end
 

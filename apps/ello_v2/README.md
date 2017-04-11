@@ -11,6 +11,11 @@ query logic and storage is handled by Ello.Core and friends.
 * GET /api/v2/categories/:id
 * GET /api/v2/users/:id_or_username
 * GET /api/v2/posts/:id_or_token
+* GET /api/v2/user/:id_or_username/posts
+* GET /api/v2/following/posts/recent
+* GET /api/v2/categories/posts/recent
+* GET /api/v2/categories/:slug/posts/recent
+* GET /api/v2/discover/posts/recent
 
 ## Data Format
 

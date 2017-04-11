@@ -1,11 +1,15 @@
 # Ello.Stream
 
-Returns post streams for category and following.
+Returns post streams for category and following by querying our Roshi backed
+stream service.
 
 Queries ello-stream service while handling minimum page sizes and proper
 nsfw/nudity/blocked filtering.
 
 Uses and depends on Ello.Core to filter and retrieve authoritative post data.
+
+Check out our Roshi backed Go [Ello Stream Service](https://github.com/ello/streams)
+to learn more.
 
 ## Configuration
 

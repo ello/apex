@@ -11,13 +11,24 @@ defmodule Ello.V2.Router do
     pipe_through :api
 
     get "/ping", StatusController, :ping
+
+    # Promotionals
     resources "/categories", CategoryController, only: @read
+
+    # Discovery
+    get "/categories/:slug/posts/recent", CategoryPostController, :recent
+    get "/categories/posts/recent", CategoryPostController, :featured
+    get "/discover/posts/recent", DiscoverPostController, :recent
+
+    # Users And Posts
     resources "/users", UserController, only: [:show] do
       resources "/posts", UserPostController, only: [:index], name: :post
     end
     resources "/posts", PostController, only: [:show] do
       resources "/related", RelatedPostController, only: [:index], name: :related
     end
+
+    # Following
     resources "/following/posts/recent", FollowingPostController, only: [:index]
   end
 end

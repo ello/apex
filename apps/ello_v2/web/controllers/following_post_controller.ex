@@ -10,7 +10,7 @@ defmodule Ello.V2.FollowingPostController do
 
     conn
     |> track_post_view(stream.posts, stream_kind: "following")
-    |> add_page_headers(stream)
+    |> add_pagination_headers("/following/posts/recent", stream)
     |> api_render_if_stale(PostView, :index, data: stream.posts)
   end
 
@@ -25,13 +25,4 @@ defmodule Ello.V2.FollowingPostController do
       allow_nudity: conn.assigns[:allow_nudity],
     )
   end
-
-  defp add_page_headers(conn, %{per_page: per_page, before: before}) do
-    put_resp_header(conn, "link", "<https://#{webapp_host()}/api/v2/following/posts/recent?before=#{before}&per_page=#{per_page}>; rel=\"next\"")
-  end
-
-  defp webapp_host do
-    Application.get_env(:ello_v2, :webapp_host, "ello.co")
-  end
-
 end
