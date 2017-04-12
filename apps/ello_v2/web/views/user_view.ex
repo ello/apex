@@ -36,8 +36,15 @@ defmodule Ello.V2.UserView do
     end)
   end
 
-  defp get_avatar_filename(%{assigns: %{allow_nsfw: false}}, %{settings: %{posts_adult_content: true}} = user), do: small_avatar_version(user).pixellated_filename
-  defp get_avatar_filename(%{assigns: %{allow_nudity: false}}, %{settings: %{posts_nudity: true}} = user), do: small_avatar_version(user).pixellated_filename
+  @doc "Renders users for search results"
+  def render("index.json", %{conn: conn, data: users}), do: render_resource(json_response(), :users, users, __MODULE__, %{})
+
+  defp get_avatar_filename(%{assigns: %{allow_nsfw: false}}, %{settings: %{posts_adult_content: true}} = user) do
+    small_avatar_version(user).pixellated_filename
+  end
+  defp get_avatar_filename(%{assigns: %{allow_nudity: false}}, %{settings: %{posts_nudity: true}} = user) do
+    small_avatar_version(user).pixellated_filename
+  end
   defp get_avatar_filename(_, user), do: small_avatar_version(user).filename
 
   defp small_avatar_version(user), do: Enum.find(user.avatar_struct.versions, &(&1.name == "small"))

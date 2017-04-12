@@ -98,14 +98,14 @@ defmodule Ello.V2.UserControllerTest do
   end
 
   test "GET /v2/users/autocomplete - without token", %{unauth_conn: conn, archer: archer} do
-    conn = get(conn, user_path(conn, :autocomplete, %{"username" => archer.username}))
+    conn = get(conn, user_path(conn, :autocomplete, %{"terms" => archer.username}))
     assert conn.status == 401
   end
 
   test "GET /v2/users/autocomplete - public token", %{unauth_conn: conn, archer: archer} do
     conn = conn
            |> public_conn
-           |> get(user_path(conn, :autocomplete, %{"username" => archer.username}))
+           |> get(user_path(conn, :autocomplete, %{"terms" => archer.username}))
     assert conn.status == 401
   end
 
@@ -113,14 +113,33 @@ defmodule Ello.V2.UserControllerTest do
     UserIndex.delete
     UserIndex.create
     UserIndex.add(archer)
-    conn = get(conn, user_path(conn, :autocomplete, %{"username" => archer.username}))
-    assert conn.status == 200
+    conn = get(conn, user_path(conn, :autocomplete, %{"terms" => archer.username}))
     assert [%{"image_url" => "https://assets.ello.co/uploads/user/avatar/42/ello-small-fad52e18.png",
               "name" => "archer"}] = json_response(conn, 200)
   end
 
   test "GET /v2/users/autocomplete - user token with no search results", %{conn: conn, archer: archer} do
-    conn = get(conn, user_path(conn, :autocomplete, %{"username" => "asdf"}))
+    conn = get(conn, user_path(conn, :autocomplete, %{"terms" => "asdf"}))
     assert conn.status == 204
+  end
+
+  test "GET /v2/users - without token", %{unauth_conn: conn, archer: archer} do
+    conn = get(conn, user_path(conn, :index, %{"terms" => "archer"}))
+    assert conn.status == 401
+  end
+
+  test "GET /v2/users - public token", %{unauth_conn: conn, archer: archer} do
+    conn = conn
+           |> public_conn
+           |> get(user_path(conn, :index, %{"terms" => "archer"}))
+    assert %{"name" => "Sterling Archer"} = hd(json_response(conn, 200)["users"])
+  end
+
+  test "GET /v2/users - user token", %{conn: conn, archer: archer} do
+    UserIndex.delete
+    UserIndex.create
+    UserIndex.add(archer)
+    conn = get(conn, user_path(conn, :index, %{"terms" => "archer"}))
+    assert %{"name" => "Sterling Archer"} = hd(json_response(conn, 200)["users"])
   end
 end

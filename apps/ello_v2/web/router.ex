@@ -22,7 +22,7 @@ defmodule Ello.V2.Router do
 
     # Users And Posts
     get "/users/autocomplete", UserController, :autocomplete
-    resources "/users", UserController, only: [:show] do
+    resources "/users", UserController, only: [:show, :index] do
       resources "/posts", UserPostController, only: [:index], name: :post
     end
     resources "/posts", PostController, only: [:show] do

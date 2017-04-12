@@ -20,7 +20,25 @@ defmodule Ello.V2.UserController do
     end
   end
 
-  def autocomplete(conn, %{"username" => username}) do
+  @doc """
+  GET /v2/users
+
+  Renders a list of relevant results from user search
+  """
+  def index(conn, %{"terms" => terms}) do
+    users = UserSearch.user_search(terms, %{current_user: current_user(conn), allow_nsfw: conn.assigns[:allow_nsfw], allow_nudity: conn.assigns[:allow_nudity]}).body["hits"]["hits"]
+            |> Enum.map(&(&1["_id"]))
+            |> Network.users
+
+    api_render(conn, UserView, "index.json", data: users)
+  end
+
+  @doc """
+  GET /v2/users/autocomplete
+
+  Renders a list of relevant results from username search
+  """
+  def autocomplete(conn, %{"terms" => username}) do
     users = UserSearch.username_search(username, %{current_user: current_user(conn)}).body["hits"]["hits"]
             |> Enum.map(&(&1["_id"]))
             |> Network.users
