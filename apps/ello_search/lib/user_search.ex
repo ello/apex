@@ -8,7 +8,28 @@ defmodule Ello.Search.UserSearch do
             |> build_username_query(username)
             |> build_relationship_query(following_ids)
             |> filter_blocked(current_user)
-            |> filter_locked
+
+    Client.search(UserIndex.index_name(), UserIndex.doc_types(), query)
+  end
+
+  def user_search(terms, %{current_user: nil} = opts) do
+    query = base_query()
+            |> build_user_query(terms)
+            |> filter_spam
+            |> filter_nsfw(opts[:allow_nsfw])
+            |> filter_nudity(opts[:allow_nudity])
+
+    Client.search(UserIndex.index_name(), UserIndex.doc_types(), query)
+  end
+  def user_search(terms, %{allow_nsfw: allow_nsfw, allow_nudity: allow_nudity, current_user: current_user}) do
+    following_ids = Network.following_ids(current_user)
+    query = base_query()
+            |> build_user_query(terms)
+            |> build_relationship_query(following_ids)
+            |> filter_spam
+            |> filter_nsfw(allow_nsfw)
+            |> filter_nudity(allow_nudity)
+            |> filter_blocked(current_user)
 
     Client.search(UserIndex.index_name(), UserIndex.doc_types(), query)
   end
@@ -17,12 +38,19 @@ defmodule Ello.Search.UserSearch do
     %{
       query: %{
         bool: %{
-          must_not: [],
+          must_not: [
+            %{term:   %{username: "wtf"}},
+            %{exists: %{field: :locked_at}},
+          ],
           must:     [],
           should:   [],
         }
       }
     }
+  end
+
+  defp build_user_query(query, terms) do
+    update_in(query[:query][:bool][:must], &([%{query_string: %{query: terms, fields: ["raw_username^2.5", "raw_name^2", "links", "short_bio", "username^0.01", "name^0.01"]}} | &1]))
   end
 
   defp build_username_query(query, username) do
@@ -37,10 +65,6 @@ defmodule Ello.Search.UserSearch do
     limit = Application.get_env(:ello_search, :es_prefix) || 1000
     boost = Application.get_env(:ello_search, :following_search_boost_value) || 15.0
     update_in(query[:query][:bool][:should], &([%{constant_score: %{filter: %{terms: %{id: Enum.take(relationship_ids, limit)}}, boost: boost}} | &1]))
-  end
-
-  defp filter_locked(query) do
-    update_in(query[:query][:bool][:must_not], &([%{exists: %{field: :locked_at}} | &1]))
   end
 
   defp filter_nsfw(query, true), do: query
