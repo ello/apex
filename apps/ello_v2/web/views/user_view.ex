@@ -37,7 +37,7 @@ defmodule Ello.V2.UserView do
   end
 
   @doc "Renders users for search results"
-  def render("index.json", %{conn: conn, data: users}), do: render_resource(json_response(), :users, users, __MODULE__, %{})
+  def render("index.json", %{data: users}), do: render_resource(json_response(), :users, users, __MODULE__, %{})
 
   defp get_avatar_filename(%{assigns: %{allow_nsfw: false}}, %{settings: %{posts_adult_content: true}} = user) do
     small_avatar_version(user).pixellated_filename

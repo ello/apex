@@ -1,22 +1,28 @@
 defmodule Ello.Search.Client do
+  alias Elastix.{
+    Search,
+    Index,
+    Mapping,
+    Document,
+  }
 
-  def search(index_name, doc_types, query) do
-    Elastix.Search.search(es_url(), add_prefix(index_name), doc_types, query)
-  end
+  def search(index_name, doc_types, query), do:
+    Search.search(es_url(), add_prefix(index_name), doc_types, query)
 
-  def create_index(index_name, settings), do: Elastix.Index.create(es_url, add_prefix(index_name), settings)
+  def create_index(index_name, settings), do:
+    Index.create(es_url(), add_prefix(index_name), settings)
 
-  def delete_index(index_name), do: Elastix.Index.delete(es_url, add_prefix(index_name))
+  def delete_index(index_name), do:
+    Index.delete(es_url(), add_prefix(index_name))
 
-  def put_mapping(index_name, doc_type, mapping) do
-    Elastix.Mapping.put(es_url, add_prefix(index_name), doc_type, mapping)
-  end
+  def put_mapping(index_name, doc_type, mapping), do:
+    Mapping.put(es_url(), add_prefix(index_name), doc_type, mapping)
 
-  def index_document(index_name, doc_type, id, index_data) do
-    Elastix.Document.index(es_url, add_prefix(index_name), doc_type, id, index_data)
-  end
+  def index_document(index_name, doc_type, id, index_data), do:
+    Document.index(es_url(), add_prefix(index_name), doc_type, id, index_data)
 
-  def refresh_index(index_name), do: Elastix.Index.refresh(es_url, add_prefix(index_name))
+  def refresh_index(index_name), do:
+    Index.refresh(es_url(), add_prefix(index_name))
 
   defp es_url, do: Application.get_env(:ello_search, :es_url)
 

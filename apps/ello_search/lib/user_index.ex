@@ -8,18 +8,18 @@ defmodule Ello.Search.UserIndex do
 
   def add(user, overrides \\ %{}) do
     data = %{
-              id:           user.id,
-              username:     user.username,
-              raw_username: user.username,
-              short_bio:    user.short_bio,
-              links:        user.links,
-              is_spammer:   false,
-              is_nsfw_user: user.settings.posts_adult_content,
-              posts_nudity: user.settings.posts_nudity,
-              locked_at:    user.locked_at,
-              created_at:   user.created_at,
-              updated_at:   user.updated_at
-            } |> Map.merge(overrides)
+      id:           user.id,
+      username:     user.username,
+      raw_username: user.username,
+      short_bio:    user.short_bio,
+      links:        user.links,
+      is_spammer:   false,
+      is_nsfw_user: user.settings.posts_adult_content,
+      posts_nudity: user.settings.posts_nudity,
+      locked_at:    user.locked_at,
+      created_at:   user.created_at,
+      updated_at:   user.updated_at
+    } |> Map.merge(overrides)
     Client.index_document(index_name(), doc_type(), user.id, data)
     Client.refresh_index(index_name())
   end
@@ -28,11 +28,15 @@ defmodule Ello.Search.UserIndex do
 
   def index_name, do: "users"
   def doc_type,   do: "user"
-  def doc_types,  do: [doc_type]
+  def doc_types,  do: [doc_type()]
 
   def settings do
     %{
       settings: %{
+        index: %{
+            number_of_shards: Application.get_env(:ello_search, :es_default_shards),
+            number_of_replicas: Application.get_env(:ello_search, :es_default_replicas)
+        },
         analysis: %{
           filter: %{
             autocomplete: %{

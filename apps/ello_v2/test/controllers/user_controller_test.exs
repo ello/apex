@@ -118,17 +118,17 @@ defmodule Ello.V2.UserControllerTest do
               "name" => "archer"}] = json_response(conn, 200)
   end
 
-  test "GET /v2/users/autocomplete - user token with no search results", %{conn: conn, archer: archer} do
+  test "GET /v2/users/autocomplete - user token with no search results", %{conn: conn} do
     conn = get(conn, user_path(conn, :autocomplete, %{"terms" => "asdf"}))
     assert conn.status == 204
   end
 
-  test "GET /v2/users - without token", %{unauth_conn: conn, archer: archer} do
+  test "GET /v2/users - without token", %{unauth_conn: conn} do
     conn = get(conn, user_path(conn, :index, %{"terms" => "archer"}))
     assert conn.status == 401
   end
 
-  test "GET /v2/users - public token", %{unauth_conn: conn, archer: archer} do
+  test "GET /v2/users - public token", %{unauth_conn: conn} do
     conn = conn
            |> public_conn
            |> get(user_path(conn, :index, %{"terms" => "archer"}))

@@ -54,7 +54,7 @@ defmodule Ello.Search.UserSearch do
   end
 
   defp build_username_query(query, username) do
-    boost = Application.get_env(:ello_search, :username_match_boost_value) || 5.0
+    boost = Application.get_env(:ello_search, :username_match_boost)
     query
     |> update_in([:query, :bool, :must], &([%{fuzzy: %{username: username}} | &1]))
     |> update_in([:query, :bool, :should], &([%{term: %{username: %{value: username, boost: boost}}} | &1]))
@@ -62,8 +62,8 @@ defmodule Ello.Search.UserSearch do
 
   defp build_relationship_query(query, []), do: query
   defp build_relationship_query(query, relationship_ids) do
-    limit = Application.get_env(:ello_search, :es_prefix) || 1000
-    boost = Application.get_env(:ello_search, :following_search_boost_value) || 15.0
+    limit = Application.get_env(:ello_search, :following_search_boost_limit)
+    boost = Application.get_env(:ello_search, :following_search_boost)
     update_in(query[:query][:bool][:should], &([%{constant_score: %{filter: %{terms: %{id: Enum.take(relationship_ids, limit)}}, boost: boost}} | &1]))
   end
 

@@ -25,7 +25,17 @@ defmodule Ello.Search.UserSearchTest do
     UserIndex.add(spam_user, %{is_spammer: true})
     UserIndex.add(nsfw_user)
     UserIndex.add(nudity_user)
-    {:ok, user: user, locked_user: locked_user, spam_user: spam_user, nsfw_user: nsfw_user, nudity_user: nudity_user, current_user: current_user, lana32d: lana32d, lanakane: lanakane, lanabandero: lanabandero}
+    {:ok,
+      user: user,
+      locked_user: locked_user,
+      spam_user: spam_user,
+      nsfw_user: nsfw_user,
+      nudity_user: nudity_user,
+      current_user: current_user,
+      lana32d: lana32d,
+      lanakane: lanakane,
+      lanabandero: lanabandero
+    }
   end
 
   test "username_search - scores more exact matches higher", context do
@@ -36,21 +46,21 @@ defmodule Ello.Search.UserSearchTest do
   end
 
   test "username_search - does not include locked users", context do
-    response = UserSearch.username_search(context.user.username, %{current_user: context.current_user})
+    response = UserSearch.username_search("username", %{current_user: context.current_user})
     assert response.status_code == 200
     assert to_string(context.user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
     refute to_string(context.locked_user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
   end
 
   test "username_search - includes spamified users", context do
-    response = UserSearch.username_search(context.user.username, %{current_user: context.current_user})
+    response = UserSearch.username_search("username", %{current_user: context.current_user})
     assert response.status_code == 200
     assert to_string(context.user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
     assert to_string(context.spam_user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
   end
 
   test "username_search - includes nsfw users", context do
-    response = UserSearch.username_search(context.user.username, %{current_user: context.current_user})
+    response = UserSearch.username_search("username", %{current_user: context.current_user})
     assert response.status_code == 200
     assert to_string(context.user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
     assert to_string(context.nsfw_user.id) in Enum.map(response.body["hits"]["hits"], &(&1["_id"]))
