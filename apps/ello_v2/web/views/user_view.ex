@@ -53,7 +53,6 @@ defmodule Ello.V2.UserView do
 
   defp build_autocomplete_response(image_url, user), do: %{name: user.username, image_url: image_url}
 
-
   def attributes, do: [
     :username,
     :name,

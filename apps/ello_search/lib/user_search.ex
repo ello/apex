@@ -1,41 +1,40 @@
 defmodule Ello.Search.UserSearch do
+  import NewRelicPhoenix, only: [measure_segment: 2]
   alias Ello.Core.Network
   alias Ello.Search.{Client, UserIndex}
 
   def username_search(username, %{current_user: current_user}) do
     following_ids = Network.following_ids(current_user)
-    query = base_query()
-            |> build_username_query(username)
-            |> build_relationship_query(following_ids)
-            |> filter_blocked(current_user)
-
-    Client.search(UserIndex.index_name(), UserIndex.doc_types(), query)
+    base_query()
+    |> build_username_query(username)
+    |> build_relationship_query(following_ids)
+    |> filter_blocked(current_user)
+    |> search_user_index
   end
 
   def user_search(terms, %{current_user: nil} = opts) do
-    query = base_query()
-            |> build_user_query(terms)
-            |> filter_spam
-            |> filter_nsfw(opts[:allow_nsfw])
-            |> filter_nudity(opts[:allow_nudity])
-
-    Client.search(UserIndex.index_name(), UserIndex.doc_types(), query)
+    base_query()
+    |> build_user_query(terms)
+    |> filter_spam
+    |> filter_nsfw(opts[:allow_nsfw])
+    |> filter_nudity(opts[:allow_nudity])
+    |> search_user_index
   end
   def user_search(terms, %{allow_nsfw: allow_nsfw, allow_nudity: allow_nudity, current_user: current_user}) do
     following_ids = Network.following_ids(current_user)
-    query = base_query()
-            |> build_user_query(terms)
-            |> build_relationship_query(following_ids)
-            |> filter_spam
-            |> filter_nsfw(allow_nsfw)
-            |> filter_nudity(allow_nudity)
-            |> filter_blocked(current_user)
-
-    Client.search(UserIndex.index_name(), UserIndex.doc_types(), query)
+    base_query()
+    |> build_user_query(terms)
+    |> build_relationship_query(following_ids)
+    |> filter_spam
+    |> filter_nsfw(allow_nsfw)
+    |> filter_nudity(allow_nudity)
+    |> filter_blocked(current_user)
+    |> search_user_index
   end
 
   defp base_query do
     %{
+      stored_fields: [],
       query: %{
         bool: %{
           must_not: [
@@ -83,5 +82,23 @@ defmodule Ello.Search.UserSearch do
 
   defp filter_spam(query) do
     update_in(query[:query][:bool][:must_not], &([%{term: %{is_spammer: true}} | &1]))
+  end
+
+  defp search_user_index(query) do
+    ids = Client.search(UserIndex.index_name(), UserIndex.doc_types(), query).body["hits"]["hits"]
+          |> Enum.map(&(String.to_integer(&1["_id"])))
+
+    ids
+    |> Network.users
+    |> user_sorting(ids)
+  end
+
+  defp user_sorting(users, ids) do
+    measure_segment {__MODULE__, "user_sorting"} do
+      mapped = Enum.group_by(users, &(&1.id))
+      ids
+      |> Enum.uniq
+      |> Enum.flat_map(&(mapped[&1] || []))
+    end
   end
 end

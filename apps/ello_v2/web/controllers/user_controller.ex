@@ -4,7 +4,7 @@ defmodule Ello.V2.UserController do
   alias Ello.V2.UserView
   alias Ello.Search.UserSearch
 
-  plug Ello.Auth.RequireUser, "before autocomplete" when action in [:autocomplete]
+  plug Ello.Auth.RequireUser when action in [:autocomplete]
 
   @doc """
   GET /v2/users/:id, GET /v2/users/~:username
@@ -26,11 +26,8 @@ defmodule Ello.V2.UserController do
   Renders a list of relevant results from user search
   """
   def index(conn, %{"terms" => terms}) do
-    users = UserSearch.user_search(terms, %{current_user: current_user(conn), allow_nsfw: conn.assigns[:allow_nsfw], allow_nudity: conn.assigns[:allow_nudity]}).body["hits"]["hits"]
-            |> Enum.map(&(&1["_id"]))
-            |> Network.users
-
-    api_render(conn, UserView, "index.json", data: users)
+    users = UserSearch.user_search(terms, %{current_user: current_user(conn), allow_nsfw: conn.assigns[:allow_nsfw], allow_nudity: conn.assigns[:allow_nudity]})
+    api_render_if_stale(conn, UserView, "index.json", data: users)
   end
 
   @doc """
@@ -39,10 +36,7 @@ defmodule Ello.V2.UserController do
   Renders a list of relevant results from username search
   """
   def autocomplete(conn, %{"terms" => username}) do
-    users = UserSearch.username_search(username, %{current_user: current_user(conn)}).body["hits"]["hits"]
-            |> Enum.map(&(&1["_id"]))
-            |> Network.users
-
+    users = UserSearch.username_search(username, %{current_user: current_user(conn)})
     api_render(conn, UserView, "autocomplete.json", data: users)
   end
 end

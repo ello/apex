@@ -31,7 +31,7 @@ defmodule Ello.Search.Client do
   defp add_prefix(index_name) do
     case es_prefix() do
       nil -> index_name
-        _ -> es_prefix() <> index_name
+        _ -> es_prefix() <> "_" <> index_name
     end
   end
 

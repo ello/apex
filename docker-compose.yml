@@ -20,6 +20,6 @@ streams:
     - "8080:8080"
 
 elasticsearch:
-  image: elasticsearch:5.3.0
+  image: elasticsearch:5.1.1
   ports:
     - "9200:9200"
