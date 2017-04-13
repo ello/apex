@@ -184,6 +184,16 @@ defmodule Ello.Core.ContentTest do
     assert (Map.put(posts_page.before, :microsecond, 0)) == (Map.put(earlier_date, :microsecond, 0))
   end
 
+  test "posts_by_ids/2 - does not include duplicates" do
+    p1 = Factory.insert(:post)
+    p2 = Factory.insert(:post)
+    p3 = Factory.insert(:post)
+    dup_ids = [p1.id, p2.id, p2.id, p2.id, p3.id]
+    posts = Content.posts_by_ids(dup_ids, [current_user: nil, allow_nsfw: true, allow_nudity: true])
+    assert [_, _, _] = posts
+  end
+
+
   test "related_posts/2 - id", _context do
     author = Factory.insert(:user)
     posts = Enum.map 1..10, fn (_) ->
