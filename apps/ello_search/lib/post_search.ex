@@ -1,23 +1,26 @@
 defmodule Ello.Search.PostSearch do
   import NewRelicPhoenix, only: [measure_segment: 2]
-  alias Ello.Core.Network
+  alias Ello.Core.Content
   alias Ello.Search.{Client, PostIndex}
   use Timex
 
-  def search_posts(terms, %{current_user: nil} = opts) do
-    opts
-    |> build_default_queries(terms)
+  def post_search(terms, %{current_user: nil} = opts) do
+    terms
+    |> build_default_queries(opts)
     |> filter_private_authors
+    |> search_post_index
   end
-  def search_posts(terms, %{current_user: current_user} = opts) do
-    opts
-    |> build_default_queries(terms)
+  def post_search(terms, %{current_user: current_user} = opts) do
+    terms
+    |> build_default_queries(opts)
     |> filter_blocked(current_user)
+    |> search_post_index
   end
 
-  defp build_default_queries(opts, terms) do
+  defp build_default_queries(terms, opts) do
     base_query()
     |> build_author_query
+    |> build_pagination_query
     |> build_text_content_query(terms)
     |> build_mention_query(terms)
     |> build_hashtag_query(terms)
@@ -29,6 +32,8 @@ defmodule Ello.Search.PostSearch do
 
   defp base_query do
     %{
+      from: 0,
+      size: 10,
       query: %{
         bool: %{
           must:     [],
@@ -93,6 +98,13 @@ defmodule Ello.Search.PostSearch do
     update_in(query[:query][:bool][:filter], &([author_query() | &1]))
   end
 
+  defp build_pagination_query(query, nil, nil), do: query
+  defp build_pagination_query(query, page, per_page) do
+    query
+    |> update_in([:from], &(&1 = page * per_page))
+    |> update_in([:size], &(&1 = per_page))
+  end
+
   defp filter_private_authors(query) do
     update_in(query[:query][:bool][:filter][:has_parent][:query][:bool][:filter],
               &([%{term: %{is_public: true}} | &1]))
@@ -110,5 +122,23 @@ defmodule Ello.Search.PostSearch do
            |> Timex.shift(days: -within_days)
            |> Timex.format!("%Y-%m-%d", :strftime)
     update_in(query[:query][:bool][:filter], &([%{range: %{created_at: %{gte: date}}} | &1]))
+  end
+
+  defp search_post_index(query) do
+    ids = Client.search(PostIndex.index_name(), PostIndex.doc_types(), query).body["hits"]["hits"]
+          |> Enum.map(&(String.to_integer(&1["_id"])))
+
+    ids
+    |> Content.posts_by_ids
+    |> post_sorting(ids)
+  end
+
+  defp post_sorting(posts, ids) do
+    measure_segment {__MODULE__, "post_sorting"} do
+      mapped = Enum.group_by(posts, &(&1.id))
+      ids
+      |> Enum.uniq
+      |> Enum.flat_map(&(mapped[&1] || []))
+    end
   end
 end
