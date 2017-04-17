@@ -13,22 +13,16 @@ defmodule Ello.Search.UserSearch do
   end
 
   def user_search(terms, %{current_user: nil} = opts) do
-    base_query()
-    |> build_user_query(terms)
-    |> filter_spam
-    |> filter_nsfw(opts[:allow_nsfw])
-    |> filter_nudity(opts[:allow_nudity])
+    terms
+    |> build_default_user_search_query(opts)
+    |> filter_private_users
     |> search_user_index
   end
-  def user_search(terms, %{allow_nsfw: allow_nsfw, allow_nudity: allow_nudity, current_user: current_user} = opts) do
+  def user_search(terms, %{current_user: current_user} = opts) do
     following_ids = Network.following_ids(current_user)
-    base_query()
-    |> build_pagination_query(opts[:page], opts[:per_page])
-    |> build_user_query(terms)
+    terms
+    |> build_default_user_search_query(opts)
     |> build_relationship_query(following_ids)
-    |> filter_spam
-    |> filter_nsfw(allow_nsfw)
-    |> filter_nudity(allow_nudity)
     |> filter_blocked(current_user)
     |> search_user_index
   end
@@ -45,9 +39,19 @@ defmodule Ello.Search.UserSearch do
           ],
           must:     [],
           should:   [],
+          filter:   [],
         }
       }
     }
+  end
+
+  defp build_default_user_search_query(terms, opts) do
+    base_query()
+    |> build_user_query(terms)
+    |> build_pagination_query(opts[:page], opts[:per_page])
+    |> filter_spam
+    |> filter_nsfw(opts[:allow_nsfw])
+    |> filter_nudity(opts[:allow_nudity])
   end
 
   defp build_pagination_query(query, nil, nil), do: query
@@ -91,6 +95,10 @@ defmodule Ello.Search.UserSearch do
 
   defp filter_spam(query) do
     update_in(query[:query][:bool][:must_not], &([%{term: %{is_spammer: true}} | &1]))
+  end
+
+  defp filter_private_users(query) do
+    update_in(query[:query][:bool][:filter], &([%{term: %{is_public: true}} | &1]))
   end
 
   defp search_user_index(query) do
