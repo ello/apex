@@ -44,6 +44,7 @@ defmodule Ello.Search.Mixfile do
     [
       {:elastix, "~> 0.3.2"},
       {:poison, "~> 3.1", override: true},
+      {:timex, "~> 3.0"},
 
       {:ello_core, in_umbrella: true},
     ]
