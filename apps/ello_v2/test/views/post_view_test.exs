@@ -196,6 +196,16 @@ defmodule Ello.V2.PostViewTest do
     )
   end
 
+  test "show.json - gif meta attrs", %{post: post, conn: conn} do
+    post = Map.update!(post, :assets, &([Factory.build(:gif_asset) | &1]))
+    resp = render(PostView, "show.json", data: post, conn: conn)
+    assert [image1, image2] = resp[:posts][:meta_attributes][:images]
+    assert Regex.match?(~r(\.gif$), image1)
+    assert Regex.match?(~r(optimized), image1)
+    assert Regex.match?(~r(\.jpg$), image2)
+    assert Regex.match?(~r(hdpi), image2)
+  end
+
   test "show.json - it renders a linked repost", %{post: post, archer: archer, repost: repost, reposter: reposter, conn: conn} do
     author_id = "#{archer.id}"
     repost_author_id = "#{reposter.id}"
