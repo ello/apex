@@ -20,9 +20,10 @@ defmodule Ello.Search.UserSearch do
     |> filter_nudity(opts[:allow_nudity])
     |> search_user_index
   end
-  def user_search(terms, %{allow_nsfw: allow_nsfw, allow_nudity: allow_nudity, current_user: current_user}) do
+  def user_search(terms, %{allow_nsfw: allow_nsfw, allow_nudity: allow_nudity, current_user: current_user} = opts) do
     following_ids = Network.following_ids(current_user)
     base_query()
+    |> build_pagination_query(opts[:page], opts[:per_page])
     |> build_user_query(terms)
     |> build_relationship_query(following_ids)
     |> filter_spam
@@ -34,7 +35,8 @@ defmodule Ello.Search.UserSearch do
 
   defp base_query do
     %{
-      stored_fields: [],
+      from: 0,
+      size: 10,
       query: %{
         bool: %{
           must_not: [
@@ -46,6 +48,13 @@ defmodule Ello.Search.UserSearch do
         }
       }
     }
+  end
+
+  defp build_pagination_query(query, nil, nil), do: query
+  defp build_pagination_query(query, page, per_page) do
+    query
+    |> update_in([:from], &(&1 = page * per_page))
+    |> update_in([:size], &(&1 = per_page))
   end
 
   defp build_user_query(query, terms) do

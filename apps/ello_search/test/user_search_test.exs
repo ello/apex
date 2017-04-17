@@ -159,8 +159,22 @@ defmodule Ello.Search.UserSearchTest do
   test "user_search - following users should be given a higher score", context do
     Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.nsfw_user.id])
 
-    results = UserSearch.username_search("username", %{allow_nsfw: true, allow_nudity: false, current_user: context.current_user})
+    results = UserSearch.user_search("username", %{allow_nsfw: true, allow_nudity: false, current_user: context.current_user})
     assert context.nsfw_user.id == hd(Enum.map(results, &(&1.id)))
     assert context.user.id in Enum.map(results, &(&1.id))
+  end
+
+  test "user_search - pagination", context do
+    results = UserSearch.user_search("username", %{allow_nsfw: true, allow_nudity: true, current_user: context.current_user})
+    assert length(Enum.map(results, &(&1.id))) == 3
+
+    results = UserSearch.user_search("username", %{allow_nsfw: true, allow_nudity: true, current_user: context.current_user, page: 0, per_page: 2})
+    assert length(Enum.map(results, &(&1.id))) == 2
+
+    results = UserSearch.user_search("username", %{allow_nsfw: true, allow_nudity: true, current_user: context.current_user, page: 1, per_page: 2})
+    assert length(Enum.map(results, &(&1.id))) == 1
+
+    results = UserSearch.user_search("username", %{allow_nsfw: true, allow_nudity: true, current_user: context.current_user, page: 2, per_page: 2})
+    assert length(Enum.map(results, &(&1.id))) == 0
   end
 end
