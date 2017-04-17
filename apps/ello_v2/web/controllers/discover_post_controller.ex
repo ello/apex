@@ -11,7 +11,7 @@ defmodule Ello.V2.DiscoverPostController do
     conn
     |> track_post_view(stream.posts, stream_kind: "recent")
     |> add_pagination_headers("/discover/posts/recent", stream)
-    |> api_render_if_stale(PostView, :index, data: stream.posts)
+    |> api_render(PostView, :index, data: stream.posts)
   end
 
   defp fetch_stream(conn, stream, params) do

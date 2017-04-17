@@ -13,7 +13,7 @@ defmodule Ello.V2.CategoryPostController do
         conn
         |> track_post_view(stream.posts, stream_kind: "category", stream_id: category.id)
         |> add_pagination_headers("/categories/#{category.slug}/posts/recent", stream)
-        |> api_render_if_stale(PostView, :index, data: stream.posts)
+        |> api_render(PostView, :index, data: stream.posts)
     end
   end
 
@@ -24,7 +24,7 @@ defmodule Ello.V2.CategoryPostController do
     conn
     |> track_post_view(stream.posts, stream_kind: "featured")
     |> add_pagination_headers("/categories/posts/recent", stream)
-    |> api_render_if_stale(PostView, :index, data: stream.posts)
+    |> api_render(PostView, :index, data: stream.posts)
   end
 
   defp fetch_stream(conn, categories, params) do
