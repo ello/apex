@@ -21,7 +21,7 @@ defmodule Ello.Core.Redis do
 
   @doc "Execute any redis command and get response back."
   def command([operation | _] = command, opts \\ []) do
-    timeout = Application.get_env(:ello_core, :redis_timeout, 5_000)
+    timeout = Application.get_env(:ello_core, :redis_timeout)
     measure_segment {:db, "Redis.#{operation}-#{opts[:name] || "unnamed"}"} do
       Redix.command(random_worker(), command, timeout: timeout)
     end
