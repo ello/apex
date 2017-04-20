@@ -11,6 +11,8 @@ defmodule Ello.Core.Factory do
       email:      sequence(:user_email, &"user-#{&1}@example.com"),
       email_hash: sequence(:user_email_hash, &"emailhash#{&1}"),
       settings:   %User.Settings{},
+      locked_at:  nil,
+      is_public:  true,
 
       created_at: DateTime.utc_now,
       updated_at: DateTime.utc_now,
@@ -45,6 +47,8 @@ defmodule Ello.Core.Factory do
                            "data" => "<p>Phrasing!</p>",
                            "link_url" => nil
                          }],
+      reposted_source: nil,
+      parent_post:     nil,
       created_at: DateTime.utc_now,
       updated_at: DateTime.utc_now,
     }

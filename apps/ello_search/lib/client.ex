@@ -6,8 +6,9 @@ defmodule Ello.Search.Client do
     Document,
   }
 
-  def search(index_name, doc_types, query), do:
-    Search.search(es_url(), add_prefix(index_name), doc_types, query)
+  def search(index_name, doc_types, query) do
+    Search.search(es_url(), add_prefix(index_name), doc_types, query) |> IO.inspect
+  end
 
   def create_index(index_name, settings), do:
     Index.create(es_url(), add_prefix(index_name), settings)
@@ -18,8 +19,8 @@ defmodule Ello.Search.Client do
   def put_mapping(index_name, doc_type, mapping), do:
     Mapping.put(es_url(), add_prefix(index_name), doc_type, mapping)
 
-  def index_document(index_name, doc_type, id, index_data), do:
-    Document.index(es_url(), add_prefix(index_name), doc_type, id, index_data)
+  def index_document(index_name, doc_type, id, index_data, query_params \\ %{}), do:
+    Document.index(es_url(), add_prefix(index_name), doc_type, id, index_data, query_params)
 
   def refresh_index(index_name), do:
     Index.refresh(es_url(), add_prefix(index_name))

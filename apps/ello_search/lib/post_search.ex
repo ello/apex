@@ -7,20 +7,19 @@ defmodule Ello.Search.PostSearch do
   def post_search(terms, %{current_user: nil} = opts) do
     terms
     |> build_default_queries(opts)
-    |> filter_private_authors
-    |> search_post_index
+    |> search_post_index(opts)
   end
   def post_search(terms, %{current_user: current_user} = opts) do
     terms
     |> build_default_queries(opts)
     |> filter_blocked(current_user)
-    |> search_post_index
+    |> search_post_index(opts)
   end
 
   defp build_default_queries(terms, opts) do
     base_query()
-    |> build_author_query
-    |> build_pagination_query
+    |> build_author_query(opts[:current_user])
+    |> build_pagination_query(opts[:page], opts[:per_page])
     |> build_text_content_query(terms)
     |> build_mention_query(terms)
     |> build_hashtag_query(terms)
@@ -34,6 +33,7 @@ defmodule Ello.Search.PostSearch do
     %{
       from: 0,
       size: 10,
+      stored_fields: [],
       query: %{
         bool: %{
           must:     [],
@@ -41,8 +41,8 @@ defmodule Ello.Search.PostSearch do
           filter:   [],
           must_not: [
             %{term: %{is_comment: true}},
-            %{term: %{is_hidden: true}},
-            %{term: %{is_repost: true}},
+            %{term: %{is_hidden:  true}},
+            %{term: %{is_repost:  true}},
           ]
         }
       }
@@ -94,7 +94,11 @@ defmodule Ello.Search.PostSearch do
     }
   end
 
-  defp build_author_query(query) do
+  defp build_author_query(query, nil) do
+    author_query = filter_private_authors(author_query())
+    update_in(query[:query][:bool][:filter], &([author_query | &1]))
+  end
+  defp build_author_query(query, current_user) do
     update_in(query[:query][:bool][:filter], &([author_query() | &1]))
   end
 
@@ -106,8 +110,7 @@ defmodule Ello.Search.PostSearch do
   end
 
   defp filter_private_authors(query) do
-    update_in(query[:query][:bool][:filter][:has_parent][:query][:bool][:filter],
-              &([%{term: %{is_public: true}} | &1]))
+    update_in(query[:has_parent][:query][:bool][:filter], &([%{term: %{is_public: true}} | &1]))
   end
 
   defp build_language_query(query, nil), do: query
@@ -124,21 +127,10 @@ defmodule Ello.Search.PostSearch do
     update_in(query[:query][:bool][:filter], &([%{range: %{created_at: %{gte: date}}} | &1]))
   end
 
-  defp search_post_index(query) do
-    ids = Client.search(PostIndex.index_name(), PostIndex.doc_types(), query).body["hits"]["hits"]
-          |> Enum.map(&(String.to_integer(&1["_id"])))
-
+  defp search_post_index(query, opts) do
+    ids = Client.search(PostIndex.index_name(), [PostIndex.post_doc_type], query).body["hits"]["hits"]
     ids
-    |> Content.posts_by_ids
-    |> post_sorting(ids)
-  end
-
-  defp post_sorting(posts, ids) do
-    measure_segment {__MODULE__, "post_sorting"} do
-      mapped = Enum.group_by(posts, &(&1.id))
-      ids
-      |> Enum.uniq
-      |> Enum.flat_map(&(mapped[&1] || []))
-    end
+    |> Enum.map(&(String.to_integer(&1["_id"])))
+    |> Content.posts_by_ids(opts)
   end
 end

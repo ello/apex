@@ -1,10 +1,11 @@
 defmodule Ello.Search.PostIndex do
   alias Ello.Search.Client
+  alias Ello.Core.Discovery
 
   def create do
     Client.create_index(index_name(), settings())
-    Client.put_mapping(index_name(), author_doc_type(), author_mapping())
     Client.put_mapping(index_name(), post_doc_type(), post_mapping())
+    Client.put_mapping(index_name(), author_doc_type(), author_mapping())
   end
 
   def add(post, overrides \\ %{}) do
@@ -14,10 +15,10 @@ defmodule Ello.Search.PostIndex do
       updated_at:        post.updated_at,
       token:             post.token,
       author_id:         post.author_id,
-      text_content:      "",
+      text_content:      text_content(post),
       hashtags:          "",
       mentions:          "",
-      detected_language: "",
+      detected_language: "en",
       is_adult_content:  post.is_adult_content,
       has_nudity:        post.has_nudity,
       is_disabled:       post.is_disabled,
@@ -40,21 +41,21 @@ defmodule Ello.Search.PostIndex do
       username:         post.author.username,
       short_bio:        post.author.short_bio,
       links:            post.author.links,
-      locked_out:       post.author.locked_at,
+      locked_out:       !!post.author.locked_at,
       post_count:       0,
       comment_count:    0,
       follower_count:   0,
       is_spammer:       false,
       is_system_user:   post.author.is_system_user,
-      is_featured_user: Enum.any(post.author.category_ids),
+      is_featured_user: Enum.any?(post.author.category_ids),
       has_avatar:       !!post.author.avatar,
       is_public:        post.author.is_public,
       category_ids:     post.author.category_ids,
-      category_names:   post.author.category_names
+      category_names:   category_names(post.author.category_ids)
     }
 
     Client.index_document(index_name(), author_doc_type(), post.author.id, author_data)
-    Client.index_document(index_name(), post_doc_type(), post.id, post_data)
+    Client.index_document(index_name(), post_doc_type(), post.id, post_data, %{parent: post.author.id})
     Client.refresh_index(index_name())
   end
 
@@ -63,20 +64,20 @@ defmodule Ello.Search.PostIndex do
   def index_name,      do: "posts"
   def author_doc_type, do: "author"
   def post_doc_type,   do: "post"
-  def doc_types,       do: [post_doc_type()]
+  def doc_types,       do: [post_doc_type(), author_doc_type()]
   def settings,        do: %{}
 
   def author_mapping do
     %{
       properties: %{
-        id:               %{type: "text"},
+        id:               %{type: "integer"},
         created_at:       %{type: "date"},
         updated_at:       %{type: "date"},
         name:             %{type: "text"},
         username:         %{type: "text"},
         short_bio:        %{type: "text"},
         links:            %{type: "text"},
-        locked_out:       %{type: "date"},
+        locked_out:       %{type: "boolean"},
         post_count:       %{type: "integer"},
         comment_count:    %{type: "integer"},
         follower_count:   %{type: "integer"},
@@ -93,7 +94,7 @@ defmodule Ello.Search.PostIndex do
 
   def post_mapping do
     %{
-      "_parent" => %{type: author_doc_type},
+      "_parent" => %{type: author_doc_type()},
       properties: %{
         id:                %{type: "integer"},
         created_at:        %{type: "date"},
@@ -119,4 +120,23 @@ defmodule Ello.Search.PostIndex do
       }
     }
   end
+
+  defp category_names(category_ids) when length(category_ids) == 0, do: []
+  defp category_names(category_ids) do
+    category_ids
+    |> Discovery.categories_without_includes
+    |> Enum.map(&(&1.name))
+  end
+
+  defp text_content(%{reposted_source: reposted_source} = post) when reposted_source != nil do
+    text_content(post, text_data(post.reposted_source.body))
+  end
+  defp text_content(post, repost_text_data \\ []) do
+    repost_text_data ++ text_data(post.body)
+    |> Enum.map_join(" ", &(String.trim(&1["data"])))
+    |> HtmlSanitizeEx.strip_tags
+    |> String.trim
+  end
+
+  defp text_data(body) when is_list(body), do: Enum.filter(body, &(&1["kind"] == "text"))
 end
