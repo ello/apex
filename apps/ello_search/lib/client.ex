@@ -6,9 +6,8 @@ defmodule Ello.Search.Client do
     Document,
   }
 
-  def search(index_name, doc_types, query) do
-    Search.search(es_url(), add_prefix(index_name), doc_types, query) |> IO.inspect
-  end
+  def search(index_name, doc_types, query), do:
+    Search.search(es_url(), add_prefix(index_name), doc_types, query)
 
   def create_index(index_name, settings), do:
     Index.create(es_url(), add_prefix(index_name), settings)

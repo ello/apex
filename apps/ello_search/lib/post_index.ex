@@ -16,9 +16,9 @@ defmodule Ello.Search.PostIndex do
       token:             post.token,
       author_id:         post.author_id,
       text_content:      text_content(post),
-      hashtags:          "",
-      mentions:          "",
-      detected_language: "en",
+      hashtags:          hashtags(post),
+      mentions:          post.mentioned_usernames,
+      detected_language: detected_language(post),
       is_adult_content:  post.is_adult_content,
       has_nudity:        post.has_nudity,
       is_disabled:       post.is_disabled,
@@ -31,28 +31,32 @@ defmodule Ello.Search.PostIndex do
       view_count:        0,
       alt_text:          "",
       is_saleable:       post.is_saleable
-    } |> Map.merge(overrides)
+    } |> Map.merge(overrides[:post] || %{})
 
     author_data = %{
-      id:               post.author.id,
-      created_at:       post.author.created_at,
-      updated_at:       post.author.updated_at,
-      name:             post.author.name,
-      username:         post.author.username,
-      short_bio:        post.author.short_bio,
-      links:            post.author.links,
-      locked_out:       !!post.author.locked_at,
-      post_count:       0,
-      comment_count:    0,
-      follower_count:   0,
-      is_spammer:       false,
-      is_system_user:   post.author.is_system_user,
-      is_featured_user: Enum.any?(post.author.category_ids),
-      has_avatar:       !!post.author.avatar,
-      is_public:        post.author.is_public,
-      category_ids:     post.author.category_ids,
-      category_names:   category_names(post.author.category_ids)
-    }
+      id:                 post.author.id,
+      created_at:         post.author.created_at,
+      updated_at:         post.author.updated_at,
+      name:               post.author.name,
+      username:           post.author.username,
+      short_bio:          post.author.short_bio,
+      links:              post.author.links,
+      locked_out:         !!post.author.locked_at,
+      post_count:         0,
+      comment_count:      0,
+      follower_count:     0,
+      is_spammer:         false,
+      is_system_user:     post.author.is_system_user,
+      is_featured_user:   Enum.any?(post.author.category_ids),
+      has_avatar:         !!post.author.avatar,
+      is_public:          post.author.is_public,
+      category_ids:       post.author.category_ids,
+      category_names:     category_names(post.author.category_ids),
+      is_hireable:        post.author.settings.is_hireable,
+      is_collaborateable: post.author.settings.is_collaborateable,
+      location:           post.author.location,
+      coordinates:        coordinates(post.author)
+    } |> Map.merge(overrides[:author] || %{})
 
     Client.index_document(index_name(), author_doc_type(), post.author.id, author_data)
     Client.index_document(index_name(), post_doc_type(), post.id, post_data, %{parent: post.author.id})
@@ -70,24 +74,28 @@ defmodule Ello.Search.PostIndex do
   def author_mapping do
     %{
       properties: %{
-        id:               %{type: "integer"},
-        created_at:       %{type: "date"},
-        updated_at:       %{type: "date"},
-        name:             %{type: "text"},
-        username:         %{type: "text"},
-        short_bio:        %{type: "text"},
-        links:            %{type: "text"},
-        locked_out:       %{type: "boolean"},
-        post_count:       %{type: "integer"},
-        comment_count:    %{type: "integer"},
-        follower_count:   %{type: "integer"},
-        is_spammer:       %{type: "boolean"},
-        is_system_user:   %{type: "boolean"},
-        is_featured_user: %{type: "boolean"},
-        has_avatar:       %{type: "boolean"},
-        is_public:        %{type: "boolean"},
-        category_ids:     %{type: "text"},
-        category_names:   %{type: "text"}
+        id:                 %{type: "integer"},
+        created_at:         %{type: "date"},
+        updated_at:         %{type: "date"},
+        name:               %{type: "text"},
+        username:           %{type: "text"},
+        short_bio:          %{type: "text"},
+        links:              %{type: "text"},
+        locked_out:         %{type: "boolean"},
+        post_count:         %{type: "integer"},
+        comment_count:      %{type: "integer"},
+        follower_count:     %{type: "integer"},
+        is_spammer:         %{type: "boolean"},
+        is_system_user:     %{type: "boolean"},
+        is_featured_user:   %{type: "boolean"},
+        has_avatar:         %{type: "boolean"},
+        is_public:          %{type: "boolean"},
+        category_ids:       %{type: "text"},
+        category_names:     %{type: "text"},
+        is_hireable:        %{type: "boolean"},
+        is_collaborateable: %{type: "boolean"},
+        location:           %{type: "text"},
+        coordinates:        %{type: "geo_point"}
       }
     }
   end
@@ -139,4 +147,18 @@ defmodule Ello.Search.PostIndex do
   end
 
   defp text_data(body) when is_list(body), do: Enum.filter(body, &(&1["kind"] == "text"))
+
+  defp hashtags(post) do
+    case Regex.run(~r/\B(#\w+)/, text_content(post, [])) do
+      nil     -> []
+      results -> results
+                 |> Enum.map(&(String.downcase(&1)))
+                 |> Enum.uniq
+    end
+  end
+
+  defp coordinates(%{location_lat: nil, location_long: nil}), do: nil
+  defp coordinates(%{location_lat: lat, location_long: long}), do: %{lat: lat, lon: long}
+
+  defp detected_language(post), do: "en"
 end

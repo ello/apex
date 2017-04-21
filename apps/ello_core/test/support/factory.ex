@@ -11,8 +11,6 @@ defmodule Ello.Core.Factory do
       email:      sequence(:user_email, &"user-#{&1}@example.com"),
       email_hash: sequence(:user_email_hash, &"emailhash#{&1}"),
       settings:   %User.Settings{},
-      locked_at:  nil,
-      is_public:  true,
 
       created_at: DateTime.utc_now,
       updated_at: DateTime.utc_now,
