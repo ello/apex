@@ -24,11 +24,7 @@ defmodule Ello.Search.TrendingPost do
               must:     [],
               should:   [],
               filter:   [],
-              must_not: [
-                %{term: %{is_comment: true}},
-                %{term: %{is_hidden:  true}},
-                %{term: %{is_repost:  true}},
-              ]
+              must_not: []
             }
           },
           functions: [],
