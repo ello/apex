@@ -1,31 +1,36 @@
 defmodule Ello.Search.PostSearch do
   import NewRelicPhoenix, only: [measure_segment: 2]
   alias Ello.Core.Content
-  alias Ello.Search.{Client, PostIndex}
+  alias Ello.Search.{Client, PostIndex, TrendingPost}
   use Timex
 
-  def post_search(terms, %{current_user: nil} = opts) do
-    terms
-    |> build_default_queries(opts)
-    |> search_post_index(opts)
-  end
-  def post_search(terms, %{current_user: current_user} = opts) do
-    terms
-    |> build_default_queries(opts)
-    |> filter_blocked(current_user)
-    |> search_post_index(opts)
-  end
-
-  defp build_default_queries(terms, opts) do
-    base_query()
-    |> build_author_query(opts[:current_user])
-    |> build_pagination_query(opts[:page], opts[:per_page])
+  def post_search(terms, opts) do
+    opts
+    |> build_client_filter_queries
     |> build_text_content_query(terms)
     |> build_mention_query(terms)
     |> build_hashtag_query(terms)
+    |> search_post_index(opts)
+  end
+
+  def trending(opts) do
+    client_filters = build_client_filter_queries(opts)[:query]
+
+    TrendingPost.base_query
+    |> TrendingPost.build_boosting_queries
+    |> Map.merge(%{query: %{function_score: %{query: client_filters}}})
+    |> TrendingPost.build_match_all_query
+    |> search_post_index(opts)
+  end
+
+  defp build_client_filter_queries(opts) do
+    base_query()
+    |> build_author_query(opts[:current_user])
+    |> build_pagination_query(opts[:page], opts[:per_page])
     |> build_language_query(opts[:language])
     |> filter_nsfw(opts[:allow_nsfw])
     |> filter_nudity(opts[:allow_nudity])
+    |> filter_blocked(opts[:current_user])
     |> filter_days(opts[:within_days])
   end
 
@@ -74,6 +79,7 @@ defmodule Ello.Search.PostSearch do
     update_in(query[:query][:bool][:must_not], &([%{term: %{has_nudity: true}} | &1]))
   end
 
+  defp filter_blocked(query, nil), do: query
   defp filter_blocked(query, user) do
     update_in(query[:query][:bool][:must_not], &([%{terms: %{author_id: user.all_blocked_ids}} | &1]))
   end
