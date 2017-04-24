@@ -15,9 +15,17 @@ defmodule Ello.V2.DiscoverPostController do
     |> api_render_if_stale(PostView, :index, data: stream.posts)
   end
 
-  def trending(conn, _) do
-    posts = PostSearch.post_search(%{trending: true, current_user: current_user(conn), allow_nsfw: conn.assigns[:allow_nsfw], allow_nudity: conn.assigns[:allow_nudity]})
-    api_render_if_stale(conn, PostView, "index.json", data: posts)
+  def trending(conn, params) do
+    posts = PostSearch.post_search(%{trending:     true,
+                                     current_user: current_user(conn),
+                                     allow_nsfw:   conn.assigns[:allow_nsfw],
+                                     allow_nudity: conn.assigns[:allow_nudity],
+                                     page:         params["page"],
+                                     per_page:     params["per_page"]})
+
+    conn
+    |> track_post_view(posts, stream_kind: "trending")
+    |> api_render_if_stale(PostView, "index.json", data: posts)
   end
 
   defp fetch_stream(conn, stream, params) do

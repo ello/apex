@@ -20,9 +20,16 @@ defmodule Ello.V2.PostController do
 
   Renders a list of relevant results from post search
   """
-  def index(conn, %{"terms" => terms}) do
-    posts = PostSearch.post_search(%{terms: terms, current_user: current_user(conn), allow_nsfw: conn.assigns[:allow_nsfw], allow_nudity: conn.assigns[:allow_nudity]})
-    api_render_if_stale(conn, PostView, "index.json", data: posts)
+  def index(conn, %{"terms" => terms} = params) do
+    posts = PostSearch.post_search(%{terms: terms,
+                                     current_user: current_user(conn),
+                                     allow_nsfw:   conn.assigns[:allow_nsfw],
+                                     allow_nudity: conn.assigns[:allow_nudity],
+                                     page:         params["page"],
+                                     per_page:     params["per_page"]})
+    conn
+    |> track_post_view(posts, stream_kind: "search")
+    |> api_render_if_stale(PostView, "index.json", data: posts)
   end
 
   defp load_post(conn, %{"id" => id_or_slug}) do
