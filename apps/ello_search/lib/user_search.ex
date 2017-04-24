@@ -102,8 +102,10 @@ defmodule Ello.Search.UserSearch do
   end
 
   defp search_user_index(query) do
-    ids = Client.search(UserIndex.index_name(), UserIndex.doc_types(), query).body["hits"]["hits"]
-          |> Enum.map(&(String.to_integer(&1["_id"])))
+    measure_segment {:ext, "search_user_index"} do
+      ids = Client.search(UserIndex.index_name(), UserIndex.doc_types(), query).body["hits"]["hits"]
+            |> Enum.map(&(String.to_integer(&1["_id"])))
+    end
 
     ids
     |> Network.users
