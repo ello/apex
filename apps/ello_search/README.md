@@ -17,3 +17,7 @@ Ello.Search expects the following environment variables:
 * `FOLLOWING_SEARCH_BOOST` - Boost factor for users that you also follow that get
   returned in searches.
 * `USERNAME_MATCH_BOOST` - Boost factor for exact username matches.
+* `TEXT_CONTENT_BOOST_FACTOR` - Boost factor for text relevance in post searches.
+* `MENTION_BOOST_FACTOR` - Boost factor for user mentions within post searches.
+* `HASHTAG_BOOST_FACTOR` - Boost factor for hastags within post searches.
+* `LANGUAGE_BOOST_FACTOR` - Boost factor for preferred client language within post searches.

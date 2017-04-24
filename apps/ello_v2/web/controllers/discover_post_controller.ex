@@ -2,6 +2,7 @@ defmodule Ello.V2.DiscoverPostController do
   use Ello.V2.Web, :controller
   alias Ello.Stream
   alias Ello.V2.PostView
+  alias Ello.Search.PostSearch
 
   @recent_stream "all_post_firehose"
 
@@ -12,6 +13,19 @@ defmodule Ello.V2.DiscoverPostController do
     |> track_post_view(stream.posts, stream_kind: "recent")
     |> add_pagination_headers("/discover/posts/recent", stream)
     |> api_render_if_stale(PostView, :index, data: stream.posts)
+  end
+
+  def trending(conn, params) do
+    posts = PostSearch.post_search(%{trending:     true,
+                                     current_user: current_user(conn),
+                                     allow_nsfw:   conn.assigns[:allow_nsfw],
+                                     allow_nudity: conn.assigns[:allow_nudity],
+                                     page:         params["page"],
+                                     per_page:     params["per_page"]})
+
+    conn
+    |> track_post_view(posts, stream_kind: "trending")
+    |> api_render_if_stale(PostView, "index.json", data: posts)
   end
 
   defp fetch_stream(conn, stream, params) do

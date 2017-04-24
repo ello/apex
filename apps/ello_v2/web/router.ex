@@ -19,13 +19,14 @@ defmodule Ello.V2.Router do
     get "/categories/:slug/posts/recent", CategoryPostController, :recent
     get "/categories/posts/recent", CategoryPostController, :featured
     get "/discover/posts/recent", DiscoverPostController, :recent
+    get "/discover/posts/trending", DiscoverPostController, :trending
 
     # Users And Posts
     get "/users/autocomplete", UserController, :autocomplete
     resources "/users", UserController, only: [:show, :index] do
       resources "/posts", UserPostController, only: [:index], name: :post
     end
-    resources "/posts", PostController, only: [:show] do
+    resources "/posts", PostController, only: [:show, :index] do
       resources "/related", RelatedPostController, only: [:index], name: :related
     end
 
