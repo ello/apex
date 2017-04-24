@@ -1,6 +1,8 @@
 defmodule Ello.V2.PostController do
   use Ello.V2.Web, :controller
   alias Ello.Core.{Content, Content.Post}
+  alias Ello.Search.PostSearch
+  alias Ello.V2.PostView
 
   def show(conn, params) do
     with %Post{} = post <- load_post(conn, params),
@@ -11,6 +13,16 @@ defmodule Ello.V2.PostController do
     else
       _ -> send_resp(conn, 404, "")
     end
+  end
+
+  @doc """
+  GET /v2/posts
+
+  Renders a list of relevant results from post search
+  """
+  def index(conn, %{"terms" => terms}) do
+    posts = PostSearch.post_search(%{terms: terms, current_user: current_user(conn), allow_nsfw: conn.assigns[:allow_nsfw], allow_nudity: conn.assigns[:allow_nudity]})
+    api_render_if_stale(conn, PostView, "index.json", data: posts)
   end
 
   defp load_post(conn, %{"id" => id_or_slug}) do
