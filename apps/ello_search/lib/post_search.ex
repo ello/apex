@@ -136,7 +136,10 @@ defmodule Ello.Search.PostSearch do
   end
 
   defp search_post_index(query, opts) do
-    ids = Client.search(PostIndex.index_name(), [PostIndex.post_doc_type], query).body["hits"]["hits"]
+    measure_segment {:ext, "search_post_index"} do
+      ids = Client.search(PostIndex.index_name(), [PostIndex.post_doc_type], query).body["hits"]["hits"]
+    end
+
     ids
     |> Enum.map(&(String.to_integer(&1["_id"])))
     |> Content.posts_by_ids(opts)
