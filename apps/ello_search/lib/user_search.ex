@@ -56,6 +56,9 @@ defmodule Ello.Search.UserSearch do
 
   defp build_pagination_query(query, nil, nil), do: query
   defp build_pagination_query(query, page, per_page) do
+    page     = String.to_integer(page)
+    per_page = String.to_integer(per_page)
+
     query
     |> update_in([:from], &(&1 = page * per_page))
     |> update_in([:size], &(&1 = per_page))
