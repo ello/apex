@@ -35,6 +35,8 @@ defmodule Ello.V2.UserView do
     :followers_count,
     :loves_count,
     :posts_count,
+    :is_community,
+    :badges,
   ]
 
   def computed_attributes, do: [

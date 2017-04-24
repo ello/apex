@@ -27,9 +27,11 @@ defmodule Ello.Core.Network.User do
 
     field :is_system_user, :boolean, default: false
     field :is_public, :boolean, default: true
+    field :is_community, :boolean, default: false
     field :bad_for_seo?, :boolean, default: true
     field :category_ids, {:array, :integer}, default: []
     field :categories, {:array, :map}, default: [], virtual: true
+    field :badges, {:array, :string}, default: []
 
     field :locked_at, :utc_datetime
     field :locked_reason, :string
