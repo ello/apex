@@ -119,13 +119,13 @@ defmodule Ello.Search.PostSearchTest do
     results = PostSearch.post_search(%{terms: "Phrasing", allow_nsfw: true, allow_nudity: true, current_user: nil})
     assert length(Enum.map(results, &(&1.id))) == 3
 
-    results = PostSearch.post_search(%{terms: "Phrasing", allow_nsfw: true, allow_nudity: true, current_user: nil, page: 0, per_page: 2})
+    results = PostSearch.post_search(%{terms: "Phrasing", allow_nsfw: true, allow_nudity: true, current_user: nil, per_page: "2"})
     assert length(Enum.map(results, &(&1.id))) == 2
 
-    results = PostSearch.post_search(%{terms: "Phrasing", allow_nsfw: true, allow_nudity: true, current_user: nil, page: 1, per_page: 2})
+    results = PostSearch.post_search(%{terms: "Phrasing", allow_nsfw: true, allow_nudity: true, current_user: nil, page: "2", per_page: "2"})
     assert length(Enum.map(results, &(&1.id))) == 1
 
-    results = PostSearch.post_search(%{terms: "Phrasing", allow_nsfw: true, allow_nudity: true, current_user: nil, page: 2, per_page: 2})
+    results = PostSearch.post_search(%{terms: "Phrasing", allow_nsfw: true, allow_nudity: true, current_user: nil, page: "3", per_page: "2"})
     assert length(Enum.map(results, &(&1.id))) == 0
   end
 

@@ -10,7 +10,7 @@ defmodule Ello.Search.PostSearch do
     |> build_text_content_query(terms)
     |> build_mention_query(terms)
     |> build_hashtag_query(terms)
-    |> build_pagination_query(opts)
+    |> build_pagination_query(opts[:page], opts[:per_page])
     |> search_post_index(opts)
   end
 
@@ -21,7 +21,7 @@ defmodule Ello.Search.PostSearch do
     |> TrendingPost.build_boosting_queries
     |> Map.merge(%{query: %{function_score: %{query: client_filters}}})
     |> TrendingPost.build_match_all_query
-    |> build_pagination_query(opts)
+    |> build_pagination_query(opts[:page], opts[:per_page])
     |> search_post_index(opts)
   end
 
@@ -109,8 +109,13 @@ defmodule Ello.Search.PostSearch do
     update_in(query[:query][:bool][:filter], &([author_query() | &1]))
   end
 
-  defp build_pagination_query(query, %{page: nil, per_page: nil}), do: query
-  defp build_pagination_query(query, %{page: page, per_page: per_page}) do
+  defp build_pagination_query(query, nil, nil), do: query
+  defp build_pagination_query(query, nil, per_page), do:
+    build_pagination_query(query, "1", per_page)
+  defp build_pagination_query(query, page, per_page) do
+    page     = String.to_integer(page) - 1
+    per_page = String.to_integer(per_page)
+
     query
     |> update_in([:from], &(&1 = page * per_page))
     |> update_in([:size], &(&1 = per_page))
