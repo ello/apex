@@ -4,7 +4,7 @@ defmodule Ello.Search.PostSearch do
   alias Ello.Search.{Client, PostIndex, TrendingPost}
   use Timex
 
-  def post_search(terms, opts) do
+  def post_search(%{terms: terms} = opts) do
     opts
     |> build_client_filter_queries
     |> build_text_content_query(terms)
@@ -14,7 +14,7 @@ defmodule Ello.Search.PostSearch do
     |> search_post_index(opts)
   end
 
-  def trending(opts) do
+  def post_search(%{trending: true} = opts) do
     client_filters = build_client_filter_queries(opts)[:query]
 
     TrendingPost.base_query

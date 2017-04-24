@@ -56,82 +56,82 @@ defmodule Ello.Search.PostSearchTest do
   end
 
   test "post_search - returns a relevant result", context do
-    results = PostSearch.post_search("Phrasing", %{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{terms: "Phrasing", current_user: nil, allow_nsfw: false, allow_nudity: false})
     assert hd(results).id == context.post.id
     refute context.irrel_post.id in Enum.map(results, &(&1.id))
   end
 
   test "post_search - does not return comments", context do
-    results = PostSearch.post_search("Phrasing", %{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{terms: "Phrasing", current_user: nil, allow_nsfw: false, allow_nudity: false})
     assert hd(results).id == context.post.id
     refute context.comment.id in Enum.map(results, &(&1.id))
   end
 
   test "post_search - does not return flagged (hidden) posts", context do
-    results = PostSearch.post_search("Phrasing", %{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{terms: "Phrasing", current_user: nil, allow_nsfw: false, allow_nudity: false})
     assert hd(results).id == context.post.id
     refute context.flagged_post.id in Enum.map(results, &(&1.id))
   end
 
   test "post_search - does not return nsfw posts if the client disallows", context do
-    results = PostSearch.post_search("Phrasing", %{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{terms: "Phrasing", current_user: nil, allow_nsfw: false, allow_nudity: false})
     assert hd(results).id == context.post.id
     refute context.nsfw_post.id in Enum.map(results, &(&1.id))
   end
 
   test "post_search - returns nsfw posts if the client allows", context do
-    results = PostSearch.post_search("Phrasing", %{current_user: nil, allow_nsfw: true, allow_nudity: false})
+    results = PostSearch.post_search(%{terms: "Phrasing", current_user: nil, allow_nsfw: true, allow_nudity: false})
     assert context.post.id in Enum.map(results, &(&1.id))
     assert context.nsfw_post.id in Enum.map(results, &(&1.id))
   end
 
   test "post_search - does not return nudity posts if the client disallows", context do
-    results = PostSearch.post_search("Phrasing", %{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{terms: "Phrasing", current_user: nil, allow_nsfw: false, allow_nudity: false})
     assert hd(results).id == context.post.id
     refute context.nudity_post.id in Enum.map(results, &(&1.id))
   end
 
   test "post_search - returns nudity posts if the client allows", context do
-    results = PostSearch.post_search("Phrasing", %{current_user: nil, allow_nsfw: false, allow_nudity: true})
+    results = PostSearch.post_search(%{terms: "Phrasing", current_user: nil, allow_nsfw: false, allow_nudity: true})
     assert context.post.id in Enum.map(results, &(&1.id))
     assert context.nudity_post.id in Enum.map(results, &(&1.id))
   end
 
   test "post_search - does not return posts with a private author if no current_user", context do
-    results = PostSearch.post_search("Phrasing", %{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{terms: "Phrasing", current_user: nil, allow_nsfw: false, allow_nudity: false})
     assert hd(results).id == context.post.id
     refute context.private_post.id in Enum.map(results, &(&1.id))
   end
 
   test "post_search - does not return posts with a locked author", context do
-    results = PostSearch.post_search("Phrasing", %{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{terms: "Phrasing", current_user: nil, allow_nsfw: false, allow_nudity: false})
     assert hd(results).id == context.post.id
     refute context.locked_post.id in Enum.map(results, &(&1.id))
   end
 
   test "post_search - does not return posts with a spam author", context do
-    results = PostSearch.post_search("Phrasing", %{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{terms: "Phrasing", current_user: nil, allow_nsfw: false, allow_nudity: false})
     assert hd(results).id == context.post.id
     refute context.spam_post.id in Enum.map(results, &(&1.id))
   end
 
   test "post_search - paginates successfully", context do
-    results = PostSearch.post_search("Phrasing", %{allow_nsfw: true, allow_nudity: true, current_user: nil})
+    results = PostSearch.post_search(%{terms: "Phrasing", allow_nsfw: true, allow_nudity: true, current_user: nil})
     assert length(Enum.map(results, &(&1.id))) == 3
 
-    results = PostSearch.post_search("Phrasing", %{allow_nsfw: true, allow_nudity: true, current_user: nil, page: 0, per_page: 2})
+    results = PostSearch.post_search(%{terms: "Phrasing", allow_nsfw: true, allow_nudity: true, current_user: nil, page: 0, per_page: 2})
     assert length(Enum.map(results, &(&1.id))) == 2
 
-    results = PostSearch.post_search("Phrasing", %{allow_nsfw: true, allow_nudity: true, current_user: nil, page: 1, per_page: 2})
+    results = PostSearch.post_search(%{terms: "Phrasing", allow_nsfw: true, allow_nudity: true, current_user: nil, page: 1, per_page: 2})
     assert length(Enum.map(results, &(&1.id))) == 1
 
-    results = PostSearch.post_search("Phrasing", %{allow_nsfw: true, allow_nudity: true, current_user: nil, page: 2, per_page: 2})
+    results = PostSearch.post_search(%{terms: "Phrasing", allow_nsfw: true, allow_nudity: true, current_user: nil, page: 2, per_page: 2})
     assert length(Enum.map(results, &(&1.id))) == 0
   end
 
   test "post_search - boosts hashtags", context do
     PostIndex.add(context.hashtag_post)
-    results = PostSearch.post_search("phrasing", %{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{terms: "phrasing", current_user: nil, allow_nsfw: false, allow_nudity: false})
     assert hd(results).id == context.hashtag_post.id
     assert context.post.id in Enum.map(results, &(&1.id))
     assert length(Enum.map(results, &(&1.id))) == 2
@@ -139,7 +139,7 @@ defmodule Ello.Search.PostSearchTest do
 
   test "post_search - also finds posts if hashtags are used in terms", context do
     PostIndex.add(context.hashtag_post)
-    results = PostSearch.post_search("#phrasing", %{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{terms: "#phrasing", current_user: nil, allow_nsfw: false, allow_nudity: false})
     assert hd(results).id == context.hashtag_post.id
     assert context.post.id in Enum.map(results, &(&1.id))
     assert length(Enum.map(results, &(&1.id))) == 2
@@ -147,21 +147,21 @@ defmodule Ello.Search.PostSearchTest do
 
   test "post_search - matches on mentions", context do
     PostIndex.add(context.mention_post)
-    results = PostSearch.post_search("@archer", %{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{terms: "@archer", current_user: nil, allow_nsfw: false, allow_nudity: false})
     assert hd(results).id == context.mention_post.id
     assert length(Enum.map(results, &(&1.id))) == 1
   end
 
   test "post_search - handles encoded terms correctly", context do
     PostIndex.add(context.badman_post)
-    results = PostSearch.post_search("bad%20AND%20man%20", %{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{terms: "bad%20AND%20man%20", current_user: nil, allow_nsfw: false, allow_nudity: false})
     assert hd(results).id == context.badman_post.id
     assert length(Enum.map(results, &(&1.id))) == 1
   end
 
   test "post_search - does not throw exceptions when logic operators end the terms", context do
     PostIndex.add(context.badman_post)
-    results = PostSearch.post_search("bad%20%20%20AND%20%20%20", %{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{terms: "bad%20%20%20AND%20%20%20", current_user: nil, allow_nsfw: false, allow_nudity: false})
     assert hd(results).id == context.badman_post.id
     assert length(Enum.map(results, &(&1.id))) == 1
   end
@@ -170,7 +170,7 @@ defmodule Ello.Search.PostSearchTest do
     Redis.command(["SADD", "user:#{context.current_user.id}:block_id_cache", context.private_user.id])
     current_user = Network.User.preload_blocked_ids(context.current_user)
 
-    results = PostSearch.post_search("phrasing", %{allow_nsfw: false, allow_nudity: false, current_user: current_user})
+    results = PostSearch.post_search(%{terms: "phrasing", allow_nsfw: false, allow_nudity: false, current_user: current_user})
     refute context.private_post.id in Enum.map(results, &(&1.id))
     assert context.post.id in Enum.map(results, &(&1.id))
   end
@@ -179,64 +179,64 @@ defmodule Ello.Search.PostSearchTest do
     Redis.command(["SADD", "user:#{context.current_user.id}:inverse_block_id_cache", context.private_user.id])
     current_user = Network.User.preload_blocked_ids(context.current_user)
 
-    results = PostSearch.post_search("phrasing", %{allow_nsfw: false, allow_nudity: false, current_user: current_user})
+    results = PostSearch.post_search(%{terms: "phrasing", allow_nsfw: false, allow_nudity: false, current_user: current_user})
     refute context.private_post.id in Enum.map(results, &(&1.id))
     assert context.post.id in Enum.map(results, &(&1.id))
   end
 
   test "trending - returns a relevant result", context do
-    results = PostSearch.trending(%{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{trending: true, current_user: nil, allow_nsfw: false, allow_nudity: false})
     assert context.irrel_post.id in Enum.map(results, &(&1.id))
     assert context.post.id in Enum.map(results, &(&1.id))
   end
 
   test "trending - does not return comments", context do
-    results = PostSearch.trending(%{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{trending: true, current_user: nil, allow_nsfw: false, allow_nudity: false})
     refute context.comment.id in Enum.map(results, &(&1.id))
   end
 
   test "trending - does not return flagged (hidden) posts", context do
-    results = PostSearch.trending(%{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{trending: true, current_user: nil, allow_nsfw: false, allow_nudity: false})
     refute context.flagged_post.id in Enum.map(results, &(&1.id))
   end
 
   test "trending - does not return nsfw posts if the client disallows", context do
-    results = PostSearch.trending(%{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{trending: true, current_user: nil, allow_nsfw: false, allow_nudity: false})
     refute context.nsfw_post.id in Enum.map(results, &(&1.id))
   end
 
   test "trending - returns nsfw posts if the client allows", context do
-    results = PostSearch.trending(%{current_user: nil, allow_nsfw: true, allow_nudity: false})
+    results = PostSearch.post_search(%{trending: true, current_user: nil, allow_nsfw: true, allow_nudity: false})
     assert context.nsfw_post.id in Enum.map(results, &(&1.id))
   end
 
   test "trending - does not return nudity posts if the client disallows", context do
-    results = PostSearch.trending(%{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{trending: true, current_user: nil, allow_nsfw: false, allow_nudity: false})
     refute context.nudity_post.id in Enum.map(results, &(&1.id))
   end
 
   test "trending - returns nudity posts if the client allows", context do
-    results = PostSearch.trending(%{current_user: nil, allow_nsfw: false, allow_nudity: true})
+    results = PostSearch.post_search(%{trending: true, current_user: nil, allow_nsfw: false, allow_nudity: true})
     assert context.nudity_post.id in Enum.map(results, &(&1.id))
   end
 
   test "trending - does not return posts with a private author if no current_user", context do
-    results = PostSearch.trending(%{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{trending: true, current_user: nil, allow_nsfw: false, allow_nudity: false})
     refute context.private_post.id in Enum.map(results, &(&1.id))
   end
 
   test "trending - returns private posts if there is a current_user", context do
-    results = PostSearch.trending(%{current_user: context.current_user, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{trending: true, current_user: context.current_user, allow_nsfw: false, allow_nudity: false})
     assert context.private_post.id in Enum.map(results, &(&1.id))
   end
 
   test "trending - does not return posts with a locked author", context do
-    results = PostSearch.trending(%{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{trending: true, current_user: nil, allow_nsfw: false, allow_nudity: false})
     refute context.locked_post.id in Enum.map(results, &(&1.id))
   end
 
   test "trending - does not return posts with a spam author", context do
-    results = PostSearch.trending(%{current_user: nil, allow_nsfw: false, allow_nudity: false})
+    results = PostSearch.post_search(%{trending: true, current_user: nil, allow_nsfw: false, allow_nudity: false})
     refute context.spam_post.id in Enum.map(results, &(&1.id))
   end
 
@@ -244,7 +244,7 @@ defmodule Ello.Search.PostSearchTest do
     Redis.command(["SADD", "user:#{context.current_user.id}:block_id_cache", context.private_user.id])
     current_user = Network.User.preload_blocked_ids(context.current_user)
 
-    results = PostSearch.trending(%{allow_nsfw: false, allow_nudity: false, current_user: current_user})
+    results = PostSearch.post_search(%{trending: true, allow_nsfw: false, allow_nudity: false, current_user: current_user})
     refute context.private_post.id in Enum.map(results, &(&1.id))
   end
 
@@ -252,7 +252,7 @@ defmodule Ello.Search.PostSearchTest do
     Redis.command(["SADD", "user:#{context.current_user.id}:inverse_block_id_cache", context.private_user.id])
     current_user = Network.User.preload_blocked_ids(context.current_user)
 
-    results = PostSearch.trending(%{allow_nsfw: false, allow_nudity: false, current_user: current_user})
+    results = PostSearch.post_search(%{trending: true, allow_nsfw: false, allow_nudity: false, current_user: current_user})
     refute context.private_post.id in Enum.map(results, &(&1.id))
   end
 end
