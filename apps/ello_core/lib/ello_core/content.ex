@@ -65,9 +65,9 @@ defmodule Ello.Core.Content do
   defp post_sorting(posts, ids) do
     measure_segment {__MODULE__, "post_sorting"} do
       mapped = Enum.group_by(posts, &(&1.id))
-      Enum.flat_map(ids, fn(id) ->
-        mapped[id] || []
-      end)
+      ids
+      |> Enum.uniq
+      |> Enum.flat_map(&(mapped[&1] || []))
     end
   end
 

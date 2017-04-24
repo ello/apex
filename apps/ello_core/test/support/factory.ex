@@ -90,7 +90,24 @@ defmodule Ello.Core.Factory do
       },
       created_at: DateTime.utc_now,
       updated_at: DateTime.utc_now,
-    }
+    } |> Asset.build_attachment
+  end
+
+  def gif_asset_factory do
+    %Asset{
+      user: build(:user),
+      post: build(:post),
+      attachment: "ello-a9c0ede1-aeca-45af-9723-5750babf541e.gif",
+      attachment_metadata: %{
+        "optimized" => %{"size"=>433_286, "type"=>"image/gif", "width"=>1_280, "height"=>1_024},
+        "xhdpi" => %{"size"=>434_916, "type"=>"image/jpeg", "width"=>1_280, "height"=>1_024},
+        "hdpi" => %{"size"=>287_932, "type"=>"image/jpeg", "width"=>750, "height"=>600},
+        "mdpi" => %{"size"=>77_422, "type"=>"image/jpeg", "width"=>375, "height"=>300},
+        "ldpi" => %{"size"=>19_718, "type"=>"image/jpeg", "width"=>180, "height"=>144}
+      },
+      created_at: DateTime.utc_now,
+      updated_at: DateTime.utc_now,
+    } |> Asset.build_attachment
   end
 
   def love_factory do

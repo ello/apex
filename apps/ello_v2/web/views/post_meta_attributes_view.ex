@@ -29,11 +29,17 @@ defmodule Ello.V2.PostMetaAttributesView do
 
   defp images(nil), do: []
   defp images(post) do
-    images = Enum.map post.assets, fn(asset) ->
-      version = Enum.find(asset.attachment_struct.versions, &(&1.name == "hdpi"))
-      image_url(asset.attachment_struct.path, version.filename)
-    end
+    images = Enum.map(post.assets, &image_for_asset/1)
     images ++ images(post.reposted_source)
+  end
+
+  defp image_for_asset(%{attachment_struct: %{filename: orig, path: path, versions: versions}}) do
+    version = if Regex.match?(~r(\.gif$), orig) do
+      Enum.find(versions, &(&1.name == "optimized"))
+    else
+      Enum.find(versions, &(&1.name == "hdpi"))
+    end
+    image_url(path, version.filename)
   end
 
   defp embeds(post) do
