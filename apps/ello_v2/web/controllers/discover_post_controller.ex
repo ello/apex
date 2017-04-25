@@ -16,16 +16,11 @@ defmodule Ello.V2.DiscoverPostController do
   end
 
   def trending(conn, params) do
-    posts = PostSearch.post_search(%{trending:     true,
-                                     current_user: current_user(conn),
-                                     allow_nsfw:   conn.assigns[:allow_nsfw],
-                                     allow_nudity: conn.assigns[:allow_nudity],
-                                     page:         params["page"],
-                                     per_page:     params["per_page"]})
-
+    page = post_search(conn, params)
     conn
-    |> track_post_view(posts, stream_kind: "trending")
-    |> api_render_if_stale(PostView, "index.json", data: posts)
+    |> track_post_view(page.results, stream_kind: "trending")
+    |> add_pagination_headers("/discover/posts/trending", page)
+    |> api_render_if_stale(PostView, "index.json", data: page.results)
   end
 
   defp fetch_stream(conn, stream, params) do
@@ -38,5 +33,16 @@ defmodule Ello.V2.DiscoverPostController do
       allow_nsfw:   true, # No NSFW in categories, reduces slop.
       allow_nudity: conn.assigns[:allow_nudity],
     )
+  end
+
+  defp post_search(conn, params) do
+    PostSearch.post_search(%{
+      trending:     true,
+      current_user: current_user(conn),
+      allow_nsfw:   conn.assigns[:allow_nsfw],
+      allow_nudity: conn.assigns[:allow_nudity],
+      page:         params["page"],
+      per_page:     params["per_page"]
+    })
   end
 end

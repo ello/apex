@@ -25,9 +25,11 @@ defmodule Ello.V2.UserController do
 
   Renders a list of relevant results from user search
   """
-  def index(conn, %{"terms" => terms}) do
-    users = UserSearch.user_search(terms, %{current_user: current_user(conn), allow_nsfw: conn.assigns[:allow_nsfw], allow_nudity: conn.assigns[:allow_nudity]})
-    api_render_if_stale(conn, UserView, "index.json", data: users)
+  def index(conn, params) do
+    page = user_search(conn, params)
+    conn
+    |> add_pagination_headers("/users", page)
+    |> api_render_if_stale(UserView, "index.json", data: page.results)
   end
 
   @doc """
@@ -36,7 +38,17 @@ defmodule Ello.V2.UserController do
   Renders a list of relevant results from username search
   """
   def autocomplete(conn, %{"terms" => username}) do
-    users = UserSearch.username_search(username, %{current_user: current_user(conn)})
+    users = UserSearch.username_search(username, %{current_user: current_user(conn)}).results
     api_render(conn, UserView, "autocomplete.json", data: users)
+  end
+
+  defp user_search(conn, params) do
+    UserSearch.user_search(params["terms"], %{
+      current_user: current_user(conn),
+      allow_nsfw:   conn.assigns[:allow_nsfw],
+      allow_nudity: conn.assigns[:allow_nudity],
+      page:         params["page"],
+      per_page:     params["per_page"]
+    })
   end
 end

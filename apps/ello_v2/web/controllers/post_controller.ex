@@ -20,16 +20,12 @@ defmodule Ello.V2.PostController do
 
   Renders a list of relevant results from post search
   """
-  def index(conn, %{"terms" => terms} = params) do
-    posts = PostSearch.post_search(%{terms: terms,
-                                     current_user: current_user(conn),
-                                     allow_nsfw:   conn.assigns[:allow_nsfw],
-                                     allow_nudity: conn.assigns[:allow_nudity],
-                                     page:         params["page"],
-                                     per_page:     params["per_page"]})
+  def index(conn, params) do
+    page = post_search(conn, params)
     conn
-    |> track_post_view(posts, stream_kind: "search")
-    |> api_render_if_stale(PostView, "index.json", data: posts)
+    |> track_post_view(page.results, stream_kind: "search")
+    |> add_pagination_headers("/posts", page)
+    |> api_render_if_stale(PostView, "index.json", data: page.results)
   end
 
   defp load_post(conn, %{"id" => id_or_slug}) do
@@ -38,6 +34,17 @@ defmodule Ello.V2.PostController do
       allow_nsfw: conn.assigns[:allow_nsfw],
       allow_nudity: conn.assigns[:allow_nudity]
     )
+  end
+
+  defp post_search(conn, params) do
+    PostSearch.post_search(%{
+      terms:        params["terms"],
+      current_user: current_user(conn),
+      allow_nsfw:   conn.assigns[:allow_nsfw],
+      allow_nudity: conn.assigns[:allow_nudity],
+      page:         params["page"],
+      per_page:     params["per_page"]
+    })
   end
 
   defp owned_by_user(post, %{"user_id" => "~" <> username}),

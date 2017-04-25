@@ -1,7 +1,7 @@
 defmodule Ello.Search.PostSearch do
   import NewRelicPhoenix, only: [measure_segment: 2]
   alias Ello.Core.Content
-  alias Ello.Search.{Client, PostIndex, TrendingPost}
+  alias Ello.Search.{Client, PostIndex, TrendingPost, Page}
   use Timex
 
   def post_search(%{terms: terms} = opts) do
@@ -142,11 +142,13 @@ defmodule Ello.Search.PostSearch do
 
   defp search_post_index(query, opts) do
     measure_segment {:ext, "search_post_index"} do
-      ids = Client.search(PostIndex.index_name(), [PostIndex.post_doc_type], query).body["hits"]["hits"]
+      results = Client.search(PostIndex.index_name(), [PostIndex.post_doc_type], query).body
     end
 
-    ids
-    |> Enum.map(&(String.to_integer(&1["_id"])))
-    |> Content.posts_by_ids(opts)
+    posts = results["hits"]["hits"]
+            |> Enum.map(&(String.to_integer(&1["_id"])))
+            |> Content.posts_by_ids(opts)
+
+    Page.from_results(results, posts, opts)
   end
 end
