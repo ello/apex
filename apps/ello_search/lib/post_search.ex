@@ -34,7 +34,7 @@ defmodule Ello.Search.PostSearch do
         function_score: %{
           query: %{
             bool: %{
-              must:     [%{match_all: %{}}], # Remove once ES version is > 5.1
+              must:     [],
               should:   [],
               filter:   [],
               must_not: [
