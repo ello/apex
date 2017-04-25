@@ -12,18 +12,7 @@ defmodule Ello.Search.PostSearch do
     |> build_hashtag_query(opts[:terms])
     |> build_pagination_query(opts[:page], opts[:per_page])
     |> filter_days(opts[:within_days])
-    |> boost_recent(opts[:trending])
-    |> search_post_index(opts)
-  end
-
-  def post_search(%{trending: true} = opts) do
-    client_filters = build_client_filter_queries(opts)[:query]
-
-    TrendingPost.base_query
-    |> TrendingPost.build_boosting_queries
-    |> Map.merge(%{query: %{function_score: %{query: client_filters}}})
-    |> TrendingPost.build_match_all_query
-    |> build_pagination_query(opts[:page], opts[:per_page])
+    |> TrendingPost.build_boosting_queries(opts[:trending])
     |> search_post_index(opts)
   end
 
@@ -45,7 +34,7 @@ defmodule Ello.Search.PostSearch do
         function_score: %{
           query: %{
             bool: %{
-              must:     [],
+              must:     [%{match_all: %{}}], # Remove once ES version is > 5.1
               should:   [],
               filter:   [],
               must_not: [
@@ -148,16 +137,6 @@ defmodule Ello.Search.PostSearch do
            |> Timex.shift(days: -within_days)
            |> Timex.format!("%Y-%m-%d", :strftime)
     update_bool(query, :filter, &([%{range: %{created_at: %{gte: date}}} | &1]))
-  end
-
-  defp boost_recent(query, true) do
-    recent_boost = %{gauss: %{created_at: %{scale: "3h", offset: "1d"}}, weight: 1}
-    update_in(query[:query][:function_score][:functions], &([recent_boost | &1]))
-  end
-
-  defp boost_recent(query, _) do
-    recent_boost = %{gauss: %{created_at: %{scale: "3d", offset: "1d"}}, weight: 1000}
-    update_in(query[:query][:function_score][:functions], &([recent_boost | &1]))
   end
 
   defp update_bool(query, type, fun) do
