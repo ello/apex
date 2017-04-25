@@ -11,7 +11,7 @@ defmodule Ello.Search.PostSearch do
     |> build_mention_query(opts[:terms])
     |> build_hashtag_query(opts[:terms])
     |> build_pagination_query(opts[:page], opts[:per_page])
-    |> filter_days(opts[:within_days])
+    |> filter_days(opts[:within_days], opts[:trending])
     |> TrendingPost.build_boosting_queries(opts[:trending])
     |> search_post_index(opts)
   end
@@ -131,13 +131,17 @@ defmodule Ello.Search.PostSearch do
     update_bool(query, :should, &([%{term: %{detected_language: %{value: language, boost: language_boost}}} | &1]))
   end
 
-  defp filter_days(query, nil), do: query
+  defp filter_days(query, nil, false), do: query
+  defp filter_days(query, nil, true), do: filter_days(query, 14)
+  defp filter_days(query, within_days, true), do: filter_days(query, within_days)
+  defp filter_days(query, _, _), do: query
   defp filter_days(query, within_days) do
     date = Timex.now
            |> Timex.shift(days: -within_days)
            |> Timex.format!("%Y-%m-%d", :strftime)
     update_bool(query, :filter, &([%{range: %{created_at: %{gte: date}}} | &1]))
   end
+  defp fil
 
   defp update_bool(query, type, fun) do
     update_in(query[:query][:function_score][:query][:bool][type], fun)
