@@ -128,7 +128,10 @@ defmodule Ello.V2.UserControllerTest do
     assert conn.status == 401
   end
 
-  test "GET /v2/users - public token", %{unauth_conn: conn} do
+  test "GET /v2/users - public token", %{unauth_conn: conn, archer: archer} do
+    UserIndex.delete
+    UserIndex.create
+    UserIndex.add(archer)
     conn = conn
            |> public_conn
            |> get(user_path(conn, :index, %{"terms" => "archer"}))

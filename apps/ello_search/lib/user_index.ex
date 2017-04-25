@@ -14,6 +14,7 @@ defmodule Ello.Search.UserIndex do
       short_bio:    user.short_bio,
       links:        user.links,
       is_spammer:   false,
+      is_public:    user.is_public,
       is_nsfw_user: user.settings.posts_adult_content,
       posts_nudity: user.settings.posts_nudity,
       locked_at:    user.locked_at,
