@@ -85,7 +85,7 @@ defmodule Ello.Search.PostSearch do
     update_bool(query, :must_not, &([%{terms: %{author_id: user.all_blocked_ids}} | &1]))
   end
 
-  defp author_query do
+  defp author_base_query do
     %{
       has_parent: %{
         parent_type: "author",
@@ -102,11 +102,11 @@ defmodule Ello.Search.PostSearch do
   end
 
   defp build_author_query(query, nil) do
-    author_query = filter_private_authors(author_query())
+    author_query = filter_private_authors(author_base_query())
     update_bool(query, :filter, &([author_query | &1]))
   end
   defp build_author_query(query, _current_user) do
-    update_bool(query, :filter, &([author_query() | &1]))
+    update_bool(query, :filter, &([author_base_query() | &1]))
   end
 
   defp filter_private_authors(author_query) do

@@ -9,7 +9,16 @@ defmodule Ello.Search.PostIndex do
   end
 
   def add(post, overrides \\ %{}) do
-    post_data = %{
+    post_data   = assemble_post_data(post, overrides)
+    author_data = assemble_author_data(post.author, overrides)
+
+    Client.index_document(index_name(), author_doc_type(), post.author.id, author_data)
+    Client.index_document(index_name(), post_doc_type(), post.id, post_data, %{parent: post.author.id})
+    Client.refresh_index(index_name())
+  end
+
+  defp assemble_post_data(post, overrides) do
+    %{
       id:                post.id,
       created_at:        post.created_at,
       updated_at:        post.updated_at,
@@ -32,8 +41,10 @@ defmodule Ello.Search.PostIndex do
       alt_text:          "",
       is_saleable:       post.is_saleable
     } |> Map.merge(overrides[:post] || %{})
+  end
 
-    author_data = %{
+  defp assemble_author_data(author, overrides) do
+    %{
       id:                 post.author.id,
       created_at:         post.author.created_at,
       updated_at:         post.author.updated_at,
@@ -57,10 +68,6 @@ defmodule Ello.Search.PostIndex do
       location:           post.author.location,
       coordinates:        coordinates(post.author)
     } |> Map.merge(overrides[:author] || %{})
-
-    Client.index_document(index_name(), author_doc_type(), post.author.id, author_data)
-    Client.index_document(index_name(), post_doc_type(), post.id, post_data, %{parent: post.author.id})
-    Client.refresh_index(index_name())
   end
 
   def delete, do: Client.delete_index(index_name())
