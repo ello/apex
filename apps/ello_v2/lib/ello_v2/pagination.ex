@@ -23,7 +23,7 @@ defmodule Ello.V2.Pagination do
     |> put_resp_header("link", ~s(<#{next}>; rel="next"))
   end
   def add_pagination_headers(conn, path, %Page{} = page) do
-    next = pagination_link(path, %{page: page.next_page, per_page: page.per_page})
+    next = pagination_link(path, %{page: page.next_page, per_page: page.per_page, terms: page.terms})
 
     conn
     |> put_resp_header("x-total-pages", "#{page.total_pages}")
