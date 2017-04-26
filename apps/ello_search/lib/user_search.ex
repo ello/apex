@@ -113,7 +113,7 @@ defmodule Ello.Search.UserSearch do
 
     ids   = Enum.map(results["hits"]["hits"], &(String.to_integer(&1["_id"])))
     users = ids
-            |> Network.users
+            |> Network.users(opts[:current_user])
             |> user_sorting(ids)
 
     Page.from_results(results, users, opts)
