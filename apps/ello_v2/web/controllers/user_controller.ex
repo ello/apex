@@ -43,7 +43,8 @@ defmodule Ello.V2.UserController do
   end
 
   defp user_search(conn, params) do
-    UserSearch.user_search(params["terms"], %{
+    UserSearch.user_search(%{
+      terms:        params["terms"],
       current_user: current_user(conn),
       allow_nsfw:   conn.assigns[:allow_nsfw],
       allow_nudity: conn.assigns[:allow_nudity],

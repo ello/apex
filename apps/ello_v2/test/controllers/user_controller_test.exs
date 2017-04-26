@@ -143,6 +143,10 @@ defmodule Ello.V2.UserControllerTest do
     UserIndex.create
     UserIndex.add(archer)
     conn = get(conn, user_path(conn, :index, %{"terms" => "archer"}))
+    assert [link] = get_resp_header(conn, "link")
+    assert String.contains?(link, "terms=archer")
+    assert String.contains?(link, "page=2")
+    assert String.contains?(link, "/api/v2/users")
     assert %{"name" => "Sterling Archer"} = hd(json_response(conn, 200)["users"])
   end
 end

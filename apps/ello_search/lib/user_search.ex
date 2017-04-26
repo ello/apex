@@ -12,16 +12,16 @@ defmodule Ello.Search.UserSearch do
     |> search_user_index
   end
 
-  def user_search(terms, %{current_user: nil} = opts) do
-    terms
-    |> build_default_user_search_query(opts)
+  def user_search(%{current_user: nil} = opts) do
+    opts
+    |> build_default_user_search_query
     |> filter_private_users
     |> search_user_index(opts)
   end
-  def user_search(terms, %{current_user: current_user} = opts) do
+  def user_search(%{current_user: current_user} = opts) do
     following_ids = Network.following_ids(current_user)
-    terms
-    |> build_default_user_search_query(opts)
+    opts
+    |> build_default_user_search_query
     |> build_relationship_query(following_ids)
     |> filter_blocked(current_user)
     |> search_user_index(opts)
@@ -45,9 +45,9 @@ defmodule Ello.Search.UserSearch do
     }
   end
 
-  defp build_default_user_search_query(terms, opts) do
+  defp build_default_user_search_query(opts) do
     base_query()
-    |> build_user_query(terms)
+    |> build_user_query(opts[:terms])
     |> build_pagination_query(opts[:page], opts[:per_page])
     |> filter_spam
     |> filter_nsfw(opts[:allow_nsfw])

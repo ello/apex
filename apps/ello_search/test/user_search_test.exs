@@ -105,7 +105,7 @@ defmodule Ello.Search.UserSearchTest do
   end
 
   test "user_search - does not include spamified users", context do
-    results = UserSearch.user_search("username", %{allow_nsfw: false, allow_nudity: false, current_user: context.current_user}).results
+    results = UserSearch.user_search(%{terms: "username", allow_nsfw: false, allow_nudity: false, current_user: context.current_user}).results
     refute context.spam_user.id in Enum.map(results, &(&1.id))
   end
 
@@ -115,22 +115,22 @@ defmodule Ello.Search.UserSearchTest do
   end
 
   test "user_search - does not include nsfw users if client disallows nsfw", context do
-    results = UserSearch.user_search("username", %{allow_nsfw: false, allow_nudity: false, current_user: context.current_user}).results
+    results = UserSearch.user_search(%{terms: "username", allow_nsfw: false, allow_nudity: false, current_user: context.current_user}).results
     refute context.nsfw_user.id in Enum.map(results, &(&1.id))
   end
 
   test "user_search - includes nsfw users if client allows nsfw", context do
-    results = UserSearch.user_search("username", %{allow_nsfw: true, allow_nudity: false, current_user: context.current_user}).results
+    results = UserSearch.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: false, current_user: context.current_user}).results
     assert context.nsfw_user.id in Enum.map(results, &(&1.id))
   end
 
   test "user_search - does not include nudity users if client disallows nudity", context do
-    results = UserSearch.user_search("username", %{allow_nsfw: false, allow_nudity: false, current_user: context.current_user}).results
+    results = UserSearch.user_search(%{terms: "username", allow_nsfw: false, allow_nudity: false, current_user: context.current_user}).results
     refute context.nudity_user.id in Enum.map(results, &(&1.id))
   end
 
   test "user_search - includes nudity users if client allows nudity", context do
-    results = UserSearch.user_search("username", %{allow_nsfw: false, allow_nudity: true, current_user: context.current_user}).results
+    results = UserSearch.user_search(%{terms: "username", allow_nsfw: false, allow_nudity: true, current_user: context.current_user}).results
     assert context.nudity_user.id in Enum.map(results, &(&1.id))
   end
 
@@ -138,7 +138,7 @@ defmodule Ello.Search.UserSearchTest do
     Redis.command(["SADD", "user:#{context.current_user.id}:block_id_cache", context.user.id])
     current_user = Network.User.preload_blocked_ids(context.current_user)
 
-    results = UserSearch.user_search("username", %{allow_nsfw: true, allow_nudity: false, current_user: current_user}).results
+    results = UserSearch.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: false, current_user: current_user}).results
     refute context.user.id in Enum.map(results, &(&1.id))
     assert context.nsfw_user.id in Enum.map(results, &(&1.id))
   end
@@ -147,7 +147,7 @@ defmodule Ello.Search.UserSearchTest do
     Redis.command(["SADD", "user:#{context.current_user.id}:inverse_block_id_cache", context.user.id])
     current_user = Network.User.preload_blocked_ids(context.current_user)
 
-    results = UserSearch.user_search("username", %{allow_nsfw: true, allow_nudity: false, current_user: current_user}).results
+    results = UserSearch.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: false, current_user: current_user}).results
     refute context.user.id in Enum.map(results, &(&1.id))
     assert context.nsfw_user.id in Enum.map(results, &(&1.id))
   end
@@ -155,27 +155,27 @@ defmodule Ello.Search.UserSearchTest do
   test "user_search - following users should be given a higher score", context do
     Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.nsfw_user.id])
 
-    results = UserSearch.user_search("username", %{allow_nsfw: true, allow_nudity: false, current_user: context.current_user}).results
+    results = UserSearch.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: false, current_user: context.current_user}).results
     assert context.nsfw_user.id == hd(Enum.map(results, &(&1.id)))
     assert context.user.id in Enum.map(results, &(&1.id))
   end
 
   test "user_search - pagination", context do
-    results = UserSearch.user_search("username", %{allow_nsfw: true, allow_nudity: true, current_user: context.current_user}).results
+    results = UserSearch.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: true, current_user: context.current_user}).results
     assert length(Enum.map(results, &(&1.id))) == 4
 
-    results = UserSearch.user_search("username", %{allow_nsfw: true, allow_nudity: true, current_user: context.current_user, per_page: "2"}).results
+    results = UserSearch.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: true, current_user: context.current_user, per_page: "2"}).results
     assert length(Enum.map(results, &(&1.id))) == 2
 
-    results = UserSearch.user_search("username", %{allow_nsfw: true, allow_nudity: true, current_user: context.current_user, page: "2", per_page: "2"}).results
+    results = UserSearch.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: true, current_user: context.current_user, page: "2", per_page: "2"}).results
     assert length(Enum.map(results, &(&1.id))) == 2
 
-    results = UserSearch.user_search("username", %{allow_nsfw: true, allow_nudity: true, current_user: context.current_user, page: "3", per_page: "2"}).results
+    results = UserSearch.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: true, current_user: context.current_user, page: "3", per_page: "2"}).results
     assert length(Enum.map(results, &(&1.id))) == 0
   end
 
   test "user_search - filters private users if no current user", context do
-    results = UserSearch.user_search("username", %{allow_nsfw: false, allow_nudity: false, current_user: nil}).results
+    results = UserSearch.user_search(%{terms: "username", allow_nsfw: false, allow_nudity: false, current_user: nil}).results
 
     assert context.user.id in Enum.map(results, &(&1.id))
     refute context.private_user.id in Enum.map(results, &(&1.id))
