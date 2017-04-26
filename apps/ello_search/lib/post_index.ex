@@ -160,5 +160,5 @@ defmodule Ello.Search.PostIndex do
   defp coordinates(%{location_lat: nil, location_long: nil}), do: nil
   defp coordinates(%{location_lat: lat, location_long: long}), do: %{lat: lat, lon: long}
 
-  defp detected_language(post), do: "en"
+  defp detected_language(_post), do: "en"
 end
