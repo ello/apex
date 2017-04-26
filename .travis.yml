@@ -7,7 +7,10 @@ addons:
   postgresql: '9.3'
 services:
   - redis-server
-jdk: oraclejdk8
+addons:
+  apt:
+    packages:
+      - oracle-java8-set-default
 before_install:
   - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.deb
   - sudo dpkg -i --force-confnew elasticsearch-5.1.1.deb
