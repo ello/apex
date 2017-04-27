@@ -45,28 +45,28 @@ defmodule Ello.Search.PostIndex do
 
   defp assemble_author_data(author, overrides) do
     %{
-      id:                 post.author.id,
-      created_at:         post.author.created_at,
-      updated_at:         post.author.updated_at,
-      name:               post.author.name,
-      username:           post.author.username,
-      short_bio:          post.author.short_bio,
-      links:              post.author.links,
-      locked_out:         !!post.author.locked_at,
+      id:                 author.id,
+      created_at:         author.created_at,
+      updated_at:         author.updated_at,
+      name:               author.name,
+      username:           author.username,
+      short_bio:          author.short_bio,
+      links:              author.links,
+      locked_out:         !!author.locked_at,
       post_count:         0,
       comment_count:      0,
       follower_count:     0,
       is_spammer:         false,
-      is_system_user:     post.author.is_system_user,
-      is_featured_user:   Enum.any?(post.author.category_ids),
-      has_avatar:         !!post.author.avatar,
-      is_public:          post.author.is_public,
-      category_ids:       post.author.category_ids,
-      category_names:     category_names(post.author.category_ids),
-      is_hireable:        post.author.settings.is_hireable,
-      is_collaborateable: post.author.settings.is_collaborateable,
-      location:           post.author.location,
-      coordinates:        coordinates(post.author)
+      is_system_user:     author.is_system_user,
+      is_featured_user:   Enum.any?(author.category_ids),
+      has_avatar:         !!author.avatar,
+      is_public:          author.is_public,
+      category_ids:       author.category_ids,
+      category_names:     category_names(author.category_ids),
+      is_hireable:        author.settings.is_hireable,
+      is_collaborateable: author.settings.is_collaborateable,
+      location:           author.location,
+      coordinates:        coordinates(author)
     } |> Map.merge(overrides[:author] || %{})
   end
 
