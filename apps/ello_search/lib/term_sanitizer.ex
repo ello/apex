@@ -3,7 +3,7 @@ defmodule Ello.Search.TermSanitizer.Regex do
     expression = "lib/nsfw_stopwords.txt"
                  |> File.read!
                  |> String.split
-                 |> Enum.map(&("\\b#?#{&1}\\b"))
+                 |> Enum.map(&("(\\b|#)?#{&1}\\b"))
                  |> Enum.join("|")
 
     {:ok, compiled_regex} = Regex.compile(expression)
