@@ -15,6 +15,7 @@ defmodule Ello.Search.UserSearchTest do
     nsfw_user    = Factory.insert(:user, settings: %{posts_adult_content: true})
     nudity_user  = Factory.insert(:user, settings: %{posts_nudity: true})
     private_user = Factory.insert(:user, %{is_public: false})
+    archer       = Factory.insert(:user, %{username: "archer"})
 
     UserIndex.delete
     UserIndex.create
@@ -27,6 +28,7 @@ defmodule Ello.Search.UserSearchTest do
     UserIndex.add(nsfw_user)
     UserIndex.add(nudity_user)
     UserIndex.add(private_user)
+    UserIndex.add(archer)
     {:ok,
       user: user,
       locked_user: locked_user,
@@ -37,7 +39,8 @@ defmodule Ello.Search.UserSearchTest do
       current_user: current_user,
       lana32d: lana32d,
       lanakane: lanakane,
-      lanabandero: lanabandero
+      lanabandero: lanabandero,
+      archer: archer
     }
   end
 
@@ -176,8 +179,12 @@ defmodule Ello.Search.UserSearchTest do
 
   test "user_search - filters private users if no current user", context do
     results = UserSearch.user_search(%{terms: "username", allow_nsfw: false, allow_nudity: false, current_user: nil}).results
-
     assert context.user.id in Enum.map(results, &(&1.id))
     refute context.private_user.id in Enum.map(results, &(&1.id))
+  end
+
+  test "user_search - build user query to prefer username if terms starts with @", context do
+    results = UserSearch.user_search(%{terms: "@archer", allow_nsfw: false, allow_nudity: false, current_user: nil}).results
+    assert context.archer.id in Enum.map(results, &(&1.id))
   end
 end
