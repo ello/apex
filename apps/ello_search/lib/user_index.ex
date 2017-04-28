@@ -10,7 +10,9 @@ defmodule Ello.Search.UserIndex do
     data = %{
       id:           user.id,
       username:     user.username,
+      name:         user.name,
       raw_username: user.username,
+      raw_name:     raw_name(user.name),
       short_bio:    user.short_bio,
       links:        user.links,
       is_spammer:   false,
@@ -51,6 +53,11 @@ defmodule Ello.Search.UserIndex do
               type: "custom",
               tokenizer: "keyword",
               filter: ["lowercase", "autocomplete"]
+            },
+            name_autocomplete: %{
+              type: "custom",
+              tokenizer: "whitespace",
+              filter: ["lowercase", "autocomplete"]
             }
           }
         }
@@ -63,7 +70,9 @@ defmodule Ello.Search.UserIndex do
       properties: %{
         id:           %{type: "text"},
         username:     %{type: "text", analyzer: "username_autocomplete"},
+        name:         %{type: "text", analyzer: "name_autocomplete"},
         raw_username: %{type: "text", index: false},
+        raw_name:     %{type: "text", index: false},
         short_bio:    %{type: "text"},
         links:        %{type: "text"},
         is_spammer:   %{type: "boolean"},
@@ -75,4 +84,7 @@ defmodule Ello.Search.UserIndex do
       }
     }
   end
+
+  defp raw_name(nil),  do: nil
+  defp raw_name(name), do: String.downcase(name)
 end

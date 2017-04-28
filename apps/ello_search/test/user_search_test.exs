@@ -16,6 +16,7 @@ defmodule Ello.Search.UserSearchTest do
     nudity_user  = Factory.insert(:user, settings: %{posts_nudity: true})
     private_user = Factory.insert(:user, %{is_public: false})
     archer       = Factory.insert(:user, %{username: "archer"})
+    casey        = Factory.insert(:user, %{username: "dcdoran", name: "Casey Doran"})
 
     UserIndex.delete
     UserIndex.create
@@ -29,6 +30,8 @@ defmodule Ello.Search.UserSearchTest do
     UserIndex.add(nudity_user)
     UserIndex.add(private_user)
     UserIndex.add(archer)
+    UserIndex.add(casey)
+
     {:ok,
       user: user,
       locked_user: locked_user,
@@ -40,7 +43,8 @@ defmodule Ello.Search.UserSearchTest do
       lana32d: lana32d,
       lanakane: lanakane,
       lanabandero: lanabandero,
-      archer: archer
+      archer: archer,
+      casey: casey
     }
   end
 
@@ -186,5 +190,15 @@ defmodule Ello.Search.UserSearchTest do
   test "user_search - build user query to prefer username if terms starts with @", context do
     results = UserSearch.user_search(%{terms: "@archer", allow_nsfw: false, allow_nudity: false, current_user: nil}).results
     assert context.archer.id in Enum.map(results, &(&1.id))
+  end
+
+  test "user_search - returns relevant results based on name", context do
+    results = UserSearch.user_search(%{terms: "casey doran", allow_nsfw: false, allow_nudity: false, current_user: nil}).results
+    assert context.casey.id in Enum.map(results, &(&1.id))
+  end
+
+  test "user_search - does not return results if terms are irrelevant", context do
+    results = UserSearch.user_search(%{terms: "case doorknob", allow_nsfw: false, allow_nudity: false, current_user: nil}).results
+    refute context.casey.id in Enum.map(results, &(&1.id))
   end
 end

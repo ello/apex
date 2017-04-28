@@ -2,7 +2,6 @@ defmodule Ello.Search.PostSearchTest do
   use Ello.Search.Case
   alias Ello.Search.{PostIndex, PostSearch}
   alias Ello.Core.{Repo, Factory, Network}
-  require IEx
 
   setup do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})

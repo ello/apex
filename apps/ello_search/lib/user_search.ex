@@ -2,7 +2,7 @@ defmodule Ello.Search.UserSearch do
   import NewRelicPhoenix, only: [measure_segment: 2]
   alias Ello.Core.Network
   alias Ello.Search.{Client, UserIndex, Page, TermSanitizer}
-  require IEx
+
   def username_search(%{current_user: current_user} = opts) do
     following_ids = Network.following_ids(current_user)
     base_query()
@@ -66,13 +66,16 @@ defmodule Ello.Search.UserSearch do
     |> update_in([:size], &(&1 = per_page))
   end
 
-  defp build_user_query(query, %{terms: "@" <> terms} = opts) do
-    filtered_terms = filter_terms(terms, opts[:allow_nsfw])
-    update_in(query[:query][:bool][:must], &([%{query_string: %{query: filtered_terms, fields: ["raw_username^2.5", "short_bio", "username^0.01"]}} | &1]))
-  end
+  defp build_user_query(query, %{terms: "@" <> terms} = opts), do: build_username_query(query, opts)
   defp build_user_query(query, %{terms: terms} = opts) do
     filtered_terms = filter_terms(terms, opts[:allow_nsfw])
-    update_in(query[:query][:bool][:must], &([%{query_string: %{query: filtered_terms, fields: ["raw_username^2.5", "raw_name^2", "links", "short_bio", "username^0.01", "name^0.01"]}} | &1]))
+    update_in(query[:query][:bool][:must],
+              &([%{multi_match:
+                   %{query: filtered_terms,
+                     type: "best_fields",
+                     fields: ["name", "username"],
+                     analyzer: "standard",
+                     minimum_should_match: "100%"}} | &1]))
   end
 
   defp build_username_query(query, %{terms: username} = opts) do
