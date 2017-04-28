@@ -15,7 +15,7 @@ defmodule Ello.Search.TrendingPost do
     update_in(query[:query][:function_score][:functions], &([recent_boost | &1]))
   end
   defp boost_recent(query, _) do
-    recent_boost = %{gauss: %{created_at: %{scale: "3d", offset: "1d"}}, weight: 1000}
+    recent_boost = %{gauss: %{created_at: %{scale: "90d", offset: "90d"}}, weight: 0.2}
     update_in(query[:query][:function_score][:functions], &([recent_boost | &1]))
   end
 
