@@ -3,11 +3,10 @@ elixir:
   - 1.4.0
 otp_release:
   - 19.2
-addons:
-  postgresql: '9.3'
 services:
   - redis-server
 addons:
+  postgresql: '9.3'
   apt:
     packages:
       - oracle-java8-set-default
