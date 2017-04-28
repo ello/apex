@@ -6,10 +6,10 @@ defmodule Ello.Search.TermSanitizer.Regex do
                  |> Enum.map(&("\\b#?#{&1}\\b"))
                  |> Enum.join("|")
 
-    regex = Regex.compile(expression)
+    {:ok, regex} = Regex.compile(expression)
 
     quote do
-      @regex unquote(regex)
+      def regex, do: unquote(Macro.escape(regex))
     end
   end
 end
@@ -17,6 +17,6 @@ end
 defmodule Ello.Search.TermSanitizer do
   @before_compile Ello.Search.TermSanitizer.Regex
 
-  def sanitize(terms), do: String.replace(terms, @regex, "") #@regex, "")
+  def sanitize(terms), do: String.replace(terms, regex(), "")
 end
 
