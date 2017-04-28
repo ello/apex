@@ -1,12 +1,12 @@
 defmodule Ello.Search.UserSearch do
   import NewRelicPhoenix, only: [measure_segment: 2]
   alias Ello.Core.Network
-  alias Ello.Search.{Client, UserIndex, Page}
-
-  def username_search(username, %{current_user: current_user}) do
+  alias Ello.Search.{Client, UserIndex, Page, TermSanitizer}
+  require IEx
+  def username_search(%{current_user: current_user} = opts) do
     following_ids = Network.following_ids(current_user)
     base_query()
-    |> build_username_query(username)
+    |> build_username_query(opts)
     |> build_relationship_query(following_ids)
     |> filter_blocked(current_user)
     |> search_user_index
@@ -47,7 +47,7 @@ defmodule Ello.Search.UserSearch do
 
   defp build_default_user_search_query(opts) do
     base_query()
-    |> build_user_query(opts[:terms])
+    |> build_user_query(opts)
     |> build_pagination_query(opts[:page], opts[:per_page])
     |> filter_spam
     |> filter_nsfw(opts[:allow_nsfw])
@@ -66,15 +66,18 @@ defmodule Ello.Search.UserSearch do
     |> update_in([:size], &(&1 = per_page))
   end
 
-  defp build_user_query(query, terms) do
-    update_in(query[:query][:bool][:must], &([%{query_string: %{query: terms, fields: ["raw_username^2.5", "raw_name^2", "links", "short_bio", "username^0.01", "name^0.01"]}} | &1]))
+  defp build_user_query(query, %{terms: terms} = opts) do
+    filtered_terms = filter_terms(terms, opts[:allow_nsfw])
+    update_in(query[:query][:bool][:must], &([%{query_string: %{query: filtered_terms, fields: ["raw_username^2.5", "raw_name^2", "links", "short_bio", "username^0.01", "name^0.01"]}} | &1]))
   end
 
-  defp build_username_query(query, username) do
-    boost = Application.get_env(:ello_search, :username_match_boost)
+  defp build_username_query(query, %{terms: username} = opts) do
+    filtered_username = filter_terms(username, opts[:allow_nsfw])
+    boost             = Application.get_env(:ello_search, :username_match_boost)
+
     query
-    |> update_in([:query, :bool, :must], &([%{fuzzy: %{username: username}} | &1]))
-    |> update_in([:query, :bool, :should], &([%{term: %{username: %{value: username, boost: boost}}} | &1]))
+    |> update_in([:query, :bool, :must], &([%{fuzzy: %{username: filtered_username}} | &1]))
+    |> update_in([:query, :bool, :should], &([%{term: %{username: %{value: filtered_username, boost: boost}}} | &1]))
   end
 
   defp build_relationship_query(query, []), do: query
@@ -105,6 +108,9 @@ defmodule Ello.Search.UserSearch do
   defp filter_private_users(query) do
     update_in(query[:query][:bool][:filter], &([%{term: %{is_public: true}} | &1]))
   end
+
+  defp filter_terms(terms, true), do: terms
+  defp filter_terms(terms, _),    do: TermSanitizer.sanitize(terms)
 
   defp search_user_index(query, opts \\ %{}) do
     measure_segment {:ext, "search_user_index"} do

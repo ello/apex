@@ -38,7 +38,11 @@ defmodule Ello.V2.UserController do
   Renders a list of relevant results from username search
   """
   def autocomplete(conn, %{"terms" => username}) do
-    users = UserSearch.username_search(username, %{current_user: current_user(conn)}).results
+    users = UserSearch.username_search(%{
+              terms:        username,
+              current_user: current_user(conn),
+              allow_nsfw:   conn.assigns[:allow_nsfw]
+            }).results
     api_render(conn, UserView, "autocomplete.json", data: users)
   end
 

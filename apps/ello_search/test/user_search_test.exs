@@ -42,30 +42,30 @@ defmodule Ello.Search.UserSearchTest do
   end
 
   test "username_search - scores more exact matches higher", context do
-    results = UserSearch.username_search(context.user.username, %{current_user: context.current_user}).results
+    results = UserSearch.username_search(%{terms: context.user.username, current_user: context.current_user}).results
     assert hd(results).id == context.user.id
   end
 
   test "username_search - does not include locked users", context do
-    results = UserSearch.username_search("username", %{current_user: context.current_user}).results
+    results = UserSearch.username_search(%{terms: "username", current_user: context.current_user}).results
     assert context.user.id in Enum.map(results, &(&1.id))
     refute context.locked_user.id in Enum.map(results, &(&1.id))
   end
 
   test "username_search - includes spamified users", context do
-    results = UserSearch.username_search("username", %{current_user: context.current_user}).results
+    results = UserSearch.username_search(%{terms: "username", current_user: context.current_user}).results
     assert context.user.id in Enum.map(results, &(&1.id))
     assert context.spam_user.id in Enum.map(results, &(&1.id))
   end
 
   test "username_search - includes nsfw users", context do
-    results = UserSearch.username_search("username", %{current_user: context.current_user}).results
+    results = UserSearch.username_search(%{terms: "username", current_user: context.current_user}).results
     assert context.user.id in Enum.map(results, &(&1.id))
     assert context.nsfw_user.id in Enum.map(results, &(&1.id))
   end
 
   test "username_search - includes nudity users", context do
-    results = UserSearch.username_search(context.spam_user.username, %{current_user: context.current_user}).results
+    results = UserSearch.username_search(%{terms: context.spam_user.username, current_user: context.current_user}).results
     assert context.user.id in Enum.map(results, &(&1.id))
     assert context.nudity_user.id in Enum.map(results, &(&1.id))
   end
@@ -73,7 +73,7 @@ defmodule Ello.Search.UserSearchTest do
   test "username_search - following users should be given a higher score", context do
     Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.spam_user.id])
 
-    results = UserSearch.username_search("username", %{current_user: context.current_user}).results
+    results = UserSearch.username_search(%{terms: "username", current_user: context.current_user}).results
     assert context.spam_user.id == hd(Enum.map(results, &(&1.id)))
   end
 
@@ -81,7 +81,7 @@ defmodule Ello.Search.UserSearchTest do
     Redis.command(["SADD", "user:#{context.current_user.id}:block_id_cache", context.spam_user.id])
     current_user = Network.User.preload_blocked_ids(context.current_user)
 
-    results = UserSearch.username_search("username", %{current_user: current_user}).results
+    results = UserSearch.username_search(%{terms: "username", current_user: current_user}).results
     assert context.user.id in Enum.map(results, &(&1.id))
     refute context.spam_user.id in Enum.map(results, &(&1.id))
   end
@@ -90,7 +90,7 @@ defmodule Ello.Search.UserSearchTest do
     Redis.command(["SADD", "user:#{context.current_user.id}:inverse_block_id_cache", context.spam_user.id])
     current_user = Network.User.preload_blocked_ids(context.current_user)
 
-    results = UserSearch.username_search("username", %{current_user: current_user}).results
+    results = UserSearch.username_search(%{terms: "username", current_user: current_user}).results
     assert context.user.id in Enum.map(results, &(&1.id))
     refute context.spam_user.id in Enum.map(results, &(&1.id))
   end
@@ -98,7 +98,7 @@ defmodule Ello.Search.UserSearchTest do
   test "username_search - lana test", context do
     Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.lana32d.id])
 
-    results = UserSearch.username_search("lana", %{current_user: context.current_user}).results
+    results = UserSearch.username_search(%{terms: "lana", current_user: context.current_user}).results
     assert context.lana32d.id == hd(Enum.map(results, &(&1.id)))
     assert context.lanakane.id in Enum.map(results, &(&1.id))
     assert context.lanabandero.id in Enum.map(results, &(&1.id))
@@ -110,7 +110,7 @@ defmodule Ello.Search.UserSearchTest do
   end
 
   test "user_search - does not include locked users", context do
-    results = UserSearch.username_search("username", %{allow_nsfw: false, allow_nudity: false, current_user: context.current_user}).results
+    results = UserSearch.user_search(%{terms: "username", allow_nsfw: false, allow_nudity: false, current_user: context.current_user}).results
     refute context.locked_user.id in Enum.map(results, &(&1.id))
   end
 
