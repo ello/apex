@@ -61,12 +61,14 @@ defmodule Ello.V2.UserViewTest do
       bad_for_seo: false,
       is_hireable: false,
       is_collaborateable: false,
+      is_community: false,
       posts_count: nil,
       followers_count: nil,
       following_count: nil,
       loves_count: nil,
       total_views_count: 2500,
       formatted_short_bio: "<p>I have been spying for a while now</p>",
+      badges: [],
       external_links_list: [
         %{
           "url" => "http://www.twitter.com/ArcherFX",
@@ -160,6 +162,18 @@ defmodule Ello.V2.UserViewTest do
       links: %{categories: ["#{spying.id}"]}
     }
     assert render(UserView, "user.json", user: archer, conn: conn) == expected
+  end
+
+  test "user.json - renders most badges for normal accounts", %{conn: conn, user: user} do
+    user = Map.merge(user, %{ badges: ["community", "nsfw", "spam"]})
+    assert render(UserView, "user.json", user: user, conn: conn).badges == ["community"]
+  end
+
+  test "user.json - renders all badges for staff accounts", %{conn: conn, user: user} do
+    staff = Factory.build(:user, is_staff: true)
+    user = Map.merge(user, %{ badges: ["community", "nsfw", "spam"]})
+    conn = user_conn(conn, staff)
+    assert render(UserView, "user.json", user: user, conn: conn).badges == ["community", "nsfw", "spam"]
   end
 
   test "user.json - knows user relationship", %{conn: conn, user: user} do

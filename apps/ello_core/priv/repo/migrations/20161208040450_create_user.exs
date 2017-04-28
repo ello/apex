@@ -29,6 +29,9 @@ defmodule Ello.Repo.Migrations.CreateUser do
       add :bad_for_seo?, :boolean, default: true
       add :category_ids, {:array, :integer}
 
+      add :is_community, :boolean
+      add :badges, {:array, :string}
+
       add :settings, :json
 
       add :rendered_links, :json

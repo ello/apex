@@ -35,6 +35,7 @@ defmodule Ello.V2.UserView do
     :followers_count,
     :loves_count,
     :posts_count,
+    :is_community,
   ]
 
   def computed_attributes, do: [
@@ -47,6 +48,12 @@ defmodule Ello.V2.UserView do
     :avatar,
     :cover_image,
     :total_views_count,
+    :badges,
+  ]
+
+  @sensitive_badges [
+    "nsfw",
+    "spam",
   ]
 
   @settings_attributes [
@@ -115,4 +122,12 @@ defmodule Ello.V2.UserView do
 
   def total_views_count(%{total_views_count: 0}, _), do: nil
   def total_views_count(%{total_views_count: count}, _), do: count
+
+  def badges(%{badges: nil}, _), do: nil
+  def badges(%{badges: []}, _), do: []
+  def badges(%{badges: badges}, %{assigns: %{current_user: %{is_staff: true}}}), do: badges
+  def badges(%{badges: badges}, _) do
+    badges
+    |> Enum.reject(&(Enum.member?(@sensitive_badges, &1)))
+  end
 end
