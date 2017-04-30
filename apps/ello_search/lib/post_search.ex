@@ -11,6 +11,7 @@ defmodule Ello.Search.PostSearch do
     |> build_mention_query(opts[:terms])
     |> build_hashtag_query(opts[:terms])
     |> build_pagination_query(opts[:page], opts[:per_page])
+    |> filter_category(opts[:category])
     |> filter_days(opts[:within_days])
     |> TrendingPost.build_boosting_queries(opts[:trending])
     |> search_post_index(opts)
@@ -83,6 +84,11 @@ defmodule Ello.Search.PostSearch do
   defp filter_blocked(query, nil), do: query
   defp filter_blocked(query, user) do
     update_bool(query, :must_not, &([%{terms: %{author_id: user.all_blocked_ids}} | &1]))
+  end
+
+  defp filter_category(query, nil), do: query
+  defp filter_category(query, id) do
+    update_bool(query, :filter, &([%{term: %{category_ids: id}} | &1]))
   end
 
   defp author_base_query do
