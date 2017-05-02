@@ -45,6 +45,8 @@ defmodule Ello.Core.Factory do
                            "data" => "<p>Phrasing!</p>",
                            "link_url" => nil
                          }],
+      reposted_source: nil,
+      parent_post:     nil,
       created_at: DateTime.utc_now,
       updated_at: DateTime.utc_now,
     }

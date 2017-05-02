@@ -33,6 +33,14 @@ defmodule Ello.Core.Discovery do
     |> Repo.get_by(slug: slug)
   end
 
+  @doc "Find multiple categories by ids - without includes"
+  @spec categories_without_includes(ids :: [integer]) :: [Category.t]
+  def categories_without_includes(ids) do
+    Category
+    |> where([u], u.id in ^ids)
+    |> Repo.all
+  end
+
   @doc "Find all primary categories - without includes"
   @spec primary_categories() :: [Category.t]
   def primary_categories do

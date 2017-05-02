@@ -1,6 +1,10 @@
 defmodule Ello.V2.UserController do
   use Ello.V2.Web, :controller
   alias Ello.Core.Network
+  alias Ello.V2.UserView
+  alias Ello.Search.UserSearch
+
+  plug Ello.Auth.RequireUser when action in [:autocomplete]
 
   @doc """
   GET /v2/users/:id, GET /v2/users/~:username
@@ -16,4 +20,40 @@ defmodule Ello.V2.UserController do
     end
   end
 
+  @doc """
+  GET /v2/users
+
+  Renders a list of relevant results from user search
+  """
+  def index(conn, params) do
+    page = user_search(conn, params)
+    conn
+    |> add_pagination_headers("/users", page)
+    |> api_render_if_stale(UserView, "index.json", data: page.results)
+  end
+
+  @doc """
+  GET /v2/users/autocomplete
+
+  Renders a list of relevant results from username search
+  """
+  def autocomplete(conn, %{"terms" => username}) do
+    users = UserSearch.username_search(%{
+              terms:        username,
+              current_user: current_user(conn),
+              allow_nsfw:   conn.assigns[:allow_nsfw]
+            }).results
+    api_render(conn, UserView, "autocomplete.json", data: users)
+  end
+
+  defp user_search(conn, params) do
+    UserSearch.user_search(%{
+      terms:        params["terms"],
+      current_user: current_user(conn),
+      allow_nsfw:   conn.assigns[:allow_nsfw],
+      allow_nudity: conn.assigns[:allow_nudity],
+      page:         params["page"],
+      per_page:     params["per_page"]
+    })
+  end
 end

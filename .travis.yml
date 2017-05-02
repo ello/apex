@@ -3,14 +3,21 @@ elixir:
   - 1.4.0
 otp_release:
   - 19.2
-addons:
-  postgresql: '9.3'
 services:
   - redis-server
+addons:
+  postgresql: '9.3'
+  apt:
+    packages:
+      - oracle-java8-set-default
+before_install:
+  - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.deb
+  - sudo dpkg -i --force-confnew elasticsearch-5.1.1.deb
+  - sudo service elasticsearch start
 script:
-- mix compile --warnings-as-errors
-- mix credo -a
-- mix test --exclude skip_on_travis
+  - mix compile --warnings-as-errors
+  - mix credo -a
+  - mix test --exclude skip_on_travis
 notifications:
   email: false
   slack:

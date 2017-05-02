@@ -184,4 +184,33 @@ defmodule Ello.V2.UserViewTest do
     user = Factory.build(:user, is_system_user: true, total_views_count: 0)
     assert render(UserView, "user.json", user: user, conn: conn).total_views_count == nil
   end
+
+  test "autocomplete.json - it renders the username and avatar", %{conn: conn, archer: archer} do
+    user1 = Factory.build(:user)
+    users = [user1, archer]
+    assert %{autocomplete_results: [
+      %{name: user1.username, image_url: "https://assets.ello.co/images/fallback/user/avatar/1/ello-default-small.png"},
+      %{name: archer.username, image_url: "https://assets.ello.co/uploads/user/avatar/#{archer.id}/ello-small-fad52e18.png"}
+    ]} == render(UserView, "autocomplete.json", data: users, conn: conn)
+  end
+
+  test "autocomplete.json - returns pixelated avatars if client disallows NSFW", %{conn: conn, archer: archer} do
+    conn  = assign(conn, :allow_nsfw, false)
+    user1 = Script.build(:archer, settings: %{posts_adult_content: true})
+    users = [user1, archer]
+    assert %{autocomplete_results: [
+      %{name: user1.username, image_url: "https://assets.ello.co/uploads/user/avatar/#{archer.id}/ello-small-pixellated-fad52e18.png"},
+      %{name: archer.username, image_url: "https://assets.ello.co/uploads/user/avatar/#{archer.id}/ello-small-fad52e18.png"}
+    ]} == render(UserView, "autocomplete.json", data: users, conn: conn)
+  end
+
+  test "autocomplete.json - returns pixelated avatars if client disallows nudity", %{conn: conn, archer: archer} do
+    conn  = assign(conn, :allow_nudity, false)
+    user1 = Script.build(:archer, settings: %{posts_nudity: true})
+    users = [user1, archer]
+    assert %{autocomplete_results: [
+      %{name: user1.username, image_url: "https://assets.ello.co/uploads/user/avatar/#{archer.id}/ello-small-pixellated-fad52e18.png"},
+      %{name: archer.username, image_url: "https://assets.ello.co/uploads/user/avatar/#{archer.id}/ello-small-fad52e18.png"}
+    ]} == render(UserView, "autocomplete.json", data: users, conn: conn)
+  end
 end

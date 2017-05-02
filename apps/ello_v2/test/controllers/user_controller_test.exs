@@ -1,6 +1,7 @@
 defmodule Ello.V2.UserControllerTest do
   use Ello.V2.ConnCase, async: false
   alias Ello.Core.Redis
+  alias Ello.Search.UserIndex
 
   setup %{conn: conn} do
     user = Factory.insert(:user)
@@ -94,5 +95,58 @@ defmodule Ello.V2.UserControllerTest do
            |> get(user_path(conn, :show, archer))
 
     assert conn.status == 404
+  end
+
+  test "GET /v2/users/autocomplete - without token", %{unauth_conn: conn, archer: archer} do
+    conn = get(conn, user_path(conn, :autocomplete, %{"terms" => archer.username}))
+    assert conn.status == 401
+  end
+
+  test "GET /v2/users/autocomplete - public token", %{unauth_conn: conn, archer: archer} do
+    conn = conn
+           |> public_conn
+           |> get(user_path(conn, :autocomplete, %{"terms" => archer.username}))
+    assert conn.status == 401
+  end
+
+  test "GET /v2/users/autocomplete - user token", %{conn: conn, archer: archer} do
+    UserIndex.delete
+    UserIndex.create
+    UserIndex.add(archer)
+    conn = get(conn, user_path(conn, :autocomplete, %{"terms" => archer.username}))
+    assert %{"autocomplete_results" => [%{"image_url" => "https://assets.ello.co/uploads/user/avatar/42/ello-small-fad52e18.png",
+              "name" => "archer"}]} = json_response(conn, 200)
+  end
+
+  test "GET /v2/users/autocomplete - user token with no search results", %{conn: conn} do
+    conn = get(conn, user_path(conn, :autocomplete, %{"terms" => "asdf"}))
+    assert conn.status == 204
+  end
+
+  test "GET /v2/users - without token", %{unauth_conn: conn} do
+    conn = get(conn, user_path(conn, :index, %{"terms" => "archer"}))
+    assert conn.status == 401
+  end
+
+  test "GET /v2/users - public token", %{unauth_conn: conn, archer: archer} do
+    UserIndex.delete
+    UserIndex.create
+    UserIndex.add(archer)
+    conn = conn
+           |> public_conn
+           |> get(user_path(conn, :index, %{"terms" => "archer"}))
+    assert %{"name" => "Sterling Archer"} = hd(json_response(conn, 200)["users"])
+  end
+
+  test "GET /v2/users - user token", %{conn: conn, archer: archer} do
+    UserIndex.delete
+    UserIndex.create
+    UserIndex.add(archer)
+    conn = get(conn, user_path(conn, :index, %{"terms" => "archer"}))
+    assert [link] = get_resp_header(conn, "link")
+    assert String.contains?(link, "terms=archer")
+    assert String.contains?(link, "page=2")
+    assert String.contains?(link, "/api/v2/users")
+    assert %{"name" => "Sterling Archer"} = hd(json_response(conn, 200)["users"])
   end
 end
