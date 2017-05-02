@@ -165,13 +165,13 @@ defmodule Ello.V2.UserViewTest do
   end
 
   test "user.json - renders most badges for normal accounts", %{conn: conn, user: user} do
-    user = Map.merge(user, %{ badges: ["community", "nsfw", "spam"]})
+    user = Map.merge(user, %{badges: ["community", "nsfw", "spam"]})
     assert render(UserView, "user.json", user: user, conn: conn).badges == ["community"]
   end
 
   test "user.json - renders all badges for staff accounts", %{conn: conn, user: user} do
     staff = Factory.build(:user, is_staff: true)
-    user = Map.merge(user, %{ badges: ["community", "nsfw", "spam"]})
+    user = Map.merge(user, %{badges: ["community", "nsfw", "spam"]})
     conn = user_conn(conn, staff)
     assert render(UserView, "user.json", user: user, conn: conn).badges == ["community", "nsfw", "spam"]
   end
