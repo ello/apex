@@ -17,6 +17,8 @@ defmodule Ello.Search.UserSearchTest do
     private_user = Factory.insert(:user, %{is_public: false})
     archer       = Factory.insert(:user, %{username: "archer"})
     casey        = Factory.insert(:user, %{username: "dcdoran", name: "Casey Doran"})
+    dcdoran122   = Factory.insert(:user, %{username: "dcdoran122"})
+    dcdoran11888 = Factory.insert(:user, %{username: "dcdoran11888"})
 
     UserIndex.delete
     UserIndex.create
@@ -31,6 +33,8 @@ defmodule Ello.Search.UserSearchTest do
     UserIndex.add(private_user)
     UserIndex.add(archer)
     UserIndex.add(casey)
+    UserIndex.add(dcdoran122)
+    UserIndex.add(dcdoran11888)
 
     {:ok,
       user: user,
@@ -44,7 +48,9 @@ defmodule Ello.Search.UserSearchTest do
       lanakane: lanakane,
       lanabandero: lanabandero,
       archer: archer,
-      casey: casey
+      casey: casey,
+      dcdoran122: dcdoran122,
+      dcdoran11888: dcdoran11888
     }
   end
 
@@ -72,7 +78,7 @@ defmodule Ello.Search.UserSearchTest do
   end
 
   test "username_search - includes nudity users", context do
-    results = UserSearch.username_search(%{terms: context.spam_user.username, current_user: context.current_user}).results
+    results = UserSearch.username_search(%{terms: "username", current_user: context.current_user}).results
     assert context.user.id in Enum.map(results, &(&1.id))
     assert context.nudity_user.id in Enum.map(results, &(&1.id))
   end
@@ -201,4 +207,13 @@ defmodule Ello.Search.UserSearchTest do
     results = UserSearch.user_search(%{terms: "case doorknob", allow_nsfw: false, allow_nudity: false, current_user: nil}).results
     refute context.casey.id in Enum.map(results, &(&1.id))
   end
+
+  # TODO: Figure out a way to get exact matches to appear first in results
+  # test "user_search - @dcdoran test", context do
+  #   results = UserSearch.user_search(%{terms: "@dcdoran", current_user: context.current_user, allow_nsfw: false, allow_nudity: false}).results
+  #   assert context.casey.id == hd(Enum.map(results, &(&1.id)))
+  #   assert context.dcdoran122.id in Enum.map(results, &(&1.id))
+  #   assert context.dcdoran11888.id in Enum.map(results, &(&1.id))
+  # end
+
 end

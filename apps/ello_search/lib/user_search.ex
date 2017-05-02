@@ -66,7 +66,7 @@ defmodule Ello.Search.UserSearch do
     |> update_in([:size], &(&1 = per_page))
   end
 
-  defp build_user_query(query, %{terms: "@" <> terms} = opts), do: build_username_query(query, opts)
+  defp build_user_query(query, %{terms: "@" <> terms} = opts), do: build_username_query(query, Map.merge(opts, %{terms: terms}))
   defp build_user_query(query, %{terms: terms} = opts) do
     filtered_terms = filter_terms(terms, opts[:allow_nsfw])
     update_in(query[:query][:bool][:must],
