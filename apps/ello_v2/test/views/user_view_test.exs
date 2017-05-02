@@ -61,12 +61,14 @@ defmodule Ello.V2.UserViewTest do
       bad_for_seo: false,
       is_hireable: false,
       is_collaborateable: false,
+      is_community: false,
       posts_count: nil,
       followers_count: nil,
       following_count: nil,
       loves_count: nil,
       total_views_count: 2500,
       formatted_short_bio: "<p>I have been spying for a while now</p>",
+      badges: [],
       external_links_list: [
         %{
           "url" => "http://www.twitter.com/ArcherFX",
@@ -162,6 +164,18 @@ defmodule Ello.V2.UserViewTest do
     assert render(UserView, "user.json", user: archer, conn: conn) == expected
   end
 
+  test "user.json - renders most badges for normal accounts", %{conn: conn, user: user} do
+    user = Map.merge(user, %{badges: ["community", "nsfw", "spam"]})
+    assert render(UserView, "user.json", user: user, conn: conn).badges == ["community"]
+  end
+
+  test "user.json - renders all badges for staff accounts", %{conn: conn, user: user} do
+    staff = Factory.build(:user, is_staff: true)
+    user = Map.merge(user, %{badges: ["community", "nsfw", "spam"]})
+    conn = user_conn(conn, staff)
+    assert render(UserView, "user.json", user: user, conn: conn).badges == ["community", "nsfw", "spam"]
+  end
+
   test "user.json - knows user relationship", %{conn: conn, user: user} do
     assert render(UserView, "user.json", user: user, conn: conn).relationship_priority == "friend"
   end
@@ -174,29 +188,29 @@ defmodule Ello.V2.UserViewTest do
   test "autocomplete.json - it renders the username and avatar", %{conn: conn, archer: archer} do
     user1 = Factory.build(:user)
     users = [user1, archer]
-    assert [
+    assert %{autocomplete_results: [
       %{name: user1.username, image_url: "https://assets.ello.co/images/fallback/user/avatar/1/ello-default-small.png"},
       %{name: archer.username, image_url: "https://assets.ello.co/uploads/user/avatar/#{archer.id}/ello-small-fad52e18.png"}
-    ] == render(UserView, "autocomplete.json", data: users, conn: conn)
+    ]} == render(UserView, "autocomplete.json", data: users, conn: conn)
   end
 
   test "autocomplete.json - returns pixelated avatars if client disallows NSFW", %{conn: conn, archer: archer} do
     conn  = assign(conn, :allow_nsfw, false)
     user1 = Script.build(:archer, settings: %{posts_adult_content: true})
     users = [user1, archer]
-    assert [
+    assert %{autocomplete_results: [
       %{name: user1.username, image_url: "https://assets.ello.co/uploads/user/avatar/#{archer.id}/ello-small-pixellated-fad52e18.png"},
       %{name: archer.username, image_url: "https://assets.ello.co/uploads/user/avatar/#{archer.id}/ello-small-fad52e18.png"}
-    ] == render(UserView, "autocomplete.json", data: users, conn: conn)
+    ]} == render(UserView, "autocomplete.json", data: users, conn: conn)
   end
 
   test "autocomplete.json - returns pixelated avatars if client disallows nudity", %{conn: conn, archer: archer} do
     conn  = assign(conn, :allow_nudity, false)
     user1 = Script.build(:archer, settings: %{posts_nudity: true})
     users = [user1, archer]
-    assert [
+    assert %{autocomplete_results: [
       %{name: user1.username, image_url: "https://assets.ello.co/uploads/user/avatar/#{archer.id}/ello-small-pixellated-fad52e18.png"},
       %{name: archer.username, image_url: "https://assets.ello.co/uploads/user/avatar/#{archer.id}/ello-small-fad52e18.png"}
-    ] == render(UserView, "autocomplete.json", data: users, conn: conn)
+    ]} == render(UserView, "autocomplete.json", data: users, conn: conn)
   end
 end

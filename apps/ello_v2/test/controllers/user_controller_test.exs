@@ -114,8 +114,8 @@ defmodule Ello.V2.UserControllerTest do
     UserIndex.create
     UserIndex.add(archer)
     conn = get(conn, user_path(conn, :autocomplete, %{"terms" => archer.username}))
-    assert [%{"image_url" => "https://assets.ello.co/uploads/user/avatar/42/ello-small-fad52e18.png",
-              "name" => "archer"}] = json_response(conn, 200)
+    assert %{"autocomplete_results" => [%{"image_url" => "https://assets.ello.co/uploads/user/avatar/42/ello-small-fad52e18.png",
+              "name" => "archer"}]} = json_response(conn, 200)
   end
 
   test "GET /v2/users/autocomplete - user token with no search results", %{conn: conn} do
@@ -143,6 +143,10 @@ defmodule Ello.V2.UserControllerTest do
     UserIndex.create
     UserIndex.add(archer)
     conn = get(conn, user_path(conn, :index, %{"terms" => "archer"}))
+    assert [link] = get_resp_header(conn, "link")
+    assert String.contains?(link, "terms=archer")
+    assert String.contains?(link, "page=2")
+    assert String.contains?(link, "/api/v2/users")
     assert %{"name" => "Sterling Archer"} = hd(json_response(conn, 200)["users"])
   end
 end

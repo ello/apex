@@ -38,6 +38,7 @@ defmodule Ello.V2.DiscoverPostController do
   defp post_search(conn, params) do
     PostSearch.post_search(%{
       trending:     true,
+      within_days:  14,
       current_user: current_user(conn),
       allow_nsfw:   conn.assigns[:allow_nsfw],
       allow_nudity: conn.assigns[:allow_nudity],

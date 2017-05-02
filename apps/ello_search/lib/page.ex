@@ -9,6 +9,7 @@ defmodule Ello.Search.Page do
     total_count:  nil,
     total_pages:  nil,
     total_pages_remaining: nil,
+    terms:        nil,
   ]
 
   def from_results(raw_results, models, opts) do
@@ -20,6 +21,7 @@ defmodule Ello.Search.Page do
     %__MODULE__{
       results:      models,
       raw:          raw_results,
+      terms:        opts[:terms],
       current_page: page,
       next_page:    page + 1,
       per_page:     per_page,

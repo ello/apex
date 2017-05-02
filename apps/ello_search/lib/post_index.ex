@@ -9,7 +9,16 @@ defmodule Ello.Search.PostIndex do
   end
 
   def add(post, overrides \\ %{}) do
-    post_data = %{
+    post_data   = assemble_post_data(post, overrides)
+    author_data = assemble_author_data(post.author, overrides)
+
+    Client.index_document(index_name(), author_doc_type(), post.author.id, author_data)
+    Client.index_document(index_name(), post_doc_type(), post.id, post_data, %{parent: post.author.id})
+    Client.refresh_index(index_name())
+  end
+
+  defp assemble_post_data(post, overrides) do
+    %{
       id:                post.id,
       created_at:        post.created_at,
       updated_at:        post.updated_at,
@@ -32,35 +41,33 @@ defmodule Ello.Search.PostIndex do
       alt_text:          "",
       is_saleable:       post.is_saleable
     } |> Map.merge(overrides[:post] || %{})
+  end
 
-    author_data = %{
-      id:                 post.author.id,
-      created_at:         post.author.created_at,
-      updated_at:         post.author.updated_at,
-      name:               post.author.name,
-      username:           post.author.username,
-      short_bio:          post.author.short_bio,
-      links:              post.author.links,
-      locked_out:         !!post.author.locked_at,
+  defp assemble_author_data(author, overrides) do
+    %{
+      id:                 author.id,
+      created_at:         author.created_at,
+      updated_at:         author.updated_at,
+      name:               author.name,
+      username:           author.username,
+      short_bio:          author.short_bio,
+      links:              author.links,
+      locked_out:         !!author.locked_at,
       post_count:         0,
       comment_count:      0,
       follower_count:     0,
       is_spammer:         false,
-      is_system_user:     post.author.is_system_user,
-      is_featured_user:   Enum.any?(post.author.category_ids),
-      has_avatar:         !!post.author.avatar,
-      is_public:          post.author.is_public,
-      category_ids:       post.author.category_ids,
-      category_names:     category_names(post.author.category_ids),
-      is_hireable:        post.author.settings.is_hireable,
-      is_collaborateable: post.author.settings.is_collaborateable,
-      location:           post.author.location,
-      coordinates:        coordinates(post.author)
+      is_system_user:     author.is_system_user,
+      is_featured_user:   Enum.any?(author.category_ids),
+      has_avatar:         !!author.avatar,
+      is_public:          author.is_public,
+      category_ids:       author.category_ids,
+      category_names:     category_names(author.category_ids),
+      is_hireable:        author.settings.is_hireable,
+      is_collaborateable: author.settings.is_collaborateable,
+      location:           author.location,
+      coordinates:        coordinates(author)
     } |> Map.merge(overrides[:author] || %{})
-
-    Client.index_document(index_name(), author_doc_type(), post.author.id, author_data)
-    Client.index_document(index_name(), post_doc_type(), post.id, post_data, %{parent: post.author.id})
-    Client.refresh_index(index_name())
   end
 
   def delete, do: Client.delete_index(index_name())
@@ -160,5 +167,5 @@ defmodule Ello.Search.PostIndex do
   defp coordinates(%{location_lat: nil, location_long: nil}), do: nil
   defp coordinates(%{location_lat: lat, location_long: long}), do: %{lat: lat, lon: long}
 
-  defp detected_language(post), do: "en"
+  defp detected_language(_post), do: "en"
 end
