@@ -123,7 +123,7 @@ defmodule Ello.V2.UserView do
   def total_views_count(%{total_views_count: 0}, _), do: nil
   def total_views_count(%{total_views_count: count}, _), do: count
 
-  def badges(%{badges: nil}, _), do: nil
+  def badges(%{badges: nil}, _), do: []
   def badges(%{badges: []}, _), do: []
   def badges(%{badges: badges}, %{assigns: %{current_user: %{is_staff: true}}}), do: badges
   def badges(%{badges: badges}, _) do
