@@ -11,11 +11,17 @@ defmodule Ello.Search.TrendingPost do
   end
 
   defp boost_recent(query, true) do
-    recent_boost = %{gauss: %{created_at: %{scale: "3h", offset: "1d"}}, weight: 1}
+    weight = Application.get_env(:ello_search, :post_trending_recency_weight)
+    scale = Application.get_env(:ello_search, :post_trending_recency_scale)
+    offset = Application.get_env(:ello_search, :post_trending_recency_offset)
+    recent_boost = %{gauss: %{created_at: %{scale: scale, offset: offset}}, weight: weight}
     update_in(query[:query][:function_score][:functions], &([recent_boost | &1]))
   end
   defp boost_recent(query, _) do
-    recent_boost = %{gauss: %{created_at: %{scale: "90d", offset: "90d"}}, weight: 0.2}
+    weight = Application.get_env(:ello_search, :post_search_recency_weight)
+    scale = Application.get_env(:ello_search, :post_search_recency_scale)
+    offset = Application.get_env(:ello_search, :post_search_recency_offset)
+    recent_boost = %{gauss: %{created_at: %{scale: scale, offset: offset}}, weight: weight}
     update_in(query[:query][:function_score][:functions], &([recent_boost | &1]))
   end
 
