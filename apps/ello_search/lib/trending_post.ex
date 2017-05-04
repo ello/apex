@@ -18,11 +18,7 @@ defmodule Ello.Search.TrendingPost do
     update_in(query[:query][:function_score][:functions], &([recent_boost | &1]))
   end
   defp boost_recent(query, _) do
-    weight = Application.get_env(:ello_search, :post_search_recency_weight)
-    scale = Application.get_env(:ello_search, :post_search_recency_scale)
-    offset = Application.get_env(:ello_search, :post_search_recency_offset)
-    recent_boost = %{gauss: %{created_at: %{scale: scale, offset: offset}}, weight: weight}
-    update_in(query[:query][:function_score][:functions], &([recent_boost | &1]))
+    update_in(query[:query][:function_score][:functions], &([%{field_value_factor: %{field: "created_at", modifier: "square"}} | &1]))
   end
 
   defp boost_comment_count(query, true), do:
