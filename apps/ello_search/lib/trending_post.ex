@@ -17,9 +17,7 @@ defmodule Ello.Search.TrendingPost do
     recent_boost = %{gauss: %{created_at: %{scale: scale, offset: offset}}, weight: weight}
     update_in(query[:query][:function_score][:functions], &([recent_boost | &1]))
   end
-  defp boost_recent(query, _) do
-    update_in(query[:query][:function_score][:functions], &([%{field_value_factor: %{field: "created_at", modifier: "square"}} | &1]))
-  end
+  defp boost_recent(query, _), do: update_in(query[:sort], &(&1 = %{created_at: %{order: "desc"}}))
 
   defp boost_comment_count(query, true), do:
     update_in(query[:query][:function_score][:functions], &([%{field_value_factor: %{field: "comment_count", modifier: "log1p", factor: 0.3}} | &1]))
