@@ -65,10 +65,10 @@ defmodule Ello.Search.PostSearch do
   end
 
   defp build_hashtag_query(query, nil), do: query
-  defp build_hashtag_query(query, terms) do
-    hashtag_boost = Application.get_env(:ello_search, :hashtag_boost_factor)
-    update_bool(query, :should, &([%{match: %{hashtags: %{query: terms, boost: hashtag_boost}}} | &1]))
+  defp build_hashtag_query(query, "#" <> terms) do
+    update_bool(query, :must, &([%{match: %{hashtags: %{query: terms}}} | &1]))
   end
+  defp build_hashtag_query(query, _), do: query
 
   defp filter_nsfw(query, true), do: query
   defp filter_nsfw(query, false) do
