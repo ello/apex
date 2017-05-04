@@ -14,12 +14,9 @@ config :ello_search,
   language_boost_factor:        String.to_float(System.get_env("ES_TRENDING_DETECTED_LANGUAGE_WEIGHT") || "3.0"),
   es_default_shards:            String.to_integer(System.get_env("ES_DEFAULT_SHARDS") || "5"),
   es_default_replicas:          String.to_integer(System.get_env("ES_DEFAULT_REPLICAS") || "1"),
-  post_search_recency_weight:   String.to_float(System.get_env("POST_SEARCH_RECENCY_WEIGHT") || "0.2"),
-  post_search_recency_scale:    System.get_env("POST_SEARCH_RECENCY_SCALE") || "90d",
-  post_search_recency_offset:   System.get_env("POST_SEARCH_RECENCY_OFFSET") || "90d",
   post_trending_recency_weight: String.to_float(System.get_env("POST_TRENDING_RECENCY_WEIGHT") || "1.0"),
-  post_trending_recency_scale:  System.get_env("POST_TRENDING_RECENCY_SCALE") || "3d",
-  post_trending_recency_offset: System.get_env("POST_TRENDING_RECENCY_OFFSET") || "1h"
+  post_trending_recency_scale:  System.get_env("POST_TRENDING_RECENCY_SCALE") || "3h",
+  post_trending_recency_offset: System.get_env("POST_TRENDING_RECENCY_OFFSET") || "1d"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
