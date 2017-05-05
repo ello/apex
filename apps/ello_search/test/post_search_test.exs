@@ -54,6 +54,16 @@ defmodule Ello.Search.PostSearchTest do
     }
   end
 
+  test "post_search - returns empty result when nothing relevant", _context do
+    search = PostSearch.post_search(%{
+      terms: "notactualyincludinganywhere",
+      current_user: nil,
+      allow_nsfw: false,
+      allow_nudity: false
+    })
+    assert search.results == []
+  end
+
   test "post_search - returns a relevant result", context do
     results = PostSearch.post_search(%{terms: "Phrasing", current_user: nil, allow_nsfw: false, allow_nudity: false}).results
     assert hd(results).id == context.post.id

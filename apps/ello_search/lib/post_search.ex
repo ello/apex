@@ -148,10 +148,13 @@ defmodule Ello.Search.PostSearch do
       results = Client.search(PostIndex.index_name(), [PostIndex.post_doc_type], query).body
     end
 
-    posts = results
-            |> get_in(["hits", "hits"])
-            |> Enum.map(&(String.to_integer(&1["_id"])))
-            |> Content.posts_by_ids(opts)
+    posts = case results["hits"]["hits"] do
+      hits when is_list(hits) ->
+        hits
+        |> Enum.map(&(String.to_integer(&1["_id"])))
+        |> Content.posts_by_ids(opts)
+      _ -> []
+    end
 
     Page.from_results(results, posts, opts)
   end
