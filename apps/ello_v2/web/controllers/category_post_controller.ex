@@ -11,7 +11,7 @@ defmodule Ello.V2.CategoryPostController do
         stream = fetch_stream(conn, [category], params)
 
         conn
-        |> track_post_view(stream.posts, stream_kind: "category", stream_id: category.id)
+        |> track_post_view(stream.posts, stream_kind: stream_kind(conn), stream_id: category.id)
         |> add_pagination_headers("/categories/#{category.slug}/posts/recent", stream)
         |> api_render(PostView, :index, data: stream.posts)
     end
@@ -22,7 +22,7 @@ defmodule Ello.V2.CategoryPostController do
     stream = fetch_stream(conn, categories, params)
 
     conn
-    |> track_post_view(stream.posts, stream_kind: "featured")
+    |> track_post_view(stream.posts, stream_kind: stream_kind(conn))
     |> add_pagination_headers("/categories/posts/recent", stream)
     |> api_render(PostView, :index, data: stream.posts)
   end
@@ -40,4 +40,13 @@ defmodule Ello.V2.CategoryPostController do
   end
 
   defp category_stream_key(%{slug: slug}), do: "categories:v1:#{slug}"
+
+  defp stream_kind(conn) do
+    case {action_name(conn), conn.params["stream_source"]} do
+      {:featured, nil}    -> "featured"
+      {:recent, nil}      -> "category"
+      {:featured, source} -> "featured_" <> source
+      {:recent, source}   -> "category_" <> source
+    end
+  end
 end
