@@ -115,10 +115,14 @@ defmodule Ello.Search.UserSearch do
       results = Client.search(UserIndex.index_name(), UserIndex.doc_types(), query).body
     end
 
-    ids   = Enum.map(results["hits"]["hits"], &(String.to_integer(&1["_id"])))
-    users = ids
-            |> Network.users(opts[:current_user])
-            |> user_sorting(ids)
+    users = case results["hits"]["hits"] do
+      hits when is_list(hits) ->
+        ids   = Enum.map(hits, &(String.to_integer(&1["_id"])))
+        ids
+        |> Network.users(opts[:current_user])
+        |> user_sorting(ids)
+      _ -> []
+    end
 
     Page.from_results(results, users, opts)
   end
