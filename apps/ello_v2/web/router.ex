@@ -32,6 +32,7 @@ defmodule Ello.V2.Router do
     end
 
     # Following
-    resources "/following/posts/recent", FollowingPostController, only: [:index]
+    get "/following/posts/recent", FollowingPostController, :recent
+    get "/following/posts/trending", FollowingPostController, :trending
   end
 end

@@ -96,6 +96,7 @@ defmodule Ello.Search.UserSearchTest do
     Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.spam_user.id])
 
     results = UserSearch.username_search(%{terms: "username", current_user: context.current_user}).results
+    Redis.command(["DEL", "user:#{context.current_user.id}:followed_users_id_cache"])
     assert context.spam_user.id == hd(Enum.map(results, &(&1.id)))
   end
 
@@ -104,6 +105,8 @@ defmodule Ello.Search.UserSearchTest do
     current_user = Network.User.preload_blocked_ids(context.current_user)
 
     results = UserSearch.username_search(%{terms: "username", current_user: current_user}).results
+    Redis.command(["DEL", "user:#{context.current_user.id}:block_id_cache"])
+
     assert context.user.id in Enum.map(results, &(&1.id))
     refute context.spam_user.id in Enum.map(results, &(&1.id))
   end
@@ -113,6 +116,7 @@ defmodule Ello.Search.UserSearchTest do
     current_user = Network.User.preload_blocked_ids(context.current_user)
 
     results = UserSearch.username_search(%{terms: "username", current_user: current_user}).results
+    Redis.command(["DEL", "user:#{context.current_user.id}:inverse_block_id_cache"])
     assert context.user.id in Enum.map(results, &(&1.id))
     refute context.spam_user.id in Enum.map(results, &(&1.id))
   end
@@ -121,6 +125,7 @@ defmodule Ello.Search.UserSearchTest do
     Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.lana32d.id])
 
     results = UserSearch.username_search(%{terms: "lana", current_user: context.current_user}).results
+    Redis.command(["DEL", "user:#{context.current_user.id}:followed_users_id_cache"])
     assert context.lana32d.id == hd(Enum.map(results, &(&1.id)))
     assert context.lanakane.id in Enum.map(results, &(&1.id))
     assert context.lanabandero.id in Enum.map(results, &(&1.id))
@@ -170,6 +175,7 @@ defmodule Ello.Search.UserSearchTest do
     current_user = Network.User.preload_blocked_ids(context.current_user)
 
     results = UserSearch.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: false, current_user: current_user}).results
+    Redis.command(["DEL", "user:#{context.current_user.id}:block_id_cache"])
     refute context.user.id in Enum.map(results, &(&1.id))
     assert context.nsfw_user.id in Enum.map(results, &(&1.id))
   end
@@ -179,6 +185,7 @@ defmodule Ello.Search.UserSearchTest do
     current_user = Network.User.preload_blocked_ids(context.current_user)
 
     results = UserSearch.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: false, current_user: current_user}).results
+    Redis.command(["DEL", "user:#{context.current_user.id}:inverse_block_id_cache"])
     refute context.user.id in Enum.map(results, &(&1.id))
     assert context.nsfw_user.id in Enum.map(results, &(&1.id))
   end
@@ -187,6 +194,7 @@ defmodule Ello.Search.UserSearchTest do
     Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.nsfw_user.id])
 
     results = UserSearch.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: false, current_user: context.current_user}).results
+    Redis.command(["DEL", "user:#{context.current_user.id}:followed_users_id_cache"])
     assert context.nsfw_user.id == hd(Enum.map(results, &(&1.id)))
     assert context.user.id in Enum.map(results, &(&1.id))
   end

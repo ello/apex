@@ -300,4 +300,24 @@ defmodule Ello.Search.PostSearchTest do
     refute context.nsfw_post.id in ids
     refute context.private_post.id in ids
   end
+
+  test "following filtering - for search or trending", context do
+    Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.post.author_id])
+    Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.nudity_post.author_id])
+
+    results = PostSearch.post_search(%{
+      trending:     true,
+      allow_nsfw:   true,
+      allow_nudity: true,
+      current_user: context.current_user,
+      following:    true
+    }).results
+
+    Redis.command(["DEL", "user:#{context.current_user.id}:followed_users_id_cache"])
+    ids = Enum.map(results, &(&1.id))
+    assert context.post.id in ids
+    assert context.nudity_post.id in ids
+    refute context.nsfw_post.id in ids
+    refute context.private_post.id in ids
+  end
 end
