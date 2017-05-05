@@ -128,7 +128,7 @@ defmodule Ello.Search.PostSearchTest do
     assert length(Enum.map(results, &(&1.id))) == 0
   end
 
-  test "post_search - boosts hashtags", context do
+  test "post_search - returns hashtag posts and non-hashtag posts", context do
     PostIndex.add(context.hashtag_post)
     results = PostSearch.post_search(%{terms: "phrasing", current_user: nil, allow_nsfw: false, allow_nudity: false}).results
     assert hd(results).id == context.hashtag_post.id
@@ -136,12 +136,12 @@ defmodule Ello.Search.PostSearchTest do
     assert length(Enum.map(results, &(&1.id))) == 2
   end
 
-  test "post_search - also finds posts if hashtags are used in terms", context do
+  test "post_search - returns only hashtag posts", context do
     PostIndex.add(context.hashtag_post)
     results = PostSearch.post_search(%{terms: "#phrasing", current_user: nil, allow_nsfw: false, allow_nudity: false}).results
     assert hd(results).id == context.hashtag_post.id
-    assert context.post.id in Enum.map(results, &(&1.id))
-    assert length(Enum.map(results, &(&1.id))) == 2
+    refute context.post.id in Enum.map(results, &(&1.id))
+    assert length(Enum.map(results, &(&1.id))) == 1
   end
 
   test "post_search - matches on mentions", context do
