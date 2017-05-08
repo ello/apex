@@ -89,7 +89,7 @@ defmodule Ello.Search.PostSearch do
 
   defp filter_category(query, nil), do: query
   defp filter_category(query, id) do
-    update_bool(query, :filter, &([%{term: %{category_ids: id}} | &1]))
+    update_bool(query, :filter, &([%{terms: %{category_ids: [id]}} | &1]))
   end
 
   defp filter_following(query, true, %{} = user) do
