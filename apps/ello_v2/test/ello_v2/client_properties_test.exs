@@ -66,7 +66,7 @@ defmodule Ello.V2.ClientPropertiesTest do
            |> put_req_header("user_agent", "Ello/4640 CFNetwork/758.3.15 Darwin/15.5.0")
            |> ClientProperties.call([])
     assert conn.assigns[:ios]
-    refute conn.assigns[:allow_nudity]
+    assert conn.assigns[:allow_nudity]
     refute conn.assigns[:allow_nsfw]
   end
 
@@ -126,7 +126,7 @@ defmodule Ello.V2.ClientPropertiesTest do
            |> assign(:current_user, %User{settings: %{views_adult_content: false}})
            |> ClientProperties.call([])
     assert conn.assigns[:ios]
-    refute conn.assigns[:allow_nudity]
+    assert conn.assigns[:allow_nudity]
     refute conn.assigns[:allow_nsfw]
   end
 end
