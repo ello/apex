@@ -164,6 +164,12 @@ defmodule Ello.V2.UserViewTest do
     assert render(UserView, "user.json", user: archer, conn: conn) == expected
   end
 
+  test "user.json - has_sharing_enabled is false if is_public is false", %{conn: conn, user: user} do
+    settings = Map.merge(user.settings, %{has_sharing_enabled: true})
+    user = Map.merge(user, %{is_public: false, settings: settings})
+    assert render(UserView, "user.json", user: user, conn: conn).has_sharing_enabled == false
+  end
+
   test "user.json - renders most badges for normal accounts", %{conn: conn, user: user} do
     user = Map.merge(user, %{badges: ["community", "nsfw", "spam"]})
     assert render(UserView, "user.json", user: user, conn: conn).badges == ["community"]

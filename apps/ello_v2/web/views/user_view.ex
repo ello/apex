@@ -75,6 +75,7 @@ defmodule Ello.V2.UserView do
     :external_links_list,
     :avatar,
     :cover_image,
+    :has_sharing_enabled,
     :total_views_count,
     :badges,
   ]
@@ -88,7 +89,6 @@ defmodule Ello.V2.UserView do
     :posts_adult_content,
     :views_adult_content,
     :has_commenting_enabled,
-    :has_sharing_enabled,
     :has_reposting_enabled,
     :has_loves_enabled,
     :has_auto_watch_enabled,
@@ -157,5 +157,9 @@ defmodule Ello.V2.UserView do
   def badges(%{badges: badges}, _) do
     badges
     |> Enum.reject(&(Enum.member?(@sensitive_badges, &1)))
+  end
+
+  def has_sharing_enabled(user, _) do
+    user.is_public && user.settings.has_sharing_enabled
   end
 end
