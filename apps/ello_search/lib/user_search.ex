@@ -75,7 +75,7 @@ defmodule Ello.Search.UserSearch do
     ]}}))
   end
 
-  defp build_username_query(query, %{terms: terms} = opts) do
+  defp build_username_query(query, %{terms: terms}) do
     boost = Application.get_env(:ello_search, :username_match_boost)
     query
     |> update_in([:query, :bool, :must], &([%{match_phrase_prefix: %{username: terms}} | &1]))
