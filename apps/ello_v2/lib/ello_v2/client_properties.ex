@@ -56,6 +56,8 @@ defmodule Ello.V2.ClientProperties do
     do: assign(conn, :allow_nudity, true)
   defp nudity(%{assigns: %{webapp: true}} = conn, _),
     do: assign(conn, :allow_nudity, true)
+  defp nudity(%{assigns: %{ios: true}} = conn, _),
+    do: assign(conn, :allow_nudity, true)
   defp nudity(conn, _),
     do: assign(conn, :allow_nudity, false)
 
