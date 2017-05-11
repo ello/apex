@@ -69,13 +69,10 @@ defmodule Ello.Search.UserSearch do
   defp build_user_query(query, %{terms: "@" <> terms} = opts), do: build_username_query(query, Map.merge(opts, %{terms: terms}))
   defp build_user_query(query, %{terms: terms} = opts) do
     filtered_terms = filter_terms(terms, opts[:allow_nsfw])
-    update_in(query[:query][:bool][:must],
-              &([%{multi_match:
-                   %{query: filtered_terms,
-                     type: "best_fields",
-                     fields: ["name", "username"],
-                     analyzer: "standard",
-                     minimum_should_match: "100%"}} | &1]))
+    update_in(query[:query][:bool][:must], &(&1 = %{dis_max: %{queries: [
+        %{match_phrase_prefix: %{username: filtered_terms}},
+        %{match_phrase_prefix: %{name: %{query: filtered_terms, analyzer: "standard"}}}
+    ]}}))
   end
 
   defp build_username_query(query, %{terms: terms} = opts) do
