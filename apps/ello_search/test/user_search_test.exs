@@ -208,12 +208,11 @@ defmodule Ello.Search.UserSearchTest do
     refute context.casey.id in Enum.map(results, &(&1.id))
   end
 
-  # Temporarily skipped until we figure out a way to get exact matches to appear first in results
-  # test "user_search - @dcdoran test", context do
-  #   results = UserSearch.user_search(%{terms: "@dcdoran", current_user: context.current_user, allow_nsfw: false, allow_nudity: false}).results
-  #   assert context.casey.id == hd(Enum.map(results, &(&1.id)))
-  #   assert context.dcdoran122.id in Enum.map(results, &(&1.id))
-  #   assert context.dcdoran11888.id in Enum.map(results, &(&1.id))
-  # end
+  test "user_search - @dcdoran test", context do
+    results = UserSearch.user_search(%{terms: "@dcdoran", current_user: context.current_user, allow_nsfw: false, allow_nudity: false}).results
+    assert context.casey.id == hd(Enum.map(results, &(&1.id)))
+    assert context.dcdoran122.id in Enum.map(results, &(&1.id))
+    assert context.dcdoran11888.id in Enum.map(results, &(&1.id))
+  end
 
 end

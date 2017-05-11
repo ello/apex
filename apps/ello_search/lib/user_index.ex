@@ -52,7 +52,7 @@ defmodule Ello.Search.UserIndex do
             username_autocomplete: %{
               type: "custom",
               tokenizer: "keyword",
-              filter: ["lowercase", "autocomplete"]
+              filter: ["lowercase"]
             },
             name_autocomplete: %{
               type: "custom",
