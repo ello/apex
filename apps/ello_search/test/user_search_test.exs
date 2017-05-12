@@ -19,6 +19,7 @@ defmodule Ello.Search.UserSearchTest do
     casey        = Factory.insert(:user, %{username: "dcdoran", name: "Casey Doran"})
     dcdoran122   = Factory.insert(:user, %{username: "dcdoran122"})
     dcdoran11888 = Factory.insert(:user, %{username: "dcdoran11888"})
+    lucian       = Factory.insert(:user, %{username: "lucian", name: "Lucian Föhr"})
 
     UserIndex.delete
     UserIndex.create
@@ -35,6 +36,7 @@ defmodule Ello.Search.UserSearchTest do
     UserIndex.add(casey)
     UserIndex.add(dcdoran122)
     UserIndex.add(dcdoran11888)
+    UserIndex.add(lucian)
 
     {:ok,
       user: user,
@@ -50,7 +52,8 @@ defmodule Ello.Search.UserSearchTest do
       archer: archer,
       casey: casey,
       dcdoran122: dcdoran122,
-      dcdoran11888: dcdoran11888
+      dcdoran11888: dcdoran11888,
+      lucian: lucian
     }
   end
 
@@ -208,12 +211,17 @@ defmodule Ello.Search.UserSearchTest do
     refute context.casey.id in Enum.map(results, &(&1.id))
   end
 
-  # Temporarily skipped until we figure out a way to get exact matches to appear first in results
-  # test "user_search - @dcdoran test", context do
-  #   results = UserSearch.user_search(%{terms: "@dcdoran", current_user: context.current_user, allow_nsfw: false, allow_nudity: false}).results
-  #   assert context.casey.id == hd(Enum.map(results, &(&1.id)))
-  #   assert context.dcdoran122.id in Enum.map(results, &(&1.id))
-  #   assert context.dcdoran11888.id in Enum.map(results, &(&1.id))
-  # end
+  test "user_search - @dcdoran test", context do
+    results = UserSearch.user_search(%{terms: "@dcdoran", current_user: context.current_user, allow_nsfw: false, allow_nudity: false}).results
+    assert context.casey.id == hd(Enum.map(results, &(&1.id)))
+    assert context.dcdoran122.id in Enum.map(results, &(&1.id))
+    assert context.dcdoran11888.id in Enum.map(results, &(&1.id))
+  end
+
+  test "user_search - Lucian Föhr test (special characters)", context do
+    results = UserSearch.user_search(%{terms: "Lucian Föhr", current_user: context.current_user, allow_nsfw: false, allow_nudity: false}).results
+    assert context.lucian.id == hd(Enum.map(results, &(&1.id)))
+    assert length(Enum.map(results, &(&1.id))) == 1
+  end
 
 end

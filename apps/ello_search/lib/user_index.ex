@@ -46,18 +46,22 @@ defmodule Ello.Search.UserIndex do
               type: "edge_ngram",
               min_gram: 1,
               max_gram: 20
+            },
+            my_asciifolding: %{
+              type: "asciifolding",
+              preserve_original: true,
             }
           },
           analyzer: %{
             username_autocomplete: %{
               type: "custom",
               tokenizer: "keyword",
-              filter: ["lowercase", "autocomplete"]
+              filter: ["lowercase"]
             },
             name_autocomplete: %{
               type: "custom",
               tokenizer: "whitespace",
-              filter: ["lowercase", "autocomplete"]
+              filter: ["lowercase", "autocomplete", "my_asciifolding"]
             }
           }
         }
