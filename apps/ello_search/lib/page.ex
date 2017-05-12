@@ -15,7 +15,7 @@ defmodule Ello.Search.Page do
   def from_results(raw_results, models, opts) do
     page        = String.to_integer(opts[:page] || "1")
     per_page    = String.to_integer(opts[:per_page] || "25")
-    total_count = raw_results["hits"]["total"]
+    total_count = raw_results["hits"]["total"] || 0
     total_pages = round(Float.ceil(total_count / per_page))
 
     %__MODULE__{
