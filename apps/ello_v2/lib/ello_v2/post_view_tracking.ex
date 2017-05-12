@@ -13,8 +13,12 @@ defmodule Ello.V2.PostViewTracking do
         _ -> nil
       end
 
+      post_ids = posts
+                 |> Enum.reject(&is_nil/1)
+                 |> Enum.map(&(&1.id))
+
       event = %CountPostView{
-        post_ids:    Enum.map(posts, &(&1.id)),
+        post_ids:    post_ids,
         user_id:     user_id,
         stream_kind: opts[:stream_kind],
         stream_id:   "#{opts[:stream_id]}",

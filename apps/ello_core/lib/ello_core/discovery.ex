@@ -1,7 +1,7 @@
 defmodule Ello.Core.Discovery do
   import Ecto.Query
-  alias Ello.Core.{Repo, Network, Discovery}
-  alias Discovery.{Category, Promotional}
+  alias Ello.Core.{Repo, Network, Discovery, Content}
+  alias Discovery.{Category, Promotional, Editorial}
   alias Network.User
 
   @moduledoc """
@@ -58,6 +58,31 @@ defmodule Ello.Core.Discovery do
     |> Repo.all
     |> load_images
   end
+
+  def editorials(%{preview: false} = opts) do
+    Editorial
+    |> where([e], not is_nil(e.published_position))
+    |> order_by(desc: :published_position)
+    |> editorial_cursor(false, opts[:before])
+    |> limit(^opts[:per_page])
+    |> Repo.all
+    |> Repo.preload(post: &(Content.posts_by_ids(&1, opts)))
+  end
+  def editorials(%{preview: true} = opts) do
+    Editorial
+    |> where([e], not is_nil(e.preview_position))
+    |> order_by(desc: :preview_position)
+    |> editorial_cursor(true, opts[:before])
+    |> limit(^opts[:per_page])
+    |> Repo.all
+    |> Repo.preload(post: &(Content.posts_by_ids(&1, opts)))
+  end
+
+  defp editorial_cursor(query, _, nil), do: query
+  defp editorial_cursor(query, true, before),
+    do: where(query, [e], e.preview_position < ^before)
+  defp editorial_cursor(query, false, before),
+    do: where(query, [e], e.published_position < ^before)
 
   @type categorizable :: User.t | Post.t | [User.t | Post.t]
 

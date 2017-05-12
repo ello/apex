@@ -9,6 +9,7 @@ query logic and storage is handled by Ello.Core and friends.
 
 * GET /api/v2/categories
 * GET /api/v2/categories/:id
+* GET /api/v2/editorials
 * GET /api/v2/users/:id_or_username
 * GET /api/v2/posts/:id_or_token
 * GET /api/v2/user/:id_or_username/posts

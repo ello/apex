@@ -3,6 +3,10 @@ defprotocol Ello.V2.ConditionalGet do
   def etag(data)
 end
 
+defimpl Ello.V2.ConditionalGet, for: Atom do
+  def etag(nil), do: ""
+end
+
 defimpl Ello.V2.ConditionalGet, for: BitString do
   def etag(binary) do
     "W/" <> Base.encode16(:crypto.hash(:md5, binary), case: :lower)
@@ -93,5 +97,19 @@ defimpl Ello.V2.ConditionalGet, for: Ello.Core.Content.Post do
     ]
     values
     |> :erlang.term_to_binary
+  end
+end
+
+defimpl Ello.V2.ConditionalGet, for: Ello.Core.Discovery.Editorial do
+  def etag(editorial) do
+    values = [
+      :editorial,
+      editorial.id,
+      editorial.updated_at,
+      Ello.V2.ConditionalGet.etag(editorial.post),
+    ]
+    values
+    |> :erlang.term_to_binary
+    |> Ello.V2.ConditionalGet.etag
   end
 end
