@@ -20,6 +20,8 @@ defmodule Ello.Search.UserSearchTest do
     dcdoran122   = Factory.insert(:user, %{username: "dcdoran122"})
     dcdoran11888 = Factory.insert(:user, %{username: "dcdoran11888"})
     lucian       = Factory.insert(:user, %{username: "lucian", name: "Lucian Föhr"})
+    todd         = Factory.insert(:user, %{username: "todd", name: "Todd Berger"})
+    toddreed     = Factory.insert(:user, %{username: "toddreed", name: "Todd Reed"})
 
     UserIndex.delete
     UserIndex.create
@@ -37,6 +39,8 @@ defmodule Ello.Search.UserSearchTest do
     UserIndex.add(dcdoran122)
     UserIndex.add(dcdoran11888)
     UserIndex.add(lucian)
+    UserIndex.add(todd)
+    UserIndex.add(toddreed)
 
     {:ok,
       user: user,
@@ -53,7 +57,9 @@ defmodule Ello.Search.UserSearchTest do
       casey: casey,
       dcdoran122: dcdoran122,
       dcdoran11888: dcdoran11888,
-      lucian: lucian
+      lucian: lucian,
+      todd: todd,
+      toddreed: toddreed
     }
   end
 
@@ -118,6 +124,12 @@ defmodule Ello.Search.UserSearchTest do
     assert context.lana32d.id == hd(Enum.map(results, &(&1.id)))
     assert context.lanakane.id in Enum.map(results, &(&1.id))
     assert context.lanabandero.id in Enum.map(results, &(&1.id))
+  end
+
+  test "username_search - @todd test", context do
+    results = UserSearch.user_search(%{terms: "@todd", current_user: context.current_user, allow_nsfw: false, allow_nudity: false}).results
+    assert context.todd.id == hd(Enum.map(results, &(&1.id)))
+    assert context.toddreed.id in Enum.map(results, &(&1.id))
   end
 
   test "user_search - does not include spamified users", context do
@@ -220,6 +232,12 @@ defmodule Ello.Search.UserSearchTest do
 
   test "user_search - Lucian Föhr test (special characters)", context do
     results = UserSearch.user_search(%{terms: "Lucian Föhr", current_user: context.current_user, allow_nsfw: false, allow_nudity: false}).results
+    assert context.lucian.id == hd(Enum.map(results, &(&1.id)))
+    assert length(Enum.map(results, &(&1.id))) == 1
+  end
+
+  test "user_search - Lucian Fohr test", context do
+    results = UserSearch.user_search(%{terms: "lucian fohr", current_user: context.current_user, allow_nsfw: false, allow_nudity: false}).results
     assert context.lucian.id == hd(Enum.map(results, &(&1.id)))
     assert length(Enum.map(results, &(&1.id))) == 1
   end
