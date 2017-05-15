@@ -30,6 +30,11 @@ defmodule Ello.V2.EditorialControllerTest do
         "users" => [%{}],
       }
     } = json_response(conn, 200)
+
+    assert [
+      "<https://ello.co/api/v2/editorials?before=2&per_page=4>;" <> _
+    ] = get_resp_header(conn, "link")
+
     assert post["id"] == "#{e7.id}"
     assert post["kind"] == "post"
     assert post["title"]
@@ -64,12 +69,24 @@ defmodule Ello.V2.EditorialControllerTest do
     assert external["url"]
   end
 
+  test "GET /v2/categories - published - page2", %{conn: conn, editorials: editorials} do
+    [e1, _e2, _e3, _e4, _e5, _e6, _e7] = editorials
+    conn = get(conn, editorial_path(conn, :index), %{before: "2", per_page: "4"})
+    assert %{"editorials" => response} = json_response(conn, 200)
+    assert Enum.map(response, &(String.to_integer(&1["id"]))) ==
+      [e1.id]
+  end
+
   test "GET /v2/categories - preview - not staff", %{conn: conn, editorials: editorials} do
     [_e1, _e2, e3, e4, e5, _e6, e7] = editorials
     conn = get(conn, editorial_path(conn, :index), %{preview: "true", per_page: "4"})
     assert %{"editorials" => response} = json_response(conn, 200)
     assert Enum.map(response, &(String.to_integer(&1["id"]))) ==
       [e7.id, e5.id, e4.id, e3.id]
+
+    assert [
+      "<https://ello.co/api/v2/editorials?before=2&per_page=4>;" <> _
+    ] = get_resp_header(conn, "link")
   end
 
   test "GET /v2/categories - preview - as staff", %{staff_conn: conn, editorials: editorials} do
@@ -78,5 +95,9 @@ defmodule Ello.V2.EditorialControllerTest do
     assert %{"editorials" => response} = json_response(conn, 200)
     assert Enum.map(response, &(String.to_integer(&1["id"]))) ==
       [e7.id, e6.id, e5.id, e4.id]
+
+    assert [
+      "<https://ello.co/api/v2/editorials?before=4&per_page=4&preview=true>;" <> _
+    ] = get_resp_header(conn, "link")
   end
 end

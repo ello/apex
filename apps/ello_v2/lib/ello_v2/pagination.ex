@@ -31,6 +31,10 @@ defmodule Ello.V2.Pagination do
     |> put_resp_header("x-total-pages-remaining", "#{page.total_pages_remaining}")
     |> put_resp_header("link", ~s(<#{next}>; rel="next"))
   end
+  def add_pagination_headers(conn, path, params) do
+    next = pagination_link(path, params)
+    put_resp_header(conn, "link", ~s(<#{next}>; rel="next"))
+  end
 
   defp pagination_link(path, params) do
     %URI{
