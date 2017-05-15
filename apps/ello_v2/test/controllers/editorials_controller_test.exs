@@ -31,9 +31,37 @@ defmodule Ello.V2.EditorialControllerTest do
       }
     } = json_response(conn, 200)
     assert post["id"] == "#{e7.id}"
+    assert post["kind"] == "post"
+    assert post["title"]
+    assert post["subtitle"]
+    refute post["url"]
+    assert post["links"]["post"] == %{
+      "href" => "/api/v2/posts/#{e7.post.id}",
+      "id"   => "#{e7.post.id}",
+      "type" => "posts",
+    }
+
     assert curated["id"] == "#{e5.id}"
+    assert curated["kind"] == "post_stream"
+    assert curated["title"]
+    refute curated["subtitle"]
+    refute curated["url"]
+    assert curated["links"]["post_stream"]["type"] == "posts"
+    assert curated["links"]["post_stream"]["href"]
+
     assert category["id"] == "#{e4.id}"
+    assert category["kind"] == "post_stream"
+    assert category["title"]
+    refute category["subtitle"]
+    refute category["url"]
+    assert category["links"]["post_stream"]["type"] == "posts"
+    assert category["links"]["post_stream"]["href"]
+
     assert external["id"] == "#{e3.id}"
+    assert external["kind"] == "external"
+    assert external["title"]
+    assert external["subtitle"]
+    assert external["url"]
   end
 
   test "GET /v2/categories - preview - not staff", %{conn: conn, editorials: editorials} do

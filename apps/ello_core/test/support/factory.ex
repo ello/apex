@@ -150,6 +150,7 @@ defmodule Ello.Core.Factory do
   def post_editorial_factory do
     Map.merge(editorial_factory(), %{
       post: build(:post),
+      kind: "post",
       content: %{
         title: "Post Editorial",
         subtitle: "check it out",
@@ -159,6 +160,7 @@ defmodule Ello.Core.Factory do
 
   def external_editorial_factory do
     Map.merge(editorial_factory(), %{
+      kind: "external",
       content: %{
         title: "Post Editorial",
         subtitle: "check it out",
@@ -169,6 +171,7 @@ defmodule Ello.Core.Factory do
 
   def category_editorial_factory do
     Map.merge(editorial_factory(), %{
+      kind: "category",
       content: %{
         title: "BUY BUY BUY!!!!!",
         slug: "shop",
@@ -178,6 +181,7 @@ defmodule Ello.Core.Factory do
 
   def curated_posts_editorial_factory do
     Map.merge(editorial_factory(), %{
+      kind: "curated_posts",
       content: %{
         title: "BUY BUY BUY!!!!!",
         slug: "shop",

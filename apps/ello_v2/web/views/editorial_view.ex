@@ -31,11 +31,54 @@ defmodule Ello.V2.EditorialView do
   def render("editorial.json", %{editorial: editorial} = opts) do
     editorial
     |> render_self(__MODULE__, opts)
+    |> add_subtitle(editorial)
+    |> add_url(editorial)
   end
 
-  def attributes, do: [
-  ]
+  def attributes, do: []
+  def computed_attributes, do: [:title, :kind]
 
-  def computed_attributes, do: [
-  ]
+  def links(%{kind: "post"} = ed, _conn) do
+    %{
+      post: %{
+        id: "#{ed.post.id}",
+        type: "posts",
+        href: "/api/v2/posts/#{ed.post.id}",
+      }
+    }
+  end
+  def links(%{kind: "curated_posts"} = ed, _conn) do
+    query = ed.content["post_tokens"]
+            |> Enum.map(&("token[]=#{&1}"))
+            |> Enum.join("&")
+    %{
+      post_stream: %{
+        type: "posts",
+        href: "/api/v2/editorials/posts/?#{query}",
+      }
+    }
+  end
+  def links(%{kind: "category"} = ed, _conn) do
+    %{
+      post_stream: %{
+        type: "posts",
+        href: "/api/v2/categories/#{ed.content["slug"]}/posts/recent?per_page=3",
+      }
+    }
+  end
+  def links(_, _), do: nil
+
+  def title(ed, _), do: ed.content["title"]
+
+  def kind(%{kind: kind}, _) when kind in ["category", "curated_posts"],
+    do: "post_stream"
+  def kind(%{kind: kind}, _), do: kind
+
+  defp add_subtitle(json, %{kind: kind} = ed) when kind in ["external", "post"],
+    do: Map.put(json, "subtitle", ed.content["subtitle"])
+  defp add_subtitle(json, _), do: json
+
+  defp add_url(json, %{kind: "external"} = ed),
+    do: Map.put(json, "url", ed.content["url"])
+  defp add_url(json, _), do: json
 end
