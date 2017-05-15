@@ -32,7 +32,7 @@ defmodule Ello.V2.EditorialController do
 
   defp next_page_params(editorials, conn) do
     next = %{per_page: conn.params["per_page"] || 25}
-    if (conn.params["preview"] == "true" && current_user(conn).is_staff) do
+    if conn.params["preview"] == "true" && current_user(conn).is_staff do
       Map.merge(next, %{
         before: List.last(editorials).preview_position,
         preview: true,
