@@ -127,6 +127,9 @@ defmodule Ello.Search.UserSearchTest do
   end
 
   test "username_search - @todd test", context do
+    Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.toddreed.id])
+    Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.todd.id])
+
     results = UserSearch.user_search(%{terms: "@todd", current_user: context.current_user, allow_nsfw: false, allow_nudity: false}).results
     assert context.todd.id == hd(Enum.map(results, &(&1.id)))
     assert context.toddreed.id in Enum.map(results, &(&1.id))

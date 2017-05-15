@@ -68,9 +68,11 @@ defmodule Ello.Search.UserSearch do
 
   defp build_user_query(query, %{terms: "@" <> terms} = opts), do: build_username_query(query, Map.merge(opts, %{terms: terms}))
   defp build_user_query(query, %{terms: terms} = opts) do
+    boost = Application.get_env(:ello_search, :username_match_boost)
     filtered_terms = filter_terms(terms, opts[:allow_nsfw])
     update_in(query[:query][:bool][:must], &(&1 = %{dis_max: %{queries: [
         %{prefix: %{username: %{value: filtered_terms}}},
+        %{term: %{username: %{value: filtered_terms, boost: boost}}},
         %{match: %{name: %{query: filtered_terms, analyzer: "standard", minimum_should_match: "100%"}}} # analyzer: "standard"
     ]}}))
   end
