@@ -152,8 +152,8 @@ defmodule Ello.Core.Factory do
       post: build(:post),
       kind: "post",
       content: %{
-        title: "Post Editorial",
-        subtitle: "check it out",
+        "title"    => "Post Editorial",
+        "subtitle" => "check it out",
       }
     })
   end
@@ -162,9 +162,9 @@ defmodule Ello.Core.Factory do
     Map.merge(editorial_factory(), %{
       kind: "external",
       content: %{
-        title: "Post Editorial",
-        subtitle: "check it out",
-        url: "https://ello.co/wtf",
+        "title"    => "Post Editorial",
+        "subtitle" => "check it out",
+        "url"      => "https://ello.co/wtf",
       }
     })
   end
@@ -173,8 +173,8 @@ defmodule Ello.Core.Factory do
     Map.merge(editorial_factory(), %{
       kind: "category",
       content: %{
-        title: "BUY BUY BUY!!!!!",
-        slug: "shop",
+        "title" => "BUY BUY BUY!!!!!",
+        "slug"  => "shop",
       }
     })
   end
@@ -183,9 +183,9 @@ defmodule Ello.Core.Factory do
     Map.merge(editorial_factory(), %{
       kind: "curated_posts",
       content: %{
-        title: "BUY BUY BUY!!!!!",
-        slug: "shop",
-        post_tokens: [insert(:post).token, insert(:post).token]
+        "title"       => "BUY BUY BUY!!!!!",
+        "slug"        => "shop",
+        "post_tokens" => [insert(:post).token, insert(:post).token]
       }
     })
   end

@@ -337,12 +337,12 @@ defmodule Ello.Core.Content do
     end
   end
 
-  defp build_image_structs(%Post{assets: assets} = post) when is_list(assets) do
+  def build_image_structs(%Post{assets: assets} = post) when is_list(assets) do
     Map.put(post, :assets, Enum.map(assets, &Asset.build_attachment/1))
   end
-  defp build_image_structs(%Post{} = post), do: post
-  defp build_image_structs(nil), do: nil
-  defp build_image_structs(posts) when is_list(posts) do
+  def build_image_structs(%Post{} = post), do: post
+  def build_image_structs(nil), do: nil
+  def build_image_structs(posts) when is_list(posts) do
     measure_segment {__MODULE__, "build_image_structs"} do
       Enum.map(posts, &build_image_structs/1)
     end

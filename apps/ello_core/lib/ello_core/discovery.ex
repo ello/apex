@@ -67,6 +67,7 @@ defmodule Ello.Core.Discovery do
     |> limit(^opts[:per_page])
     |> Repo.all
     |> Repo.preload(post: &(Content.posts_by_ids(&1, opts)))
+    |> build_editorial_images
   end
   def editorials(%{preview: true} = opts) do
     Editorial
@@ -76,6 +77,7 @@ defmodule Ello.Core.Discovery do
     |> limit(^opts[:per_page])
     |> Repo.all
     |> Repo.preload(post: &(Content.posts_by_ids(&1, opts)))
+    |> build_editorial_images
   end
 
   defp editorial_cursor(query, _, nil), do: query
@@ -162,4 +164,8 @@ defmodule Ello.Core.Discovery do
   defp load_images(%Category{} = category) do
     Category.load_images(category)
   end
+
+  defp build_editorial_images([]), do: []
+  defp build_editorial_images(editorials),
+    do: Enum.map(editorials, &Editorial.build_images/1)
 end

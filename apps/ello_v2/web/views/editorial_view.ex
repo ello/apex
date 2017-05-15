@@ -6,6 +6,7 @@ defmodule Ello.V2.EditorialView do
     CategoryView,
     UserView,
     AssetView,
+    ImageView,
   }
 
   def stale_checks(_, %{data: editorials}) do
@@ -36,7 +37,14 @@ defmodule Ello.V2.EditorialView do
   end
 
   def attributes, do: []
-  def computed_attributes, do: [:title, :kind]
+  def computed_attributes, do: [
+    :title,
+    :kind,
+    :one_by_one_image,
+    :one_by_two_image,
+    :two_by_one_image,
+    :two_by_two_image,
+  ]
 
   def links(%{kind: "post"} = ed, _conn) do
     %{
@@ -75,10 +83,26 @@ defmodule Ello.V2.EditorialView do
   def kind(%{kind: kind}, _), do: kind
 
   defp add_subtitle(json, %{kind: kind} = ed) when kind in ["external", "post"],
-    do: Map.put(json, "subtitle", ed.content["subtitle"])
+    do: Map.put(json, :subtitle, ed.content["subtitle"])
   defp add_subtitle(json, _), do: json
 
   defp add_url(json, %{kind: "external"} = ed),
-    do: Map.put(json, "url", ed.content["url"])
+    do: Map.put(json, :url, ed.content["url"])
   defp add_url(json, _), do: json
+
+  def one_by_one_image(editorial, conn) do
+    render(ImageView, "image.json", image: editorial.one_by_one_image_struct, conn: conn)
+  end
+
+  def one_by_two_image(editorial, conn) do
+    render(ImageView, "image.json", image: editorial.one_by_two_image_struct, conn: conn)
+  end
+
+  def two_by_one_image(editorial, conn) do
+    render(ImageView, "image.json", image: editorial.two_by_one_image_struct, conn: conn)
+  end
+
+  def two_by_two_image(editorial, conn) do
+    render(ImageView, "image.json", image: editorial.two_by_two_image_struct, conn: conn)
+  end
 end
