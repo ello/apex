@@ -68,17 +68,19 @@ defmodule Ello.Search.UserSearch do
 
   defp build_user_query(query, %{terms: "@" <> terms} = opts), do: build_username_query(query, Map.merge(opts, %{terms: terms}))
   defp build_user_query(query, %{terms: terms} = opts) do
+    boost = Application.get_env(:ello_search, :username_match_boost)
     filtered_terms = filter_terms(terms, opts[:allow_nsfw])
     update_in(query[:query][:bool][:must], &(&1 = %{dis_max: %{queries: [
-        %{match_phrase_prefix: %{username: filtered_terms}},
-        %{match_phrase_prefix: %{name: %{query: filtered_terms, analyzer: "standard"}}}
+        %{prefix: %{username: %{value: filtered_terms}}},
+        %{term: %{username: %{value: filtered_terms, boost: boost}}},
+        %{match: %{name: %{query: filtered_terms, analyzer: "standard", minimum_should_match: "100%"}}} # analyzer: "standard"
     ]}}))
   end
 
   defp build_username_query(query, %{terms: terms}) do
     boost = Application.get_env(:ello_search, :username_match_boost)
     query
-    |> update_in([:query, :bool, :must], &([%{match_phrase_prefix: %{username: terms}} | &1]))
+    |> update_in([:query, :bool, :must], &([%{prefix: %{username: %{value: terms}}} | &1]))
     |> update_in([:query, :bool, :should], &([%{term: %{username: %{value: terms, boost: boost}}} | &1]))
   end
 
