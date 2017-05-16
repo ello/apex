@@ -183,9 +183,26 @@ defmodule Ello.Core.Factory do
     Map.merge(editorial_factory(), %{
       kind: "curated_posts",
       content: %{
-        "title"       => "BUY BUY BUY!!!!!",
-        "slug"        => "shop",
+        "title"       => "These posts are great.",
         "post_tokens" => [insert(:post).token, insert(:post).token]
+      }
+    })
+  end
+
+  def following_editorial_factory do
+    Map.merge(editorial_factory(), %{
+      kind: "following",
+      content: %{
+        "title" => "Following",
+      }
+    })
+  end
+
+  def invite_join_editorial_factory do
+    Map.merge(editorial_factory(), %{
+      kind: "invite_join",
+      content: %{
+        "title" => "Join or Invite",
       }
     })
   end

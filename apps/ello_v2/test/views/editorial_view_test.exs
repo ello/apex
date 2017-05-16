@@ -70,6 +70,58 @@ defmodule Ello.V2.EditorialViewTest do
     assert json[:links][:post_stream][:href]
   end
 
+  test "editorial.json - following kind - authenticated", context do
+    user = Factory.build(:user)
+    conn = assign(context.conn, :current_user, user)
+    editorial = Editorial.build_images(Factory.insert(:following_editorial))
+    json = render(EditorialView, "editorial.json",
+      editorial: editorial,
+      conn: conn
+    )
+    assert json[:id] == "#{editorial.id}"
+    assert json[:kind] == "post_stream"
+    refute json[:subtitle]
+    refute json[:url]
+    assert json[:links][:post_stream][:type] == "posts"
+    assert json[:links][:post_stream][:href] == "/api/v2/following"
+  end
+
+  test "editorial.json - following kind - anonymous", context do
+    editorial = Editorial.build_images(Factory.insert(:following_editorial))
+    json = render(EditorialView, "editorial.json",
+      editorial: editorial,
+      conn: context.conn
+    )
+    assert json[:id] == "#{editorial.id}"
+    assert json[:kind] == "post_stream"
+    refute json[:subtitle]
+    refute json[:url]
+    assert json[:links][:post_stream][:type] == "posts"
+    assert json[:links][:post_stream][:href] == "/api/v2/discover/posts/trending"
+  end
+
+  test "editorial.json - invite_join kind - authenticated", context do
+    user = Factory.build(:user)
+    conn = assign(context.conn, :current_user, user)
+    editorial = Editorial.build_images(Factory.insert(:invite_join_editorial))
+    json = render(EditorialView, "editorial.json",
+      editorial: editorial,
+      conn: conn
+    )
+    assert json[:id] == "#{editorial.id}"
+    assert json[:kind] == "invite"
+  end
+
+  test "editorial.json - invite_join kind - anonymous", context do
+    editorial = Editorial.build_images(Factory.insert(:invite_join_editorial))
+    json = render(EditorialView, "editorial.json",
+      editorial: editorial,
+      conn: context.conn
+    )
+    assert json[:id] == "#{editorial.id}"
+    assert json[:kind] == "join"
+  end
+
   test "editorial.json - images", context do
     editorial = Editorial.build_images(Factory.insert(:post_editorial))
     json = render(EditorialView, "editorial.json",
