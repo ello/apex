@@ -74,7 +74,7 @@ defmodule Ello.V2.EditorialView do
       }
     }
   end
-  def links(%{kind: "following"} = ed, %{assigns: %{current_user: user}} = conn) when not is_nil(user) do
+  def links(%{kind: "following"}, %{assigns: %{current_user: user}}) when not is_nil(user) do
     %{
       post_stream: %{
         type: "posts",
@@ -82,7 +82,7 @@ defmodule Ello.V2.EditorialView do
       }
     }
   end
-  def links(%{kind: "following"} = ed, _conn) do
+  def links(%{kind: "following"}, _conn) do
     %{
       post_stream: %{
         type: "posts",
