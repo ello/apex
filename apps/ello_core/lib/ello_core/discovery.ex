@@ -63,7 +63,7 @@ defmodule Ello.Core.Discovery do
     Editorial
     |> where([e], not is_nil(e.published_position))
     |> order_by(desc: :published_position)
-    |> editorial_cursor(false, opts[:before])
+    |> editorial_cursor(opts)
     |> limit(^opts[:per_page])
     |> Repo.all
     |> Repo.preload(post: &(Content.posts_by_ids(&1, opts)))
@@ -73,17 +73,17 @@ defmodule Ello.Core.Discovery do
     Editorial
     |> where([e], not is_nil(e.preview_position))
     |> order_by(desc: :preview_position)
-    |> editorial_cursor(true, opts[:before])
+    |> editorial_cursor(opts)
     |> limit(^opts[:per_page])
     |> Repo.all
     |> Repo.preload(post: &(Content.posts_by_ids(&1, opts)))
     |> build_editorial_images
   end
 
-  defp editorial_cursor(query, _, nil), do: query
-  defp editorial_cursor(query, true, before),
+  defp editorial_cursor(query, %{before: nil}), do: query
+  defp editorial_cursor(query, %{preview: true, before: before}),
     do: where(query, [e], e.preview_position < ^before)
-  defp editorial_cursor(query, false, before),
+  defp editorial_cursor(query, %{preview: false, before: before}),
     do: where(query, [e], e.published_position < ^before)
 
   @type categorizable :: User.t | Post.t | [User.t | Post.t]
