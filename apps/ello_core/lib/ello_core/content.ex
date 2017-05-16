@@ -59,13 +59,23 @@ defmodule Ello.Core.Content do
     |> Repo.all
     |> post_preloads(current_user)
     |> filter_blocked(current_user)
-    |> post_sorting(ids)
+    |> post_sorting(:id, ids)
   end
 
-  defp post_sorting(posts, ids) do
+  def posts_by_tokens(%{tokens: tokens, current_user: current_user} = filters) do
+    Post
+    |> where([p], p.token in ^tokens)
+    |> filter_post_for_client(filters)
+    |> Repo.all
+    |> post_preloads(current_user)
+    |> filter_blocked(current_user)
+    |> post_sorting(:token, tokens)
+  end
+
+  defp post_sorting(posts, field, values) do
     measure_segment {__MODULE__, "post_sorting"} do
-      mapped = Enum.group_by(posts, &(&1.id))
-      ids
+      mapped = Enum.group_by(posts, &Map.get(&1, field))
+      values
       |> Enum.uniq
       |> Enum.flat_map(&(mapped[&1] || []))
     end
