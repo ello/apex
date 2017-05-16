@@ -15,7 +15,11 @@ config :ello_search,
   es_default_replicas:          String.to_integer(System.get_env("ES_DEFAULT_REPLICAS") || "1"),
   post_trending_recency_weight: String.to_float(System.get_env("POST_TRENDING_RECENCY_WEIGHT") || "1.0"),
   post_trending_recency_scale:  System.get_env("POST_TRENDING_RECENCY_SCALE") || "3h",
-  post_trending_recency_offset: System.get_env("POST_TRENDING_RECENCY_OFFSET") || "1d"
+  post_trending_recency_offset: System.get_env("POST_TRENDING_RECENCY_OFFSET") || "1d",
+  post_trending_comment_boost:  String.to_float(System.get_env("POST_TRENDING_COMMENT_BOOST") || "0.3"),
+  post_trending_love_boost:     String.to_float(System.get_env("POST_TRENDING_LOVE_BOOST") || "0.05"),
+  post_trending_view_boost:     String.to_float(System.get_env("POST_TRENDING_VIEW_BOOST") || "0.00001"),
+  post_trending_repost_boost:   String.to_float(System.get_env("POST_TRENDING_REPOST_BOOST") || "0.8")
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
