@@ -74,12 +74,30 @@ defmodule Ello.V2.EditorialView do
       }
     }
   end
+  def links(%{kind: "following"} = ed, %{assigns: %{current_user: user}} = conn) when not is_nil(user) do
+    %{
+      post_stream: %{
+        type: "posts",
+        href: "/api/v2/following",
+      }
+    }
+  end
+  def links(%{kind: "following"} = ed, _conn) do
+    %{
+      post_stream: %{
+        type: "posts",
+        href: "/api/v2/discover/posts/trending",
+      }
+    }
+  end
   def links(_, _), do: nil
 
   def title(ed, _), do: ed.content["title"]
 
-  def kind(%{kind: kind}, _) when kind in ["category", "curated_posts"],
+  def kind(%{kind: kind}, _) when kind in ["category", "curated_posts", "following"],
     do: "post_stream"
+  def kind(%{kind: "invite_join"}, %{assigns: %{current_user: user}}) when not is_nil(user), do: "invite"
+  def kind(%{kind: "invite_join"}, _), do: "join"
   def kind(%{kind: kind}, _), do: kind
 
   defp add_subtitle(json, %{kind: kind} = ed) when kind in ["external", "post"],

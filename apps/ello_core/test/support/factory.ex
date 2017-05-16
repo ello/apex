@@ -189,6 +189,24 @@ defmodule Ello.Core.Factory do
     })
   end
 
+  def following_editorial_factory do
+    Map.merge(editorial_factory(), %{
+      kind: "following",
+      content: %{
+        "title" => "Following",
+      }
+    })
+  end
+
+  def invite_join_editorial_factory do
+    Map.merge(editorial_factory(), %{
+      kind: "invite_join",
+      content: %{
+        "title" => "Join or Invite",
+      }
+    })
+  end
+
   def love_factory do
     %Love{
       user: build(:user),
