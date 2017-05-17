@@ -56,9 +56,15 @@ defmodule Ello.Search.PostSearch do
   end
 
   defp build_text_content_query(query, %{trending: true}), do: query
-  defp build_text_content_query(query, opts) do
-    text_boost = Application.get_env(:ello_search, :text_content_boost_factor)
-    update_bool(query, :must, &([%{query_string: %{query: filter_terms(opts), fields: ["text_content"], boost: text_boost}} | &1]))
+  defp build_text_content_query(query, %{terms: terms} = opts) do
+    if String.starts_with?(terms, "\"") && String.ends_with?(terms, "\"") do
+      sliced_terms = String.slice(terms, 1, (String.length(terms) - 2))
+      updated_opts = Map.merge(opts, %{terms: sliced_terms})
+      update_bool(query, :must, &([%{match_phrase: %{text_content: filter_terms(updated_opts)}} | &1]))
+    else
+      text_boost = Application.get_env(:ello_search, :text_content_boost_factor)
+      update_bool(query, :must, &([%{query_string: %{query: filter_terms(opts), fields: ["text_content"], boost: text_boost}} | &1]))
+    end
   end
 
   defp build_mention_query(query, %{trending: true}), do: query
