@@ -19,20 +19,28 @@ defmodule Ello.Search.TrendingPost do
   end
   defp boost_recent(query, _), do: update_in(query[:sort], &(&1 = %{created_at: %{order: "desc"}}))
 
-  defp boost_comment_count(query, true), do:
-    update_in(query[:query][:function_score][:functions], &([%{field_value_factor: %{field: "comment_count", modifier: "log1p", factor: 0.3}} | &1]))
+  defp boost_comment_count(query, true) do
+    factor = Application.get_env(:ello_search, :post_trending_comment_boost)
+    update_in(query[:query][:function_score][:functions], &([%{field_value_factor: %{field: "comment_count", modifier: "log1p", factor: factor}} | &1]))
+  end
   defp boost_comment_count(query, _), do: query
 
-  defp boost_repost_count(query, true), do:
-    update_in(query[:query][:function_score][:functions], &([%{field_value_factor: %{field: "repost_count", modifier: "log1p", factor: 0.8}} | &1]))
+  defp boost_repost_count(query, true) do
+    factor = Application.get_env(:ello_search, :post_trending_repost_boost)
+    update_in(query[:query][:function_score][:functions], &([%{field_value_factor: %{field: "repost_count", modifier: "log1p", factor: factor}} | &1]))
+  end
   defp boost_repost_count(query, _), do: query
 
-  defp boost_view_count(query, true), do:
-    update_in(query[:query][:function_score][:functions], &([%{field_value_factor: %{field: "view_count", modifier: "log1p", factor: 0.00001}} | &1]))
+  defp boost_view_count(query, true) do
+    factor = Application.get_env(:ello_search, :post_trending_view_boost)
+    update_in(query[:query][:function_score][:functions], &([%{field_value_factor: %{field: "view_count", modifier: "log1p", factor: factor}} | &1]))
+  end
   defp boost_view_count(query, _), do: query
 
-  defp boost_love_count(query, true), do:
-    update_in(query[:query][:function_score][:functions], &([%{field_value_factor: %{field: "love_count", modifier: "log1p", factor: 0.05}} | &1]))
+  defp boost_love_count(query, true) do
+    factor = Application.get_env(:ello_search, :post_trending_love_boost)
+    update_in(query[:query][:function_score][:functions], &([%{field_value_factor: %{field: "love_count", modifier: "log1p", factor: factor}} | &1]))
+  end
   defp boost_love_count(query, _), do: query
 
   defp update_score_mode(query, true), do:
