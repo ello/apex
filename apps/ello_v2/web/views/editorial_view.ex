@@ -112,14 +112,23 @@ defmodule Ello.V2.EditorialView do
     render(ImageView, "image.json", image: editorial.one_by_one_image_struct, conn: conn)
   end
 
+  def one_by_two_image(%{one_by_two_image_struct: nil} = e, conn) do
+    one_by_one_image(e, conn)
+  end
   def one_by_two_image(editorial, conn) do
     render(ImageView, "image.json", image: editorial.one_by_two_image_struct, conn: conn)
   end
 
+  def two_by_one_image(%{two_by_one_image_struct: nil} = e, conn) do
+    one_by_one_image(e, conn)
+  end
   def two_by_one_image(editorial, conn) do
     render(ImageView, "image.json", image: editorial.two_by_one_image_struct, conn: conn)
   end
 
+  def two_by_two_image(%{two_by_two_image_struct: nil} = e, conn) do
+    one_by_one_image(e, conn)
+  end
   def two_by_two_image(editorial, conn) do
     render(ImageView, "image.json", image: editorial.two_by_two_image_struct, conn: conn)
   end
