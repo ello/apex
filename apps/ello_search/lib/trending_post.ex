@@ -1,8 +1,8 @@
 defmodule Ello.Search.TrendingPost do
 
-  def build_boosting_queries(query, trending) do
+  def build_boosting_queries(query, trending, following, category) do
     query
-    |> boost_recent(trending)
+    |> boost_recent(trending, following, category)
     |> boost_comment_count(trending)
     |> boost_repost_count(trending)
     |> boost_view_count(trending)
@@ -10,14 +10,28 @@ defmodule Ello.Search.TrendingPost do
     |> update_score_mode(trending)
   end
 
-  defp boost_recent(query, true) do
+  defp boost_recent(query, true, nil, nil) do
     weight = Application.get_env(:ello_search, :post_trending_recency_weight)
     scale = Application.get_env(:ello_search, :post_trending_recency_scale)
     offset = Application.get_env(:ello_search, :post_trending_recency_offset)
     recent_boost = %{gauss: %{created_at: %{scale: scale, offset: offset}}, weight: weight}
     update_in(query[:query][:function_score][:functions], &([recent_boost | &1]))
   end
-  defp boost_recent(query, _), do: update_in(query[:sort], &(&1 = %{created_at: %{order: "desc"}}))
+  defp boost_recent(query, true, true, nil) do
+    weight = Application.get_env(:ello_search, :following_trending_recency_weight)
+    scale = Application.get_env(:ello_search, :following_trending_recency_scale)
+    offset = Application.get_env(:ello_search, :following_trending_recency_offset)
+    recent_boost = %{gauss: %{created_at: %{scale: scale, offset: offset}}, weight: weight}
+    update_in(query[:query][:function_score][:functions], &([recent_boost | &1]))
+  end
+  defp boost_recent(query, true, nil, _) do
+    weight = Application.get_env(:ello_search, :category_trending_recency_weight)
+    scale = Application.get_env(:ello_search, :category_trending_recency_scale)
+    offset = Application.get_env(:ello_search, :category_trending_recency_offset)
+    recent_boost = %{gauss: %{created_at: %{scale: scale, offset: offset}}, weight: weight}
+    update_in(query[:query][:function_score][:functions], &([recent_boost | &1]))
+  end
+  defp boost_recent(query, _, _, _), do: update_in(query[:sort], &(&1 = %{created_at: %{order: "desc"}}))
 
   defp boost_comment_count(query, true) do
     factor = Application.get_env(:ello_search, :post_trending_comment_boost)

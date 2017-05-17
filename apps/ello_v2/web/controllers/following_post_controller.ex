@@ -40,7 +40,7 @@ defmodule Ello.V2.FollowingPostController do
     PostSearch.post_search(%{
       trending:     true,
       following:    true,
-      within_days:  14,
+      within_days:  60,
       current_user: current_user(conn),
       allow_nsfw:   conn.assigns[:allow_nsfw],
       allow_nudity: conn.assigns[:allow_nudity],

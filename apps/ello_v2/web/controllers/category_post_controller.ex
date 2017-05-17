@@ -69,6 +69,7 @@ defmodule Ello.V2.CategoryPostController do
     PostSearch.post_search(%{
       category:     category.id,
       trending:     true,
+      within_days:  60,
       per_page:     params["per_page"] || "25",
       page:         params["page"],
       current_user: current_user,

@@ -14,7 +14,7 @@ defmodule Ello.Search.PostSearch do
     |> filter_category(opts[:category])
     |> filter_following(opts[:following], opts[:current_user])
     |> filter_days(opts[:within_days])
-    |> TrendingPost.build_boosting_queries(opts[:trending])
+    |> TrendingPost.build_boosting_queries(opts[:trending], opts[:following], opts[:category])
     |> search_post_index(opts)
   end
 
