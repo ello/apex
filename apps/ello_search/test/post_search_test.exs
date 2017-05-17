@@ -22,6 +22,7 @@ defmodule Ello.Search.PostSearchTest do
     mention_post = Factory.insert(:post, %{body: [%{"data" => "@archer", "kind" => "text"}]})
     badman_post  = Factory.insert(:post, %{body: [%{"data" => "This is a bad, bad man.", "kind" => "text"}]})
     stopword_post = Factory.insert(:post, %{body: [%{"data" => "asshole #ass", "kind" => "text"}]})
+    irrel_post2  = Factory.insert(:post, %{body: [%{"data" => "Irrelevantpost!", "kind" => "text"}]})
 
     PostIndex.delete
     PostIndex.create
@@ -36,6 +37,7 @@ defmodule Ello.Search.PostSearchTest do
     PostIndex.add(locked_post)
     PostIndex.add(spam_post, %{author: %{is_spammer: true}})
     PostIndex.add(stopword_post)
+    PostIndex.add(irrel_post2)
 
     {:ok,
       current_user: current_user,
@@ -54,6 +56,7 @@ defmodule Ello.Search.PostSearchTest do
       mention_post: mention_post,
       badman_post: badman_post,
       stopword_post: stopword_post,
+      irrel_post2: irrel_post2,
     }
   end
 
@@ -209,6 +212,12 @@ defmodule Ello.Search.PostSearchTest do
   test "post_search - includes hashtag results with stopwords if client allows", context do
     results = PostSearch.post_search(%{terms: "#ass", webapp: true, allow_nsfw: true, allow_nudity: false, current_user: context.current_user}).results
     assert context.stopword_post.id in Enum.map(results, &(&1.id))
+  end
+
+  test "post_search - exact phrase results for quotation searches", context do
+    results = PostSearch.post_search(%{terms: ~s("irrelevant post"), allow_nsfw: true, allow_nudity: true, current_user: context.current_user}).results
+    assert context.irrel_post.id in Enum.map(results, &(&1.id))
+    refute context.irrel_post2.id in Enum.map(results, &(&1.id))
   end
 
   test "trending - returns a relevant result", context do
