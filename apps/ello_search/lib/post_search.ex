@@ -1,15 +1,15 @@
 defmodule Ello.Search.PostSearch do
   import NewRelicPhoenix, only: [measure_segment: 2]
   alias Ello.Core.Content
-  alias Ello.Search.{Client, PostIndex, TrendingPost, Page}
+  alias Ello.Search.{Client, PostIndex, TrendingPost, Page, TermSanitizer}
   use Timex
 
   def post_search(opts) do
     opts
     |> build_client_filter_queries
-    |> build_text_content_query(opts[:terms])
-    |> build_mention_query(opts[:terms])
-    |> build_hashtag_query(opts[:terms])
+    |> build_text_content_query(opts)
+    |> build_mention_query(opts)
+    |> build_hashtag_query(opts)
     |> build_pagination_query(opts[:page], opts[:per_page])
     |> filter_days(opts[:within_days])
     |> TrendingPost.build_boosting_queries(opts[:trending])
@@ -52,28 +52,26 @@ defmodule Ello.Search.PostSearch do
     }
   end
 
-  defp build_text_content_query(query, nil), do: query
-  defp build_text_content_query(query, terms) do
+  defp build_text_content_query(query, %{trending: true}), do: query
+  defp build_text_content_query(query, opts) do
     text_boost = Application.get_env(:ello_search, :text_content_boost_factor)
-    update_bool(query, :must, &([%{query_string: %{query: terms, fields: ["text_content"], boost: text_boost}} | &1]))
+    update_bool(query, :must, &([%{query_string: %{query: filter_terms(opts), fields: ["text_content"], boost: text_boost}} | &1]))
   end
 
-  defp build_mention_query(query, nil), do: query
-  defp build_mention_query(query, terms) do
+  defp build_mention_query(query, %{trending: true}), do: query
+  defp build_mention_query(query, opts) do
     mention_boost = Application.get_env(:ello_search, :mention_boost_factor)
-    update_bool(query, :should, &([%{match: %{mentions: %{query: terms, boost: mention_boost}}} | &1]))
+    update_bool(query, :should, &([%{match: %{mentions: %{query: filter_terms(opts), boost: mention_boost}}} | &1]))
   end
 
-  defp build_hashtag_query(query, nil), do: query
-  defp build_hashtag_query(query, "#" <> terms) do
-    update_bool(query, :must, &([%{match: %{hashtags: %{query: terms}}} | &1]))
-  end
+  defp build_hashtag_query(query, %{trending: true}), do: query
+  defp build_hashtag_query(query, %{terms: "#" <> _} = opts), do:
+    update_bool(query, :must, &([%{match: %{hashtags: %{query: filter_terms(opts)}}} | &1]))
   defp build_hashtag_query(query, _), do: query
 
   defp filter_nsfw(query, true), do: query
-  defp filter_nsfw(query, false) do
+  defp filter_nsfw(query, false), do:
     update_bool(query, :must_not, &([%{term: %{is_adult_content: true}} | &1]))
-  end
 
   defp filter_nudity(query, true), do: query
   defp filter_nudity(query, false) do
@@ -84,6 +82,9 @@ defmodule Ello.Search.PostSearch do
   defp filter_blocked(query, user) do
     update_bool(query, :must_not, &([%{terms: %{author_id: user.all_blocked_ids}} | &1]))
   end
+
+  defp filter_terms(%{allow_nsfw: false} = opts), do: TermSanitizer.sanitize(opts[:terms])
+  defp filter_terms(opts),                        do: opts[:terms]
 
   defp author_base_query do
     %{

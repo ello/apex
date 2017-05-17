@@ -17,6 +17,8 @@ end
 defmodule Ello.Search.TermSanitizer do
   @before_compile Ello.Search.TermSanitizer.Regex
 
+  def sanitize(nil),   do: ""
+  def sanitize(""),    do: ""
   def sanitize(terms), do: String.replace(terms, regex(), "")
 end
 
