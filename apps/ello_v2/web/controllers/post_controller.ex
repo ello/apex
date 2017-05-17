@@ -42,6 +42,8 @@ defmodule Ello.V2.PostController do
       current_user: current_user(conn),
       allow_nsfw:   conn.assigns[:allow_nsfw],
       allow_nudity: conn.assigns[:allow_nudity],
+      ios:          conn.assigns[:ios],
+      android:      conn.assigns[:android],
       page:         params["page"],
       per_page:     params["per_page"]
     })
