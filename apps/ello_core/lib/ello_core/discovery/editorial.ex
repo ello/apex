@@ -48,10 +48,15 @@ defmodule Ello.Core.Discovery.Editorial do
     field_string = Atom.to_string(field)
     metadata = Map.get(editorial, String.to_atom("#{field_string}_metadata"))
     filename = Map.get(editorial, field)
-    %Image{
-      filename: filename,
-      path:     "/uploads/editorial/#{field_string}/#{editorial.id}",
-      versions: Image.Version.from_metadata(metadata, filename),
-    }
+    case filename do
+      nil -> nil
+      ""  -> nil
+      _   ->
+        %Image{
+          filename: filename,
+          path:     "/uploads/editorial/#{field_string}/#{editorial.id}",
+          versions: Image.Version.from_metadata(metadata, filename),
+        }
+    end
   end
 end

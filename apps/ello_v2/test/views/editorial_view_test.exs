@@ -123,7 +123,10 @@ defmodule Ello.V2.EditorialViewTest do
   end
 
   test "editorial.json - images", context do
-    editorial = Editorial.build_images(Factory.insert(:post_editorial))
+    editorial = :post_editorial
+                |> Factory.insert(%{one_by_two_image: nil, one_by_two_image_metadata: %{}})
+                |> Editorial.build_images()
+
     json = render(EditorialView, "editorial.json",
       editorial: editorial,
       conn: context.conn
@@ -156,7 +159,7 @@ defmodule Ello.V2.EditorialViewTest do
 
     assert %{
       "original" => %{
-        url: "https://assets.ello.co/uploads/editorial/one_by_two_image/" <> _,
+        url: "https://assets.ello.co/uploads/editorial/one_by_one_image/" <> _,
       },
       "optimized" => %{},
       "xhdpi" => %{},
@@ -166,7 +169,9 @@ defmodule Ello.V2.EditorialViewTest do
     } = json[:one_by_two_image]
 
     assert %{
-      "original" => %{},
+      "original" => %{
+        url: "https://assets.ello.co/uploads/editorial/two_by_one_image/" <> _,
+      },
       "optimized" => %{},
       "xhdpi" => %{},
       "hdpi" => %{},
