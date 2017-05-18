@@ -203,13 +203,13 @@ defmodule Ello.Search.UserSearchTest do
     results = UserSearch.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: true, current_user: context.current_user}).results
     assert length(Enum.map(results, &(&1.id))) == 4
 
-    results = UserSearch.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: true, current_user: context.current_user, per_page: "2"}).results
+    results = UserSearch.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: true, current_user: context.current_user, per_page: 2}).results
     assert length(Enum.map(results, &(&1.id))) == 2
 
-    results = UserSearch.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: true, current_user: context.current_user, page: "2", per_page: "2"}).results
+    results = UserSearch.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: true, current_user: context.current_user, page: 2, per_page: 2}).results
     assert length(Enum.map(results, &(&1.id))) == 2
 
-    results = UserSearch.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: true, current_user: context.current_user, page: "3", per_page: "2"}).results
+    results = UserSearch.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: true, current_user: context.current_user, page: 3, per_page: 2}).results
     assert length(Enum.map(results, &(&1.id))) == 0
   end
 

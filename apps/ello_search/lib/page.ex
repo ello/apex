@@ -13,8 +13,8 @@ defmodule Ello.Search.Page do
   ]
 
   def from_results(raw_results, models, opts) do
-    page        = opts[:page]
-    per_page    = opts[:per_page]
+    page        = opts[:page] || 1
+    per_page    = opts[:per_page] || 25
     total_count = raw_results["hits"]["total"] || 0
     total_pages = round(Float.ceil(total_count / per_page))
 

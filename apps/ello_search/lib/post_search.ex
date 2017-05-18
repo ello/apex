@@ -138,7 +138,8 @@ defmodule Ello.Search.PostSearch do
   end
 
   defp build_pagination_query(query, page, per_page) do
-    page = page - 1
+    page = (page || 1) - 1
+    per_page = per_page || 25
     query
     |> update_in([:from], &(&1 = page * per_page))
     |> update_in([:size], &(&1 = per_page))

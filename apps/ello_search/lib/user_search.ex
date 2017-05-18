@@ -55,7 +55,8 @@ defmodule Ello.Search.UserSearch do
   end
 
   defp build_pagination_query(query, page, per_page) do
-    page = page - 1
+    page = (page || 1) - 1
+    per_page = per_page || 25
     query
     |> update_in([:from], &(&1 = page * per_page))
     |> update_in([:size], &(&1 = per_page))
@@ -111,7 +112,7 @@ defmodule Ello.Search.UserSearch do
   defp filter_terms(terms, true), do: terms
   defp filter_terms(terms, _),    do: TermSanitizer.sanitize(terms)
 
-  defp search_user_index(query, opts \\ %{}) do
+  defp search_user_index(query, opts) do
     measure_segment {:ext, "search_user_index"} do
       results = Client.search(UserIndex.index_name(), UserIndex.doc_types(), query).body
     end
