@@ -40,7 +40,7 @@ defmodule Ello.V2.DiscoverPostController do
       trending:     true,
       within_days:  14,
       current_user: current_user(conn),
-      allow_nsfw:   conn.assigns[:allow_nsfw],
+      allow_nsfw:   false,
       allow_nudity: conn.assigns[:allow_nudity],
       page:         params["page"],
       per_page:     params["per_page"]

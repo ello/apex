@@ -1,6 +1,7 @@
 defmodule Ello.V2.CategoryPostController do
   use Ello.V2.Web, :controller
   alias Ello.Stream
+  alias Ello.Search.PostSearch
   alias Ello.V2.PostView
   alias Ello.Core.Discovery
 
@@ -14,6 +15,19 @@ defmodule Ello.V2.CategoryPostController do
         |> track_post_view(stream.posts, stream_kind: stream_kind(conn), stream_id: category.id)
         |> add_pagination_headers("/categories/#{category.slug}/posts/recent", stream)
         |> api_render(PostView, :index, data: stream.posts)
+    end
+  end
+
+  def trending(conn, params) do
+    case Discovery.category_without_includes(params["slug"]) do
+      nil -> send_resp(conn, 404, "")
+      category ->
+        results = fetch_trending(conn, category, params)
+
+        conn
+        |> track_post_view(results.results, stream_kind: "category_trending", stream_id: category.id)
+        |> add_pagination_headers("/categories/#{category.slug}/posts/trending", results)
+        |> api_render(PostView, :index, data: results.results)
     end
   end
 
@@ -48,5 +62,19 @@ defmodule Ello.V2.CategoryPostController do
       {:featured, source} -> "featured_" <> source
       {:recent, source}   -> "category_" <> source
     end
+  end
+
+  defp fetch_trending(conn, category, params) do
+    current_user = current_user(conn)
+    PostSearch.post_search(%{
+      category:     category.id,
+      trending:     true,
+      within_days:  60,
+      per_page:     params["per_page"] || "25",
+      page:         params["page"],
+      current_user: current_user,
+      allow_nudity: conn.assigns[:allow_nudity],
+      allow_nsfw:   conn.assigns[:allow_nsfw],
+    })
   end
 end

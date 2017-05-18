@@ -19,6 +19,7 @@ defmodule Ello.V2.Router do
     get "/editorials", EditorialController, :index
     get "/editorials/posts", EditorialPostController, :index
     get "/categories/:slug/posts/recent", CategoryPostController, :recent
+    get "/categories/:slug/posts/trending", CategoryPostController, :trending
     get "/categories/posts/recent", CategoryPostController, :featured
     get "/discover/posts/recent", DiscoverPostController, :recent
     get "/discover/posts/trending", DiscoverPostController, :trending
@@ -33,6 +34,7 @@ defmodule Ello.V2.Router do
     end
 
     # Following
-    resources "/following/posts/recent", FollowingPostController, only: [:index]
+    get "/following/posts/recent", FollowingPostController, :recent
+    get "/following/posts/trending", FollowingPostController, :trending
   end
 end

@@ -6,7 +6,7 @@ defmodule Ello.Search.UserSearch do
   def username_search(%{current_user: current_user} = opts) do
     following_ids = Network.following_ids(current_user)
     base_query()
-    |> build_user_query(opts)
+    |> build_username_query(opts)
     |> build_relationship_query(following_ids)
     |> filter_blocked(current_user)
     |> search_user_index
@@ -66,16 +66,22 @@ defmodule Ello.Search.UserSearch do
     |> update_in([:size], &(&1 = per_page))
   end
 
-  defp build_user_query(query, %{terms: "@" <> terms} = opts), do: build_user_query(query, Map.merge(opts, %{terms: terms}))
+  defp build_user_query(query, %{terms: "@" <> terms} = opts), do: build_username_query(query, Map.merge(opts, %{terms: terms}))
   defp build_user_query(query, %{terms: terms} = opts) do
+    boost = Application.get_env(:ello_search, :username_match_boost)
     filtered_terms = filter_terms(terms, opts[:allow_nsfw])
-    update_in(query[:query][:bool][:must],
-              &([%{multi_match:
-                   %{query: filtered_terms,
-                     type: "best_fields",
-                     fields: ["name", "username"],
-                     analyzer: "standard",
-                     minimum_should_match: "100%"}} | &1]))
+    update_in(query[:query][:bool][:must], &(&1 = %{dis_max: %{queries: [
+        %{prefix: %{username: %{value: filtered_terms}}},
+        %{term: %{username: %{value: filtered_terms, boost: boost}}},
+        %{match: %{name: %{query: filtered_terms, analyzer: "standard", minimum_should_match: "100%"}}} # analyzer: "standard"
+    ]}}))
+  end
+
+  defp build_username_query(query, %{terms: terms}) do
+    boost = Application.get_env(:ello_search, :username_match_boost)
+    query
+    |> update_in([:query, :bool, :must], &([%{prefix: %{username: %{value: terms}}} | &1]))
+    |> update_in([:query, :bool, :should], &([%{term: %{username: %{value: terms, boost: boost}}} | &1]))
   end
 
   defp build_relationship_query(query, []), do: query

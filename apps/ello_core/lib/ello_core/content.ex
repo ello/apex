@@ -121,9 +121,11 @@ defmodule Ello.Core.Content do
       total_count_task = Task.async(__MODULE__, :count_and_pages_calc, [total_query, per_page])
       remaining_count_task = Task.async(__MODULE__, :count_and_pages_calc, [remaining_query, per_page])
 
-      posts = Task.await(posts_task)
-      {total_count, total_pages} = Task.await(total_count_task)
-      {_, remaining_pages} = Task.await(remaining_count_task)
+      query_wait_time = Application.get_env(:ello_core, :user_post_query_timeout)
+
+      posts = Task.await(posts_task, query_wait_time)
+      {total_count, total_pages} = Task.await(total_count_task, query_wait_time)
+      {_, remaining_pages} = Task.await(remaining_count_task, query_wait_time)
     end
 
     last_post_date = get_last_post_created_at(posts)
