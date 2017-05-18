@@ -5,14 +5,17 @@ defmodule Ello.Search.PostSearchTest do
 
   setup do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
+    cat1         = Factory.insert(:category, id: 1)
+    cat10        = Factory.insert(:category, id: 10)
+    cat100       = Factory.insert(:category, id: 100)
     current_user = Factory.insert(:user)
-    post         = Factory.insert(:post)
+    post         = Factory.insert(:post, %{category_ids: [cat1.id, cat100.id]})
     irrel_post   = Factory.insert(:post, %{body: [%{"data" => "Irrelevant post!", "kind" => "text"}]})
     comment      = Factory.insert(:comment)
     repost       = Factory.insert(:repost)
     flagged_post = Factory.insert(:post)
     nsfw_post    = Factory.insert(:post, %{is_adult_content: true})
-    nudity_post  = Factory.insert(:post, %{has_nudity: true})
+    nudity_post  = Factory.insert(:post, %{has_nudity: true, category_ids: [cat1.id]})
     private_user = Factory.insert(:user, %{is_public: false})
     private_post = Factory.insert(:post, %{author: private_user})
     locked_user  = Factory.insert(:user, %{locked_at: DateTime.utc_now})
@@ -37,6 +40,9 @@ defmodule Ello.Search.PostSearchTest do
 
     {:ok,
       current_user: current_user,
+      cat1: cat1,
+      cat10: cat10,
+      cat100: cat100,
       post: post,
       irrel_post: irrel_post,
       comment: comment,
@@ -263,5 +269,55 @@ defmodule Ello.Search.PostSearchTest do
 
     results = PostSearch.post_search(%{trending: true, allow_nsfw: false, allow_nudity: false, current_user: current_user}).results
     refute context.private_post.id in Enum.map(results, &(&1.id))
+  end
+
+  test "category filtering - for search or trending", context do
+    results = PostSearch.post_search(%{
+      trending:     true,
+      allow_nsfw:   true,
+      allow_nudity: true,
+      current_user: context.current_user,
+      category:     context.cat1.id
+    }).results
+
+    ids = Enum.map(results, &(&1.id))
+    assert context.post.id in ids
+    assert context.nudity_post.id in ids
+    refute context.nsfw_post.id in ids
+    refute context.private_post.id in ids
+
+    results = PostSearch.post_search(%{
+      terms:        "Phrasing",
+      allow_nsfw:   true,
+      allow_nudity: true,
+      current_user: context.current_user,
+      category:     context.cat100.id
+    }).results
+
+    ids = Enum.map(results, &(&1.id))
+    assert context.post.id in ids
+    refute context.nudity_post.id in ids
+    refute context.nsfw_post.id in ids
+    refute context.private_post.id in ids
+  end
+
+  test "following filtering - for search or trending", context do
+    Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.post.author_id])
+    Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.nudity_post.author_id])
+
+    results = PostSearch.post_search(%{
+      trending:     true,
+      allow_nsfw:   true,
+      allow_nudity: true,
+      current_user: context.current_user,
+      following:    true
+    }).results
+
+    Redis.command(["DEL", "user:#{context.current_user.id}:followed_users_id_cache"])
+    ids = Enum.map(results, &(&1.id))
+    assert context.post.id in ids
+    assert context.nudity_post.id in ids
+    refute context.nsfw_post.id in ids
+    refute context.private_post.id in ids
   end
 end

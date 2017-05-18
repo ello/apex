@@ -39,7 +39,8 @@ defmodule Ello.Search.PostIndex do
       love_count:        0,
       view_count:        0,
       alt_text:          "",
-      is_saleable:       post.is_saleable
+      is_saleable:       post.is_saleable,
+      category_ids:      post.category_ids,
     } |> Map.merge(overrides[:post] || %{})
   end
 

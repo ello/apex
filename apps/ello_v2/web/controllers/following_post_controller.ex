@@ -1,11 +1,12 @@
 defmodule Ello.V2.FollowingPostController do
   use Ello.V2.Web, :controller
   alias Ello.Stream
+  alias Ello.Search.PostSearch
   alias Ello.Core.{Network}
   alias Ello.V2.PostView
   plug Ello.Auth.RequireUser
 
-  def index(conn, params) do
+  def recent(conn, params) do
     stream = fetch_stream(conn, params)
 
     conn
@@ -24,5 +25,27 @@ defmodule Ello.V2.FollowingPostController do
       allow_nsfw:   conn.assigns[:allow_nsfw],
       allow_nudity: conn.assigns[:allow_nudity],
     )
+  end
+
+  def trending(conn, params) do
+    results = trending_search(conn, params)
+
+    conn
+    |> track_post_view(results.results, stream_kind: "following_trending")
+    |> add_pagination_headers("/following/posts/trending", results)
+    |> api_render_if_stale(PostView, :index, data: results.results)
+  end
+
+  defp trending_search(conn, params) do
+    PostSearch.post_search(%{
+      trending:     true,
+      following:    true,
+      within_days:  60,
+      current_user: current_user(conn),
+      allow_nsfw:   conn.assigns[:allow_nsfw],
+      allow_nudity: conn.assigns[:allow_nudity],
+      page:         params["page"],
+      per_page:     params["per_page"]
+    })
   end
 end

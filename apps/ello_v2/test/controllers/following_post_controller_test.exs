@@ -4,6 +4,7 @@ defmodule Ello.V2.FollowingPostControllerTest do
   alias Ello.Stream
   alias Ello.Stream.Item
   alias Ello.Core.{Redis}
+  alias Ello.Search.PostIndex
 
   setup %{conn: conn} do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
@@ -16,6 +17,8 @@ defmodule Ello.V2.FollowingPostControllerTest do
     nudity_post = Factory.insert(:post, author: following_user, has_nudity: true)
     nsfw_post = Factory.insert(:post, author: following_user, is_adult_content: true)
     my_post = Factory.insert(:post, author: user)
+    other_post = Factory.insert(:post)
+
     Factory.insert(:love, post: post, user: user)
     roshi_items = [
       %Item{id: "#{post.id}", stream_id: "#{following_user.id}", ts: DateTime.utc_now},
@@ -40,6 +43,7 @@ defmodule Ello.V2.FollowingPostControllerTest do
         my_post: my_post,
         nudity_post: nudity_post,
         nsfw_post: nsfw_post,
+        other_post: other_post,
     ]}
   end
 
@@ -47,7 +51,7 @@ defmodule Ello.V2.FollowingPostControllerTest do
     response = conn
                |> assign(:allow_nsfw, true)
                |> assign(:allow_nudity, true)
-               |> get(following_post_path(conn, :index))
+               |> get(following_post_path(conn, :recent))
     assert response.status == 200
     json = json_response(response, 200)
     returned_ids = Enum.map(json["posts"], &(String.to_integer(&1["id"])))
@@ -59,7 +63,7 @@ defmodule Ello.V2.FollowingPostControllerTest do
   end
 
   test "GET /v2/following/posts/recent - fails for unauth requests", %{unauth_conn: conn} do
-    response = get(conn, following_post_path(conn, :index))
+    response = get(conn, following_post_path(conn, :recent))
     assert response.status == 401
   end
 
@@ -67,7 +71,7 @@ defmodule Ello.V2.FollowingPostControllerTest do
     response = conn
                |> assign(:allow_nsfw, false)
                |> assign(:allow_nudity, true)
-               |> get(following_post_path(conn, :index))
+               |> get(following_post_path(conn, :recent))
     assert response.status == 200
     json = json_response(response, 200)
     returned_ids = Enum.map(json["posts"], &(String.to_integer(&1["id"])))
@@ -81,7 +85,7 @@ defmodule Ello.V2.FollowingPostControllerTest do
     response = conn
                |> assign(:allow_nsfw, false)
                |> assign(:allow_nudity, false)
-               |> get(following_post_path(conn, :index))
+               |> get(following_post_path(conn, :recent))
     assert response.status == 200
     json = json_response(response, 200)
     returned_ids = Enum.map(json["posts"], &(String.to_integer(&1["id"])))
@@ -93,7 +97,59 @@ defmodule Ello.V2.FollowingPostControllerTest do
 
   @tag :json_schema
   test "GET /v2/following/posts/recent - json schema", %{conn: conn} do
-    conn = get(conn, following_post_path(conn, :index))
+    conn = get(conn, following_post_path(conn, :recent))
+    assert :ok = validate_json("post", json_response(conn, 200))
+  end
+
+  test "GET /v2/following/posts/trending", context do
+    %{
+      conn: conn,
+      post: post,
+      my_post: my_post,
+      nsfw_post: nsfw_post,
+      nudity_post: nudity_post,
+      user: current_user,
+    } = context
+    Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", post.author_id])
+    Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", nudity_post.author_id])
+    Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", my_post.author_id])
+    Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", nsfw_post.author_id])
+
+    Enum.each([post, my_post, nsfw_post, nudity_post], &PostIndex.add/1)
+
+    response = conn
+               |> assign(:allow_nsfw, true)
+               |> assign(:allow_nudity, true)
+               |> get(following_post_path(conn, :trending))
+    assert response.status == 200
+    json = json_response(response, 200)
+    Redis.command(["DEL", "user:#{current_user.id}:followed_users_id_cache"])
+    returned_ids = Enum.map(json["posts"], &(String.to_integer(&1["id"])))
+    assert post.id in returned_ids
+    assert my_post.id in returned_ids
+    assert nsfw_post.id in returned_ids
+    assert nudity_post.id in returned_ids
+    assert Enum.find(json["posts"], &(&1["id"] == "#{post.id}"))["loved"]
+  end
+
+  @tag :json_schema
+  test "GET /v2/following/posts/trending - json schema", context do
+    %{
+      conn: conn,
+      post: post,
+      my_post: my_post,
+      nsfw_post: nsfw_post,
+      nudity_post: nudity_post,
+      user: current_user,
+    } = context
+    Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", post.author_id])
+    Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", nudity_post.author_id])
+    Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", my_post.author_id])
+    Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", nsfw_post.author_id])
+
+    Enum.each([post, my_post, nsfw_post, nudity_post], &PostIndex.add/1)
+    conn = get(conn, following_post_path(conn, :trending))
+    Redis.command(["DEL", "user:#{current_user.id}:followed_users_id_cache"])
     assert :ok = validate_json("post", json_response(conn, 200))
   end
 
