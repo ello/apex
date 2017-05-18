@@ -53,7 +53,7 @@ defmodule Ello.V2.UserPostControllerTest do
   end
 
   test "GET /v2/users/:id/posts - returns page headers", %{conn: conn, author: author} do
-    response = get(conn, user_post_path(conn, :index, author), %{per_page: 2})
+    response = get(conn, user_post_path(conn, :index, author), %{per_page: "2"})
     assert get_resp_header(response, "x-total-pages") == ["5"]
     assert get_resp_header(response, "x-total-count") == ["9"]
     assert get_resp_header(response, "x-total-pages-remaining") == ["5"]
@@ -78,14 +78,14 @@ defmodule Ello.V2.UserPostControllerTest do
     second = String.pad_leading("#{second}", 2, "0")
 
     before = "#{year}-#{month}-#{day}T#{hour}:#{minute}:#{second}Z"
-    response = get(conn, user_post_path(conn, :index, author), %{per_page: 2, before: before})
+    response = get(conn, user_post_path(conn, :index, author), %{per_page: "2", before: before})
     assert get_resp_header(response, "x-total-pages") == ["5"]
     assert get_resp_header(response, "x-total-count") == ["9"]
     assert get_resp_header(response, "x-total-pages-remaining") == ["3"]
   end
 
   test "GET /v2/users/:id/posts - using link headers to fetch next page returns results", %{conn: conn, author: author} do
-    response = get(conn, user_post_path(conn, :index, author), %{per_page: 2})
+    response = get(conn, user_post_path(conn, :index, author), %{per_page: "2"})
     assert [link] = get_resp_header(response, "link")
     [_, url | _] = Regex.run(~r/<(.*?)>; rel="next"/, link)
     [_, before | _] = Regex.run(~r/[?&]before=(.*?)(&|$)/, url)
