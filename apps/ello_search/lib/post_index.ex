@@ -91,7 +91,7 @@ defmodule Ello.Search.PostIndex do
               tokenizer: "standard",
               filter: ["lowercase"]
             },
-            my_stop_analyzer: %{
+            english_stop_analyzer: %{
                type: "custom",
                tokenizer: "standard",
                filter: ["lowercase", "english_stop"]
@@ -149,7 +149,7 @@ defmodule Ello.Search.PostIndex do
         text_content: %{
           type:                  "text",
           analyzer:              "default_text_analyzer",
-          search_analyzer:       "my_stop_analyzer",
+          search_analyzer:       "english_stop_analyzer",
           search_quote_analyzer: "default_text_analyzer"
         },
         hashtags:          %{type: "text"},
