@@ -13,12 +13,9 @@ defmodule Ello.V2.EditorialPostController do
   defp posts_by_tokens(conn, params) do
     case params["tokens"] do
       tokens when is_list(tokens) ->
-        Content.posts_by_tokens(%{
-          tokens:       params["tokens"],
-          current_user: current_user(conn),
-          allow_nsfw:   conn.assigns[:allow_nsfw],
-          allow_nudity: conn.assigns[:allow_nudity],
-        })
+        Content.posts_by_tokens(standard_params(conn, %{
+          tokens: params["tokens"],
+        }))
       _ -> []
     end
   end

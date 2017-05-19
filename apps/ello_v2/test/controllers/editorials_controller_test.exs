@@ -15,6 +15,7 @@ defmodule Ello.V2.EditorialControllerTest do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
     {:ok, [
       conn: auth_conn(conn, user),
+      public_conn: public_conn(conn),
       staff_conn: auth_conn(conn, staff),
       editorials: [e1, e2, e3, e4, e5, e6, e7]
     ]}
@@ -45,6 +46,25 @@ defmodule Ello.V2.EditorialControllerTest do
     assert %{"editorials" => response} = json_response(conn, 200)
     assert Enum.map(response, &(String.to_integer(&1["id"]))) ==
       [e1.id]
+  end
+
+  test "GET /v2/categories - logged out", %{public_conn: conn, editorials: editorials} do
+    [_e1, _e2, e3, e4, e5, _e6, e7] = editorials
+    conn = get(conn, editorial_path(conn, :index), %{per_page: "4"})
+    assert %{
+      "editorials" => response,
+      "linked" => %{
+        "posts" => [%{}],
+        "users" => [%{}],
+      }
+    } = json_response(conn, 200)
+
+    assert Enum.map(response, &(String.to_integer(&1["id"]))) ==
+      [e7.id, e5.id, e4.id, e3.id]
+
+    assert [
+      "<https://ello.co/api/v2/editorials?before=2&per_page=4>;" <> _
+    ] = get_resp_header(conn, "link")
   end
 
   test "GET /v2/categories - preview - not staff", %{conn: conn, editorials: editorials} do
