@@ -56,8 +56,14 @@ defmodule Ello.Search.PostSearch do
   end
 
   defp build_text_content_query(query, %{trending: true}), do: query
-  defp build_text_content_query(query, opts), do:
-    update_bool(query, :must, &([%{query_string: %{query: filter_terms(opts), default_field: "text_content"}} | &1]))
+  defp build_text_content_query(query, %{terms: terms} = opts) do
+    field = if String.starts_with?(terms, "\"") && String.ends_with?(terms, "\"") do
+      "text_content"
+    else
+      "text_content.english"
+    end
+    update_bool(query, :must, &([%{query_string: %{query: filter_terms(opts), default_field: field}} | &1]))
+  end
 
   defp build_mention_query(query, %{trending: true}), do: query
   defp build_mention_query(query, opts) do
