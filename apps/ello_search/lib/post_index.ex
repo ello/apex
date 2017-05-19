@@ -77,7 +77,36 @@ defmodule Ello.Search.PostIndex do
   def author_doc_type, do: "author"
   def post_doc_type,   do: "post"
   def doc_types,       do: [post_doc_type(), author_doc_type()]
-  def settings,        do: %{}
+  def settings do
+    %{
+      settings: %{
+        index: %{
+          number_of_shards: Application.get_env(:ello_search, :es_default_shards),
+          number_of_replicas: Application.get_env(:ello_search, :es_default_replicas)
+        },
+        analysis: %{
+          analyzer: %{
+            default_text_analyzer: %{
+              type: "custom",
+              tokenizer: "standard",
+              filter: ["lowercase"]
+            },
+            english_stop_analyzer: %{
+               type: "custom",
+               tokenizer: "standard",
+               filter: ["lowercase", "english_stop"]
+            }
+          },
+          filter: %{
+            english_stop: %{
+               type: "stop",
+               stopwords: "_english_"
+            }
+          }
+        }
+      }
+    }
+  end
 
   def author_mapping do
     %{
@@ -117,7 +146,12 @@ defmodule Ello.Search.PostIndex do
         updated_at:        %{type: "date"},
         token:             %{type: "text"},
         author_id:         %{type: "integer"},
-        text_content:      %{type: "text", analyzer: "english"},
+        text_content: %{
+          type:                  "text",
+          analyzer:              "default_text_analyzer",
+          search_analyzer:       "english_stop_analyzer",
+          search_quote_analyzer: "default_text_analyzer"
+        },
         hashtags:          %{type: "text"},
         mentions:          %{type: "text"},
         detected_language: %{type: "text", index: false},
