@@ -49,9 +49,9 @@ defmodule Ello.V2.EditorialView do
   def links(%{kind: "post"} = ed, _conn) do
     %{
       post: %{
-        id: "#{ed.post.id}",
+        id: "#{ed.post_id}",
         type: "posts",
-        href: "/api/v2/posts/#{ed.post.id}",
+        href: "/api/v2/posts/#{ed.post_id}",
       }
     }
   end
