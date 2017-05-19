@@ -70,7 +70,7 @@ defmodule Ello.V2.EditorialView do
     %{
       post_stream: %{
         type: "posts",
-        href: "/api/v2/categories/#{ed.content["slug"]}/posts/recent?stream_source=editorial&per_page=3",
+        href: "/api/v2/categories/#{ed.content["slug"]}/posts/recent?stream_source=editorial&per_page=#{per_page()}",
       }
     }
   end
@@ -78,7 +78,7 @@ defmodule Ello.V2.EditorialView do
     %{
       post_stream: %{
         type: "posts",
-        href: "/api/v2/following",
+        href: "/api/v2/following/posts/trending?stream_source=editorial&per_page=#{per_page()}",
       }
     }
   end
@@ -86,7 +86,7 @@ defmodule Ello.V2.EditorialView do
     %{
       post_stream: %{
         type: "posts",
-        href: "/api/v2/discover/posts/trending",
+        href: "/api/v2/discover/posts/trending?stream_source=editorial&per_page=#{per_page()}",
       }
     }
   end
@@ -131,5 +131,9 @@ defmodule Ello.V2.EditorialView do
   end
   def two_by_two_image(editorial, conn) do
     render(ImageView, "image.json", image: editorial.two_by_two_image_struct, conn: conn)
+  end
+
+  defp per_page do
+    Application.get_env(:ello_v2, :editorial_stream_kind_size, 5)
   end
 end
