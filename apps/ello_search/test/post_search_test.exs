@@ -26,6 +26,8 @@ defmodule Ello.Search.PostSearchTest do
     badman_post  = Factory.insert(:post, %{body: [%{"data" => "This is a bad, bad man.", "kind" => "text"}]})
     stopword_post = Factory.insert(:post, %{body: [%{"data" => "asshole #ass", "kind" => "text"}]})
     irrel_post2  = Factory.insert(:post, %{body: [%{"data" => "Irrelevantpost!", "kind" => "text"}]})
+    nfp          = Factory.insert(:post, %{body: [%{"data" => "not for print is finally here!", "kind" => "text"}]})
+    not_nfp      = Factory.insert(:post, %{body: [%{"data" => "not my print for ello", "kind" => "text"}]})
 
     PostIndex.delete
     PostIndex.create
@@ -41,6 +43,8 @@ defmodule Ello.Search.PostSearchTest do
     PostIndex.add(spam_post, %{author: %{is_spammer: true}})
     PostIndex.add(stopword_post)
     PostIndex.add(irrel_post2)
+    PostIndex.add(nfp)
+    PostIndex.add(not_nfp)
 
     {:ok,
       current_user: current_user,
@@ -63,6 +67,8 @@ defmodule Ello.Search.PostSearchTest do
       badman_post: badman_post,
       stopword_post: stopword_post,
       irrel_post2: irrel_post2,
+      nfp: nfp,
+      not_nfp: not_nfp,
     }
   end
 
@@ -224,6 +230,12 @@ defmodule Ello.Search.PostSearchTest do
     results = PostSearch.post_search(%{terms: ~s("irrelevant post"), allow_nsfw: true, allow_nudity: true, current_user: context.current_user}).results
     assert context.irrel_post.id in Enum.map(results, &(&1.id))
     refute context.irrel_post2.id in Enum.map(results, &(&1.id))
+  end
+
+  test "post_search - NFP test - exact phrase results for quotation searches", context do
+    results = PostSearch.post_search(%{terms: ~s("not for print"), allow_nsfw: true, allow_nudity: true, current_user: context.current_user}).results
+    assert context.nfp.id in Enum.map(results, &(&1.id))
+    refute context.not_nfp.id in Enum.map(results, &(&1.id))
   end
 
   test "trending - returns a relevant result", context do
