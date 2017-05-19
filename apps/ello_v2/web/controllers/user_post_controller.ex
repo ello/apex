@@ -10,10 +10,10 @@ defmodule Ello.V2.UserPostController do
 
   Render posts written by a user
   """
-  def index(conn, %{"user_id" => id_or_username} = params) do
+  def index(conn, %{"user_id" => id_or_username}) do
     user = Network.user(id_or_username, current_user(conn), false)
     if can_view_user?(conn, user) do
-      posts_page = fetch_posts_page(conn, user, params)
+      posts_page = fetch_posts_page(conn, user)
 
       conn
       |> track_post_view(posts_page.posts, stream_kind: "user", stream_id: user.id)
@@ -24,13 +24,7 @@ defmodule Ello.V2.UserPostController do
     end
   end
 
-  defp fetch_posts_page(conn, user, params) do
-    Content.posts_by_user(user.id,
-      current_user: conn.assigns[:current_user],
-      allow_nsfw: conn.assigns[:allow_nsfw],
-      allow_nudity: conn.assigns[:allow_nudity],
-      per_page: params["per_page"],
-      before: params["before"]
-    )
+  defp fetch_posts_page(conn, user) do
+    Content.posts_by_user(user.id, standard_params(conn))
   end
 end

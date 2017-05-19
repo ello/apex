@@ -9,7 +9,7 @@ defmodule Ello.Search.UserSearch do
     |> build_username_query(opts)
     |> build_relationship_query(following_ids)
     |> filter_blocked(current_user)
-    |> search_user_index
+    |> search_user_index(opts)
   end
 
   def user_search(%{current_user: nil} = opts) do
@@ -54,13 +54,9 @@ defmodule Ello.Search.UserSearch do
     |> filter_nudity(opts[:allow_nudity])
   end
 
-  defp build_pagination_query(query, nil, nil), do: query
-  defp build_pagination_query(query, nil, per_page), do:
-    build_pagination_query(query, "1", per_page)
   defp build_pagination_query(query, page, per_page) do
-    page     = String.to_integer(page) - 1
-    per_page = String.to_integer(per_page)
-
+    page = (page || 1) - 1
+    per_page = per_page || 25
     query
     |> update_in([:from], &(&1 = page * per_page))
     |> update_in([:size], &(&1 = per_page))
@@ -116,7 +112,7 @@ defmodule Ello.Search.UserSearch do
   defp filter_terms(terms, true), do: terms
   defp filter_terms(terms, _),    do: TermSanitizer.sanitize(terms)
 
-  defp search_user_index(query, opts \\ %{}) do
+  defp search_user_index(query, opts) do
     measure_segment {:ext, "search_user_index"} do
       results = Client.search(UserIndex.index_name(), UserIndex.doc_types(), query).body
     end

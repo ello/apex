@@ -9,7 +9,7 @@ defmodule Ello.V2.CategoryPostController do
     case Discovery.category_without_includes(params["slug"]) do
       nil -> send_resp(conn, 404, "")
       category ->
-        stream = fetch_stream(conn, [category], params)
+        stream = fetch_stream(conn, [category])
 
         conn
         |> track_post_view(stream.posts, stream_kind: stream_kind(conn), stream_id: category.id)
@@ -22,7 +22,7 @@ defmodule Ello.V2.CategoryPostController do
     case Discovery.category_without_includes(params["slug"]) do
       nil -> send_resp(conn, 404, "")
       category ->
-        results = fetch_trending(conn, category, params)
+        results = fetch_trending(conn, category)
 
         conn
         |> track_post_view(results.results, stream_kind: "category_trending", stream_id: category.id)
@@ -31,9 +31,9 @@ defmodule Ello.V2.CategoryPostController do
     end
   end
 
-  def featured(conn, params) do
+  def featured(conn, _params) do
     categories = Discovery.primary_categories
-    stream = fetch_stream(conn, categories, params)
+    stream = fetch_stream(conn, categories)
 
     conn
     |> track_post_view(stream.posts, stream_kind: stream_kind(conn))
@@ -41,16 +41,11 @@ defmodule Ello.V2.CategoryPostController do
     |> api_render(PostView, :index, data: stream.posts)
   end
 
-  defp fetch_stream(conn, categories, params) do
-    current_user = current_user(conn)
-    Stream.fetch(
+  defp fetch_stream(conn, categories) do
+    Stream.fetch(standard_params(conn, %{
       keys:         Enum.map(categories, &category_stream_key/1),
-      before:       params["before"],
-      per_page:     String.to_integer(params["per_page"] || "25"),
-      current_user: current_user,
       allow_nsfw:   true, # No NSFW in categories, reduces slop.
-      allow_nudity: conn.assigns[:allow_nudity],
-    )
+    }))
   end
 
   defp category_stream_key(%{slug: slug}), do: "categories:v1:#{slug}"
@@ -64,17 +59,12 @@ defmodule Ello.V2.CategoryPostController do
     end
   end
 
-  defp fetch_trending(conn, category, params) do
-    current_user = current_user(conn)
-    PostSearch.post_search(%{
+  defp fetch_trending(conn, category) do
+    PostSearch.post_search(standard_params(conn, %{
       category:     category.id,
       trending:     true,
       within_days:  60,
-      per_page:     params["per_page"] || "25",
-      page:         params["page"],
-      current_user: current_user,
-      allow_nudity: conn.assigns[:allow_nudity],
-      allow_nsfw:   conn.assigns[:allow_nsfw],
-    })
+      allow_nsfw:   false,
+    }))
   end
 end
