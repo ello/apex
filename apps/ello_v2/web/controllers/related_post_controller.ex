@@ -10,13 +10,10 @@ defmodule Ello.V2.RelatedPostController do
     |> api_render(PostView, :index, data: posts)
   end
 
-  defp fetch_related_posts(conn, %{"post_id" => id_or_token} = params) do
-    Content.related_posts(id_or_token, [
-      current_user: current_user(conn),
-      allow_nsfw:   conn.assigns[:allow_nsfw],
-      allow_nudity: conn.assigns[:allow_nudity],
-      per_page:     params["per_page"] || 5,
-    ])
+  defp fetch_related_posts(conn, %{"post_id" => id_or_token}) do
+    Content.related_posts(id_or_token, standard_params(conn, %{
+      default: %{per_page: 5}
+    }))
   end
 
   defp stream_opts(%{id: id}), do: [stream_kind: "related", stream_id: id]

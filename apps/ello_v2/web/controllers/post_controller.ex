@@ -29,22 +29,13 @@ defmodule Ello.V2.PostController do
   end
 
   defp load_post(conn, %{"id" => id_or_slug}) do
-    Content.post(id_or_slug,
-      current_user: conn.assigns[:current_user],
-      allow_nsfw: conn.assigns[:allow_nsfw],
-      allow_nudity: conn.assigns[:allow_nudity]
-    )
+    Content.post(id_or_slug, standard_params(conn))
   end
 
   defp post_search(conn, params) do
-    PostSearch.post_search(%{
+    PostSearch.post_search(standard_params(conn, %{
       terms:        params["terms"],
-      current_user: current_user(conn),
-      allow_nsfw:   conn.assigns[:allow_nsfw],
-      allow_nudity: conn.assigns[:allow_nudity],
-      page:         params["page"],
-      per_page:     params["per_page"]
-    })
+    }))
   end
 
   defp owned_by_user(post, %{"user_id" => "~" <> username}),

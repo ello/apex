@@ -137,13 +137,9 @@ defmodule Ello.Search.PostSearch do
     update_in(author_query[:has_parent][:query][:bool][:filter], &([%{term: %{is_public: true}} | &1]))
   end
 
-  defp build_pagination_query(query, nil, nil), do: query
-  defp build_pagination_query(query, nil, per_page), do:
-    build_pagination_query(query, "1", per_page)
   defp build_pagination_query(query, page, per_page) do
-    page     = String.to_integer(page) - 1
-    per_page = String.to_integer(per_page)
-
+    page = (page || 1) - 1
+    per_page = per_page || 25
     query
     |> update_in([:from], &(&1 = page * per_page))
     |> update_in([:size], &(&1 = per_page))
