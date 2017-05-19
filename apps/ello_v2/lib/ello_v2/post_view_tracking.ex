@@ -2,6 +2,7 @@ defmodule Ello.V2.PostViewTracking do
   alias Ello.Events
   alias Ello.Events.CountPostView
   import NewRelicPhoenix, only: [measure_segment: 2]
+  import Phoenix.Controller, only: [action_name: 1]
 
   def track_post_view(conn, posts, opts \\ [])
   def track_post_view(conn, %{} = post, opts),
@@ -16,7 +17,7 @@ defmodule Ello.V2.PostViewTracking do
       event = %CountPostView{
         post_ids:    Enum.map(posts, &(&1.id)),
         user_id:     user_id,
-        stream_kind: opts[:stream_kind],
+        stream_kind: stream_kind(conn, opts[:stream_kind]),
         stream_id:   "#{opts[:stream_id]}",
       }
       Events.publish(event)
@@ -25,4 +26,12 @@ defmodule Ello.V2.PostViewTracking do
     end
   end
 
+  def stream_kind(conn, kind) do
+    case {kind, conn.params["stream_source"]} do
+      {nil, nil}     -> action_name(conn)
+      {nil, source}  -> "#{action_name(conn)}_#{source}"
+      {kind, nil}    -> kind
+      {kind, source} -> "#{kind}_#{source}"
+    end
+  end
 end
