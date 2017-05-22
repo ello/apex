@@ -1,7 +1,7 @@
 defmodule Ello.V2.CategoryPostController do
   use Ello.V2.Web, :controller
   alias Ello.Stream
-  alias Ello.Search.PostSearch
+  alias Ello.Search.Post.Search
   alias Ello.V2.PostView
   alias Ello.Core.Discovery
 
@@ -51,7 +51,7 @@ defmodule Ello.V2.CategoryPostController do
   defp category_stream_key(%{slug: slug}), do: "categories:v1:#{slug}"
 
   defp fetch_trending(conn, category) do
-    PostSearch.post_search(standard_params(conn, %{
+    Search.post_search(standard_params(conn, %{
       category:     category.id,
       trending:     true,
       within_days:  60,

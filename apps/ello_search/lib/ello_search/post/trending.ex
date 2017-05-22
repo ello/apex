@@ -1,4 +1,4 @@
-defmodule Ello.Search.TrendingPost do
+defmodule Ello.Search.Post.Trending do
 
   def build_boosting_queries(query, trending, following, category) do
     query

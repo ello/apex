@@ -3,8 +3,8 @@ defmodule Ello.V2.FollowingPostControllerTest do
   alias Ello.Core.Repo
   alias Ello.Stream
   alias Ello.Stream.Item
-  alias Ello.Core.{Redis}
-  alias Ello.Search.PostIndex
+  alias Ello.Core.Redis
+  alias Ello.Search.Post.Index
 
   setup %{conn: conn} do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
@@ -115,7 +115,7 @@ defmodule Ello.V2.FollowingPostControllerTest do
     Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", my_post.author_id])
     Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", nsfw_post.author_id])
 
-    Enum.each([post, my_post, nsfw_post, nudity_post], &PostIndex.add/1)
+    Enum.each([post, my_post, nsfw_post, nudity_post], &Index.add/1)
 
     response = conn
                |> assign(:allow_nsfw, true)
@@ -147,7 +147,7 @@ defmodule Ello.V2.FollowingPostControllerTest do
     Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", my_post.author_id])
     Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", nsfw_post.author_id])
 
-    Enum.each([post, my_post, nsfw_post, nudity_post], &PostIndex.add/1)
+    Enum.each([post, my_post, nsfw_post, nudity_post], &Index.add/1)
     conn = get(conn, following_post_path(conn, :trending))
     Redis.command(["DEL", "user:#{current_user.id}:followed_users_id_cache"])
     assert :ok = validate_json("post", json_response(conn, 200))

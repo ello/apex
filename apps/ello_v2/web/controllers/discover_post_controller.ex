@@ -2,7 +2,7 @@ defmodule Ello.V2.DiscoverPostController do
   use Ello.V2.Web, :controller
   alias Ello.Stream
   alias Ello.V2.PostView
-  alias Ello.Search.PostSearch
+  alias Ello.Search.Post.Search
 
   @recent_stream "all_post_firehose"
 
@@ -31,7 +31,7 @@ defmodule Ello.V2.DiscoverPostController do
   end
 
   defp post_search(conn) do
-    PostSearch.post_search(standard_params(conn, %{
+    Search.post_search(standard_params(conn, %{
       trending:     true,
       within_days:  14,
       allow_nsfw:   false,

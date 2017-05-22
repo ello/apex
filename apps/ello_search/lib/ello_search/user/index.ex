@@ -1,4 +1,4 @@
-defmodule Ello.Search.UserIndex do
+defmodule Ello.Search.User.Index do
   alias Ello.Search.Client
 
   def create do

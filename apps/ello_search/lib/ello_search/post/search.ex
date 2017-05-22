@@ -1,8 +1,9 @@
-defmodule Ello.Search.PostSearch do
+defmodule Ello.Search.Post.Search do
   import NewRelicPhoenix, only: [measure_segment: 2]
   alias Ello.Core.{Content, Network}
   alias Ello.Core.Content
-  alias Ello.Search.{Client, PostIndex, TrendingPost, Page, TermSanitizer}
+  alias Ello.Search.{Client, Page, TermSanitizer}
+  alias Ello.Search.Post.{Index, Trending}
   use Timex
 
   def post_search(opts) do
@@ -15,7 +16,7 @@ defmodule Ello.Search.PostSearch do
     |> filter_category(opts[:category])
     |> filter_following(opts[:following], opts[:current_user])
     |> filter_days(opts[:within_days])
-    |> TrendingPost.build_boosting_queries(opts[:trending], opts[:following], opts[:category])
+    |> Trending.build_boosting_queries(opts[:trending], opts[:following], opts[:category])
     |> search_post_index(opts)
   end
 
@@ -163,7 +164,7 @@ defmodule Ello.Search.PostSearch do
 
   defp search_post_index(query, opts) do
     measure_segment {:ext, "search_post_index"} do
-      results = Client.search(PostIndex.index_name(), [PostIndex.post_doc_type], query).body
+      results = Client.search(Index.index_name(), [Index.post_doc_type], query).body
     end
 
     posts = case results["hits"]["hits"] do

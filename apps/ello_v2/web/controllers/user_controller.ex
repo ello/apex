@@ -2,7 +2,7 @@ defmodule Ello.V2.UserController do
   use Ello.V2.Web, :controller
   alias Ello.Core.Network
   alias Ello.V2.UserView
-  alias Ello.Search.UserSearch
+  alias Ello.Search.User.Search
 
   plug Ello.Auth.RequireUser when action in [:autocomplete]
 
@@ -38,14 +38,14 @@ defmodule Ello.V2.UserController do
   Renders a list of relevant results from username search
   """
   def autocomplete(conn, %{"terms" => username}) do
-    users = UserSearch.username_search(standard_params(conn, %{
+    users = Search.username_search(standard_params(conn, %{
               terms: username,
             })).results
     api_render(conn, UserView, "autocomplete.json", data: users)
   end
 
   defp user_search(conn, params) do
-    UserSearch.user_search(standard_params(conn, %{
+    Search.user_search(standard_params(conn, %{
       terms:        params["terms"],
     }))
   end

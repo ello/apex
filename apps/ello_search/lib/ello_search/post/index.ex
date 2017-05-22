@@ -1,4 +1,4 @@
-defmodule Ello.Search.PostIndex do
+defmodule Ello.Search.Post.Index do
   alias Ello.Search.Client
   alias Ello.Core.Discovery
 

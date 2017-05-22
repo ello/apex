@@ -1,7 +1,7 @@
 defmodule Ello.V2.UserControllerTest do
   use Ello.V2.ConnCase, async: false
   alias Ello.Core.Redis
-  alias Ello.Search.UserIndex
+  alias Ello.Search.User.Index
 
   setup %{conn: conn} do
     user = Factory.insert(:user)
@@ -110,9 +110,9 @@ defmodule Ello.V2.UserControllerTest do
   end
 
   test "GET /v2/users/autocomplete - user token", %{conn: conn, archer: archer} do
-    UserIndex.delete
-    UserIndex.create
-    UserIndex.add(archer)
+    Index.delete
+    Index.create
+    Index.add(archer)
     conn = get(conn, user_path(conn, :autocomplete, %{"terms" => archer.username}))
     assert %{"autocomplete_results" => [%{"image_url" => "https://assets.ello.co/uploads/user/avatar/42/ello-small-fad52e18.png",
               "name" => "archer"}]} = json_response(conn, 200)
@@ -129,9 +129,9 @@ defmodule Ello.V2.UserControllerTest do
   end
 
   test "GET /v2/users - public token", %{unauth_conn: conn, archer: archer} do
-    UserIndex.delete
-    UserIndex.create
-    UserIndex.add(archer)
+    Index.delete
+    Index.create
+    Index.add(archer)
     conn = conn
            |> public_conn
            |> get(user_path(conn, :index, %{"terms" => "archer"}))
@@ -139,9 +139,9 @@ defmodule Ello.V2.UserControllerTest do
   end
 
   test "GET /v2/users - user token", %{conn: conn, archer: archer} do
-    UserIndex.delete
-    UserIndex.create
-    UserIndex.add(archer)
+    Index.delete
+    Index.create
+    Index.add(archer)
     conn = get(conn, user_path(conn, :index, %{"terms" => "archer"}))
     assert [link] = get_resp_header(conn, "link")
     assert String.contains?(link, "terms=archer")

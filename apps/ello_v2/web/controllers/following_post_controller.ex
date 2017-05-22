@@ -1,7 +1,7 @@
 defmodule Ello.V2.FollowingPostController do
   use Ello.V2.Web, :controller
   alias Ello.Stream
-  alias Ello.Search.PostSearch
+  alias Ello.Search.Post.Search
   alias Ello.Core.{Network}
   alias Ello.V2.PostView
   plug Ello.Auth.RequireUser
@@ -32,7 +32,7 @@ defmodule Ello.V2.FollowingPostController do
   end
 
   defp trending_search(conn) do
-    PostSearch.post_search(standard_params(conn, %{
+    Search.post_search(standard_params(conn, %{
       trending:     true,
       following:    true,
       within_days:  60,
