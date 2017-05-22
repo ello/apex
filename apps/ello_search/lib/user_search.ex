@@ -73,6 +73,7 @@ defmodule Ello.Search.UserSearch do
     ]}}))
   end
 
+  defp build_username_query(query, %{terms: "@" <> terms} = opts), do: build_username_query(query, Map.merge(opts, %{terms: terms}))
   defp build_username_query(query, %{terms: terms}) do
     boost = Application.get_env(:ello_search, :username_match_boost)
     query
