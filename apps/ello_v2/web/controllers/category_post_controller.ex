@@ -56,6 +56,7 @@ defmodule Ello.V2.CategoryPostController do
       trending:     true,
       within_days:  60,
       allow_nsfw:   false,
+      images_only:  (not is_nil(conn.params["images_only"])),
     }))
   end
 end

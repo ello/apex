@@ -36,6 +36,7 @@ defmodule Ello.V2.FollowingPostController do
       trending:     true,
       following:    true,
       within_days:  60,
+      images_only:  (not is_nil(conn.params["images_only"]))
     }))
   end
 end

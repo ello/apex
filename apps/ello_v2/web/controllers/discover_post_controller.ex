@@ -35,6 +35,7 @@ defmodule Ello.V2.DiscoverPostController do
       trending:     true,
       within_days:  14,
       allow_nsfw:   false,
+      images_only:  (not is_nil(conn.params["images_only"]))
     }))
   end
 end
