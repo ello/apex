@@ -85,10 +85,10 @@ defmodule Ello.V2.DiscoverPostControllerTest do
 
   test "GET /v2/discover/posts/trending - images only", %{conn: conn, posts: posts} do
     [p1, p2 | _] = posts
-    PostIndex.delete
-    PostIndex.create
-    PostIndex.add(p1)
-    PostIndex.add(p2)
+    Index.delete
+    Index.create
+    Index.add(p1)
+    Index.add(p2)
     conn = get(conn, discover_post_path(conn, :trending, %{"images_only" => "t"}))
     json = json_response(conn, 200)["posts"]
     assert p1.id in Enum.map(json, &String.to_integer(&1["id"]))

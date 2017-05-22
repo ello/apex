@@ -146,7 +146,7 @@ defmodule Ello.V2.FollowingPostControllerTest do
     Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", my_post.author_id])
     Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", nsfw_post.author_id])
 
-    Enum.each([post, my_post, nsfw_post, nudity_post], &PostIndex.add/1)
+    Enum.each([post, my_post, nsfw_post, nudity_post], &Index.add/1)
 
     response = conn
                |> assign(:allow_nsfw, true)

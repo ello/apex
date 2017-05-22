@@ -361,7 +361,7 @@ defmodule Ello.Search.Post.SearchTest do
   end
 
   test "image only filtering - for search or trending", context do
-    results = PostSearch.post_search(%{
+    results = Search.post_search(%{
       terms:        "print",
       allow_nsfw:   true,
       allow_nudity: true,
@@ -371,7 +371,7 @@ defmodule Ello.Search.Post.SearchTest do
     assert context.nfp.id in ids
     assert context.not_nfp.id in ids
 
-    results = PostSearch.post_search(%{
+    results = Search.post_search(%{
       terms:        "print",
       allow_nsfw:   true,
       allow_nudity: true,
