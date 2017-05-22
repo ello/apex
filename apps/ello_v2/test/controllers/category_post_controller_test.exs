@@ -3,7 +3,7 @@ defmodule Ello.V2.CategoryPostControllerTest do
   alias Ello.Core.Repo
   alias Ello.Stream
   alias Ello.Stream.Item
-  alias Ello.Search.PostIndex
+  alias Ello.Search.Post.Index
 
   setup %{conn: conn} do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
@@ -118,7 +118,7 @@ defmodule Ello.V2.CategoryPostControllerTest do
   end
 
   test "GET /v2/categories/:slug/posts/trending", %{conn: conn, posts: posts} do
-    Enum.each(posts, &PostIndex.add/1)
+    Enum.each(posts, &Index.add/1)
     response = get(conn, category_post_path(conn, :trending, "cat1"))
     assert response.status == 200
     json = json_response(response, 200)
@@ -135,7 +135,7 @@ defmodule Ello.V2.CategoryPostControllerTest do
 
   @tag :json_schema
   test "GET /v2/categoreis/:slug/posts/trending - json schema", %{conn: conn, posts: posts} do
-    Enum.each(posts, &PostIndex.add/1)
+    Enum.each(posts, &Index.add/1)
     conn = get(conn, category_post_path(conn, :trending, "cat1"))
     assert :ok = validate_json("post", json_response(conn, 200))
   end

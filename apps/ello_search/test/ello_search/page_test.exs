@@ -1,12 +1,13 @@
 defmodule Ello.Search.PageTest do
   use Ello.Search.Case
   alias Ello.Core.{Repo, Factory, Network}
-  alias Ello.Search.{Page, UserSearch, UserIndex}
+  alias Ello.Search.Page
+  alias Ello.Search.User.{Search, Index}
 
   setup do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
-    UserIndex.delete
-    UserIndex.create
+    Index.delete
+    Index.create
     {:ok, %{}}
   end
 

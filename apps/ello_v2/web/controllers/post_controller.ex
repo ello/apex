@@ -1,7 +1,7 @@
 defmodule Ello.V2.PostController do
   use Ello.V2.Web, :controller
   alias Ello.Core.{Content, Content.Post}
-  alias Ello.Search.PostSearch
+  alias Ello.Search.Post.Search
   alias Ello.V2.PostView
 
   def show(conn, params) do
@@ -33,7 +33,7 @@ defmodule Ello.V2.PostController do
   end
 
   defp post_search(conn, params) do
-    PostSearch.post_search(standard_params(conn, %{
+    Search.post_search(standard_params(conn, %{
       terms:        params["terms"],
     }))
   end

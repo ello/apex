@@ -1,7 +1,7 @@
 defmodule Ello.V2.PostControllerTest do
   use Ello.V2.ConnCase
   alias Ello.Core.Repo
-  alias Ello.Search.PostIndex
+  alias Ello.Search.Post.Index
 
   setup %{conn: conn} do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
@@ -68,9 +68,9 @@ defmodule Ello.V2.PostControllerTest do
   end
 
   test "GET /v2/posts - success", %{conn: conn, post: post} do
-    PostIndex.delete
-    PostIndex.create
-    PostIndex.add(post)
+    Index.delete
+    Index.create
+    Index.add(post)
     conn = get(conn, post_path(conn, :index, %{"terms" => "phrasing"}))
     assert Integer.to_string(post.id) == hd(json_response(conn, 200)["posts"])["id"]
   end

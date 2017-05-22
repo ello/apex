@@ -1,7 +1,8 @@
-defmodule Ello.Search.UserSearch do
+defmodule Ello.Search.User.Search do
   import NewRelicPhoenix, only: [measure_segment: 2]
   alias Ello.Core.Network
-  alias Ello.Search.{Client, UserIndex, Page, TermSanitizer}
+  alias Ello.Search.{Client, Page, TermSanitizer}
+  alias Ello.Search.User.Index
 
   def username_search(%{current_user: current_user} = opts) do
     following_ids = Network.following_ids(current_user)
@@ -115,7 +116,7 @@ defmodule Ello.Search.UserSearch do
 
   defp search_user_index(query, opts) do
     measure_segment {:ext, "search_user_index"} do
-      results = Client.search(UserIndex.index_name(), UserIndex.doc_types(), query).body
+      results = Client.search(Index.index_name(), Index.doc_types(), query).body
     end
 
     users = case results["hits"]["hits"] do

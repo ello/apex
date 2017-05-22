@@ -3,7 +3,7 @@ defmodule Ello.V2.DiscoverPostControllerTest do
   alias Ello.Core.Repo
   alias Ello.Stream
   alias Ello.Stream.Item
-  alias Ello.Search.PostIndex
+  alias Ello.Search.Post.Index
 
   setup %{conn: conn} do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
@@ -76,9 +76,9 @@ defmodule Ello.V2.DiscoverPostControllerTest do
 
   test "GET /v2/discover/posts/trending - success", %{conn: conn, posts: posts} do
     post = hd(posts)
-    PostIndex.delete
-    PostIndex.create
-    PostIndex.add(post)
+    Index.delete
+    Index.create
+    Index.add(post)
     conn = get(conn, discover_post_path(conn, :trending, %{}))
     assert Integer.to_string(post.id) == hd(json_response(conn, 200)["posts"])["id"]
   end
