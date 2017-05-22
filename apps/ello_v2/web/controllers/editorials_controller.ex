@@ -52,8 +52,7 @@ defmodule Ello.V2.EditorialController do
     end
   end
 
-  defp per_page(%{params: %{"per_page" => per_page}}) when is_integer(per_page), do: per_page
-  defp per_page(%{params: %{"per_page" => per_page}}), do: String.to_integer(per_page)
+  defp per_page(%{params: %{"per_page" => per_page}}) when is_binary(per_page), do: String.to_integer(per_page)
   defp per_page(%{params: %{"per_page" => per_page}}), do: per_page
   defp per_page(_), do: 25
 
