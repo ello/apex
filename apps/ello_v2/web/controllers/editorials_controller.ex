@@ -19,25 +19,18 @@ defmodule Ello.V2.EditorialController do
     Discovery.editorials(standard_params(conn, %{preview: preview?(conn)}))
   end
 
+  defp next_page_params([], _), do: %{}
   defp next_page_params(editorials, conn) do
     last_editorial = List.last(editorials)
     next = %{per_page: per_page(conn)}
     if preview?(conn) do
-      before = case last_editorial do
-        %{preview_position: preview_position} -> preview_position
-        _ -> nil
-      end
       Map.merge(next, %{
-        before: before,
+        before: last_editorial.preview_position,
         preview: true,
       })
     else
-      before = case last_editorial do
-        %{published_position: published_position} -> published_position
-        _ -> nil
-      end
       Map.merge(next, %{
-        before: before,
+        before: last_editorial.published_position,
       })
     end
   end
