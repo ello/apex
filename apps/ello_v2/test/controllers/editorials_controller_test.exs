@@ -101,4 +101,11 @@ defmodule Ello.V2.EditorialControllerTest do
     conn = get(conn, editorial_path(conn, :index), %{per_page: "4", before: "#{e5.published_position}"})
     assert ["0"] = get_resp_header(conn, "x-total-pages-remaining")
   end
+
+  test "GET /v2/categories - too many pages", %{public_conn: conn, editorials: editorials} do
+    [e1, _e2, _e3, _e4, _e5, _e6, _e7] = editorials
+    conn = get(conn, editorial_path(conn, :index), %{per_page: "4", before: "#{e1.published_position}"})
+    assert response(conn, 204)
+    assert ["0"] = get_resp_header(conn, "x-total-pages-remaining")
+  end
 end
