@@ -14,7 +14,7 @@ defmodule Ello.V2.EditorialPostControllerTest do
   end
 
   test "GET /v2/editorials/posts", %{conn: conn, post1: p1, post2: p2} do
-    response = get(conn, editorial_post_path(conn, :index), %{tokens: [p1.token, p2.token]})
+    response = get(conn, editorial_post_path(conn, :index), %{token: [p1.token, p2.token]})
     json = json_response(response, 200)
     returned_ids = Enum.map(json["posts"], &(String.to_integer(&1["id"])))
     assert p1.id in returned_ids
@@ -28,7 +28,7 @@ defmodule Ello.V2.EditorialPostControllerTest do
 
   @tag :json_schema
   test "GET /v2/editorials/posts - json schema", %{conn: conn, post1: p1, post2: p2} do
-    response = get(conn, editorial_post_path(conn, :index), %{tokens: [p1.token, p2.token]})
+    response = get(conn, editorial_post_path(conn, :index), %{token: [p1.token, p2.token]})
     assert :ok = validate_json("post", json_response(response, 200))
   end
 end

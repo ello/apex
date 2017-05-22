@@ -11,10 +11,10 @@ defmodule Ello.V2.EditorialPostController do
   end
 
   defp posts_by_tokens(conn, params) do
-    case params["tokens"] do
+    case params["token"] do
       tokens when is_list(tokens) ->
         Content.posts_by_tokens(standard_params(conn, %{
-          tokens: params["tokens"],
+          tokens: params["token"],
         }))
       _ -> []
     end
