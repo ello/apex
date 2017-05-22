@@ -63,7 +63,7 @@ defmodule Ello.Search.Post.Search do
     else
       "text_content.english"
     end
-    update_bool(query, :must, &([%{query_string: %{query: filter_terms(opts), default_field: field}} | &1]))
+    update_bool(query, :must, &([%{query_string: %{query: filter_terms(opts), fields: [field]}} | &1]))
   end
 
   defp build_mention_query(query, %{trending: true}), do: query
