@@ -11,6 +11,7 @@ defmodule Ello.V2.EditorialController do
     conn
     |> track_post_view(Enum.map(editorials, &(&1.post)), stream_kind: "editorials")
     |> add_pagination_headers("/editorials", next_page_params(editorials, conn))
+    |> last_page_header(length(editorials))
     |> api_render_if_stale(data: editorials)
   end
 
@@ -19,7 +20,7 @@ defmodule Ello.V2.EditorialController do
   end
 
   defp next_page_params(editorials, conn) do
-    next = %{per_page: conn.params["per_page"] || 25}
+    next = %{per_page: per_page(conn)}
     if preview?(conn) do
       Map.merge(next, %{
         before: List.last(editorials).preview_position,
@@ -31,6 +32,20 @@ defmodule Ello.V2.EditorialController do
       })
     end
   end
+
+  defp last_page_header(conn, editorials_count) do
+    per_page = per_page(conn)
+    if editorials_count < per_page do
+      put_resp_header(conn, "x-total-pages-remaining", "0")
+    else
+      put_resp_header(conn, "x-total-pages-remaining", "1")
+    end
+  end
+
+  defp per_page(%{ params: %{ "per_page" => per_page }}) when is_integer(per_page), do: per_page
+  defp per_page(%{ params: %{ "per_page" => per_page }}), do: String.to_integer(per_page)
+  defp per_page(%{ params: %{ "per_page" => per_page }}), do: per_page
+  defp per_page(_), do: 25
 
   defp preview?(%{assigns: %{current_user: %{is_staff: true}}, params: %{"preview" => _}}), do: true
   defp preview?(_), do: false
