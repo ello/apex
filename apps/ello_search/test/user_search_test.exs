@@ -68,6 +68,11 @@ defmodule Ello.Search.UserSearchTest do
     assert hd(results).id == context.user.id
   end
 
+  test "username_search - removes @ sign if provided", context do
+    results = UserSearch.username_search(%{terms: "@#{context.user.username}", current_user: context.current_user}).results
+    assert hd(results).id == context.user.id
+  end
+
   test "username_search - does not include locked users", context do
     results = UserSearch.username_search(%{terms: "username", current_user: context.current_user}).results
     assert context.user.id in Enum.map(results, &(&1.id))
