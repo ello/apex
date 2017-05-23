@@ -13,6 +13,7 @@ defmodule Ello.Search.Post.Search do
     |> build_mention_query(opts)
     |> build_hashtag_query(opts)
     |> build_pagination_query(opts[:page], opts[:per_page])
+    |> filter_has_images(opts)
     |> filter_category(opts[:category])
     |> filter_following(opts[:following], opts[:current_user])
     |> filter_days(opts[:within_days])
@@ -107,6 +108,11 @@ defmodule Ello.Search.Post.Search do
 
   defp filter_terms(%{allow_nsfw: false} = opts), do: TermSanitizer.sanitize(opts[:terms])
   defp filter_terms(opts),                        do: opts[:terms]
+
+  defp filter_has_images(query, %{images_only: true}) do
+    update_bool(query, :filter, &([%{term: %{has_images: true}} | &1]))
+  end
+  defp filter_has_images(query, _), do: query
 
   defp author_base_query do
     %{

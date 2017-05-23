@@ -13,7 +13,7 @@ defmodule Ello.V2.FollowingPostControllerTest do
 
     user = Factory.insert(:user)
     following_user = Factory.insert(:user)
-    post = Factory.insert(:post, author: following_user)
+    post = Factory.add_assets(Factory.insert(:post, author: following_user))
     nudity_post = Factory.insert(:post, author: following_user, has_nudity: true)
     nsfw_post = Factory.insert(:post, author: following_user, is_adult_content: true)
     my_post = Factory.insert(:post, author: user)
@@ -129,6 +129,37 @@ defmodule Ello.V2.FollowingPostControllerTest do
     assert my_post.id in returned_ids
     assert nsfw_post.id in returned_ids
     assert nudity_post.id in returned_ids
+    assert Enum.find(json["posts"], &(&1["id"] == "#{post.id}"))["loved"]
+  end
+
+  test "GET /v2/following/posts/trending?images_only=t", context do
+    %{
+      conn: conn,
+      post: post,
+      my_post: my_post,
+      nsfw_post: nsfw_post,
+      nudity_post: nudity_post,
+      user: current_user,
+    } = context
+    Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", post.author_id])
+    Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", nudity_post.author_id])
+    Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", my_post.author_id])
+    Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", nsfw_post.author_id])
+
+    Enum.each([post, my_post, nsfw_post, nudity_post], &Index.add/1)
+
+    response = conn
+               |> assign(:allow_nsfw, true)
+               |> assign(:allow_nudity, true)
+               |> get(following_post_path(conn, :trending), %{"images_only" => "pls"})
+    assert response.status == 200
+    json = json_response(response, 200)
+    Redis.command(["DEL", "user:#{current_user.id}:followed_users_id_cache"])
+    returned_ids = Enum.map(json["posts"], &(String.to_integer(&1["id"])))
+    assert post.id in returned_ids
+    refute my_post.id in returned_ids
+    refute nsfw_post.id in returned_ids
+    refute nudity_post.id in returned_ids
     assert Enum.find(json["posts"], &(&1["id"] == "#{post.id}"))["loved"]
   end
 

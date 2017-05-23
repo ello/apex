@@ -26,7 +26,7 @@ defmodule Ello.Search.Post.SearchTest do
     badman_post  = Factory.insert(:post, %{body: [%{"data" => "This is a bad, bad man.", "kind" => "text"}]})
     stopword_post = Factory.insert(:post, %{body: [%{"data" => "asshole #ass", "kind" => "text"}]})
     irrel_post2  = Factory.insert(:post, %{body: [%{"data" => "Irrelevantpost!", "kind" => "text"}]})
-    nfp          = Factory.insert(:post, %{body: [%{"data" => "not for print is finally here!", "kind" => "text"}]})
+    nfp          = Factory.insert(:post, %{body: [%{"data" => "not for print is finally here!", "kind" => "text"}, %{"kind" => "image", "date" => %{"url" => "doesntmatter"}}]})
     not_nfp      = Factory.insert(:post, %{body: [%{"data" => "not my print for ello", "kind" => "text"}]})
 
     Index.delete
@@ -358,5 +358,28 @@ defmodule Ello.Search.Post.SearchTest do
     assert context.nudity_post.id in ids
     refute context.nsfw_post.id in ids
     refute context.private_post.id in ids
+  end
+
+  test "image only filtering - for search or trending", context do
+    results = Search.post_search(%{
+      terms:        "print",
+      allow_nsfw:   true,
+      allow_nudity: true,
+      current_user: context.current_user,
+    }).results
+    ids = Enum.map(results, &(&1.id))
+    assert context.nfp.id in ids
+    assert context.not_nfp.id in ids
+
+    results = Search.post_search(%{
+      terms:        "print",
+      allow_nsfw:   true,
+      allow_nudity: true,
+      current_user: context.current_user,
+      images_only:  true,
+    }).results
+    ids = Enum.map(results, &(&1.id))
+    assert context.nfp.id in ids
+    refute context.not_nfp.id in ids
   end
 end

@@ -41,6 +41,7 @@ defmodule Ello.Search.Post.Index do
       alt_text:          "",
       is_saleable:       post.is_saleable,
       category_ids:      post.category_ids,
+      has_images:        has_images(post),
     } |> Map.merge(overrides[:post] || %{})
   end
 
@@ -154,7 +155,8 @@ defmodule Ello.Search.Post.Index do
         love_count:        %{type: "integer"},
         view_count:        %{type: "integer"},
         alt_text:          %{type: "text", analyzer: "english"},
-        is_saleable:       %{type: "boolean"}
+        is_saleable:       %{type: "boolean"},
+        has_images:        %{type: "boolean"},
       }
     }
   end
@@ -191,4 +193,11 @@ defmodule Ello.Search.Post.Index do
   defp coordinates(%{location_lat: lat, location_long: long}), do: %{lat: lat, lon: long}
 
   defp detected_language(_post), do: "en"
+
+  defp has_images(%{body: body, reposted_source: %{body: reposted_body}}) do
+    Enum.any?(body ++ reposted_body, &(&1["kind" == "image"]))
+  end
+  defp has_images(%{body: body}) do
+    Enum.any?(body, &(&1["kind"] == "image"))
+  end
 end
