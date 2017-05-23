@@ -1,8 +1,9 @@
-defmodule Ello.Search.PostSearch do
+defmodule Ello.Search.Post.Search do
   import NewRelicPhoenix, only: [measure_segment: 2]
   alias Ello.Core.{Content, Network}
   alias Ello.Core.Content
-  alias Ello.Search.{Client, PostIndex, TrendingPost, Page, TermSanitizer}
+  alias Ello.Search.{Client, Page, TermSanitizer}
+  alias Ello.Search.Post.{Index, Trending}
   use Timex
 
   def post_search(opts) do
@@ -12,10 +13,11 @@ defmodule Ello.Search.PostSearch do
     |> build_mention_query(opts)
     |> build_hashtag_query(opts)
     |> build_pagination_query(opts[:page], opts[:per_page])
+    |> filter_has_images(opts)
     |> filter_category(opts[:category])
     |> filter_following(opts[:following], opts[:current_user])
     |> filter_days(opts[:within_days])
-    |> TrendingPost.build_boosting_queries(opts[:trending], opts[:following], opts[:category])
+    |> Trending.build_boosting_queries(opts[:trending], opts[:following], opts[:category])
     |> search_post_index(opts)
   end
 
@@ -57,14 +59,12 @@ defmodule Ello.Search.PostSearch do
 
   defp build_text_content_query(query, %{trending: true}), do: query
   defp build_text_content_query(query, %{terms: terms} = opts) do
-    if String.starts_with?(terms, "\"") && String.ends_with?(terms, "\"") do
-      sliced_terms = String.slice(terms, 1, (String.length(terms) - 2))
-      updated_opts = Map.merge(opts, %{terms: sliced_terms})
-      update_bool(query, :must, &([%{match_phrase: %{text_content: filter_terms(updated_opts)}} | &1]))
+    field = if String.starts_with?(terms, "\"") && String.ends_with?(terms, "\"") do
+      "text_content"
     else
-      text_boost = Application.get_env(:ello_search, :text_content_boost_factor)
-      update_bool(query, :must, &([%{query_string: %{query: filter_terms(opts), fields: ["text_content"], boost: text_boost}} | &1]))
+      "text_content.english"
     end
+    update_bool(query, :must, &([%{query_string: %{query: filter_terms(opts), default_field: field}} | &1]))
   end
 
   defp build_mention_query(query, %{trending: true}), do: query
@@ -108,6 +108,11 @@ defmodule Ello.Search.PostSearch do
 
   defp filter_terms(%{allow_nsfw: false} = opts), do: TermSanitizer.sanitize(opts[:terms])
   defp filter_terms(opts),                        do: opts[:terms]
+
+  defp filter_has_images(query, %{images_only: true}) do
+    update_bool(query, :filter, &([%{term: %{has_images: true}} | &1]))
+  end
+  defp filter_has_images(query, _), do: query
 
   defp author_base_query do
     %{
@@ -165,7 +170,7 @@ defmodule Ello.Search.PostSearch do
 
   defp search_post_index(query, opts) do
     measure_segment {:ext, "search_post_index"} do
-      results = Client.search(PostIndex.index_name(), [PostIndex.post_doc_type], query).body
+      results = Client.search(Index.index_name(), [Index.post_doc_type], query).body
     end
 
     posts = case results["hits"]["hits"] do

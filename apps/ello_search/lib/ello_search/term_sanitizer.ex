@@ -1,6 +1,6 @@
 defmodule Ello.Search.TermSanitizer.Regex do
   defmacro __before_compile__(_) do
-    expression = "lib/nsfw_stopwords.txt"
+    expression = "lib/ello_search/nsfw_stopwords.txt"
                  |> File.read!
                  |> String.split
                  |> Enum.map(&("(\\b|#)?#{&1}\\b"))

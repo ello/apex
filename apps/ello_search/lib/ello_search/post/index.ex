@@ -1,4 +1,4 @@
-defmodule Ello.Search.PostIndex do
+defmodule Ello.Search.Post.Index do
   alias Ello.Search.Client
   alias Ello.Core.Discovery
 
@@ -41,6 +41,7 @@ defmodule Ello.Search.PostIndex do
       alt_text:          "",
       is_saleable:       post.is_saleable,
       category_ids:      post.category_ids,
+      has_images:        has_images(post),
     } |> Map.merge(overrides[:post] || %{})
   end
 
@@ -77,7 +78,25 @@ defmodule Ello.Search.PostIndex do
   def author_doc_type, do: "author"
   def post_doc_type,   do: "post"
   def doc_types,       do: [post_doc_type(), author_doc_type()]
-  def settings,        do: %{}
+  def settings do
+    %{
+      settings: %{
+        index: %{
+          number_of_shards: Application.get_env(:ello_search, :es_default_shards),
+          number_of_replicas: Application.get_env(:ello_search, :es_default_replicas)
+        },
+        analysis: %{
+          analyzer: %{
+            default_text_analyzer: %{
+              type: "custom",
+              tokenizer: "standard",
+              filter: ["lowercase"]
+            }
+          }
+        }
+      }
+    }
+  end
 
   def author_mapping do
     %{
@@ -117,7 +136,11 @@ defmodule Ello.Search.PostIndex do
         updated_at:        %{type: "date"},
         token:             %{type: "text"},
         author_id:         %{type: "integer"},
-        text_content:      %{type: "text", analyzer: "english"},
+        text_content: %{
+          type:     "text",
+          fields:   %{english: %{type: "text", analyzer: "english"}},
+          analyzer: "default_text_analyzer",
+        },
         hashtags:          %{type: "text"},
         mentions:          %{type: "text"},
         detected_language: %{type: "text", index: false},
@@ -132,7 +155,8 @@ defmodule Ello.Search.PostIndex do
         love_count:        %{type: "integer"},
         view_count:        %{type: "integer"},
         alt_text:          %{type: "text", analyzer: "english"},
-        is_saleable:       %{type: "boolean"}
+        is_saleable:       %{type: "boolean"},
+        has_images:        %{type: "boolean"},
       }
     }
   end
@@ -169,4 +193,11 @@ defmodule Ello.Search.PostIndex do
   defp coordinates(%{location_lat: lat, location_long: long}), do: %{lat: lat, lon: long}
 
   defp detected_language(_post), do: "en"
+
+  defp has_images(%{body: body, reposted_source: %{body: reposted_body}}) do
+    Enum.any?(body ++ reposted_body, &(&1["kind" == "image"]))
+  end
+  defp has_images(%{body: body}) do
+    Enum.any?(body, &(&1["kind"] == "image"))
+  end
 end

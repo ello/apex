@@ -3,7 +3,7 @@ defmodule Ello.V2.DiscoverPostControllerTest do
   alias Ello.Core.Repo
   alias Ello.Stream
   alias Ello.Stream.Item
-  alias Ello.Search.PostIndex
+  alias Ello.Search.Post.Index
 
   setup %{conn: conn} do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
@@ -11,7 +11,7 @@ defmodule Ello.V2.DiscoverPostControllerTest do
     Stream.Client.Test.reset
 
     user = Factory.insert(:user)
-    post1 = Factory.insert(:post)
+    post1 = Factory.add_assets(Factory.insert(:post))
     post2 = Factory.insert(:post)
     post3 = Factory.insert(:post, has_nudity: true)
     post4 = Factory.insert(:post)
@@ -76,10 +76,22 @@ defmodule Ello.V2.DiscoverPostControllerTest do
 
   test "GET /v2/discover/posts/trending - success", %{conn: conn, posts: posts} do
     post = hd(posts)
-    PostIndex.delete
-    PostIndex.create
-    PostIndex.add(post)
+    Index.delete
+    Index.create
+    Index.add(post)
     conn = get(conn, discover_post_path(conn, :trending, %{}))
     assert Integer.to_string(post.id) == hd(json_response(conn, 200)["posts"])["id"]
+  end
+
+  test "GET /v2/discover/posts/trending - images only", %{conn: conn, posts: posts} do
+    [p1, p2 | _] = posts
+    Index.delete
+    Index.create
+    Index.add(p1)
+    Index.add(p2)
+    conn = get(conn, discover_post_path(conn, :trending, %{"images_only" => "t"}))
+    json = json_response(conn, 200)["posts"]
+    assert p1.id in Enum.map(json, &String.to_integer(&1["id"]))
+    refute p2.id in Enum.map(json, &String.to_integer(&1["id"]))
   end
 end
