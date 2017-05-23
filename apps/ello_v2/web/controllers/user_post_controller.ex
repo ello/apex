@@ -25,6 +25,6 @@ defmodule Ello.V2.UserPostController do
   end
 
   defp fetch_posts_page(conn, user) do
-    Content.posts_by_user(user.id, standard_params(conn))
+    Content.posts_page(standard_params(conn, %{user_id: user.id}))
   end
 end

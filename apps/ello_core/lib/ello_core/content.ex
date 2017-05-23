@@ -113,17 +113,16 @@ defmodule Ello.Core.Content do
   end
 
 
-  @spec posts_by_user(user_id :: integer, filters :: any) :: PostsPage.t
-  def posts_by_user(user_id, opts) when is_list(opts), do: posts_by_user(user_id, Enum.into(opts, %{}))
-  def posts_by_user(user_id, %{} = filters) do
-    per_page = parse_per_page(filters[:per_page])
-    before = parse_before(filters[:before])
+  @spec posts_page(options) :: PostsPage.t
+  def posts_page(%{} = options) do
+    per_page = parse_per_page(options[:per_page])
+    before = parse_before(options[:before])
 
-    total_query = total_posts_by_user_query(user_id, filters)
+    total_query = total_posts_by_user_query(options)
     remaining_query = remaining_posts_by_user_query(total_query, before)
 
     measure_segment {:db, "Ecto.UserPostsQuery"} do
-      posts_task = Task.async(__MODULE__, :page_of_posts_by_user_query, [remaining_query, per_page, filters])
+      posts_task = Task.async(__MODULE__, :page_of_posts_by_user_query, [remaining_query, per_page, options])
       total_count_task = Task.async(__MODULE__, :count_and_pages_calc, [total_query, per_page])
       remaining_count_task = Task.async(__MODULE__, :count_and_pages_calc, [remaining_query, per_page])
 
@@ -167,9 +166,9 @@ defmodule Ello.Core.Content do
     end
   end
 
-  defp total_posts_by_user_query(user_id, %{} = filters) do
+  defp total_posts_by_user_query(%{user_id: user_id} = options) do
     Post
-    |> filter_post_for_client(filters)
+    |> filter_post_for_client(options)
     |> where([p], p.author_id == ^user_id and is_nil(p.parent_post_id))
   end
 
