@@ -78,7 +78,7 @@ defmodule Ello.V2.EditorialView do
     %{
       post_stream: %{
         type: "posts",
-        href: "/api/v2/following/posts/trending?stream_source=editorial&per_page=#{per_page()}",
+        href: "/api/v2/following/posts/trending?stream_source=editorial&per_page=#{per_page()}&images_only=true",
       }
     }
   end
@@ -86,7 +86,7 @@ defmodule Ello.V2.EditorialView do
     %{
       post_stream: %{
         type: "posts",
-        href: "/api/v2/discover/posts/trending?stream_source=editorial&per_page=#{per_page()}",
+        href: "/api/v2/discover/posts/trending?stream_source=editorial&per_page=#{per_page()}&images_only=true",
       }
     }
   end
