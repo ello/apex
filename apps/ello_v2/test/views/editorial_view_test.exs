@@ -83,7 +83,7 @@ defmodule Ello.V2.EditorialViewTest do
     refute json[:subtitle]
     refute json[:url]
     assert json[:links][:post_stream][:type] == "posts"
-    assert json[:links][:post_stream][:href] == "/api/v2/following/posts/trending?stream_source=editorial&per_page=5"
+    assert json[:links][:post_stream][:href] == "/api/v2/following/posts/trending?stream_source=editorial&per_page=5&images_only=true"
   end
 
   test "editorial.json - following kind - anonymous", context do
@@ -97,7 +97,7 @@ defmodule Ello.V2.EditorialViewTest do
     refute json[:subtitle]
     refute json[:url]
     assert json[:links][:post_stream][:type] == "posts"
-    assert json[:links][:post_stream][:href] == "/api/v2/discover/posts/trending?stream_source=editorial&per_page=5"
+    assert json[:links][:post_stream][:href] == "/api/v2/discover/posts/trending?stream_source=editorial&per_page=5&images_only=true"
   end
 
   test "editorial.json - invite_join kind - authenticated", context do
