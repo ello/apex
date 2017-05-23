@@ -1,18 +1,12 @@
 defmodule Ello.Core.Content do
   import NewRelicPhoenix, only: [measure_segment: 2]
   import Ecto.Query
-  alias Ello.Core.{
-    Repo,
-    Redis,
-    Network,
-    Discovery,
-  }
+  alias Ello.Core.Repo
   alias __MODULE__.{
     PostsPage,
+    Filter,
+    Preload,
     Post,
-    Love,
-    Watch,
-    Asset,
   }
 
   @moduledoc """
@@ -46,19 +40,19 @@ defmodule Ello.Core.Content do
   present, posts by private users will not be included.
   """
   @spec post(options) :: Post.t | nil
-  def post(%{id_or_token: "~" <> token, current_user: current_user} = options) do
+  def post(%{id_or_token: "~" <> token} = options) do
     Post
-    |> filter_post_for_client(options)
+    |> Filter.post_query(options)
     |> Repo.get_by(token: token)
-    |> post_preloads(current_user)
-    |> filter_blocked(current_user)
+    |> Preload.post_list(options)
+    |> Filter.post_list(options)
   end
-  def post(%{id_or_token: id, current_user: current_user} = options) do
+  def post(%{id_or_token: id} = options) do
     Post
-    |> filter_post_for_client(options)
+    |> Filter.post_query(options)
     |> Repo.get(id)
-    |> post_preloads(current_user)
-    |> filter_blocked(current_user)
+    |> Preload.post_list(options)
+    |> Filter.post_list(options)
   end
 
   @doc """
@@ -66,41 +60,41 @@ defmodule Ello.Core.Content do
 
   Uses different algorithms to find the posts based on the options passed in.
     * ids - Finds by post ids, posts returned in same order as ids.
+    * tokens - Finds by post tokens, posts returned in same order as tokens.
     * related_to - Finds posts related to the post passed in.
 
   Posts are returned in the order the ids are given.
   """
-  def posts(%{ids: ids, current_user: current_user} = filters) do
+  def posts(%{ids: ids} = options) do
     Post
     |> where([p], p.id in ^ids)
-    |> filter_post_for_client(filters)
+    |> Filter.post_query(options)
     |> Repo.all
-    |> post_preloads(current_user)
-    |> filter_blocked(current_user)
+    |> Preload.post_list(options)
+    |> Filter.post_list(options)
     |> post_sorting(:id, ids)
   end
-  def posts(%{related_to: %Post{} = related_to, current_user: current_user, per_page: per_page} = filters) do
+  def posts(%{tokens: tokens} = options) do
+    Post
+    |> where([p], p.token in ^tokens)
+    |> Filter.post_query(options)
+    |> Repo.all
+    |> Preload.post_list(options)
+    |> Filter.post_list(options)
+    |> post_sorting(:tokens, tokens)
+  end
+  def posts(%{related_to: %Post{} = related_to, per_page: per_page} = options) do
     %{id: related_id, author_id: author_id} = related_to
     Post
-    |> filter_post_for_client(filters)
+    |> Filter.post_query(options)
     |> where([p], p.author_id == ^author_id)
     |> where([p], p.id != ^related_id)
     |> where([p], is_nil(p.parent_post_id))
     |> order_by(fragment("random()"))
     |> limit(^per_page)
     |> Repo.all
-    |> post_preloads(current_user)
-    |> filter_blocked(current_user)
-  end
-
-  def posts_by_tokens(%{tokens: tokens, current_user: current_user} = filters) do
-    Post
-    |> where([p], p.token in ^tokens)
-    |> filter_post_for_client(filters)
-    |> Repo.all
-    |> post_preloads(current_user)
-    |> filter_blocked(current_user)
-    |> post_sorting(:token, tokens)
+    |> Preload.post_list(options)
+    |> Filter.post_list(options)
   end
 
   defp post_sorting(posts, field, values) do
@@ -111,7 +105,6 @@ defmodule Ello.Core.Content do
       |> Enum.flat_map(&(mapped[&1] || []))
     end
   end
-
 
   @spec posts_page(options) :: PostsPage.t
   def posts_page(%{} = options) do
@@ -168,7 +161,7 @@ defmodule Ello.Core.Content do
 
   defp total_posts_by_user_query(%{user_id: user_id} = options) do
     Post
-    |> filter_post_for_client(options)
+    |> Filter.post_query(options)
     |> where([p], p.author_id == ^user_id and is_nil(p.parent_post_id))
   end
 
@@ -177,13 +170,13 @@ defmodule Ello.Core.Content do
     where(total_query, [p], p.created_at < ^date)
   end
 
-  def page_of_posts_by_user_query(remaining_query, per_page, %{current_user: current_user} = _filters) do
+  def page_of_posts_by_user_query(remaining_query, per_page, options) do
     remaining_query
     |> order_by([p], [desc: p.created_at])
     |> limit(^per_page)
     |> Repo.all
-    |> post_preloads(current_user)
-    |> filter_blocked(current_user)
+    |> Preload.post_list(options)
+    |> Filter.post_list(options)
   end
 
   defp get_last_post_created_at([]), do: nil
@@ -194,174 +187,5 @@ defmodule Ello.Core.Content do
   def count_and_pages_calc(query, per_page) do
     count = Repo.aggregate(query, :count, :id)
     {count, round(Float.ceil(count / per_page))}
-  end
-
-  defp filter_post_for_client(query, %{current_user: current_user, allow_nsfw: allow_nsfw, allow_nudity: allow_nudity}) do
-    query
-    |> filter_nsfw(allow_nsfw)
-    |> filter_nudity(allow_nudity)
-    |> filter_banned
-    |> filter_private(current_user)
-  end
-
-  defp filter_nsfw(query, true), do: query
-  defp filter_nsfw(query, false), do: where(query, [p], not p.is_adult_content)
-
-  defp filter_nudity(query, true), do: query
-  defp filter_nudity(query, false), do: where(query, [p], not p.has_nudity)
-
-  defp filter_blocked(nil, _), do: nil
-  defp filter_blocked([], _), do: []
-  defp filter_blocked(post_or_posts, nil), do: post_or_posts
-  defp filter_blocked(post_or_posts, %{all_blocked_ids: %{map: blocked}})
-       when map_size(blocked) == 0,
-       do: post_or_posts
-  defp filter_blocked(%Post{} = post, %{all_blocked_ids: blocked}),
-    do: if is_blocked(post, blocked), do: nil, else: post
-  defp filter_blocked(posts, %{all_blocked_ids: blocked}),
-    do: Enum.reject(posts, &is_blocked(&1, blocked))
-
-  defp is_blocked(%{reposted_source: %{author_id: rp_id}, author_id: id}, blocked),
-    do: id in blocked || rp_id in blocked
-  defp is_blocked(%{author_id: id}, blocked),
-    do: id in blocked
-
-  defp filter_banned(query) do
-    query
-    |> join(:inner, [p], a in assoc(p, :author))
-    |> join(:left, [p, a], rp in assoc(p, :reposted_source))
-    |> join(:left, [p, a, rp], rpa in assoc(rp, :author))
-    |> where([p, a, rp, rpa], is_nil(a.locked_at) and is_nil(rpa.locked_at))
-  end
-
-  defp filter_private(query, nil) do
-    query
-    |> join(:inner, [p], a in assoc(p, :author))
-    |> join(:left, [p, a], rp in assoc(p, :reposted_source))
-    |> join(:left, [p, a, rp], rpa in assoc(rp, :author))
-    |> where([p, a, rp, rpa], a.is_public and (is_nil(rpa.is_public) or rpa.is_public))
-  end
-  defp filter_private(query, _), do: query
-
-  defp post_preloads(post_or_posts, current_user) do
-    post_or_posts
-    |> post_and_repost_preloads(current_user)
-    |> prefetch_reposted_source(current_user)
-  end
-
-  defp repost_preloads(reposts, current_user) do
-    reposts
-    |> post_and_repost_preloads(current_user)
-    |> Enum.map(&(nilify_reposted_source(&1)))
-  end
-
-  defp nilify_reposted_source(repost) do
-    Map.put(repost, :reposted_source, nil)
-  end
-
-  defp post_and_repost_preloads(posts, current_user) do
-    posts
-    |> prefetch_categories
-    |> prefetch_assets_and_author(current_user)
-    |> prefetch_current_user_relationships(current_user)
-    |> prefetch_post_counts
-    |> build_image_structs
-  end
-
-  defp prefetch_assets_and_author(nil, _), do: nil
-  defp prefetch_assets_and_author([], _), do: []
-  defp prefetch_assets_and_author(post_or_posts, current_user) do
-    measure_segment {:db, "Ecto.PostAssetAndAuthorPreload"} do
-      post_or_posts
-      |> Repo.preload([assets: [], author: &Network.users(&1, current_user)])
-      |> filter_assets
-    end
-  end
-
-  defp filter_assets(nil), do: nil
-  defp filter_assets([]), do: []
-  defp filter_assets(%Post{} = post), do: Post.filter_assets(post)
-  defp filter_assets(posts) do
-    Enum.map(posts, &filter_assets/1)
-  end
-
-  defp prefetch_reposted_source(nil, _), do: nil
-  defp prefetch_reposted_source([], _), do: []
-  defp prefetch_reposted_source(post_or_posts, current_user) do
-    Repo.preload post_or_posts, reposted_source: fn(ids) ->
-      Post
-      |> where([p], p.id in ^ids)
-      |> Repo.all
-      |> repost_preloads(current_user)
-    end
-  end
-
-  defp prefetch_current_user_relationships(post_or_posts, nil), do: post_or_posts
-  defp prefetch_current_user_relationships(nil, _), do: nil
-  defp prefetch_current_user_relationships([], _), do: []
-  defp prefetch_current_user_relationships(post_or_posts, %{id: id}) do
-    current_user_repost_query = where(Post, author_id: ^id)
-    current_user_love_query = where(Love, user_id: ^id)
-    current_user_watch_query = where(Watch, user_id: ^id)
-
-    measure_segment {:db, "Ecto.CurrentUserPostRelationships"} do
-      Repo.preload(post_or_posts, [
-        repost_from_current_user: current_user_repost_query,
-        love_from_current_user:   current_user_love_query,
-        watch_from_current_user:  current_user_watch_query,
-      ])
-    end
-  end
-
-  # Because categories are stored as an array on posts we can use preload.
-  # Instead we basically do what preload does ourselves manually.
-  defp prefetch_categories(post_or_posts) do
-    Discovery.put_belongs_to_many_categories(post_or_posts)
-  end
-
-  defp prefetch_post_counts(nil), do: nil
-  defp prefetch_post_counts([]), do: []
-  defp prefetch_post_counts(%Post{} = post),
-    do: hd(prefetch_post_counts([post]))
-  defp prefetch_post_counts(posts) do
-    # Get counts from redis
-    {:ok, counts} = Redis.command(["MGET" | count_keys_for_posts(posts)], name: :post_counts)
-
-    # Add counts to posts
-    counts
-    |> Enum.map(&(String.to_integer(&1 || "0")))
-    |> Enum.chunk(4)
-    |> Enum.zip(posts)
-    |> Enum.map(fn({[loves, comments, reposts, views], user}) ->
-      Map.merge user, %{
-        loves_count:    loves,
-        comments_count: comments,
-        reposts_count:  reposts,
-        views_count:    views,
-      }
-    end)
-  end
-
-  defp count_keys_for_posts(posts) do
-    # Get keys for each counter
-    Enum.flat_map posts, fn(%{id: id}) ->
-      [
-        "post:#{id}:love_counter",
-        "post:#{id}:comment_counter",
-        "post:#{id}:repost_counter",
-        "post:#{id}:view_counter",
-      ]
-    end
-  end
-
-  def build_image_structs(%Post{assets: assets} = post) when is_list(assets) do
-    Map.put(post, :assets, Enum.map(assets, &Asset.build_attachment/1))
-  end
-  def build_image_structs(%Post{} = post), do: post
-  def build_image_structs(nil), do: nil
-  def build_image_structs(posts) when is_list(posts) do
-    measure_segment {__MODULE__, "build_image_structs"} do
-      Enum.map(posts, &build_image_structs/1)
-    end
   end
 end
