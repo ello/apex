@@ -137,8 +137,8 @@ defmodule Ello.Search.Post.Index do
         author_id:         %{type: "integer"},
         text_content: %{
           type:     "text",
-          fields:   %{english: %{type: "text", analyzer: "english"}},
-          analyzer: "default_text_analyzer",
+          fields:   %{raw: %{type: "text", analyzer: "default_text_analyzer"}},
+          analyzer: "english",
         },
         hashtags:          %{type: "text"},
         mentions:          %{type: "text"},

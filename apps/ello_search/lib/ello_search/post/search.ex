@@ -59,9 +59,9 @@ defmodule Ello.Search.Post.Search do
   defp build_text_content_query(query, %{trending: true}), do: query
   defp build_text_content_query(query, %{terms: terms} = opts) do
     field = if String.starts_with?(terms, "\"") && String.ends_with?(terms, "\"") do
-      "text_content"
+      "text_content.raw"
     else
-      "text_content.english"
+      "text_content"
     end
     update_bool(query, :must, &([%{query_string: %{query: filter_terms(opts), fields: [field]}} | &1]))
   end
