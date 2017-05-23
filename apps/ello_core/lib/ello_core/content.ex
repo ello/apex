@@ -21,6 +21,18 @@ defmodule Ello.Core.Content do
   Handles database queryies, preloading reposts, and fetching cached values.
   """
 
+  @typedoc """
+  All Ello.Core.Content public functions expect to receive a map of options.
+  Those options should always include `current_user`, `allow_nsfw`, and
+  `allow_nudity`. Any extra options should be included in the same map.
+  """
+  @type options :: %{
+    required(:current_user) => User.t | nil,
+    required(:allow_nsfw)   => boolean,
+    required(:allow_nudity) => boolean,
+    optional(any)           => any
+  }
+
   @doc """
   Get a post by id or token.
 
@@ -31,21 +43,17 @@ defmodule Ello.Core.Content do
   and nudity content visibility, and posts by banned users.  If no user is
   present, posts by private users will not be included.
   """
-
-  @type filter_opts :: %{current_user: User.t | nil, allow_nsfw: boolean, allow_nudity: boolean}
-
-  @spec post(id_or_slug :: String.t | integer, filters :: filter_opts) :: Post.t
-  def post(id_or_slug, opts) when is_list(opts), do: post(id_or_slug, Enum.into(opts, %{}))
-  def post("~" <> token, %{current_user: current_user} = filters) do
+  @spec post(options) :: Post.t | nil
+  def post(%{id_or_token: "~" <> token, current_user: current_user} = options) do
     Post
-    |> filter_post_for_client(filters)
+    |> filter_post_for_client(options)
     |> Repo.get_by(token: token)
     |> post_preloads(current_user)
     |> filter_blocked(current_user)
   end
-  def post(id, %{current_user: current_user} = filters) do
+  def post(%{id_or_token: id, current_user: current_user} = options) do
     Post
-    |> filter_post_for_client(filters)
+    |> filter_post_for_client(options)
     |> Repo.get(id)
     |> post_preloads(current_user)
     |> filter_blocked(current_user)

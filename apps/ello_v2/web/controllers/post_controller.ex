@@ -28,13 +28,15 @@ defmodule Ello.V2.PostController do
     |> api_render_if_stale(PostView, "index.json", data: page.results)
   end
 
-  defp load_post(conn, %{"id" => id_or_slug}) do
-    Content.post(id_or_slug, standard_params(conn))
+  defp load_post(conn, %{"id" => id_or_token}) do
+    Content.post(standard_params(conn, %{
+      id_or_token: id_or_token,
+    }))
   end
 
   defp post_search(conn, params) do
     Search.post_search(standard_params(conn, %{
-      terms:        params["terms"],
+      terms: params["terms"],
     }))
   end
 
