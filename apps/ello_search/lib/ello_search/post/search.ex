@@ -6,29 +6,54 @@ defmodule Ello.Search.Post.Search do
   alias Ello.Search.Post.{Index, Trending}
   use Timex
 
+  defstruct [
+    terms:          nil,
+    current_user:   nil,
+    trending:       false,
+    allow_nsfw:     false,
+    allow_nudity:   false,
+    query:          %{},
+    language:       "en",
+    category:       nil,
+    images_only:    false,
+    following:      false,
+    results:        [],
+    per_page:       25,
+    page:           1,
+    next_page:      2,
+    __raw_results:  %{},
+    __total_count:  nil,
+    __total_pages:  nil,
+    __total_pages_remaining: nil,
+  ]
+
   def post_search(opts) do
-    opts
+    __MODULE__
+    |> struct(opts)
+    |> build_base_query
     |> build_client_filter_queries
-    |> build_text_content_query(opts)
-    |> build_mention_query(opts)
-    |> build_hashtag_query(opts)
-    |> build_pagination_query(opts[:page], opts[:per_page])
-    |> filter_has_images(opts)
-    |> filter_category(opts[:category])
-    |> filter_following(opts[:following], opts[:current_user])
-    |> filter_days(opts[:within_days])
-    |> Trending.build_boosting_queries(opts[:trending], opts[:following], opts[:category])
-    |> search_post_index(opts)
+    |> build_text_content_query
+    |> build_mention_query
+    |> build_hashtag_query
+    |> build_pagination_query
+    |> filter_has_images
+    |> filter_category
+    |> filter_following
+    |> filter_days
+    |> Trending.build_boosting_queries
+    |> search_post_index
   end
 
-  defp build_client_filter_queries(opts) do
-    base_query()
-    |> build_author_query(opts[:current_user])
-    |> build_language_query(opts[:language])
-    |> filter_nsfw(opts[:allow_nsfw])
-    |> filter_nudity(opts[:allow_nudity])
-    |> filter_blocked(opts[:current_user])
+  defp build_client_filter_queries(search_struct) do
+    search_struct
+    |> build_author_query
+    |> build_language_query
+    |> filter_nsfw
+    |> filter_nudity
+    |> filter_blocked
   end
+
+  defp build_base_query(search_struct), do: %{search_struct | query: base_query()}
 
   defp base_query do
     %{
@@ -57,62 +82,72 @@ defmodule Ello.Search.Post.Search do
     }
   end
 
-  defp build_text_content_query(query, %{trending: true}), do: query
-  defp build_text_content_query(query, %{terms: terms} = opts) do
+  defp build_text_content_query(%{trending: true} = search_struct), do: search_struct
+  defp build_text_content_query(%{terms: terms, query: query} = search_struct) do
     field = if String.starts_with?(terms, "\"") && String.ends_with?(terms, "\"") do
       "text_content.raw"
     else
       "text_content"
     end
-    update_bool(query, :must, &([%{query_string: %{query: filter_terms(opts), fields: [field]}} | &1]))
+    updated_query = update_bool(query, :must, &([%{query_string: %{query: filter_terms(search_struct), fields: [field]}} | &1]))
+    %{search_struct | query: updated_query}
   end
 
-  defp build_mention_query(query, %{trending: true}), do: query
-  defp build_mention_query(query, opts) do
+  defp build_mention_query(%{trending: true} = search_struct), do: search_struct
+  defp build_mention_query(%{query: query} = search_struct) do
     mention_boost = Application.get_env(:ello_search, :mention_boost_factor)
-    update_bool(query, :should, &([%{match: %{mentions: %{query: filter_terms(opts), boost: mention_boost}}} | &1]))
+    updated_query = update_bool(query, :should, &([%{match: %{mentions: %{query: filter_terms(search_struct), boost: mention_boost}}} | &1]))
+    %{search_struct | query: updated_query}
   end
 
-  defp build_hashtag_query(query, %{trending: true}), do: query
-  defp build_hashtag_query(query, %{terms: "#" <> _} = opts), do:
-    update_bool(query, :must, &([%{match: %{hashtags: %{query: filter_terms(opts)}}} | &1]))
-  defp build_hashtag_query(query, _), do: query
+  defp build_hashtag_query(%{terms: "#" <> _, query: query} = search_struct) do
+    updated_query = update_bool(query, :must, &([%{match: %{hashtags: %{query: filter_terms(search_struct)}}} | &1]))
+    %{search_struct | query: updated_query}
+  end
+  defp build_hashtag_query(search_struct), do: search_struct
 
-  defp filter_nsfw(query, true), do: query
-  defp filter_nsfw(query, false), do:
-    update_bool(query, :must_not, &([%{term: %{is_adult_content: true}} | &1]))
-
-  defp filter_nudity(query, true), do: query
-  defp filter_nudity(query, false) do
-    update_bool(query, :must_not, &([%{term: %{has_nudity: true}} | &1]))
+  defp filter_nsfw(%{allow_nsfw: true} = search_struct), do: search_struct
+  defp filter_nsfw(%{allow_nsfw: false, query: query} = search_struct) do
+    updated_query = update_bool(query, :must_not, &([%{term: %{is_adult_content: true}} | &1]))
+    %{search_struct | query: updated_query}
   end
 
-  defp filter_blocked(query, nil), do: query
-  defp filter_blocked(query, user) do
-    update_bool(query, :must_not, &([%{terms: %{author_id: user.all_blocked_ids}} | &1]))
+  defp filter_nudity(%{allow_nudity: true} = search_struct), do: search_struct
+  defp filter_nudity(%{allow_nudity: false, query: query} = search_struct) do
+    updated_query = update_bool(query, :must_not, &([%{term: %{has_nudity: true}} | &1]))
+    %{search_struct | query: updated_query}
   end
 
-  defp filter_category(query, nil), do: query
-  defp filter_category(query, id) do
-    update_bool(query, :filter, &([%{terms: %{category_ids: [id]}} | &1]))
+  defp filter_blocked(%{current_user: nil} = search_struct), do: search_struct
+  defp filter_blocked(%{current_user: current_user, query: query} = search_struct) do
+    updated_query = update_bool(query, :must_not, &([%{terms: %{author_id: current_user.all_blocked_ids}} | &1]))
+    %{search_struct | query: updated_query}
   end
 
-  defp filter_following(query, true, %{} = user) do
+  defp filter_category(%{category: nil} = search_struct), do: search_struct
+  defp filter_category(%{category: id, query: query} = search_struct) do
+    updated_query = update_bool(query, :filter, &([%{terms: %{category_ids: [id]}} | &1]))
+    %{search_struct | query: updated_query}
+  end
+
+  defp filter_following(%{query: query, following: true, current_user: current_user} = search_struct) do
     limit = Application.get_env(:ello_search, :following_search_boost_limit)
-    following_ids = user
+    following_ids = current_user
                     |> Network.following_ids
                     |> Enum.take(limit)
-    update_bool(query, :filter, &([%{terms: %{author_id: following_ids}} | &1]))
+    updated_query = update_bool(query, :filter, &([%{terms: %{author_id: following_ids}} | &1]))
+    %{search_struct | query: updated_query}
   end
-  defp filter_following(query, _, _), do: query
+  defp filter_following(search_struct), do: search_struct
 
-  defp filter_terms(%{allow_nsfw: false} = opts), do: TermSanitizer.sanitize(opts[:terms])
-  defp filter_terms(opts),                        do: opts[:terms]
+  defp filter_terms(%{allow_nsfw: false} = search_struct), do: TermSanitizer.sanitize(search_struct)
+  defp filter_terms(%{terms: terms}),                      do: terms
 
-  defp filter_has_images(query, %{images_only: true}) do
-    update_bool(query, :filter, &([%{term: %{has_images: true}} | &1]))
+  defp filter_has_images(%{images_only: true, query: query} = search_struct) do
+    updated_query = update_bool(query, :filter, &([%{term: %{has_images: true}} | &1]))
+    %{search_struct | query: updated_query}
   end
-  defp filter_has_images(query, _), do: query
+  defp filter_has_images(search_struct), do: search_struct
 
   defp author_base_query do
     %{
@@ -130,45 +165,51 @@ defmodule Ello.Search.Post.Search do
     }
   end
 
-  defp build_author_query(query, nil) do
+  defp build_author_query(%{query: query, current_user: nil} = search_struct) do
     author_query = filter_private_authors(author_base_query())
-    update_bool(query, :filter, &([author_query | &1]))
+    updated_query = update_bool(query, :filter, &([author_query | &1]))
+    %{search_struct | query: updated_query}
   end
-  defp build_author_query(query, _current_user) do
-    update_bool(query, :filter, &([author_base_query() | &1]))
+  defp build_author_query(%{query: query} = search_struct) do
+    updated_query = update_bool(query, :filter, &([author_base_query() | &1]))
+    %{search_struct | query: updated_query}
   end
 
   defp filter_private_authors(author_query) do
     update_in(author_query[:has_parent][:query][:bool][:filter], &([%{term: %{is_public: true}} | &1]))
   end
 
-  defp build_pagination_query(query, page, per_page) do
-    page = (page || 1) - 1
-    per_page = per_page || 25
-    query
-    |> update_in([:from], &(&1 = page * per_page))
-    |> update_in([:size], &(&1 = per_page))
+  defp build_pagination_query(%{query: query, page: page, per_page: per_page} = search_struct) do
+    page = page - 1
+    per_page = per_page
+    updated_query = query
+                    |> update_in([:from], &(&1 = page * per_page))
+                    |> update_in([:size], &(&1 = per_page))
+    %{search_struct | query: updated_query}
   end
 
-  defp build_language_query(query, nil), do: query
-  defp build_language_query(query, language) do
+  defp build_language_query(%{language: nil} = search_struct),  do: search_struct
+  defp build_language_query(%{language: "en"} = search_struct), do: search_struct
+  defp build_language_query(%{query: query, language: language} = search_struct) do
     language_boost = Application.get_env(:ello_search, :language_boost_factor)
-    update_bool(query, :should, &([%{term: %{detected_language: %{value: language, boost: language_boost}}} | &1]))
+    updated_query = update_bool(query, :should, &([%{term: %{detected_language: %{value: language, boost: language_boost}}} | &1]))
+    %{search_struct | query: updated_query}
   end
 
-  defp filter_days(query, within_days) when is_integer(within_days) do
+  defp filter_days(%{query: query, within_days: within_days} = search_struct) when is_integer(within_days) do
     date = Timex.now
            |> Timex.shift(days: -within_days)
            |> Timex.format!("%Y-%m-%d", :strftime)
-    update_bool(query, :filter, &([%{range: %{created_at: %{gte: date}}} | &1]))
+    updated_query = update_bool(query, :filter, &([%{range: %{created_at: %{gte: date}}} | &1]))
+    %{search_struct | query: updated_query}
   end
-  defp filter_days(query, _), do: query
+  defp filter_days(search_struct), do: search_struct
 
   defp update_bool(query, type, fun) do
     update_in(query[:query][:function_score][:query][:bool][type], fun)
   end
 
-  defp search_post_index(query, opts) do
+  defp search_post_index(%{query: query} = search_struct) do
     measure_segment {:ext, "search_post_index"} do
       results = Client.search(Index.index_name(), [Index.post_doc_type], query).body
     end
@@ -181,6 +222,6 @@ defmodule Ello.Search.Post.Search do
       _ -> []
     end
 
-    Page.from_results(results, posts, opts)
+    Page.pagination_builder(%{search_struct | results: posts, __raw_results: results})
   end
 end
