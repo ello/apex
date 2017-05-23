@@ -175,9 +175,9 @@ defmodule Ello.Search.Post.Search do
 
     posts = case results["hits"]["hits"] do
       hits when is_list(hits) ->
-        hits
-        |> Enum.map(&(String.to_integer(&1["_id"])))
-        |> Content.posts_by_ids(opts)
+        Content.posts(Map.merge(opts, %{
+          ids: Enum.map(hits, &(String.to_integer(&1["_id"])))
+        }))
       _ -> []
     end
 

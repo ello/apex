@@ -273,17 +273,22 @@ defmodule Ello.Core.ContentTest do
     assert (Map.put(posts_page.before, :microsecond, 0)) == (Map.put(earlier_date, :microsecond, 0))
   end
 
-  test "posts_by_ids/2 - does not include duplicates" do
+  test "posts/1 - by ids - does not include duplicates" do
     p1 = Factory.insert(:post)
     p2 = Factory.insert(:post)
     p3 = Factory.insert(:post)
     dup_ids = [p1.id, p2.id, p2.id, p2.id, p3.id]
-    posts = Content.posts_by_ids(dup_ids, [current_user: nil, allow_nsfw: true, allow_nudity: true])
+    posts = Content.posts(%{
+      ids:          dup_ids,
+      current_user: nil,
+      allow_nsfw:   true,
+      allow_nudity: true,
+    })
     assert [_, _, _] = posts
   end
 
 
-  test "related_posts/2 - id", _context do
+  test "posts/1 - related to", _context do
     author = Factory.insert(:user)
     posts = Enum.map 1..10, fn (_) ->
       Factory.insert(:post, author: author)
@@ -293,17 +298,17 @@ defmodule Ello.Core.ContentTest do
     comment2 = Factory.insert(:post, author: author, parent_post_id: other_post.id)
     comment3 = Factory.insert(:post, author: author, parent_post_id: other_post.id)
     post = Enum.random(posts)
-    {related_to, related} = Content.related_posts(post.id, %{
+    related = Content.posts(%{
+      related_to:   post,
       current_user: nil,
-      allow_nsfw: true,
+      allow_nsfw:   true,
       allow_nudity: true,
-      per_page: 5,
+      per_page:     5,
     })
     post_ids = Enum.map(posts, &(&1.id))
     related_ids = Enum.map(related, &(&1.id))
     assert [r1, r2, r3, r4, r5] = related_ids
 
-    assert post.id == related_to.id
     refute post.id in related_ids
     refute other_post.id in related_ids
     refute comment1.id in related_ids
@@ -315,31 +320,5 @@ defmodule Ello.Core.ContentTest do
     assert r3 in post_ids
     assert r4 in post_ids
     assert r5 in post_ids
-  end
-
-  test "related_posts/2 - token", _context do
-    author = Factory.insert(:user)
-    posts = Enum.map 1..10, fn (_) ->
-      Factory.insert(:post, author: author)
-    end
-    other_post = Factory.insert(:post)
-    post = Enum.random(posts)
-    {related_to, related} = Content.related_posts("~#{post.token}", %{
-      current_user: nil,
-      allow_nsfw: true,
-      allow_nudity: true,
-      per_page: 3,
-    })
-    post_ids = Enum.map(posts, &(&1.id))
-    related_ids = Enum.map(related, &(&1.id))
-    assert [r1, r2, r3] = related_ids
-    assert post.id == related_to.id
-
-    refute post.id in related_ids
-    refute other_post.id in related_ids
-
-    assert r1 in post_ids
-    assert r2 in post_ids
-    assert r3 in post_ids
   end
 end

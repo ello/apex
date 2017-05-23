@@ -3,16 +3,21 @@ defmodule Ello.V2.RelatedPostController do
   alias Ello.Core.Content
   alias Ello.V2.PostView
 
-  def index(conn, params) do
-    {related_to, posts} = fetch_related_posts(conn, params)
-    conn
-    |> track_post_view(posts, stream_opts(related_to))
-    |> api_render(PostView, :index, data: posts)
+  def index(conn, %{"post_id" => id_or_token}) do
+    case Content.post(standard_params(conn, %{id_or_token: id_or_token})) do
+      nil     -> send_resp(conn, 404, "")
+      related ->
+        posts = fetch_related_posts(conn, related)
+        conn
+        |> track_post_view(posts, stream_opts(related))
+        |> api_render(PostView, :index, data: posts)
+    end
   end
 
-  defp fetch_related_posts(conn, %{"post_id" => id_or_token}) do
-    Content.related_posts(id_or_token, standard_params(conn, %{
-      default: %{per_page: 5}
+  defp fetch_related_posts(conn, related) do
+    Content.posts(standard_params(conn, %{
+      related_to: related,
+      default:    %{per_page: 5}
     }))
   end
 
