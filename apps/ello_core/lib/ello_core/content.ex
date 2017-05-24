@@ -107,15 +107,14 @@ defmodule Ello.Core.Content do
   end
 
   @spec posts_page(options) :: PostsPage.t
-  def posts_page(%{} = options) do
-    per_page = parse_per_page(options[:per_page])
+  def posts_page(%{per_page: per_page} = options) do
     before = parse_before(options[:before])
 
     total_query = total_posts_by_user_query(options)
     remaining_query = remaining_posts_by_user_query(total_query, before)
 
     measure_segment {:db, "Ecto.UserPostsQuery"} do
-      posts_task = Task.async(__MODULE__, :page_of_posts_by_user_query, [remaining_query, per_page, options])
+      posts_task = Task.async(__MODULE__, :page_of_posts_by_user_query, [remaining_query, options])
       total_count_task = Task.async(__MODULE__, :count_and_pages_calc, [total_query, per_page])
       remaining_count_task = Task.async(__MODULE__, :count_and_pages_calc, [remaining_query, per_page])
 
@@ -137,15 +136,6 @@ defmodule Ello.Core.Content do
       before: last_post_date,
     }
   end
-
-  defp parse_per_page(per_page) when is_binary(per_page) do
-    case Integer.parse(per_page) do
-      {val, _} -> val
-      _        -> parse_per_page(nil)
-    end
-  end
-  defp parse_per_page(per_page) when is_integer(per_page), do: per_page
-  defp parse_per_page(_), do: 25
 
   defp parse_before(%DateTime{} = before), do: before
   defp parse_before(nil), do: nil
@@ -170,7 +160,7 @@ defmodule Ello.Core.Content do
     where(total_query, [p], p.created_at < ^date)
   end
 
-  def page_of_posts_by_user_query(remaining_query, per_page, options) do
+  def page_of_posts_by_user_query(remaining_query, %{per_page: per_page} = options) do
     remaining_query
     |> order_by([p], [desc: p.created_at])
     |> limit(^per_page)
