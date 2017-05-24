@@ -29,9 +29,24 @@ defmodule Ello.Core.DiscoveryTest do
       current_user: user,
       allow_nsfw:   true,
       allow_nudity: true,
+      promotionals: true,
     })
     assert category.id == meta.id
     assert %Image{} = category.tile_image_struct
+  end
+
+  test "category/1 - promotionals: false, images: false", %{meta: meta, user: user} do
+    category = Discovery.category(%{
+      id_or_slug:   meta.slug,
+      current_user: user,
+      allow_nsfw:   true,
+      allow_nudity: true,
+      images:       false,
+      promotionals: false,
+    })
+    assert category.id == meta.id
+    refute category.tile_image_struct
+    assert %Ecto.Association.NotLoaded{} = category.promotionals
   end
 
   test "categories/1", context do
@@ -95,10 +110,25 @@ defmodule Ello.Core.DiscoveryTest do
     assert %Image{} = hd(cats).tile_image_struct
   end
 
-  test "categories/1 - no no-promos", context do
-    cats = Discovery.categories_by_ids([context.active1.id, context.inactive.id])
-    cat_ids = Enum.map(cats, &(&1.id))
-    assert context.active1.id  in cat_ids
-    refute context.inactive.id in cat_ids
+  test "categories/1 - ids: [], promotionals: false, images: true", context do
+    [cat] = Discovery.categories(%{
+      ids: [context.active1.id, context.inactive.id],
+      current_user: nil,
+      images: true,
+    })
+    assert context.active1.id == cat.id
+    assert cat.tile_image_struct
+    assert %Ecto.Association.NotLoaded{} = cat.promotionals
+  end
+
+  test "categories/1 - ids: [], promotionals: false, images: false", context do
+    [cat] = Discovery.categories(%{
+      ids: [context.active1.id, context.inactive.id],
+      current_user: nil,
+      images: false
+    })
+    assert context.active1.id == cat.id
+    refute cat.tile_image_struct
+    assert %Ecto.Association.NotLoaded{} = cat.promotionals
   end
 end

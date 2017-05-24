@@ -163,8 +163,8 @@ defmodule Ello.Search.Post.Index do
 
   defp category_names(category_ids) when length(category_ids) == 0, do: []
   defp category_names(category_ids) do
-    category_ids
-    |> Discovery.categories_without_includes
+    %{ids: category_ids, images: false}
+    |> Discovery.categories
     |> Enum.map(&(&1.name))
   end
 

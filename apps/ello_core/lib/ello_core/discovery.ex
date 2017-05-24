@@ -28,8 +28,8 @@ defmodule Ello.Core.Discovery do
   @doc """
   Find a single category by slug or id
 
-  Loads promotionals if `promotionals` option is set to true.
-  Skips images only if `skip_image` option is true.
+  Loads promotionals if `promotionals` option is set to true - default false.
+  Skips images only if `image` option is false - default true.
   """
   @spec category(options) :: Category.t
   def category(%{id_or_slug: slug} = options) when is_binary(slug) do
@@ -43,37 +43,40 @@ defmodule Ello.Core.Discovery do
     |> Preload.categories(options)
   end
 
-  @doc "Find a single category by slug - without includes"
-  @spec category_without_includes(String.t) :: Category.t
-  def category_without_includes(slug) do
-    Category
-    |> Repo.get_by(slug: slug)
-  end
+  @doc """
+  Return Categories.
 
-  @doc "Find multiple categories by ids - without includes"
-  @spec categories_without_includes(ids :: [integer]) :: [Category.t]
-  def categories_without_includes(ids) do
+  Fetch options:
+
+    * ids -          fetch by ids - if not present all categories returned.
+    * inactive -     include inactive category
+    * meta -         include meta categories
+    * images -       build image - default true.
+    * promotionals - include promotionals - default false.
+  """
+  @spec categories(options) :: [Category.t]
+  def categories(%{ids: ids} = options) do
     Category
-    |> where([u], u.id in ^ids)
+    |> where([c], c.id in ^ids)
+    |> include_inactive_categories(options[:inactive])
+    |> include_meta_categories(options[:meta])
+    |> priority_order
     |> Repo.all
+    |> Preload.categories(options)
   end
-
-  @doc "Find all primary categories - without includes"
-  @spec primary_categories() :: [Category.t]
-  def primary_categories do
+  def categories(%{primary: true} = options) do
     Category
     |> where(level: "primary")
     |> Repo.all
+    |> Preload.categories(options)
   end
-
-  def categories_by_ids([]), do: []
-  def categories_by_ids(ids) when is_list(ids) do
+  def categories(options) do
     Category
-    |> where([c], c.id in ^ids)
-    |> include_inactive_categories(false)
-    |> include_meta_categories(false)
+    |> include_inactive_categories(options[:inactive])
+    |> include_meta_categories(options[:meta])
+    |> priority_order
     |> Repo.all
-    |> Preload.categories(%{}) # TODO
+    |> Preload.categories(options)
   end
 
   def editorials(%{preview: false} = options) do
@@ -115,9 +118,11 @@ defmodule Ello.Core.Discovery do
   def put_belongs_to_many_categories(%{} = categorizable),
     do: hd(put_belongs_to_many_categories([categorizable]))
   def put_belongs_to_many_categories(categorizables) do
-    categories = categorizables
-                 |> Enum.flat_map(&(&1.category_ids || []))
-                 |> categories_by_ids
+    category_ids = categorizables
+                   |> Enum.flat_map(&(&1.category_ids || []))
+                   |> Enum.uniq
+    categories = %{ids: category_ids}
+                 |> categories
                  |> Enum.group_by(&(&1.id))
     Enum.map categorizables, fn
       %{category_ids: nil} = categorizable -> categorizable
@@ -131,24 +136,6 @@ defmodule Ello.Core.Discovery do
     end
   end
 
-  @doc """
-
-  TODO FIXUP
-  Return all Categories. with related promotionals their user.
-
-  By default neither "meta" categories nor "inactive" categories are included
-  in the results. Pass `meta: true` or `inactive: true` as opts to include them.
-  """
-  @spec categories(options) :: [Category.t]
-  def categories(options) do
-    Category
-    |> include_inactive_categories(options[:inactive])
-    |> include_meta_categories(options[:meta])
-    |> priority_order
-    |> Repo.all
-    |> Preload.categories(options)
-  end
-
   # Category Scopes
   defp priority_order(q),
     do: order_by(q, [:level, :order])
@@ -160,5 +147,4 @@ defmodule Ello.Core.Discovery do
   defp include_meta_categories(q, true), do: q
   defp include_meta_categories(q, _),
     do: where(q, [c], c.level != "meta" or is_nil(c.level))
-
 end

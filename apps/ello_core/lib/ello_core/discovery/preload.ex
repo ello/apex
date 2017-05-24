@@ -20,11 +20,12 @@ defmodule Ello.Core.Discovery.Preload do
     |> build_editorial_images
   end
 
-  defp include_promotionals(categories, options) do
+  defp include_promotionals(categories, %{promotionals: true} = options) do
     Repo.preload(categories, promotionals: [user: &Network.users(&1, options[:current_user])])
   end
+  defp include_promotionals(categories, _), do: categories
 
-  defp build_category_images(categories, %{skip_images: true}), do: categories
+  defp build_category_images(categories, %{images: false}), do: categories
   defp build_category_images(categories, _), do: build_category_images(categories)
   defp build_category_images(categories) when is_list(categories) do
     Enum.map(categories, &build_category_images/1)
