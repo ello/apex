@@ -24,7 +24,9 @@ defmodule Ello.Core.Content do
     required(:current_user) => User.t | nil,
     required(:allow_nsfw)   => boolean,
     required(:allow_nudity) => boolean,
+    optional(:id_or_slug)   => integer | String.t,
     optional(:ids)          => [integer],
+    optional(:tokens)       => [String.t],
     optional(:related_to)   => Post.t,
     optional(any)           => any
   }
