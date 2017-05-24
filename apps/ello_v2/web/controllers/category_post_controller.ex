@@ -6,7 +6,7 @@ defmodule Ello.V2.CategoryPostController do
   alias Ello.Core.Discovery
 
   def recent(conn, params) do
-    case category(conn, params) do
+    case fetch_category(conn, params) do
       nil -> send_resp(conn, 404, "")
       category ->
         stream = fetch_stream(conn, [category])
@@ -19,7 +19,7 @@ defmodule Ello.V2.CategoryPostController do
   end
 
   def trending(conn, params) do
-    case category(conn, params) do
+    case fetch_category(conn, params) do
       nil -> send_resp(conn, 404, "")
       category ->
         results = fetch_trending(conn, category)
@@ -65,7 +65,7 @@ defmodule Ello.V2.CategoryPostController do
     }))
   end
 
-  def category(conn, params) do
+  def fetch_category(conn, params) do
     Discovery.category(standard_params(conn, %{
       id_or_slug: params["slug"],
       images:     false,
