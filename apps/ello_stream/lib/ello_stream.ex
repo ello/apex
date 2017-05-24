@@ -70,7 +70,7 @@ defmodule Ello.Stream do
   defp fetch_filtered_posts(stream) do
     post_ids = Enum.map(stream.__stream_items, &(String.to_integer(&1.id)))
     filters = Map.take(stream, [:current_user, :allow_nsfw, :allow_nudity])
-    posts = Content.posts_by_ids(post_ids, filters)
+    posts = Content.posts(Map.merge(filters, %{ids: post_ids}))
     Map.put(stream, :posts, stream.posts ++ posts)
   end
 
