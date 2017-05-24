@@ -28,8 +28,11 @@ defmodule Ello.Core.Discovery do
   @doc """
   Find a single category by slug or id
 
-  Loads promotionals if `promotionals` option is set to true - default false.
-  Skips images only if `image` option is false - default true.
+  Options:
+
+    * id_or_slug -   integer id or binary slug to fetch.
+    * images -       build image - default true.
+    * promotionals - include promotionals - default false.
   """
   @spec category(options) :: Category.t
   def category(%{id_or_slug: slug} = options) when is_binary(slug) do
@@ -44,15 +47,14 @@ defmodule Ello.Core.Discovery do
   end
 
   @doc """
-  Return Categories.
+  Return C (filtered by other options)ategories.
 
   Fetch options:
 
-    * ids -          fetch by ids - if not present all categories returned.
+    * ids -          fetch by ids - if not present all categories returned (filtered by other options).
     * inactive -     include inactive category
     * meta -         include meta categories
-    * images -       build image - default true.
-    * promotionals - include promotionals - default false.
+    * primary -      only return primary categories
   """
   @spec categories(options) :: [Category.t]
   def categories(%{ids: ids} = options) do
@@ -79,6 +81,16 @@ defmodule Ello.Core.Discovery do
     |> Preload.categories(options)
   end
 
+  @doc """
+  Return Categories.
+
+  Fetch options:
+
+    * preview -  return staff preview or publicly published list of editorials?
+    * before -   pagination cursor
+    * per_page - how many per page.
+  """
+  @spec editorials(options) :: [Editorial.t]
   def editorials(%{preview: false} = options) do
     Editorial
     |> where([e], not is_nil(e.published_position))
