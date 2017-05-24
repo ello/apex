@@ -15,7 +15,7 @@ defmodule Ello.Core.Content.Preload do
     Asset,
   }
 
-  @doc "todo"
+  @doc "Accepts a list of posts and preloads all related resources."
   def post_list(nil, _), do: nil
   def post_list([], _), do: []
   def post_list(post_or_posts, options) do

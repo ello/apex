@@ -2,7 +2,17 @@ defmodule Ello.Core.Content.Filter do
   import Ecto.Query
   alias Ello.Core.Content.Post
 
-  @doc "todo"
+  @doc """
+  Takes a post query and adds filtering clauses to it.
+
+  Currently filters:
+    * nsfw posts/reposts if allow_nsfw != true
+    * nudity posts/reposts if allow_nudity != true
+    * private posts/reposts if there is no current_user
+    * banned users' posts/reposts
+
+  See post_list/1 for filtering blocked users/posts.
+  """
   def post_query(query, options) do
     query
     |> filter_nsfw(options)
@@ -11,7 +21,12 @@ defmodule Ello.Core.Content.Filter do
     |> filter_private(options)
   end
 
-  @doc "todo"
+  @doc """
+  Filters out posts/reposts by users current_user has blocked
+
+  This turns out to be more effective to do in elixir then ecto, so this must
+  be called on a list of posts.
+  """
   def post_list(list, options) do
     filter_blocked(list, options)
   end
