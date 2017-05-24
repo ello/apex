@@ -16,6 +16,8 @@ defmodule Ello.V2.Router do
     resources "/categories", CategoryController, only: @read
 
     # Discovery
+    get "/editorials", EditorialController, :index
+    get "/editorials/posts", EditorialPostController, :index
     get "/categories/:slug/posts/recent", CategoryPostController, :recent
     get "/categories/:slug/posts/trending", CategoryPostController, :trending
     get "/categories/posts/recent", CategoryPostController, :featured

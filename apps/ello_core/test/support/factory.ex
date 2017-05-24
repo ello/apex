@@ -1,6 +1,6 @@
 defmodule Ello.Core.Factory do
   alias Ello.Core.{Repo, Discovery, Network, Content}
-  alias Discovery.{Category, Promotional}
+  alias Discovery.{Category, Promotional, Editorial}
   alias Network.{User, Relationship}
   alias Content.{Post, Love, Watch, Asset}
   use ExMachina.Ecto, repo: Repo
@@ -108,6 +108,103 @@ defmodule Ello.Core.Factory do
       created_at: DateTime.utc_now,
       updated_at: DateTime.utc_now,
     } |> Asset.build_attachment
+  end
+
+  def editorial_factory do
+    %Editorial{
+      one_by_one_image: "ello-a9c0ede1-aeca-45af-9723-5750babf541e.jpeg",
+      one_by_two_image: "ello-a9c0ede1-aeca-45af-9723-5750babf541e.jpeg",
+      two_by_one_image: "ello-a9c0ede1-aeca-45af-9723-5750babf541e.jpeg",
+      two_by_two_image: "ello-a9c0ede1-aeca-45af-9723-5750babf541e.jpeg",
+      one_by_one_image_metadata: %{
+        "optimized" => %{"size" => 555_555, "type" => "image/jpeg", "width" => 1920, "height" => 1920},
+        "xhdpi" => %{"size" => 444_444, "type" => "image/jpeg", "width" => 1500, "height" => 1500},
+        "hdpi" => %{"size" => 333_333, "type" => "image/jpeg", "width" => 750, "height" => 750},
+        "mdpi" => %{"size" => 222_222, "type" => "image/jpeg", "width" => 375, "height" => 375},
+        "ldpi" => %{"size" => 111_111, "type" => "image/jpeg", "width" => 190, "height" => 190},
+      },
+      one_by_two_image_metadata: %{
+        "optimized" => %{"size" => 555_555, "type" => "image/jpeg", "width" => 1920, "height" => 3840},
+        "xhdpi" => %{"size" => 444_444, "type" => "image/jpeg", "width" => 1500, "height" => 3000},
+        "hdpi" => %{"size" => 333_333, "type" => "image/jpeg", "width" => 750, "height" => 1500},
+        "mdpi" => %{"size" => 222_222, "type" => "image/jpeg", "width" => 375, "height" => 750},
+        "ldpi" => %{"size" => 111_111, "type" => "image/jpeg", "width" => 190, "height" => 380},
+      },
+      two_by_one_image_metadata: %{
+        "optimized" => %{"size" => 555_555, "type" => "image/jpeg", "width" => 1920, "height" => 960},
+        "xhdpi" => %{"size" => 444_444, "type" => "image/jpeg", "width" => 1500, "height" => 750},
+        "hdpi" => %{"size" => 333_333, "type" => "image/jpeg", "width" => 750, "height" => 375},
+        "mdpi" => %{"size" => 222_222, "type" => "image/jpeg", "width" => 375, "height" => 188},
+        "ldpi" => %{"size" => 111_111, "type" => "image/jpeg", "width" => 190, "height" => 95},
+      },
+      two_by_two_image_metadata: %{
+        "optimized" => %{"size" => 555_555, "type" => "image/jpeg", "width" => 1920, "height" => 1920},
+        "xhdpi" => %{"size" => 444_444, "type" => "image/jpeg", "width" => 1500, "height" => 1500},
+        "hdpi" => %{"size" => 333_333, "type" => "image/jpeg", "width" => 750, "height" => 750},
+        "mdpi" => %{"size" => 222_222, "type" => "image/jpeg", "width" => 375, "height" => 375},
+        "ldpi" => %{"size" => 111_111, "type" => "image/jpeg", "width" => 190, "height" => 190},
+      },
+    }
+  end
+
+  def post_editorial_factory do
+    Map.merge(editorial_factory(), %{
+      post: build(:post),
+      kind: "post",
+      content: %{
+        "title"    => "Post Editorial",
+        "subtitle" => "check it out",
+      }
+    })
+  end
+
+  def external_editorial_factory do
+    Map.merge(editorial_factory(), %{
+      kind: "external",
+      content: %{
+        "title"    => "Post Editorial",
+        "subtitle" => "check it out",
+        "url"      => "https://ello.co/wtf",
+      }
+    })
+  end
+
+  def category_editorial_factory do
+    Map.merge(editorial_factory(), %{
+      kind: "category",
+      content: %{
+        "title" => "BUY BUY BUY!!!!!",
+        "slug"  => "shop",
+      }
+    })
+  end
+
+  def curated_posts_editorial_factory do
+    Map.merge(editorial_factory(), %{
+      kind: "curated_posts",
+      content: %{
+        "title"       => "These posts are great.",
+        "post_tokens" => [insert(:post).token, insert(:post).token]
+      }
+    })
+  end
+
+  def following_editorial_factory do
+    Map.merge(editorial_factory(), %{
+      kind: "following",
+      content: %{
+        "title" => "Following",
+      }
+    })
+  end
+
+  def invite_join_editorial_factory do
+    Map.merge(editorial_factory(), %{
+      kind: "invite_join",
+      content: %{
+        "title" => "Join or Invite",
+      }
+    })
   end
 
   def love_factory do

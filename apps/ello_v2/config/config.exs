@@ -9,7 +9,8 @@ use Mix.Config
 config :ello_v2,
   namespace: Ello.V2,
   webapp_host: System.get_env("WEBAPP_HOST"),
-  ecto_repos: []
+  ecto_repos: [],
+  editorial_stream_kind_size: System.get_env("EDITORIAL_STREAM_KIND_SIZE") || 5
 
 # Configures the endpoint
 config :ello_v2, Ello.V2.Endpoint,

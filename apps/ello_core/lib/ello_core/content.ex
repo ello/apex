@@ -59,13 +59,23 @@ defmodule Ello.Core.Content do
     |> Repo.all
     |> post_preloads(current_user)
     |> filter_blocked(current_user)
-    |> post_sorting(ids)
+    |> post_sorting(:id, ids)
   end
 
-  defp post_sorting(posts, ids) do
+  def posts_by_tokens(%{tokens: tokens, current_user: current_user} = filters) do
+    Post
+    |> where([p], p.token in ^tokens)
+    |> filter_post_for_client(filters)
+    |> Repo.all
+    |> post_preloads(current_user)
+    |> filter_blocked(current_user)
+    |> post_sorting(:token, tokens)
+  end
+
+  defp post_sorting(posts, field, values) do
     measure_segment {__MODULE__, "post_sorting"} do
-      mapped = Enum.group_by(posts, &(&1.id))
-      ids
+      mapped = Enum.group_by(posts, &Map.get(&1, field))
+      values
       |> Enum.uniq
       |> Enum.flat_map(&(mapped[&1] || []))
     end
@@ -339,12 +349,12 @@ defmodule Ello.Core.Content do
     end
   end
 
-  defp build_image_structs(%Post{assets: assets} = post) when is_list(assets) do
+  def build_image_structs(%Post{assets: assets} = post) when is_list(assets) do
     Map.put(post, :assets, Enum.map(assets, &Asset.build_attachment/1))
   end
-  defp build_image_structs(%Post{} = post), do: post
-  defp build_image_structs(nil), do: nil
-  defp build_image_structs(posts) when is_list(posts) do
+  def build_image_structs(%Post{} = post), do: post
+  def build_image_structs(nil), do: nil
+  def build_image_structs(posts) when is_list(posts) do
     measure_segment {__MODULE__, "build_image_structs"} do
       Enum.map(posts, &build_image_structs/1)
     end

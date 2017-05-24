@@ -1,7 +1,7 @@
 defmodule Ello.Core.Discovery do
   import Ecto.Query
-  alias Ello.Core.{Repo, Network, Discovery}
-  alias Discovery.{Category, Promotional}
+  alias Ello.Core.{Repo, Network, Discovery, Content}
+  alias Discovery.{Category, Promotional, Editorial}
   alias Network.User
 
   @moduledoc """
@@ -58,6 +58,33 @@ defmodule Ello.Core.Discovery do
     |> Repo.all
     |> load_images
   end
+
+  def editorials(%{preview: false} = opts) do
+    Editorial
+    |> where([e], not is_nil(e.published_position))
+    |> order_by(desc: :published_position)
+    |> editorial_cursor(opts)
+    |> limit(^opts[:per_page])
+    |> Repo.all
+    |> Repo.preload(post: &(Content.posts_by_ids(&1, opts)))
+    |> build_editorial_images
+  end
+  def editorials(%{preview: true} = opts) do
+    Editorial
+    |> where([e], not is_nil(e.preview_position))
+    |> order_by(desc: :preview_position)
+    |> editorial_cursor(opts)
+    |> limit(^opts[:per_page])
+    |> Repo.all
+    |> Repo.preload(post: &(Content.posts_by_ids(&1, opts)))
+    |> build_editorial_images
+  end
+
+  defp editorial_cursor(query, %{before: nil}), do: query
+  defp editorial_cursor(query, %{preview: true, before: before}),
+    do: where(query, [e], e.preview_position < ^before)
+  defp editorial_cursor(query, %{preview: false, before: before}),
+    do: where(query, [e], e.published_position < ^before)
 
   @type categorizable :: User.t | Post.t | [User.t | Post.t]
 
@@ -137,4 +164,8 @@ defmodule Ello.Core.Discovery do
   defp load_images(%Category{} = category) do
     Category.load_images(category)
   end
+
+  defp build_editorial_images([]), do: []
+  defp build_editorial_images(editorials),
+    do: Enum.map(editorials, &Editorial.build_images/1)
 end
