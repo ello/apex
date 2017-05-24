@@ -81,7 +81,7 @@ defmodule Ello.Core.Content do
     |> Repo.all
     |> Preload.post_list(options)
     |> Filter.post_list(options)
-    |> post_sorting(:tokens, tokens)
+    |> post_sorting(:token, tokens)
   end
   def posts(%{related_to: %Post{} = related_to, per_page: per_page} = options) do
     %{id: related_id, author_id: author_id} = related_to

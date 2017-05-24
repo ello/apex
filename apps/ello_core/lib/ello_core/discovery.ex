@@ -66,7 +66,7 @@ defmodule Ello.Core.Discovery do
     |> editorial_cursor(opts)
     |> limit(^opts[:per_page])
     |> Repo.all
-    |> Repo.preload(post: &(Content.posts_by_ids(&1, opts)))
+    |> Repo.preload(post: &(Content.posts(Map.put(opts, :ids, &1))))
     |> build_editorial_images
   end
   def editorials(%{preview: true} = opts) do
@@ -76,7 +76,7 @@ defmodule Ello.Core.Discovery do
     |> editorial_cursor(opts)
     |> limit(^opts[:per_page])
     |> Repo.all
-    |> Repo.preload(post: &(Content.posts_by_ids(&1, opts)))
+    |> Repo.preload(post: &(Content.posts(Map.put(opts, :ids, &1))))
     |> build_editorial_images
   end
 
