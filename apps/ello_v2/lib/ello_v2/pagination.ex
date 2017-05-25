@@ -2,7 +2,8 @@ defmodule Ello.V2.Pagination do
   import Plug.Conn
   alias Ello.Stream
   alias Ello.Core.Content.PostsPage
-  alias Ello.Search.Page
+  alias Ello.Search.Post.Search, as: PostSearch
+  alias Ello.Search.User.Search, as: UserSearch
 
   def add_pagination_headers(conn, path, %Stream{} = stream) do
     next = pagination_link(path, Map.take(stream, [:before, :per_page]))
@@ -22,13 +23,17 @@ defmodule Ello.V2.Pagination do
     |> put_resp_header("x-total-pages-remaining", "#{page.total_pages_remaining}")
     |> put_resp_header("link", ~s(<#{next}>; rel="next"))
   end
-  def add_pagination_headers(conn, path, %Page{} = page) do
-    next = pagination_link(path, %{page: page.next_page, per_page: page.per_page, terms: page.terms})
+  def add_pagination_headers(conn, path, %{__struct__: struct} = search) when struct in [PostSearch, UserSearch] do
+    next = pagination_link(path, %{
+      page: search.next_page,
+      per_page: search.per_page,
+      terms: search.terms
+    })
 
     conn
-    |> put_resp_header("x-total-pages", "#{page.total_pages}")
-    |> put_resp_header("x-total-count", "#{page.total_count}")
-    |> put_resp_header("x-total-pages-remaining", "#{page.total_pages_remaining}")
+    |> put_resp_header("x-total-pages", "#{search.total_pages}")
+    |> put_resp_header("x-total-count", "#{search.total_count}")
+    |> put_resp_header("x-total-pages-remaining", "#{search.total_pages_remaining}")
     |> put_resp_header("link", ~s(<#{next}>; rel="next"))
   end
   def add_pagination_headers(conn, path, params) do

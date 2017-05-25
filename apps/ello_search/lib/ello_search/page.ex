@@ -10,9 +10,9 @@ defmodule Ello.Search.Page do
       page:                    page,
       next_page:               page + 1,
       per_page:                per_page,
-      __total_count:           total_count,
-      __total_pages:           total_pages,
-      __total_pages_remaining: total_pages - page}
+      total_count:             total_count,
+      total_pages:             total_pages,
+      total_pages_remaining:   total_pages - page}
   end
 
 end

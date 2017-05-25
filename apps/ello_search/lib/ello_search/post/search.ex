@@ -22,9 +22,9 @@ defmodule Ello.Search.Post.Search do
     page:           1,
     next_page:      2,
     __raw_results:  %{},
-    __total_count:  nil,
-    __total_pages:  nil,
-    __total_pages_remaining: nil,
+    total_count:  nil,
+    total_pages:  nil,
+    total_pages_remaining: nil,
   ]
 
   def post_search(opts) do
@@ -216,9 +216,10 @@ defmodule Ello.Search.Post.Search do
 
     posts = case results["hits"]["hits"] do
       hits when is_list(hits) ->
-        Content.posts(Map.merge(opts, %{
-          ids: Enum.map(hits, &(String.to_integer(&1["_id"])))
-        }))
+        search_struct
+        |> Map.take([:current_user, :allow_nsfw, :allow_nudity])
+        |> Map.put(:ids, Enum.map(hits, &(String.to_integer(&1["_id"]))))
+        |> Content.posts
       _ -> []
     end
 

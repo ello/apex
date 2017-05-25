@@ -7,6 +7,6 @@ defmodule Ello.Search.PageTest do
       "total" => 5}, "hits" => %{"hits" => [], "max_score" => nil, "total" => 0},
     "timed_out" => false, "took" => 2}
 
-     assert Page.from_results(results, [], %{})
+     assert Page.pagination_builder(%Ello.Search.Post.Search{__raw_results: results})
   end
 end

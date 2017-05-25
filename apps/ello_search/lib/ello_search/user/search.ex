@@ -16,9 +16,9 @@ defmodule Ello.Search.User.Search do
     page:           1,
     next_page:      2,
     __raw_results:  %{},
-    __total_count:  nil,
-    __total_pages:  nil,
-    __total_pages_remaining: nil,
+    total_count:  nil,
+    total_pages:  nil,
+    total_pages_remaining: nil,
   ]
 
   def username_search(opts) do
