@@ -84,69 +84,60 @@ defmodule Ello.Search.Post.Search do
   end
 
   defp build_text_content_query(%{trending: true} = search_struct), do: search_struct
-  defp build_text_content_query(%{terms: terms, query: query} = search_struct) do
+  defp build_text_content_query(%{terms: terms} = search_struct) do
     field = if String.starts_with?(terms, "\"") && String.ends_with?(terms, "\"") do
       "text_content.raw"
     else
       "text_content"
     end
-    updated_query = update_bool(query, :must, &([%{query_string: %{query: filter_terms(search_struct), fields: [field]}} | &1]))
-    %{search_struct | query: updated_query}
+    update_bool(search_struct, :must, &([%{query_string: %{query: filter_terms(search_struct), fields: [field]}} | &1]))
   end
 
   defp build_mention_query(%{trending: true} = search_struct), do: search_struct
-  defp build_mention_query(%{query: query} = search_struct) do
+  defp build_mention_query(search_struct) do
     mention_boost = Application.get_env(:ello_search, :mention_boost_factor)
-    updated_query = update_bool(query, :should, &([%{match: %{mentions: %{query: filter_terms(search_struct), boost: mention_boost}}} | &1]))
-    %{search_struct | query: updated_query}
+    update_bool(search_struct, :should, &([%{match: %{mentions: %{query: filter_terms(search_struct), boost: mention_boost}}} | &1]))
   end
 
-  defp build_hashtag_query(%{terms: "#" <> _, query: query} = search_struct) do
-    updated_query = update_bool(query, :must, &([%{match: %{hashtags: %{query: filter_terms(search_struct)}}} | &1]))
-    %{search_struct | query: updated_query}
+  defp build_hashtag_query(%{terms: "#" <> _} = search_struct) do
+    update_bool(search_struct, :must, &([%{match: %{hashtags: %{query: filter_terms(search_struct)}}} | &1]))
   end
   defp build_hashtag_query(search_struct), do: search_struct
 
   defp filter_nsfw(%{allow_nsfw: true} = search_struct), do: search_struct
-  defp filter_nsfw(%{allow_nsfw: false, query: query} = search_struct) do
-    updated_query = update_bool(query, :must_not, &([%{term: %{is_adult_content: true}} | &1]))
-    %{search_struct | query: updated_query}
+  defp filter_nsfw(%{allow_nsfw: false} = search_struct) do
+    update_bool(search_struct, :must_not, &([%{term: %{is_adult_content: true}} | &1]))
   end
 
   defp filter_nudity(%{allow_nudity: true} = search_struct), do: search_struct
-  defp filter_nudity(%{allow_nudity: false, query: query} = search_struct) do
-    updated_query = update_bool(query, :must_not, &([%{term: %{has_nudity: true}} | &1]))
-    %{search_struct | query: updated_query}
+  defp filter_nudity(%{allow_nudity: false} = search_struct) do
+    update_bool(search_struct, :must_not, &([%{term: %{has_nudity: true}} | &1]))
   end
 
   defp filter_blocked(%{current_user: nil} = search_struct), do: search_struct
-  defp filter_blocked(%{current_user: current_user, query: query} = search_struct) do
-    updated_query = update_bool(query, :must_not, &([%{terms: %{author_id: current_user.all_blocked_ids}} | &1]))
-    %{search_struct | query: updated_query}
+  defp filter_blocked(%{current_user: current_user} = search_struct) do
+    update_bool(search_struct, :must_not, &([%{terms: %{author_id: current_user.all_blocked_ids}} | &1]))
   end
 
   defp filter_category(%{category: nil} = search_struct), do: search_struct
-  defp filter_category(%{category: id, query: query} = search_struct) do
-    updated_query = update_bool(query, :filter, &([%{terms: %{category_ids: [id]}} | &1]))
-    %{search_struct | query: updated_query}
+  defp filter_category(%{category: id} = search_struct) do
+    update_bool(search_struct, :filter, &([%{terms: %{category_ids: [id]}} | &1]))
   end
 
-  defp filter_following(%{query: query, following: true, current_user: current_user} = search_struct) do
+  defp filter_following(%{following: true, current_user: %{} = current_user} = search_struct) do
     limit = Application.get_env(:ello_search, :following_search_boost_limit)
     following_ids = current_user
                     |> Network.following_ids
                     |> Enum.take(limit)
-    updated_query = update_bool(query, :filter, &([%{terms: %{author_id: following_ids}} | &1]))
-    %{search_struct | query: updated_query}
+    update_bool(search_struct, :filter, &([%{terms: %{author_id: following_ids}} | &1]))
   end
   defp filter_following(search_struct), do: search_struct
 
   defp filter_terms(%{allow_nsfw: false} = search_struct), do: TermSanitizer.sanitize(search_struct)
   defp filter_terms(%{terms: terms}),                      do: terms
 
-  defp filter_has_images(%{images_only: true, query: query} = search_struct) do
-    updated_query = update_bool(query, :filter, &([%{term: %{has_images: true}} | &1]))
-    %{search_struct | query: updated_query}
+  defp filter_has_images(%{images_only: true} = search_struct) do
+    update_bool(search_struct, :filter, &([%{term: %{has_images: true}} | &1]))
   end
   defp filter_has_images(search_struct), do: search_struct
 
@@ -166,14 +157,12 @@ defmodule Ello.Search.Post.Search do
     }
   end
 
-  defp build_author_query(%{query: query, current_user: nil} = search_struct) do
+  defp build_author_query(%{current_user: nil} = search_struct) do
     author_query = filter_private_authors(author_base_query())
-    updated_query = update_bool(query, :filter, &([author_query | &1]))
-    %{search_struct | query: updated_query}
+    update_bool(search_struct, :filter, &([author_query | &1]))
   end
-  defp build_author_query(%{query: query} = search_struct) do
-    updated_query = update_bool(query, :filter, &([author_base_query() | &1]))
-    %{search_struct | query: updated_query}
+  defp build_author_query(search_struct) do
+    update_bool(search_struct, :filter, &([author_base_query() | &1]))
   end
 
   defp filter_private_authors(author_query) do
@@ -182,22 +171,20 @@ defmodule Ello.Search.Post.Search do
 
   defp build_language_query(%{language: nil} = search_struct),  do: search_struct
   defp build_language_query(%{language: "en"} = search_struct), do: search_struct
-  defp build_language_query(%{query: query, language: language} = search_struct) do
+  defp build_language_query(%{language: language} = search) do
     language_boost = Application.get_env(:ello_search, :language_boost_factor)
-    updated_query = update_bool(query, :should, &([%{term: %{detected_language: %{value: language, boost: language_boost}}} | &1]))
-    %{search_struct | query: updated_query}
+    update_bool(search, :should, &([%{term: %{detected_language: %{value: language, boost: language_boost}}} | &1]))
   end
 
-  defp filter_days(%{query: query, within_days: within_days} = search_struct) when is_integer(within_days) do
+  defp filter_days(%{within_days: within_days} = search) when is_integer(within_days) do
     date = Timex.now
            |> Timex.shift(days: -within_days)
            |> Timex.format!("%Y-%m-%d", :strftime)
-    updated_query = update_bool(query, :filter, &([%{range: %{created_at: %{gte: date}}} | &1]))
-    %{search_struct | query: updated_query}
+    update_bool(search, :filter, &([%{range: %{created_at: %{gte: date}}} | &1]))
   end
   defp filter_days(search_struct), do: search_struct
 
-  defp update_bool(query, type, fun) do
-    update_in(query[:query][:function_score][:query][:bool][type], fun)
+  defp update_bool(struct, type, fun) do
+    update_in(struct.query[:query][:function_score][:query][:bool][type], fun)
   end
 end
