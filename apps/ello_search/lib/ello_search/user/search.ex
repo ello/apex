@@ -78,24 +78,26 @@ defmodule Ello.Search.User.Search do
   end
 
   defp build_user_query(%{terms: "@" <> terms} = search_struct), do: build_username_query(%{search_struct | terms: terms})
-  defp build_user_query(%{query: query} = search_struct) do
+  defp build_user_query(search_struct) do
     boost = Application.get_env(:ello_search, :username_match_boost)
     filtered_terms = filter_terms(search_struct)
-    updated_query = update_in(query[:query][:bool][:must], &(&1 = %{dis_max: %{queries: [
-                                  %{prefix: %{username: %{value: filtered_terms}}},
-                                  %{term: %{username: %{value: filtered_terms, boost: boost}}},
-                                  %{match: %{name: %{query: filtered_terms, analyzer: "standard", minimum_should_match: "100%"}}} # analyzer: "standard"
-                                  ]}}))
-    %{search_struct | query: updated_query}
+    put_in(search_struct.query[:query][:bool][:must], %{
+      dis_max: %{
+        queries: [
+          %{prefix: %{username: %{value: filtered_terms}}},
+          %{term: %{username: %{value: filtered_terms, boost: boost}}},
+          %{match: %{name: %{query: filtered_terms, analyzer: "standard", minimum_should_match: "100%"}}}
+        ]
+      }
+    })
   end
 
   defp build_username_query(%{terms: "@" <> terms} = search_struct), do: build_username_query(%{search_struct | terms: terms})
-  defp build_username_query(%{query: query, terms: terms} = search_struct) do
+  defp build_username_query(%{terms: terms} = search_struct) do
     boost = Application.get_env(:ello_search, :username_match_boost)
-    updated_query = query
-                    |> update_in([:query, :bool, :must], &([%{prefix: %{username: %{value: terms}}} | &1]))
-                    |> update_in([:query, :bool, :should], &([%{term: %{username: %{value: terms, boost: boost}}} | &1]))
-    %{search_struct | query: updated_query}
+    search_struct
+    |> update_in([Access.key!(:query), :query, :bool, :must], &([%{prefix: %{username: %{value: terms}}} | &1]))
+    |> update_in([Access.key!(:query), :query, :bool, :should], &([%{term: %{username: %{value: terms, boost: boost}}} | &1]))
   end
 
   defp build_following_ids(%{current_user: nil} = search_struct), do: search_struct
@@ -105,39 +107,38 @@ defmodule Ello.Search.User.Search do
   end
 
   defp build_relationship_query(%{following_ids: []} = search_struct), do: search_struct
-  defp build_relationship_query(%{query: query, following_ids: following_ids} = search_struct) do
+  defp build_relationship_query(%{following_ids: following_ids} = search_struct) do
     limit = Application.get_env(:ello_search, :following_search_boost_limit)
     boost = Application.get_env(:ello_search, :following_search_boost)
-    updated_query = update_in(query[:query][:bool][:should], &([%{constant_score: %{filter: %{terms: %{id: Enum.take(following_ids, limit)}}, boost: boost}} | &1]))
-    %{search_struct | query: updated_query}
+    update_in(search_struct.query[:query][:bool][:should], &([%{
+      constant_score: %{
+        filter: %{terms: %{id: Enum.take(following_ids, limit)}},
+        boost: boost
+      }
+    } | &1]))
   end
 
   defp filter_nsfw(%{allow_nsfw: true} = search_struct), do: search_struct
-  defp filter_nsfw(%{query: query} = search_struct) do
-    updated_query = update_in(query[:query][:bool][:must_not], &([%{term: %{is_nsfw_user: true}} | &1]))
-    %{search_struct | query: updated_query}
+  defp filter_nsfw(search_struct) do
+    update_in(search_struct.query[:query][:bool][:must_not], &([%{term: %{is_nsfw_user: true}} | &1]))
   end
 
   defp filter_nudity(%{allow_nudity: true} = search_struct), do: search_struct
-  defp filter_nudity(%{query: query} = search_struct) do
-    updated_query = update_in(query[:query][:bool][:must_not], &([%{term: %{posts_nudity: true}} | &1]))
-    %{search_struct | query: updated_query}
+  defp filter_nudity(search_struct) do
+    update_in(search_struct.query[:query][:bool][:must_not], &([%{term: %{posts_nudity: true}} | &1]))
   end
 
   defp filter_blocked(%{current_user: nil} = search_struct), do: search_struct
-  defp filter_blocked(%{query: query, current_user: current_user} = search_struct) do
-    updated_query = update_in(query[:query][:bool][:must_not], &([%{terms: %{id: current_user.all_blocked_ids}} | &1]))
-    %{search_struct | query: updated_query}
+  defp filter_blocked(%{current_user: current_user} = search_struct) do
+    update_in(search_struct.query[:query][:bool][:must_not], &([%{terms: %{id: current_user.all_blocked_ids}} | &1]))
   end
 
-  defp filter_spam(%{query: query} = search_struct) do
-    updated_query = update_in(query[:query][:bool][:must_not], &([%{term: %{is_spammer: true}} | &1]))
-    %{search_struct | query: updated_query}
+  defp filter_spam(search_struct) do
+    update_in(search_struct.query[:query][:bool][:must_not], &([%{term: %{is_spammer: true}} | &1]))
   end
 
-  defp filter_private_users(%{query: query, current_user: nil} = search_struct) do
-    updated_query = update_in(query[:query][:bool][:filter], &([%{term: %{is_public: true}} | &1]))
-    %{search_struct | query: updated_query}
+  defp filter_private_users(%{current_user: nil} = search_struct) do
+    update_in(search_struct.query[:query][:bool][:filter], &([%{term: %{is_public: true}} | &1]))
   end
   defp filter_private_users(search_struct), do: search_struct
 
