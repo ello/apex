@@ -29,6 +29,7 @@ defmodule Ello.Search.Post.Search do
   def post_search(opts) do
     __MODULE__
     |> struct(opts)
+    |> TermSanitizer.sanitize
     |> build_base_query
     |> build_client_filter_queries
     |> build_text_content_query
@@ -90,17 +91,17 @@ defmodule Ello.Search.Post.Search do
     else
       "text_content"
     end
-    update_bool(search_struct, :must, &([%{query_string: %{query: filter_terms(search_struct), fields: [field]}} | &1]))
+    update_bool(search_struct, :must, &([%{query_string: %{query: terms, fields: [field]}} | &1]))
   end
 
   defp build_mention_query(%{trending: true} = search_struct), do: search_struct
-  defp build_mention_query(search_struct) do
+  defp build_mention_query(%{terms: terms} = search_struct) do
     mention_boost = Application.get_env(:ello_search, :mention_boost_factor)
-    update_bool(search_struct, :should, &([%{match: %{mentions: %{query: filter_terms(search_struct), boost: mention_boost}}} | &1]))
+    update_bool(search_struct, :should, &([%{match: %{mentions: %{query: terms, boost: mention_boost}}} | &1]))
   end
 
-  defp build_hashtag_query(%{terms: "#" <> _} = search_struct) do
-    update_bool(search_struct, :must, &([%{match: %{hashtags: %{query: filter_terms(search_struct)}}} | &1]))
+  defp build_hashtag_query(%{terms: "#" <> terms} = search_struct) do
+    update_bool(search_struct, :must, &([%{match: %{hashtags: %{query: terms}}} | &1]))
   end
   defp build_hashtag_query(search_struct), do: search_struct
 
@@ -132,9 +133,6 @@ defmodule Ello.Search.Post.Search do
     update_bool(search_struct, :filter, &([%{terms: %{author_id: following_ids}} | &1]))
   end
   defp filter_following(search_struct), do: search_struct
-
-  defp filter_terms(%{allow_nsfw: false} = search_struct), do: TermSanitizer.sanitize(search_struct)
-  defp filter_terms(%{terms: terms}),                      do: terms
 
   defp filter_has_images(%{images_only: true} = search_struct) do
     update_bool(search_struct, :filter, &([%{term: %{has_images: true}} | &1]))

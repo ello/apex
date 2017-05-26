@@ -3,14 +3,17 @@ defmodule Ello.Search.TermSanitizerTest do
   alias Ello.Search.TermSanitizer
 
   test "sanitize - does not change clean words" do
-    assert TermSanitizer.sanitize(%{terms: "hello world"}) == "hello world"
+    assert %{terms: "hello world"} =
+      TermSanitizer.sanitize(%{terms: "hello world"})
   end
 
   test "sanitize - removes dirty words" do
-    assert TermSanitizer.sanitize(%{terms: "hello world, asshole"}) == "hello world, "
+    assert %{terms: "hello world, "} =
+      TermSanitizer.sanitize(%{terms: "hello world, asshole"})
   end
 
   test "sanitize - removes dirty words if hashtagged" do
-    assert TermSanitizer.sanitize(%{terms: "hello world, #asshole"}) == "hello world, "
+    assert %{terms: "hello world, "} =
+      TermSanitizer.sanitize(%{terms: "hello world, #asshole"})
   end
 end

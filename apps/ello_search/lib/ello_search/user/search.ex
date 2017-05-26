@@ -24,6 +24,7 @@ defmodule Ello.Search.User.Search do
   def username_search(opts) do
     __MODULE__
     |> struct(opts)
+    |> TermSanitizer.sanitize
     |> build_base_query
     |> build_username_query
     |> build_following_ids
@@ -37,6 +38,7 @@ defmodule Ello.Search.User.Search do
   def user_search(opts) do
     __MODULE__
     |> struct(opts)
+    |> TermSanitizer.sanitize
     |> build_default_user_search_query
     |> build_following_ids
     |> build_relationship_query
@@ -78,15 +80,14 @@ defmodule Ello.Search.User.Search do
   end
 
   defp build_user_query(%{terms: "@" <> terms} = search_struct), do: build_username_query(%{search_struct | terms: terms})
-  defp build_user_query(search_struct) do
+  defp build_user_query(%{terms: terms} = search_struct) do
     boost = Application.get_env(:ello_search, :username_match_boost)
-    filtered_terms = filter_terms(search_struct)
     put_in(search_struct.query[:query][:bool][:must], %{
       dis_max: %{
         queries: [
-          %{prefix: %{username: %{value: filtered_terms}}},
-          %{term: %{username: %{value: filtered_terms, boost: boost}}},
-          %{match: %{name: %{query: filtered_terms, analyzer: "standard", minimum_should_match: "100%"}}}
+          %{prefix: %{username: %{value: terms}}},
+          %{term: %{username: %{value: terms, boost: boost}}},
+          %{match: %{name: %{query: terms, analyzer: "standard", minimum_should_match: "100%"}}}
         ]
       }
     })
@@ -141,7 +142,4 @@ defmodule Ello.Search.User.Search do
     update_in(search_struct.query[:query][:bool][:filter], &([%{term: %{is_public: true}} | &1]))
   end
   defp filter_private_users(search_struct), do: search_struct
-
-  defp filter_terms(%{allow_nsfw: false} = search_struct), do: TermSanitizer.sanitize(search_struct)
-  defp filter_terms(%{terms: terms}),                      do: terms
 end
