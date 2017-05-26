@@ -108,6 +108,9 @@ defmodule Ello.V2.EditorialView do
     do: Map.put(json, :url, ed.content["url"])
   defp add_url(json, _), do: json
 
+  def one_by_one_image(%{one_by_one_image_struct: nil}, _conn) do
+    %{}
+  end
   def one_by_one_image(editorial, conn) do
     render(ImageView, "image.json", image: editorial.one_by_one_image_struct, conn: conn)
   end
