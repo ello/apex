@@ -1,10 +1,10 @@
 defmodule Ello.Search.User.Search do
-  import NewRelicPhoenix, only: [measure_segment: 2]
   alias Ello.Core.Network
-  alias Ello.Search.{Client, Page, TermSanitizer}
+  alias Ello.Search.TermSanitizer
   alias Ello.Search.User.Index
 
   defstruct [
+    index:          Index,
     terms:          nil,
     current_user:   nil,
     allow_nsfw:     false,
@@ -29,7 +29,9 @@ defmodule Ello.Search.User.Search do
     |> build_following_ids
     |> build_relationship_query
     |> filter_blocked
-    |> search_user_index
+    |> Ello.Search.execute
+    |> Ello.Search.load_results(&Network.users(&1, opts[:current_user]))
+    |> Ello.Search.set_next_page
   end
 
   def user_search(opts) do
@@ -40,7 +42,9 @@ defmodule Ello.Search.User.Search do
     |> build_relationship_query
     |> filter_private_users
     |> filter_blocked
-    |> search_user_index
+    |> Ello.Search.execute
+    |> Ello.Search.load_results(&Network.users(&1, opts[:current_user]))
+    |> Ello.Search.set_next_page
   end
 
   defp build_base_query(search_struct), do: %{search_struct | query: base_query()}
@@ -67,20 +71,10 @@ defmodule Ello.Search.User.Search do
     search_struct
     |> build_base_query
     |> build_user_query
-    |> build_pagination_query
+    |> Ello.Search.paginate
     |> filter_spam
     |> filter_nsfw
     |> filter_nudity
-  end
-
-  defp build_pagination_query(%{query: query, page: page, per_page: per_page} = search_struct) do
-    page     = page - 1
-    per_page = per_page
-
-    updated_query = query
-                    |> update_in([:from], &(&1 = page * per_page))
-                    |> update_in([:size], &(&1 = per_page))
-    %{search_struct | query: updated_query}
   end
 
   defp build_user_query(%{terms: "@" <> terms} = search_struct), do: build_username_query(%{search_struct | terms: terms})
@@ -149,30 +143,4 @@ defmodule Ello.Search.User.Search do
 
   defp filter_terms(%{allow_nsfw: false} = search_struct), do: TermSanitizer.sanitize(search_struct)
   defp filter_terms(%{terms: terms}),                      do: terms
-
-  defp search_user_index(%{query: query, current_user: current_user} = search_struct) do
-    measure_segment {:ext, "search_user_index"} do
-      results = Client.search(Index.index_name(), Index.doc_types(), query).body
-    end
-
-    users = case results["hits"]["hits"] do
-      hits when is_list(hits) ->
-        ids   = Enum.map(hits, &(String.to_integer(&1["_id"])))
-        ids
-        |> Network.users(current_user)
-        |> user_sorting(ids)
-      _ -> []
-    end
-
-    Page.pagination_builder(%{search_struct | results: users, __raw_results: results})
-  end
-
-  defp user_sorting(users, ids) do
-    measure_segment {__MODULE__, "user_sorting"} do
-      mapped = Enum.group_by(users, &(&1.id))
-      ids
-      |> Enum.uniq
-      |> Enum.flat_map(&(mapped[&1] || []))
-    end
-  end
 end

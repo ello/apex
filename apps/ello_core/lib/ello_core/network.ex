@@ -1,5 +1,6 @@
 defmodule Ello.Core.Network do
   import Ecto.Query
+  import NewRelicPhoenix, only: [measure_segment: 2]
   alias Ello.Core.{Repo,Redis,Network,Discovery}
   alias Network.{User,Relationship}
 
@@ -69,7 +70,17 @@ defmodule Ello.Core.Network do
     User
     |> where([u], u.id in ^ids)
     |> Repo.all
+    |> user_sorting(ids)
     |> user_preloads(current_user)
+  end
+
+  defp user_sorting(users, ids) do
+    measure_segment {__MODULE__, "user_sorting"} do
+      mapped = Enum.group_by(users, &(&1.id))
+      ids
+      |> Enum.uniq
+      |> Enum.flat_map(&(mapped[&1] || []))
+    end
   end
 
   @following_ids_limit 10_000

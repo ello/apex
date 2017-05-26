@@ -1,12 +1,11 @@
 defmodule Ello.Search.Post.Search do
-  import NewRelicPhoenix, only: [measure_segment: 2]
   alias Ello.Core.{Content, Network}
-  alias Ello.Core.Content
-  alias Ello.Search.{Client, Page, TermSanitizer}
+  alias Ello.Search.TermSanitizer
   alias Ello.Search.Post.{Index, Trending}
   use Timex
 
   defstruct [
+    index:          Index,
     terms:          nil,
     current_user:   nil,
     trending:       false,
@@ -35,13 +34,15 @@ defmodule Ello.Search.Post.Search do
     |> build_text_content_query
     |> build_mention_query
     |> build_hashtag_query
-    |> build_pagination_query
+    |> Ello.Search.paginate
     |> filter_has_images
     |> filter_category
     |> filter_following
     |> filter_days
     |> Trending.build_boosting_queries
-    |> search_post_index
+    |> Ello.Search.execute
+    |> Ello.Search.load_results(&Content.posts(Map.put(opts, :ids, &1)))
+    |> Ello.Search.set_next_page
   end
 
   defp build_client_filter_queries(search_struct) do
@@ -179,15 +180,6 @@ defmodule Ello.Search.Post.Search do
     update_in(author_query[:has_parent][:query][:bool][:filter], &([%{term: %{is_public: true}} | &1]))
   end
 
-  defp build_pagination_query(%{query: query, page: page, per_page: per_page} = search_struct) do
-    page = page - 1
-    per_page = per_page
-    updated_query = query
-                    |> update_in([:from], &(&1 = page * per_page))
-                    |> update_in([:size], &(&1 = per_page))
-    %{search_struct | query: updated_query}
-  end
-
   defp build_language_query(%{language: nil} = search_struct),  do: search_struct
   defp build_language_query(%{language: "en"} = search_struct), do: search_struct
   defp build_language_query(%{query: query, language: language} = search_struct) do
@@ -207,22 +199,5 @@ defmodule Ello.Search.Post.Search do
 
   defp update_bool(query, type, fun) do
     update_in(query[:query][:function_score][:query][:bool][type], fun)
-  end
-
-  defp search_post_index(%{query: query} = search_struct) do
-    measure_segment {:ext, "search_post_index"} do
-      results = Client.search(Index.index_name(), [Index.post_doc_type], query).body
-    end
-
-    posts = case results["hits"]["hits"] do
-      hits when is_list(hits) ->
-        search_struct
-        |> Map.take([:current_user, :allow_nsfw, :allow_nudity])
-        |> Map.put(:ids, Enum.map(hits, &(String.to_integer(&1["_id"]))))
-        |> Content.posts
-      _ -> []
-    end
-
-    Page.pagination_builder(%{search_struct | results: posts, __raw_results: results})
   end
 end
