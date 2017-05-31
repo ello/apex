@@ -21,7 +21,7 @@ defmodule Ello.Core.Discovery.Preload do
   end
 
   defp include_promotionals(categories, %{promotionals: true} = options) do
-    Repo.preload(categories, promotionals: [user: &Network.users(&1, options[:current_user])])
+    Repo.preload(categories, promotionals: [user: &Network.users(%{ids: &1, current_user: options[:current_user]})])
   end
   defp include_promotionals(categories, _), do: categories
 

@@ -1,8 +1,8 @@
 defmodule Ello.Core.Network do
   import Ecto.Query
   import NewRelicPhoenix, only: [measure_segment: 2]
-  alias Ello.Core.{Repo,Redis,Network,Discovery}
-  alias Network.{User,Relationship}
+  alias Ello.Core.{Repo, Redis}
+  alias __MODULE__.{User, Preload}
 
   @moduledoc """
   Responsible for retrieving and loading users and relationships.
@@ -10,32 +10,37 @@ defmodule Ello.Core.Network do
   Handles database queryies, preloading relations, and fetching cached values.
   """
 
-  @doc """
-  Get a single user by id.
-
-  Includes postgres info and bulk fetched redis info.
-
-  If the current_user is passed in the user relationship will also be included.
+  @typedoc """
+  All Ello.Core.Content public functions except load_current_user expect to
+  receive a map of options. Those options should always include `current_user`.
   """
-  @spec user(id :: integer | String.t, current_user :: User.t | nil) :: User.t
-  def user(id_or_username, current_user \\ nil, preload \\ true)
-  def user("~" <> username, current_user, preload) do
-    user = User
-           |> Repo.get_by(username: String.downcase(username))
-    if preload do
-      user_preloads(user, current_user)
-    else
-      user
-    end
+  @type options :: %{
+    required(:current_user)   => User.t | nil,
+    optional(:preload)        => boolean,
+    optional(:id_or_username) => integer | String.t,
+    optional(:ids)          => [integer],
+    optional(any)           => any
+  }
+
+  @doc """
+  Get a single user.
+
+  Options:
+
+  * id_or_username - id or username to look up. Username should be pre-pended with `~`
+  * current_user - For determining relationship to current user.
+  * preload - preload counts etc? Default true.
+  """
+  @spec user(options) :: User.t
+  def user(%{id_or_username: "~" <> username} = options) do
+    User
+    |> Repo.get_by(username: String.downcase(username))
+    |> Preload.users(options)
   end
-  def user(id, current_user, preload) do
-    user = User
-           |> Repo.get(id)
-    if preload do
-      user_preloads(user, current_user)
-    else
-      user
-    end
+  def user(%{id_or_username: id} = options) do
+    User
+    |> Repo.get(id)
+    |> Preload.users(options)
   end
 
   @doc """
@@ -59,19 +64,19 @@ defmodule Ello.Core.Network do
   end
 
   @doc """
-  Get multiple users by ids.
+  Get multiple users.
 
-  Includes postgres info and bulk fetched redis info.
-
-  If the current_user is passed in the user relationship will also be included.
+  * ids - ids of users to retreive
+  * current_user - For determining relationship to current user.
+  * preload - preload counts etc? Default true.
   """
-  @spec users(ids :: [integer], current_user :: User.t | nil) :: [User.t]
-  def users(ids, current_user \\ nil) do
+  @spec users(options) :: [User.t]
+  def users(%{ids: ids} = options) do
     User
     |> where([u], u.id in ^ids)
     |> Repo.all
     |> user_sorting(ids)
-    |> user_preloads(current_user)
+    |> Preload.users(options)
   end
 
   defp user_sorting(users, ids) do
@@ -93,77 +98,5 @@ defmodule Ello.Core.Network do
     redis_key = "user:#{user.id}:followed_users_id_cache"
     {:ok, [_, following_ids]} = Redis.command(["SSCAN", redis_key, 0, "COUNT", @following_ids_limit], name: :following_ids)
     following_ids
-  end
-
-  defp user_preloads(nil, _), do: nil
-  defp user_preloads([], _), do: []
-  defp user_preloads(user_or_users, current_user) do
-    user_or_users
-    |> preload_current_user_relationship(current_user)
-    |> prefetch_user_counts
-    |> prefetch_categories
-    |> build_image_structs
-  end
-
-  defp preload_current_user_relationship(users, nil), do: users
-  defp preload_current_user_relationship(users, %{id: id}) do
-    current_user_query = where(Relationship, owner_id: ^id)
-    Repo.preload(users, [relationship_to_current_user: current_user_query])
-  end
-
-  defp prefetch_user_counts([]), do: []
-  defp prefetch_user_counts(%User{} = user),
-    do: hd(prefetch_user_counts([user]))
-  defp prefetch_user_counts(users) do
-    # Get counts from redis
-    {:ok, counts} = Redis.command(["MGET" | count_keys_for_users(users)], name: :user_counts)
-
-    # Add counts to users
-    counts
-    |> Enum.map(&(String.to_integer(&1 || "0")))
-    |> Enum.chunk(5)
-    |> Enum.zip(users)
-    |> Enum.map(&merge_user_counts/1)
-  end
-
-  defp merge_user_counts({[_, _, loves, posts, total_views], %{is_system_user: true} = user}) do
-    Map.merge user, %{
-      loves_count:        loves,
-      posts_count:        posts,
-      following_count:    0,
-      followers_count:    0,
-      total_views_count:  total_views
-    }
-  end
-  defp merge_user_counts({[followers, following, loves, posts, total_views], user}) do
-    Map.merge user, %{
-      loves_count:        loves,
-      posts_count:        posts,
-      following_count:    following,
-      followers_count:    followers,
-      total_views_count:  total_views
-    }
-  end
-
-  defp count_keys_for_users(users) do
-    # Get keys for each counter
-    Enum.flat_map users, fn(%{id: id}) ->
-      [
-        "user:#{id}:followers_counter",
-        "user:#{id}:followed_users_counter",
-        "user:#{id}:loves_counter",
-        "user:#{id}:posts_counter",
-        "user:#{id}:total_post_views_counter",
-      ]
-    end
-  end
-
-  defp prefetch_categories(user_or_users) do
-    Discovery.put_belongs_to_many_categories(user_or_users)
-  end
-
-  defp build_image_structs(%User{} = user), do: User.load_images(user)
-  defp build_image_structs(users) do
-    Enum.map(users, &build_image_structs/1)
   end
 end

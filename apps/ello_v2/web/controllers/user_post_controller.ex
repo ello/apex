@@ -11,7 +11,11 @@ defmodule Ello.V2.UserPostController do
   Render posts written by a user
   """
   def index(conn, %{"user_id" => id_or_username}) do
-    user = Network.user(id_or_username, current_user(conn), false)
+    user = Network.user(%{
+      id_or_username: id_or_username,
+      current_user:   current_user(conn),
+      preload:        false
+    })
     if can_view_user?(conn, user) do
       posts_page = fetch_posts_page(conn, user)
 
