@@ -17,8 +17,10 @@ end
 defmodule Ello.Search.TermSanitizer do
   @before_compile Ello.Search.TermSanitizer.Regex
 
-  def sanitize(nil),   do: ""
-  def sanitize(""),    do: ""
-  def sanitize(terms), do: String.replace(terms, regex(), "")
+  def sanitize(%{terms: nil} = search),       do: %{search | terms: ""}
+  def sanitize(%{terms: ""} = search),        do: %{search | terms: ""}
+  def sanitize(%{allow_nsfw: true} = search), do: search
+  def sanitize(%{terms: terms} = search),
+    do: %{search | terms: String.replace(terms, regex(), "")}
 end
 
