@@ -31,7 +31,7 @@ defmodule Ello.Search.User.Search do
     |> build_relationship_query
     |> filter_blocked
     |> Ello.Search.execute
-    |> Ello.Search.load_results(&Network.users(&1, opts[:current_user]))
+    |> Ello.Search.load_results(&Network.users(%{ids: &1, current_user: opts[:current_user]}))
     |> Ello.Search.set_next_page
   end
 
@@ -45,7 +45,7 @@ defmodule Ello.Search.User.Search do
     |> filter_private_users
     |> filter_blocked
     |> Ello.Search.execute
-    |> Ello.Search.load_results(&Network.users(&1, opts[:current_user]))
+    |> Ello.Search.load_results(&Network.users(%{ids: &1, current_user: opts[:current_user]}))
     |> Ello.Search.set_next_page
   end
 

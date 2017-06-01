@@ -12,7 +12,10 @@ defmodule Ello.V2.UserController do
   Render a single user by id or username
   """
   def show(conn, %{"id" => id_or_username}) do
-    user = Network.user(id_or_username, current_user(conn))
+    user = Network.user(%{
+      id_or_username: id_or_username,
+      current_user: current_user(conn)
+    })
     if can_view_user?(conn, user) do
       api_render_if_stale(conn, data: user)
     else

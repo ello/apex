@@ -24,7 +24,7 @@ defmodule Ello.Core.NetworkTest do
     Redis.command(["SET", "user:#{user_id}:loves_counter", "12"])
     Redis.command(["SET", "user:#{user_id}:total_post_views_counter", "13"])
 
-    assert %User{} = user = Network.user(user_id)
+    assert %User{} = user = Network.user(%{id_or_username: user_id})
 
     Redis.command(["DEL", "user:#{user_id}:posts_counter"])
     Redis.command(["DEL", "user:#{user_id}:loves_counter"])
@@ -45,7 +45,7 @@ defmodule Ello.Core.NetworkTest do
     Redis.command(["SET", "user:#{system.id}:loves_counter", "12"])
     Redis.command(["SET", "user:#{system.id}:total_post_views_counter", "13"])
 
-    assert %User{} = user = Network.user(system.id)
+    assert %User{} = user = Network.user(%{id_or_username: system.id})
 
     Redis.command(["DEL", "user:#{system.id}:followed_users_counter"])
     Redis.command(["DEL", "user:#{system.id}:followers_counter"])
@@ -64,7 +64,7 @@ defmodule Ello.Core.NetworkTest do
     Redis.command(["SET", "user:#{user_id}:loves_counter", "12"])
     Redis.command(["SET", "user:#{user_id}:total_post_views_counter", "13"])
 
-    assert %User{} = user = Network.user("~#{context.friend1.username}")
+    assert %User{} = user = Network.user(%{id_or_username: "~#{context.friend1.username}"})
 
     Redis.command(["DEL", "user:#{user_id}:posts_counter"])
     Redis.command(["DEL", "user:#{user_id}:loves_counter"])
@@ -84,7 +84,10 @@ defmodule Ello.Core.NetworkTest do
     Redis.command(["SET", "user:#{user_id}:loves_counter", "12"])
     Redis.command(["SET", "user:#{user_id}:total_post_views_counter", "13"])
 
-    assert %User{} = user = Network.user(user_id, context.current)
+    assert %User{} = user = Network.user(%{
+      id_or_username: user_id,
+      current_user:   context.current
+    })
 
     Redis.command(["DEL", "user:#{user_id}:posts_counter"])
     Redis.command(["DEL", "user:#{user_id}:loves_counter"])
@@ -106,7 +109,10 @@ defmodule Ello.Core.NetworkTest do
       Redis.command(["SET", "user:#{id}:total_post_views_counter", "13"])
     end
 
-    assert [u1, u2, u3] = Network.users(user_ids, context.current)
+    assert [u1, u2, u3] = Network.users(%{
+      ids: user_ids,
+      current_user: context.current
+    })
 
     assert u1.posts_count == 11
     assert u1.loves_count == 12
@@ -143,7 +149,7 @@ defmodule Ello.Core.NetworkTest do
       Redis.command(["SET", "user:#{id}:total_post_views_counter", "13"])
     end
 
-    assert [u1, u2, u3] = Network.users(user_ids)
+    assert [u1, u2, u3] = Network.users(%{ids: user_ids})
 
     assert u1.posts_count == 11
     assert u1.loves_count == 12
