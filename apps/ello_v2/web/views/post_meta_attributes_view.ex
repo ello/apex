@@ -40,7 +40,7 @@ defmodule Ello.V2.PostMetaAttributesView do
              |> Enum.flat_map(&(mapped[&1] || []))
              |> Enum.map(&image_for_asset/1)
 
-    images ++ images(post.reposted_source)
+    images(post.reposted_source) ++ images
   end
 
   defp image_for_asset(%{attachment_struct: %{filename: orig, path: path, versions: versions}}) do
