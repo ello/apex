@@ -29,7 +29,17 @@ defmodule Ello.V2.PostMetaAttributesView do
 
   defp images(nil), do: []
   defp images(post) do
-    images = Enum.map(post.assets, &image_for_asset/1)
+    ordered_asset_ids = Enum.reduce post.body, [], fn
+      (%{"kind" => "image", "data" => %{"asset_id" => id}}, ids) -> [String.to_integer(id) | ids]
+      (_, ids) -> ids
+    end
+
+    mapped = Enum.group_by(post.assets, &(&1.id))
+    images = ordered_asset_ids
+             |> Enum.reverse
+             |> Enum.flat_map(&(mapped[&1] || []))
+             |> Enum.map(&image_for_asset/1)
+
     images ++ images(post.reposted_source)
   end
 
