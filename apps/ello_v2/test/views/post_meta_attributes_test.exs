@@ -14,7 +14,8 @@ defmodule Ello.V2.PostMetaAttributesViewTest do
       assets: [asset1, asset2],
       body: [
         %{"kind" => "text", "data" => "Phrasing!"},
-        %{"kind" => "embed", "data" => %{"url" => "www.youtube.com/archer"}},
+        %{"kind" => "embed", "data" => %{"asset_id" => asset1.id, "url" => "www.youtube.com/archer"}},
+        %{"kind" => "image", "data" => %{"asset_id" => asset2.id, "url" => "www.asdf.com"}},
       ],
       reposted_source: nil,
       repost_from_current_user: nil,
@@ -28,6 +29,7 @@ defmodule Ello.V2.PostMetaAttributesViewTest do
       body: [
         %{"kind" => "text", "data" => "Phrasing!"},
         %{"kind" => "embed", "data" => %{"url" => "www.youtube.com/archer"}},
+        %{"kind" => "image", "data" => %{"asset_id" => asset2.id, "url" => "www.asdf.com"}},
       ],
       reposted_source: nil,
       repost_from_current_user: nil,
@@ -46,8 +48,19 @@ defmodule Ello.V2.PostMetaAttributesViewTest do
   test "post.json - it renders meta attributes for a post", %{post: post} do
     assert %{
       description: "Phrasing!",
-      images: ["https://assets.ello.co/uploads/asset/attachment/1/ello-hdpi-081e2121.jpg",
-               "https://assets.ello.co/uploads/asset/attachment/2/ello-hdpi-081e2121.jpg"],
+      images: ["https://assets.ello.co/uploads/asset/attachment/2/ello-hdpi-081e2121.jpg"],
+      embeds: ["www.youtube.com/archer"],
+      robots: "index, follow",
+      title: "test post",
+      url: "https://ello.co/archer/post/#{post.token}",
+      canonical_url: nil,
+    } == render(PostMetaAttributesView, "post.json", post: post)
+  end
+
+  test "post.json - images should maintain order", %{post: post} do
+    assert %{
+      description: "Phrasing!",
+      images: ["https://assets.ello.co/uploads/asset/attachment/2/ello-hdpi-081e2121.jpg"],
       embeds: ["www.youtube.com/archer"],
       robots: "index, follow",
       title: "test post",
@@ -60,8 +73,7 @@ defmodule Ello.V2.PostMetaAttributesViewTest do
     post = Map.put(post, :body, [])
     assert %{
       description: "Discover more amazing work like this on Ello.",
-      images: ["https://assets.ello.co/uploads/asset/attachment/1/ello-hdpi-081e2121.jpg",
-               "https://assets.ello.co/uploads/asset/attachment/2/ello-hdpi-081e2121.jpg"],
+      images: [],
       embeds: nil,
       robots: "index, follow",
       title: "test post",
@@ -70,12 +82,11 @@ defmodule Ello.V2.PostMetaAttributesViewTest do
     } == render(PostMetaAttributesView, "post.json", post: post)
   end
 
-  test "post.json - it renders the embeds correctly if there are no embeds", %{post: post} do
+  test "post.json - it renders the images and embeds correctly if there are no embeds or images", %{post: post} do
     post = Map.put(post, :body, [%{"kind" => "text", "data" => "Phrasing!"}])
     assert %{
       description: "Phrasing!",
-      images: ["https://assets.ello.co/uploads/asset/attachment/1/ello-hdpi-081e2121.jpg",
-               "https://assets.ello.co/uploads/asset/attachment/2/ello-hdpi-081e2121.jpg"],
+      images: [],
       embeds: nil,
       robots: "index, follow",
       title: "test post",
@@ -87,8 +98,7 @@ defmodule Ello.V2.PostMetaAttributesViewTest do
   test "post.json - it renders the robots correctly if the author is bad for seo", %{bad_for_seo_post: post} do
     assert %{
       description: "Phrasing!",
-      images: ["https://assets.ello.co/uploads/asset/attachment/1/ello-hdpi-081e2121.jpg",
-               "https://assets.ello.co/uploads/asset/attachment/2/ello-hdpi-081e2121.jpg"],
+      images: ["https://assets.ello.co/uploads/asset/attachment/2/ello-hdpi-081e2121.jpg"],
       embeds: ["www.youtube.com/archer"],
       robots: "noindex, follow",
       title: "test post",
@@ -100,10 +110,7 @@ defmodule Ello.V2.PostMetaAttributesViewTest do
   test "post.json - it renders the canonical_url correctly if the post is a repost", %{repost: repost, post: post} do
     assert %{
       description: "Phrasing!",
-      images: [
-        "https://assets.ello.co/uploads/asset/attachment/1/ello-hdpi-081e2121.jpg",
-        "https://assets.ello.co/uploads/asset/attachment/2/ello-hdpi-081e2121.jpg",
-        ],
+      images: ["https://assets.ello.co/uploads/asset/attachment/2/ello-hdpi-081e2121.jpg"],
       embeds: nil,
       robots: "index, follow",
       title: "test post",

@@ -29,8 +29,19 @@ defmodule Ello.V2.PostMetaAttributesView do
 
   defp images(nil), do: []
   defp images(post) do
-    images = Enum.map(post.assets, &image_for_asset/1)
-    images ++ images(post.reposted_source)
+    ordered_asset_ids = Enum.reduce post.body, [], fn
+      (%{"kind" => "image", "data" => %{"asset_id" => id}}, ids) when is_binary(id) -> [String.to_integer(id) | ids]
+      (%{"kind" => "image", "data" => %{"asset_id" => id}}, ids) -> [id | ids]
+      (_, ids) -> ids
+    end
+
+    mapped = Enum.group_by(post.assets, &(&1.id))
+    images = ordered_asset_ids
+             |> Enum.reverse
+             |> Enum.flat_map(&(mapped[&1] || []))
+             |> Enum.map(&image_for_asset/1)
+
+    images(post.reposted_source) ++ images
   end
 
   defp image_for_asset(%{attachment_struct: %{filename: orig, path: path, versions: versions}}) do
