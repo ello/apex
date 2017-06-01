@@ -177,7 +177,7 @@ defmodule Ello.V2.PostViewTest do
         id: ^post_id,
         meta_attributes: %{
           description: "Phrasing!",
-          images: ["https://assets.ello.co/uploads/asset/attachment/1/ello-hdpi-081e2121.jpg"],
+          images: [],
           embeds: nil,
           robots: "index, follow",
           title: "test post",
@@ -197,7 +197,10 @@ defmodule Ello.V2.PostViewTest do
   end
 
   test "show.json - gif meta attrs", %{post: post, conn: conn} do
-    post = Map.update!(post, :assets, &([Factory.build(:gif_asset) | &1]))
+    gif_asset = Asset.build_attachment(Factory.build(:gif_asset, %{id: 1}))
+    post = post
+           |> Map.update!(:assets, &([gif_asset | &1]))
+           |> Map.put(:body, [%{"kind" => "image", "data" => %{"asset_id" => "#{gif_asset.id}", "url" => "www.asdf.com"}}])
     resp = render(PostView, "show.json", data: post, conn: conn)
     assert [image1, image2] = resp[:posts][:meta_attributes][:images]
     assert Regex.match?(~r(\.gif$), image1)
