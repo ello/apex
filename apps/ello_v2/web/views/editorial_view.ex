@@ -34,6 +34,7 @@ defmodule Ello.V2.EditorialView do
     |> render_self(__MODULE__, opts)
     |> add_subtitle(editorial)
     |> add_url(editorial)
+    |> add_path(editorial)
   end
 
   def attributes, do: []
@@ -70,7 +71,7 @@ defmodule Ello.V2.EditorialView do
     %{
       post_stream: %{
         type: "posts",
-        href: "/api/v2/categories/#{ed.content["slug"]}/posts/recent?stream_source=editorial&per_page=#{per_page()}",
+        href: "/api/v2/categories/#{ed.content["slug"]}/posts/trending?stream_source=editorial&per_page=#{per_page()}&images_only=true",
       }
     }
   end
@@ -100,13 +101,17 @@ defmodule Ello.V2.EditorialView do
   def kind(%{kind: "invite_join"}, _), do: "join"
   def kind(%{kind: kind}, _), do: kind
 
-  defp add_subtitle(json, %{kind: kind} = ed) when kind in ["external", "post"],
+  defp add_subtitle(json, %{kind: kind} = ed) when kind in ["external", "post", "internal"],
     do: Map.put(json, :subtitle, ed.content["subtitle"])
   defp add_subtitle(json, _), do: json
 
   defp add_url(json, %{kind: "external"} = ed),
     do: Map.put(json, :url, ed.content["url"])
   defp add_url(json, _), do: json
+
+  defp add_path(json, %{kind: "internal"} = ed),
+    do: Map.put(json, :path, ed.content["path"])
+  defp add_path(json, _), do: json
 
   def one_by_one_image(%{one_by_one_image_struct: nil}, _conn) do
     %{}
