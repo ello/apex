@@ -30,7 +30,8 @@ defmodule Ello.V2.PostMetaAttributesView do
   defp images(nil), do: []
   defp images(post) do
     ordered_asset_ids = Enum.reduce post.body, [], fn
-      (%{"kind" => "image", "data" => %{"asset_id" => id}}, ids) -> [String.to_integer(id) | ids]
+      (%{"kind" => "image", "data" => %{"asset_id" => id}}, ids) when is_binary(id) -> [String.to_integer(id) | ids]
+      (%{"kind" => "image", "data" => %{"asset_id" => id}}, ids) -> [id | ids]
       (_, ids) -> ids
     end
 

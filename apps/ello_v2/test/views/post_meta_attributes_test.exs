@@ -14,8 +14,8 @@ defmodule Ello.V2.PostMetaAttributesViewTest do
       assets: [asset1, asset2],
       body: [
         %{"kind" => "text", "data" => "Phrasing!"},
-        %{"kind" => "embed", "data" => %{"asset_id" => "#{asset1.id}", "url" => "www.youtube.com/archer"}},
-        %{"kind" => "image", "data" => %{"asset_id" => "#{asset2.id}", "url" => "www.asdf.com"}},
+        %{"kind" => "embed", "data" => %{"asset_id" => asset1.id, "url" => "www.youtube.com/archer"}},
+        %{"kind" => "image", "data" => %{"asset_id" => asset2.id, "url" => "www.asdf.com"}},
       ],
       reposted_source: nil,
       repost_from_current_user: nil,
@@ -29,7 +29,7 @@ defmodule Ello.V2.PostMetaAttributesViewTest do
       body: [
         %{"kind" => "text", "data" => "Phrasing!"},
         %{"kind" => "embed", "data" => %{"url" => "www.youtube.com/archer"}},
-        %{"kind" => "image", "data" => %{"asset_id" => "#{asset2.id}", "url" => "www.asdf.com"}},
+        %{"kind" => "image", "data" => %{"asset_id" => asset2.id, "url" => "www.asdf.com"}},
       ],
       reposted_source: nil,
       repost_from_current_user: nil,
