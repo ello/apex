@@ -70,7 +70,7 @@ defmodule Ello.V2.EditorialView do
     %{
       post_stream: %{
         type: "posts",
-        href: "/api/v2/categories/#{ed.content["slug"]}/posts/recent?stream_source=editorial&per_page=#{per_page()}",
+        href: "/api/v2/categories/#{ed.content["slug"]}/posts/trending?stream_source=editorial&per_page=#{per_page()}&images_only=true",
       }
     }
   end
