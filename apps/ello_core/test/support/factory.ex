@@ -169,6 +169,17 @@ defmodule Ello.Core.Factory do
     })
   end
 
+  def internal_editorial_factory do
+    Map.merge(editorial_factory(), %{
+      kind: "internal",
+      content: %{
+        "title"    => "All the newest stuff",
+        "subtitle" => "check it out",
+        "path"     => "/discover/recent",
+      }
+    })
+  end
+
   def category_editorial_factory do
     Map.merge(editorial_factory(), %{
       kind: "category",
