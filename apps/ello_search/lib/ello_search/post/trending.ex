@@ -10,7 +10,7 @@ defmodule Ello.Search.Post.Trending do
     |> update_score_mode
   end
 
-  defp boost_recent(%{trending: true, following: nil, category: nil} = search_struct) do
+  defp boost_recent(%{trending: true, following: false, category: nil} = search_struct) do
     weight = Application.get_env(:ello_search, :post_trending_recency_weight)
     scale = Application.get_env(:ello_search, :post_trending_recency_scale)
     offset = Application.get_env(:ello_search, :post_trending_recency_offset)
@@ -24,7 +24,7 @@ defmodule Ello.Search.Post.Trending do
     recent_boost = %{gauss: %{created_at: %{scale: scale, offset: offset}}, weight: weight}
     update_function_score(search_struct, :functions, &([recent_boost | &1]))
   end
-  defp boost_recent(%{trending: true, following: nil} = search_struct) do
+  defp boost_recent(%{trending: true, following: false} = search_struct) do
     weight = Application.get_env(:ello_search, :category_trending_recency_weight)
     scale = Application.get_env(:ello_search, :category_trending_recency_scale)
     offset = Application.get_env(:ello_search, :category_trending_recency_offset)
