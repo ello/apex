@@ -66,6 +66,12 @@ defmodule Ello.Core.Discovery do
     |> Repo.all
     |> Preload.categories(options)
   end
+  def categories(%{creator_types: true} = options) do
+    Category
+    |> where(is_creator_type: true)
+    |> Repo.all
+    |> Preload.categories(options)
+  end
   def categories(%{primary: true} = options) do
     Category
     |> where(level: "primary")
