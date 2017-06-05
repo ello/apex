@@ -17,9 +17,15 @@ defmodule Ello.V2.StandardParams do
   defp before(%{"before" => before}), do: before
   defp before(_), do: nil
 
+  defp page(%{"page" => ""}), do: 1
+  defp page(%{"page" => nil}), do: 1
   defp page(%{"page" => page}), do: String.to_integer(page)
   defp page(_), do: 1
 
+  defp per_page(%{"per_page" => nil}, nil), do: 25
+  defp per_page(%{"per_page" => nil}, default), do: default
+  defp per_page(%{"per_page" => ""}, nil), do: 25
+  defp per_page(%{"per_page" => ""}, default), do: default
   defp per_page(%{"per_page" => per_page}, _) do
     min(String.to_integer(per_page), @max_page_size)
   end

@@ -34,7 +34,7 @@ defmodule Ello.Search do
       hits when is_list(hits) ->
         results = load_fun.(Enum.map(hits, &(String.to_integer(&1["_id"]))))
         %{search | results: results}
-      _ -> []
+      _ -> search
     end
   end
 
