@@ -9,6 +9,7 @@ defmodule Ello.Search.Post.Search do
     terms:          nil,
     current_user:   nil,
     trending:       false,
+    within_days:    nil,
     allow_nsfw:     false,
     allow_nudity:   false,
     query:          %{},
