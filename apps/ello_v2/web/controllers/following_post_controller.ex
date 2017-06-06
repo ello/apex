@@ -15,6 +15,22 @@ defmodule Ello.V2.FollowingPostController do
     |> api_render_if_stale(PostView, :index, data: stream.posts)
   end
 
+  def recent_updated(conn, _params) do
+    stream = fetch_stream(put_in(conn.params["per_page"], "1"))
+    last_modified = conn
+                    |> get_req_header("if-modified-since")
+                    |> hd
+                    |> Timex.parse!("{RFC1123}")
+    with %{posts: [newest | _]} <- stream,
+         :gt <- DateTime.compare(newest.created_at, last_modified) do
+      # New post! send 204
+      send_resp(conn, :no_content, "")
+    else
+      # No new content send 304
+      _ -> send_resp(conn, :not_modified, "")
+    end
+  end
+
   defp fetch_stream(conn) do
     current_user = current_user(conn)
     Stream.fetch(standard_params(conn, %{
