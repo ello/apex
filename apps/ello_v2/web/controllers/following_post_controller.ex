@@ -16,12 +16,9 @@ defmodule Ello.V2.FollowingPostController do
   end
 
   def recent_updated(conn, _params) do
-    stream = fetch_stream(put_in(conn.params["per_page"], "1"))
-    last_modified = conn
-                    |> get_req_header("if-modified-since")
-                    |> hd
-                    |> Timex.parse!("{RFC1123}")
-    with %{posts: [newest | _]} <- stream,
+    with {:ok, last_modified} <- last_modified(conn),
+         stream <- fetch_stream(put_in(conn.params["per_page"], "1")),
+         %{posts: [newest | _]} <- stream,
          :gt <- DateTime.compare(newest.created_at, last_modified) do
       # New post! send 204
       send_resp(conn, :no_content, "")
@@ -54,5 +51,12 @@ defmodule Ello.V2.FollowingPostController do
       within_days:  60,
       images_only:  (not is_nil(conn.params["images_only"]))
     }))
+  end
+
+  defp last_modified(conn) do
+    case get_req_header(conn, "if-modified-since") do
+      [header] -> Timex.parse(header, "{RFC1123}")
+      _        -> :not_available
+    end
   end
 end
