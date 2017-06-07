@@ -13,6 +13,6 @@ config :ello_core,
   redis_pool_size: String.to_integer(System.get_env("REDIS_POOL_SIZE") || "5"),
   redis_timeout: String.to_integer(System.get_env("REDIS_TIMEOUT") || "10000"),
   user_post_query_timeout: String.to_integer(System.get_env("USER_POST_QUERY_TIMEOUT") || "10000"),
-  pg_statement_timeout: (System.get_env("POSTGRES_STATEMENT_TIMEOUT") || "1min")
+  pg_statement_timeout: (System.get_env("PG_STATEMENT_TIMEOUT") || "1min")
 
 import_config "#{Mix.env}.exs"
