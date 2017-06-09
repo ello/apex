@@ -21,7 +21,7 @@ defmodule Ello.Search do
   """
   def execute(%{query: query, index: index} = search) do
     measure_segment {:ext, "search_#{index.index_name()}"} do
-      results = Client.search(index.index_name(), index.doc_types(), query).body
+      {:ok, %{body: results}} = Client.search(index.index_name(), index.doc_types(), query)
       %{search | __raw_results: results}
     end
   end

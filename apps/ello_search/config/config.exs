@@ -2,6 +2,10 @@ use Mix.Config
 
 config :ello_search, ecto_repos: []
 
+config :elastix,
+  custom_headers: {Ello.Search.Client, :headers, []},
+  httpoison_options: [hackney: [pool: :elastix_pool]]
+
 config :ello_search,
   es_url:                       System.get_env("ES_URL") || "http://localhost:9200",
   es_prefix:                    System.get_env("ES_PREFIX"),

@@ -24,6 +24,19 @@ defmodule Ello.Search.Client do
   def refresh_index(index_name), do:
     Index.refresh(es_url(), add_prefix(index_name))
 
+  def headers(%{url: url, headers: headers} = request) do
+    if String.contains?(url, "es.amazonaws.com") do
+      {:ok, headers} = auth_header(request)
+      headers
+    else
+      headers
+    end
+  end
+
+  defp auth_header(request) do
+    ExAws.Auth.headers(request.method, request.url, :es, aws_creds(), request.headers, request.body)
+  end
+
   defp es_url, do: Application.get_env(:ello_search, :es_url)
 
   defp es_prefix, do: Application.get_env(:ello_search, :es_prefix)
@@ -35,4 +48,10 @@ defmodule Ello.Search.Client do
     end
   end
 
+  # Note: There isn't support for ES built into ExAws, so we use "s3" default
+  # config. It is really only used to determine region and get signing
+  # credentials.
+  defp aws_creds do
+    ExAws.Config.new(:s3)
+  end
 end
