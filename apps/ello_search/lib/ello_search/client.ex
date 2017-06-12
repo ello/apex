@@ -9,6 +9,9 @@ defmodule Ello.Search.Client do
   def search(index_name, doc_types, query), do:
     Search.search(es_url(), add_prefix(index_name), doc_types, query)
 
+  def aws_search(index_name, doc_types, query), do:
+    Search.search(aws_es_url(), add_prefix(index_name), doc_types, query)
+
   def create_index(index_name, settings), do:
     Index.create(es_url(), add_prefix(index_name), settings)
 
@@ -38,6 +41,7 @@ defmodule Ello.Search.Client do
   end
 
   defp es_url, do: Application.get_env(:ello_search, :es_url)
+  defp aws_es_url, do: Application.get_env(:ello_search, :aws_es_url)
 
   defp es_prefix, do: Application.get_env(:ello_search, :es_prefix)
 
