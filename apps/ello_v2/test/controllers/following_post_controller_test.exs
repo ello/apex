@@ -106,6 +106,7 @@ defmodule Ello.V2.FollowingPostControllerTest do
            |> put_req_header("if-modified-since", "Tue, 06 Jun 2117 12:48:15 GMT")
            |> head(following_post_path(conn, :recent_updated))
     assert %{status: 304} = resp
+    assert [] = get_resp_header(resp, "last-modified")
   end
 
   test "HEAD /v2/following/posts/recent - updated", %{conn: conn} do
@@ -113,6 +114,7 @@ defmodule Ello.V2.FollowingPostControllerTest do
            |> put_req_header("if-modified-since", "Tue, 06 Jun 2007 12:48:15 GMT")
            |> head(following_post_path(conn, :recent_updated))
     assert %{status: 204} = resp
+    assert [_] = get_resp_header(resp, "last-modified")
   end
 
   test "GET /v2/following/posts/trending", context do

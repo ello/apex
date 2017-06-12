@@ -21,7 +21,9 @@ defmodule Ello.V2.FollowingPostController do
          %{posts: [newest | _]} <- stream,
          :gt <- DateTime.compare(newest.created_at, last_modified) do
       # New post! send 204
-      send_resp(conn, :no_content, "")
+      conn
+      |> put_resp_header("last-modified", Timex.format!(newest.created_at, "{RFC1123}"))
+      |> send_resp(:no_content, "")
     else
       # No new content send 304
       _ -> send_resp(conn, :not_modified, "")
