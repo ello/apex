@@ -28,7 +28,7 @@ defmodule Ello.Search do
   end
 
   def execute_aws(%{query: query, index: index}),
-    do: Client.aws_search(index.index_name(), index.doc_types(), query).body
+    do: Client.aws_search(index.index_name(), index.doc_types(), query)
 
   @doc """
   Parse elasticsearch results for ids, pass to function for loading.
