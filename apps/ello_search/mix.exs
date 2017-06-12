@@ -29,7 +29,8 @@ defmodule Ello.Search.Mixfile do
 
   defp deps do
     [
-      {:elastix, "~> 0.3.2"},
+      {:elastix, github: "ello/elastix", branch: "custom-header-support"},
+      {:ex_aws, "~> 1.1"},
       {:poison, "~> 3.1", override: true},
       {:timex, "~> 3.0"},
       {:html_sanitize_ex, "~> 1.0.0"},
