@@ -17,7 +17,5 @@ defmodule Ello.V2.Endpoint do
     pass: ["*/*"],
     json_decoder: Poison
 
-  plug Plug.Head
-
   plug Ello.V2.Router
 end
