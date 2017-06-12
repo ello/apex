@@ -20,9 +20,16 @@ defmodule Ello.Search do
   Execute a query against an index.
   """
   def execute(%{query: query, index: index} = search) do
+    Task.start(__MODULE__, :execute_aws, [search])
     measure_segment {:ext, "search_#{index.index_name()}"} do
       {:ok, %{body: results}} = Client.search(index.index_name(), index.doc_types(), query)
       %{search | __raw_results: results}
+    end
+  end
+
+  def execute_aws(%{query: query, index: index}) do
+    measure_segment {:ext, "search_aws_#{index.index_name()}"} do
+      Client.aws_search(index.index_name(), index.doc_types(), query).body
     end
   end
 
