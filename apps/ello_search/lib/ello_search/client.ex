@@ -9,8 +9,12 @@ defmodule Ello.Search.Client do
   def search(index_name, doc_types, query), do:
     Search.search(es_url(), add_prefix(index_name), doc_types, query)
 
-  def aws_search(index_name, doc_types, query), do:
-    Search.search(aws_es_url(), add_prefix(index_name), doc_types, query)
+  def aws_search(index_name, doc_types, query) do
+    case aws_es_url() do
+      nil -> nil
+      url -> Search.search(url, add_prefix(index_name), doc_types, query)
+    end
+  end
 
   def create_index(index_name, settings), do:
     Index.create(es_url(), add_prefix(index_name), settings)
