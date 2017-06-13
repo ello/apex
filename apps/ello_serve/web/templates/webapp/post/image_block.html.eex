@@ -1,0 +1,3 @@
+<section>
+  <img src="<%= @block["data"]["url"] %>" alt="<%= @block["data"]["alt"] %>" />
+</section>

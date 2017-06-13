@@ -1,0 +1,9 @@
+<article>
+  <%= for block <- @post.rendered_content do %>
+    <%= render __MODULE__, "block.html", Map.put(assigns, :block, block) %>
+  <% end %>
+</article>
+
+<footer>
+  For the full ello experience, please enable javascript.
+</footer>

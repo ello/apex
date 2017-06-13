@@ -1,0 +1,1 @@
+<title><%= @post.seo_title %></title>

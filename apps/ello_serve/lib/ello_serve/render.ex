@@ -21,6 +21,7 @@ defmodule Ello.Serve.Render do
     String.replace(body, "</head>", "#{meta}</head>", global: false)
   end
 
+  # TODO: skip noscript if known user with javascript (eg, skip prerender cookie set)
   defp render_noscript(conn, data) do
     view = view_module(conn)
     render_to_iodata(view, "noscript.html", Map.put(data, :conn, conn))

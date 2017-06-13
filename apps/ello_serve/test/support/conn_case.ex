@@ -21,13 +21,15 @@ defmodule Ello.Serve.ConnCase do
       use Phoenix.ConnTest
 
       import Ello.Serve.Router.Helpers
+      alias Ello.Core.Factory
 
       # The default endpoint for testing
       @endpoint Ello.Serve.Endpoint
     end
   end
 
-  setup tags do
+  setup _tags do
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Ello.Core.Repo)
 
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end

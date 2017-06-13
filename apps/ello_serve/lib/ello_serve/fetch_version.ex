@@ -19,7 +19,8 @@ defmodule Ello.Serve.FetchVersion do
     assign(conn, :version, "current")
   end
 
-  #TODO: Switch to our own redis
+  #TODO: Switch to our own redis - should be own instance (elastic cache? heroku?)
+  #TODO: Add an abstraction (eg Ello.Serve.VersionStore)
   alias Ello.Core.Redis
 
   def load_html(conn, _) do

@@ -3,7 +3,6 @@ defmodule Ello.Serve.Webapp.NoContentControllerTest do
   alias Ello.Core.Redis
 
   setup %{conn: conn} do
-
     raw = File.read!("test/support/ello.co.html")
     raw2 = File.read!("test/support/ello.co.2.html")
     Redis.command(["SET", "ello_serve:webapp:current", raw])
