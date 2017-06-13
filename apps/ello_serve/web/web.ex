@@ -28,6 +28,7 @@ defmodule Ello.Serve.Web do
 
       import Ello.Serve.Router.Helpers
       import Ello.Serve.Gettext
+      import Ello.Serve.Render
     end
   end
 
