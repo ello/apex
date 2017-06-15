@@ -8,7 +8,6 @@ defmodule Ello.Serve.Router do
   end
 
   #TODO: /api/webapp-token AND/OR inject a token into html
-
   scope "/", Ello.Serve.Webapp do
     pipe_through :webapp
     # Every route that isn't a user must be matched, otherwise user catches it

@@ -1,1 +1,17 @@
-<title><%= @post.seo_title %></title>
+<% # Shared meta tags %>
+<%= render Ello.Serve.Webapp.MetaView, "_shared.html", assigns %>
+
+<% # Custom meta tags %>
+
+<%= for image_url <- image_urls(@post) do %>
+  <meta name="image" itemprop="image" content="<%= image_url %>"/>
+  <meta property="og:image" content="<%= image_url %>"/>
+<% end %>
+
+<% for embed_url <- embed_urls(@post) do %>
+  <meta property="og:video" content="<%= embed_url %>"/>
+<% end %>
+
+<%= if @post.reposted_source do %>
+  <link href="<%= post_url(@post.reposted_source) %>" rel="canonical" />
+<% end %>

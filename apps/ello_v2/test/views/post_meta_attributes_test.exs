@@ -14,8 +14,8 @@ defmodule Ello.V2.PostMetaAttributesViewTest do
       assets: [asset1, asset2],
       body: [
         %{"kind" => "text", "data" => "Phrasing!"},
-        %{"kind" => "embed", "data" => %{"asset_id" => asset1.id, "url" => "www.youtube.com/archer"}},
-        %{"kind" => "image", "data" => %{"asset_id" => asset2.id, "url" => "www.asdf.com"}},
+        %{"kind" => "embed", "data" => %{"asset_id" => asset1.id, "url" => "https://www.youtube.com/archer"}},
+        %{"kind" => "image", "data" => %{"asset_id" => asset2.id, "url" => "https://www.asdf.com"}},
       ],
       reposted_source: nil,
       repost_from_current_user: nil,
@@ -24,11 +24,11 @@ defmodule Ello.V2.PostMetaAttributesViewTest do
     })
     bad_for_seo_post = Factory.build(:post, %{
       id: 1,
-      author: Map.put(archer, :bad_for_seo, true),
+      author: Map.put(archer, :bad_for_seo?, true),
       assets: [asset1, asset2],
       body: [
         %{"kind" => "text", "data" => "Phrasing!"},
-        %{"kind" => "embed", "data" => %{"url" => "www.youtube.com/archer"}},
+        %{"kind" => "embed", "data" => %{"url" => "https://www.youtube.com/archer"}},
         %{"kind" => "image", "data" => %{"asset_id" => asset2.id, "url" => "www.asdf.com"}},
       ],
       reposted_source: nil,
@@ -49,7 +49,7 @@ defmodule Ello.V2.PostMetaAttributesViewTest do
     assert %{
       description: "Phrasing!",
       images: ["https://assets.ello.co/uploads/asset/attachment/2/ello-hdpi-081e2121.jpg"],
-      embeds: ["www.youtube.com/archer"],
+      embeds: ["https://www.youtube.com/archer"],
       robots: "index, follow",
       title: "test post",
       url: "https://ello.co/archer/post/#{post.token}",
@@ -61,7 +61,7 @@ defmodule Ello.V2.PostMetaAttributesViewTest do
     assert %{
       description: "Phrasing!",
       images: ["https://assets.ello.co/uploads/asset/attachment/2/ello-hdpi-081e2121.jpg"],
-      embeds: ["www.youtube.com/archer"],
+      embeds: ["https://www.youtube.com/archer"],
       robots: "index, follow",
       title: "test post",
       url: "https://ello.co/archer/post/#{post.token}",
@@ -99,7 +99,7 @@ defmodule Ello.V2.PostMetaAttributesViewTest do
     assert %{
       description: "Phrasing!",
       images: ["https://assets.ello.co/uploads/asset/attachment/2/ello-hdpi-081e2121.jpg"],
-      embeds: ["www.youtube.com/archer"],
+      embeds: ["https://www.youtube.com/archer"],
       robots: "noindex, follow",
       title: "test post",
       url: "https://ello.co/archer/post/#{post.token}",
@@ -111,7 +111,7 @@ defmodule Ello.V2.PostMetaAttributesViewTest do
     assert %{
       description: "Phrasing!",
       images: ["https://assets.ello.co/uploads/asset/attachment/2/ello-hdpi-081e2121.jpg"],
-      embeds: nil,
+      embeds: ["https://www.youtube.com/archer"],
       robots: "index, follow",
       title: "test post",
       url: "https://ello.co/archer/post/#{repost.token}",

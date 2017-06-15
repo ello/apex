@@ -6,5 +6,10 @@ config :ello_serve, Ello.Serve.Endpoint,
   http: [port: 4001],
   server: false
 
+config :ello_serve,
+  apple_app_id: "1234567",
+  webapp_host: "ello.co"
+
+
 # Print only warnings and errors during test
 config :logger, level: :warn

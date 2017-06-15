@@ -22,6 +22,7 @@ defmodule Ello.Serve.ConnCase do
 
       import Ello.Serve.Router.Helpers
       alias Ello.Core.Factory
+      import Ello.Serve.ConnCase.Helpers
 
       # The default endpoint for testing
       @endpoint Ello.Serve.Endpoint
@@ -32,5 +33,20 @@ defmodule Ello.Serve.ConnCase do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Ello.Core.Repo)
 
     {:ok, conn: Phoenix.ConnTest.build_conn()}
+  end
+
+  defmodule Helpers do
+
+    def has_meta(html, args) when is_list(args),
+      do: has_meta(html, Enum.into(args, %{}))
+    def has_meta("", _),
+      do: false
+    def has_meta(html, args) do
+      Enum.all?(args, &meta_attribute_present?(html, &1))
+    end
+
+    defp meta_attribute_present?(html, {key, value}) do
+      Regex.match?(~r(<meta .*#{key}="#{value}".*/>), html)
+    end
   end
 end

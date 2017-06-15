@@ -7,7 +7,11 @@ use Mix.Config
 
 # General application configuration
 config :ello_serve,
-  namespace: Ello.Serve
+  namespace: Ello.Serve,
+  ecto_repos: [],
+  apple_app_id: System.get_env("APPLE_APP_ID"),
+  webapp_host: System.get_env("WEBAPP_HOST")
+
 
 # Configures the endpoint
 config :ello_serve, Ello.Serve.Endpoint,

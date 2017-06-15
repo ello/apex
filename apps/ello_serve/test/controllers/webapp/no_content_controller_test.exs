@@ -33,4 +33,29 @@ defmodule Ello.Serve.Webapp.NoContentControllerTest do
     html = html_response(resp, 200)
     assert html =~ "Tweak yo shit"
   end
+
+  @tag :meta
+  test "default meta", %{conn: conn} do
+    resp = get(conn, "/following")
+    html = html_response(resp, 200)
+
+    default_desc = "Welcome to the Creators Network. Ello is a community to discover, discuss, publish, share and promote the things you are passionate about."
+    default_title = "Ello | The Creators Network"
+    default_image = "/static/images/support/ello-open-graph-image.png"
+
+    assert html =~ "<title>Ello | The Creators Network</title>"
+    assert has_meta(html, name: "apple-itunes-app", content: "app-id=1234567")
+    assert has_meta(html, name: "name", content: default_title)
+    assert has_meta(html, name: "url", content: "https://ello.co/following")
+    assert has_meta(html, name: "description", content: default_desc)
+    assert has_meta(html, name: "image", content: default_image)
+
+    assert has_meta(html, property: "og:url", content: "https://ello.co/following")
+    assert has_meta(html, property: "og:title", content: default_title)
+    assert has_meta(html, property: "og:description", content: default_desc)
+
+    assert has_meta(html, property: "og:image", content: default_image)
+    assert has_meta(html, name: "twitter:card", content: "summary_large_image")
+    refute has_meta(html, name: "robots")
+  end
 end
