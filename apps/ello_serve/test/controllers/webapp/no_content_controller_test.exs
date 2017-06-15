@@ -28,10 +28,28 @@ defmodule Ello.Serve.Webapp.NoContentControllerTest do
     assert html =~ "@ellohype"
   end
 
-  test "settings - it renders - active version", %{conn: conn} do
-    resp = get(conn, "/settings")
+  @tag :meta
+  test "enter - it renders - active version", %{conn: conn} do
+    resp = get(conn, "/enter")
     html = html_response(resp, 200)
-    assert html =~ "Tweak yo shit"
+    assert html =~ "Login | Ello"
+    assert has_meta(html, name: "description", content: "Welcome back to Ello.*")
+  end
+
+  @tag :meta
+  test "join - it renders - active version", %{conn: conn} do
+    resp = get(conn, "/join")
+    html = html_response(resp, 200)
+    assert html =~ "Sign up | Ello"
+    assert has_meta(html, name: "description", content: "Join .*")
+  end
+
+  @tag :meta
+  test "forgot - it renders - active version", %{conn: conn} do
+    resp = get(conn, "/forgot")
+    html = html_response(resp, 200)
+    assert html =~ "Forgot Password | Ello"
+    assert has_meta(html, name: "description", content: "Welcome back .*")
   end
 
   @tag :meta
