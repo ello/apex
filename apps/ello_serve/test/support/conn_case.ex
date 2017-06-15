@@ -21,7 +21,7 @@ defmodule Ello.Serve.ConnCase do
       use Phoenix.ConnTest
 
       import Ello.Serve.Router.Helpers
-      alias Ello.Core.Factory
+      alias Ello.Core.{Factory,Repo,Redis}
       import Ello.Serve.ConnCase.Helpers
 
       # The default endpoint for testing
