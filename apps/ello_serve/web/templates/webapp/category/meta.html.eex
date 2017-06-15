@@ -1,0 +1,5 @@
+<% # Shared meta tags %>
+<%= render Ello.Serve.Webapp.MetaView, "_shared.html", assigns %>
+
+<% # Custom meta tags %>
+
