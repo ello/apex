@@ -99,7 +99,7 @@ defmodule Ello.Core.Content.Post do
       (%{"kind" => "image", "data" => %{"asset_id" => id}}, ids) -> [id | ids]
       (_, ids) -> ids
     end
-    mapped = Enum.group_by(post.assets, &(&1.id))
+    mapped = Enum.group_by(assets, &(&1.id))
     assets = ordered_asset_ids
              |> Enum.reverse
              |> Enum.flat_map(&(mapped[&1] || []))

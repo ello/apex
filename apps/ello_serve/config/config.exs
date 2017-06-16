@@ -10,8 +10,9 @@ config :ello_serve,
   namespace: Ello.Serve,
   ecto_repos: [],
   apple_app_id: System.get_env("APPLE_APP_ID"),
-  webapp_host: System.get_env("WEBAPP_HOST")
-
+  webapp_host: System.get_env("WEBAPP_HOST"),
+  webapp_oauth_client_id: System.get_env("WEBAPP_CLIENT_ID") || "client_id",
+  webapp_oauth_client_secret: System.get_env("WEBAPP_CLIENT_ID") || "client_secret"
 
 # Configures the endpoint
 config :ello_serve, Ello.Serve.Endpoint,

@@ -1,10 +1,19 @@
 defmodule Ello.Serve.Router do
   use Ello.Serve.Web, :router
 
+  pipeline :token do
+    plug :accepts, ["json"]
+  end
+
   pipeline :webapp do
     plug :accepts, ["html"]
     plug Ello.Serve.SetApp, app: :webapp
     plug Ello.Serve.FetchVersion
+  end
+
+  scope "/api/webapp-token", Ello.Serve do
+    pipe_through :token
+    get "/", TokenController, :show
   end
 
   scope "/", Ello.Serve.Webapp do

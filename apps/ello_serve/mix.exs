@@ -39,6 +39,7 @@ defmodule Ello.Serve.Mixfile do
       {:html_sanitize_ex, "~> 1.0.0"},
 
       {:ello_core, in_umbrella: true},
+      {:ello_auth, in_umbrella: true},
       {:ello_v2, in_umbrella: true}, # for image_url generation
    ]
   end
