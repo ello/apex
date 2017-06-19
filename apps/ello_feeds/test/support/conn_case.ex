@@ -27,8 +27,8 @@ defmodule Ello.Feeds.ConnCase do
     end
   end
 
-  setup tags do
-
+  setup _tags do
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Ello.Core.Repo)
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 end

@@ -7,12 +7,12 @@ use Mix.Config
 
 # General application configuration
 config :ello_feeds,
-  namespace: Ello.Feeds
+  namespace: Ello.Feeds,
+  ecto_repos: []
 
 # Configures the endpoint
 config :ello_feeds, Ello.Feeds.Endpoint,
   url: [host: "localhost"],
-  secret_key_base: "P5bHwN44zvv0WSz7oEvwj/zmi5qRvnv1MhO6JxP6eG6tkm+ljQQi1PVKgiI8738K",
   render_errors: [view: Ello.Feeds.ErrorView, accepts: ~w(html json)],
   pubsub: [name: Ello.Feeds.PubSub,
            adapter: Phoenix.PubSub.PG2]

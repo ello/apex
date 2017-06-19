@@ -36,13 +36,12 @@ defmodule Ello.Feeds.Web do
       use Phoenix.View, root: "web/templates", namespace: Ello.Feeds
 
       # Import convenience functions from controllers
-      import Phoenix.Controller, only: [get_csrf_token: 0, get_flash: 2, view_module: 1]
+      import Phoenix.Controller, only: [view_module: 1]
 
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
       import Ello.Feeds.Router.Helpers
-      import Ello.Feeds.ErrorHelpers
       import Ello.Feeds.Gettext
     end
   end

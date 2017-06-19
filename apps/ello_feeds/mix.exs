@@ -37,7 +37,11 @@ defmodule Ello.Feeds.Mixfile do
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_html, "~> 2.6"},
       {:gettext, "~> 0.11"},
-      {:cowboy, "~> 1.0"}
+      {:cowboy, "~> 1.0"},
+      {:poison, "~> 3.1", override: true},
+
+      {:ello_core,   in_umbrella: true},
+      {:ello_events, in_umbrella: true},
     ]
   end
 end
