@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Ello Editorials</title>
+    <description>
+      Ello's human curated list highlighting the best and brightest creatives and the works they’re sharing on ello.co.
+    </description>
+    <link><%= webapp_url() %></link>
+    <image>
+      <title>Ello Editorials</title>
+      <url>
+        https://assets2.ello.co/uploads/user/avatar/641/ello-regular-492a3dcf.png
+      </url>
+    </image>
+    <managingEditor>support@ello.co</managingEditor>
+    <webMaster>ops@ello.co</webMaster>
+    <%= for editorial <- @data do %>
+      <%= render "editorial.rss", editorial: editorial %>
+    <% end %>
+  </channel>
+</rss>

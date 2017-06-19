@@ -21,6 +21,10 @@ defmodule Ello.Feeds.ConnCase do
       use Phoenix.ConnTest
 
       import Ello.Feeds.Router.Helpers
+      alias Ello.Core.{
+        Factory,
+        Repo,
+      }
 
       # The default endpoint for testing
       @endpoint Ello.Feeds.Endpoint

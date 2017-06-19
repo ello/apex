@@ -42,6 +42,7 @@ defmodule Ello.Feeds.Mixfile do
 
       {:ello_core,   in_umbrella: true},
       {:ello_events, in_umbrella: true},
+      {:ello_v2,     in_umbrella: true}, # for image_url only
     ]
   end
 end

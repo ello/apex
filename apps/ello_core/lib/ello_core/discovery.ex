@@ -94,6 +94,7 @@ defmodule Ello.Core.Discovery do
   def editorials(%{preview: false} = options) do
     Editorial
     |> where([e], not is_nil(e.published_position))
+    |> filter_kinds(options[:kinds])
     |> order_by(desc: :published_position)
     |> editorial_cursor(options)
     |> limit(^options[:per_page])
@@ -108,6 +109,12 @@ defmodule Ello.Core.Discovery do
     |> limit(^options[:per_page])
     |> Repo.all
     |> Preload.editorials(options)
+  end
+
+  defp filter_kinds(query, nil), do: query
+  defp filter_kinds(query, []), do: query
+  defp filter_kinds(query, kinds) do
+    where(query, [e], e.kind in ^kinds)
   end
 
   defp editorial_cursor(query, %{before: nil}), do: query

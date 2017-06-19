@@ -162,7 +162,7 @@ defmodule Ello.Core.Factory do
     Map.merge(editorial_factory(), %{
       kind: "external",
       content: %{
-        "title"    => "Post Editorial",
+        "title"    => "External Editorial",
         "subtitle" => "check it out",
         "url"      => "https://ello.co/wtf",
       }
@@ -173,7 +173,7 @@ defmodule Ello.Core.Factory do
     Map.merge(editorial_factory(), %{
       kind: "internal",
       content: %{
-        "title"    => "All the newest stuff",
+        "title"    => "Internal Editorial",
         "subtitle" => "check it out",
         "path"     => "/discover/recent",
       }
@@ -184,7 +184,7 @@ defmodule Ello.Core.Factory do
     Map.merge(editorial_factory(), %{
       kind: "category",
       content: %{
-        "title" => "BUY BUY BUY!!!!!",
+        "title" => "Category Editorial",
         "slug"  => "shop",
       }
     })
@@ -194,7 +194,7 @@ defmodule Ello.Core.Factory do
     Map.merge(editorial_factory(), %{
       kind: "curated_posts",
       content: %{
-        "title"       => "These posts are great.",
+        "title"       => "Curated Posts Editorial",
         "post_tokens" => [insert(:post).token, insert(:post).token]
       }
     })
@@ -204,7 +204,7 @@ defmodule Ello.Core.Factory do
     Map.merge(editorial_factory(), %{
       kind: "following",
       content: %{
-        "title" => "Following",
+        "title" => "Following Editorial",
       }
     })
   end
@@ -213,7 +213,7 @@ defmodule Ello.Core.Factory do
     Map.merge(editorial_factory(), %{
       kind: "invite_join",
       content: %{
-        "title" => "Join or Invite",
+        "title" => "Join or Invite Editorial",
       }
     })
   end

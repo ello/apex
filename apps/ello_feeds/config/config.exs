@@ -8,7 +8,9 @@ use Mix.Config
 # General application configuration
 config :ello_feeds,
   namespace: Ello.Feeds,
-  ecto_repos: []
+  ecto_repos: [],
+  webapp_host: System.get_env("WEBAPP_HOST") || "ello.co"
+
 
 # Configures the endpoint
 config :ello_feeds, Ello.Feeds.Endpoint,
