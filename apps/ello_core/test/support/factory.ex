@@ -252,6 +252,7 @@ defmodule Ello.Core.Factory do
       is_creator_type: false,
       level:       "Primary",
       order:        Enum.random(0..10),
+      uses_page_promotionals: false,
       promotionals: [build(:promotional)],
       created_at:   DateTime.utc_now,
       updated_at:   DateTime.utc_now,

@@ -4,7 +4,7 @@ defmodule Ello.V2.CategoryControllerTest do
   setup %{conn: conn} do
     Script.insert(:featured_category)
     Script.insert(:lacross_category)
-    design = Factory.insert(:category, %{name: "Design", is_creator_type: true})
+    design = Factory.insert(:category, %{name: "Design", slug: "design", is_creator_type: true})
     spying = Script.insert(:espionage_category)
     archer = Script.insert(:archer, category_ids: [spying.id])
     {:ok, conn: auth_conn(conn, archer), unauth_conn: conn, spying: spying, design: design}
