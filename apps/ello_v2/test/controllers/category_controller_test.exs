@@ -4,9 +4,10 @@ defmodule Ello.V2.CategoryControllerTest do
   setup %{conn: conn} do
     Script.insert(:featured_category)
     Script.insert(:lacross_category)
+    design = Factory.insert(:category, %{name: "Design", slug: "design", is_creator_type: true})
     spying = Script.insert(:espionage_category)
     archer = Script.insert(:archer, category_ids: [spying.id])
-    {:ok, conn: auth_conn(conn, archer), unauth_conn: conn, spying: spying}
+    {:ok, conn: auth_conn(conn, archer), unauth_conn: conn, spying: spying, design: design}
   end
 
   test "GET /v2/categories/:slug - without token", %{unauth_conn: conn} do
@@ -80,6 +81,29 @@ defmodule Ello.V2.CategoryControllerTest do
   test "GET /v2/categories/:slug - json schema", %{conn: conn} do
     conn = get(conn, category_path(conn, :show, "featured"))
     assert :ok = validate_json("category", json_response(conn, 200))
+  end
+
+  test "GET /v2/categories?creator_types=true", %{conn: conn} do
+    conn = get(conn, category_path(conn, :index), %{creator_types: true})
+    assert %{"categories" => categories} = json_response(conn, 200)
+    assert Enum.member?(category_names(categories), "Design") == true
+    assert Enum.member?(category_names(categories), "Lacross") == false
+    assert Enum.member?(category_names(categories), "Featured") == false
+  end
+
+  test "GET /v2/categories?creator_types=true - 304", %{conn: conn, design: cat} do
+    resp = get(conn, category_path(conn, :index), %{creator_types: true})
+    assert resp.status == 200
+    [etag] = get_resp_header(resp, "etag")
+    resp2 = conn
+            |> put_req_header("if-none-match", etag)
+            |> get(category_path(conn, :index), %{creator_types: true})
+    assert resp2.status == 304
+    Factory.insert(:promotional, category: cat)
+    resp3 = conn
+            |> put_req_header("if-none-match", etag)
+            |> get(category_path(conn, :index), %{creator_types: true})
+    assert resp3.status == 200
   end
 
   defp category_names(categories) do

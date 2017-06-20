@@ -43,6 +43,7 @@ defmodule Ello.V2.CategoryView do
     :slug,
     :uses_page_promotionals,
     :allow_in_onboarding,
+    :is_creator_type,
   ]
 
   def computed_attributes, do: [

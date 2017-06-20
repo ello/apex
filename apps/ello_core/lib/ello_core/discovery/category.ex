@@ -22,6 +22,7 @@ defmodule Ello.Core.Discovery.Category do
     field :cta_caption, :string
     field :cta_href, :string
     field :uses_page_promotionals, :boolean
+    field :is_creator_type, :boolean, default: false
 
     has_many :promotionals, Promotional
   end
