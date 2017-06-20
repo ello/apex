@@ -8,11 +8,7 @@
   </description>
   <link><%= editorial_link(@editorial) %></link>
   <guid isPermaLink="false"><%= guid(@editorial) %></guid>
-  <enclosure
-    url="<%= image_url(@editorial) %>"
-    type="<%= image_type(@editorial) %>"
-    length="<%= image_length(@editorial) %>"
-  />
+  <enclosure url="<%= image_url(@editorial) %>" type="<%= image_type(@editorial) %>" length="<%= image_length(@editorial) %>" />
   <%= for category <- categories(@editorial) do %>
     <category><%= category %></category>
   <% end %>
