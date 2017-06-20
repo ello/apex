@@ -39,6 +39,7 @@ defmodule Ello.Feeds.Mixfile do
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:poison, "~> 3.1", override: true},
+      {:sweet_xml, "~> 0.6.5"},
 
       {:ello_core,   in_umbrella: true},
       {:ello_events, in_umbrella: true},

@@ -1,5 +1,6 @@
 defmodule Ello.Feeds.EditorialControllerTest do
   use Ello.Feeds.ConnCase
+  import SweetXml
 
   setup %{conn: conn} do
     Factory.insert(:post_editorial, published_position: 1)
@@ -14,9 +15,15 @@ defmodule Ello.Feeds.EditorialControllerTest do
 
   test "GET /feeds/editorials - as rss", %{conn: conn} do
     assert %{status: 200, resp_body: body} = get(conn, "/feeds/editorials")
-    assert body =~ ~r(<title>Ello Editorials</title>)
-    assert body =~ ~r(<title>Post Editorial</title>)
-    assert body =~ ~r(<title>Internal Editorial</title>)
-    assert body =~ ~r(<title>External Editorial</title>)
+    assert xpath(body, ~x"/rss/channel/title/text()"s) == "Ello Editorials"
+    assert xpath(body, ~x"/rss/channel/description/text()"s)
+    assert xpath(body, ~x"/rss/channel/link/text()"s)
+    assert xpath(body, ~x"/rss/channel/image/link/text()"s)
+    assert xpath(body, ~x"/rss/channel/item[1]/title/text()"s) == "Internal Editorial"
+    assert xpath(body, ~x"/rss/channel/item[1]/description/text()"s)
+    assert xpath(body, ~x"/rss/channel/item[2]/title/text()"s) == "External Editorial"
+    assert xpath(body, ~x"/rss/channel/item[2]/description/text()"s)
+    assert xpath(body, ~x"/rss/channel/item[3]/title/text()"s) == "Post Editorial"
+    assert xpath(body, ~x"/rss/channel/item[3]/description/text()"s)
   end
 end
