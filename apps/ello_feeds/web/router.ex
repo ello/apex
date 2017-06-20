@@ -2,6 +2,7 @@ defmodule Ello.Feeds.Router do
   use Ello.Feeds.Web, :router
 
   pipeline :public do
+    plug Ello.Feeds.DefaultToRSS
     plug :accepts, ["rss"]
   end
 
