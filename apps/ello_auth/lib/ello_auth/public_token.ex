@@ -5,7 +5,7 @@ defmodule Ello.Auth.PublicToken do
   use GenServer
   alias __MODULE__.Client
 
-  @table :rate_limiter_requests
+  @table :public_token_bucket
 
   ## Client
 

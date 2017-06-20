@@ -1,17 +1,11 @@
 defmodule Ello.Serve.Webapp.NoContentControllerTest do
   use Ello.Serve.ConnCase
-  alias Ello.Core.Redis
+  alias Ello.Serve.VersionStore
 
   setup %{conn: conn} do
-    raw = File.read!("test/support/ello.co.html")
     raw2 = File.read!("test/support/ello.co.2.html")
-    Redis.command(["SET", "ello_serve:webapp:current", raw])
-    Redis.command(["SET", "ello_serve:webapp:abc123", raw2])
-    on_exit fn() ->
-      Redis.command(["DEL", "ello_serve:webapp:current"])
-      Redis.command(["DEL", "ello_serve:webapp:abc123"])
-    end
-    {:ok, conn: conn, raw: raw}
+    :ok = VersionStore.put_version(:webapp, "abc123", raw2)
+    {:ok, conn: conn}
   end
 
   test "following - it renders - active version", %{conn: conn} do

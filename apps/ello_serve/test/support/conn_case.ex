@@ -14,6 +14,7 @@ defmodule Ello.Serve.ConnCase do
   """
 
   use ExUnit.CaseTemplate
+  alias Ello.Serve.VersionStore
 
   using do
     quote do
@@ -31,6 +32,16 @@ defmodule Ello.Serve.ConnCase do
 
   setup _tags do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Ello.Core.Repo)
+
+    # Use in memory version store for controller tests, resets automatically
+    Application.put_env(:ello_serve, :version_store_adapter, VersionStore.Memory)
+    VersionStore.Memory.start()
+    html = File.read!("test/support/ello.co.html")
+    VersionStore.put_version(:webapp, "ello", html)
+    VersionStore.activate_version(:webapp, "ello")
+    on_exit fn() ->
+      VersionStore.Memory.reset()
+    end
 
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end

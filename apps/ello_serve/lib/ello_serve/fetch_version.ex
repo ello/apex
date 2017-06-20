@@ -8,6 +8,7 @@ defmodule Ello.Serve.FetchVersion do
   If version is not found a 404 is returned.
   """
   use Plug.Builder
+  alias Ello.Serve.VersionStore
 
   plug :set_version
   plug :load_html
@@ -16,18 +17,13 @@ defmodule Ello.Serve.FetchVersion do
     assign(conn, :version, version)
   end
   def set_version(conn, _) do
-    assign(conn, :version, "current")
+    assign(conn, :version, nil)
   end
 
-  #TODO: Switch to our own redis - should be own instance (elastic cache? heroku?)
-  #TODO: Add an abstraction (eg Ello.Serve.VersionStore)
-  alias Ello.Core.Redis
-
   def load_html(conn, _) do
-    version_key = "ello_serve:#{conn.assigns.app}:#{conn.assigns.version}"
-    case Redis.command(["GET", version_key]) do
-      {:ok, nil}  -> halt send_resp(conn, 404, "version not found")
+    case VersionStore.fetch_version(conn.assigns.app, conn.assigns.version) do
       {:ok, html} -> assign(conn, :html, html)
+      _           -> halt send_resp(conn, 404, "version not found")
     end
   end
 end

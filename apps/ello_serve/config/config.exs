@@ -12,7 +12,14 @@ config :ello_serve,
   apple_app_id: System.get_env("APPLE_APP_ID"),
   webapp_host: System.get_env("WEBAPP_HOST"),
   webapp_oauth_client_id: System.get_env("WEBAPP_CLIENT_ID") || "client_id",
-  webapp_oauth_client_secret: System.get_env("WEBAPP_CLIENT_ID") || "client_secret"
+  webapp_oauth_client_secret: System.get_env("WEBAPP_CLIENT_SECRET") || "client_secret",
+  redis_url: System.get_env("SERVE_REDIS_URL") || "redis://localhost:6379",
+  redis_pool_size: String.to_integer(System.get_env("SERVE_REDIS_POOL_SIZE") || "5"),
+  redis_timeout: String.to_integer(System.get_env("SERVE_REDIS_TIMEOUT") || "5000"),
+  environments: String.split(System.get_env("SERVE_ENVIRONMENTS") || "test,dev", ","),
+  current_environment: System.get_env("SERVE_CURRENT_ENVIRONMENT") || "test"
+
+
 
 # Configures the endpoint
 config :ello_serve, Ello.Serve.Endpoint,

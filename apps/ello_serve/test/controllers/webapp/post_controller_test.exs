@@ -1,25 +1,16 @@
 defmodule Ello.Serve.Webapp.PostControllerTest do
   use Ello.Serve.ConnCase
   alias Ello.Core.{
-    Redis,
     Repo,
   }
 
   setup %{conn: conn} do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
-    raw = File.read!("test/support/ello.co.html")
-    raw2 = File.read!("test/support/ello.co.2.html")
-    Redis.command(["SET", "ello_serve:webapp:current", raw])
-    Redis.command(["SET", "ello_serve:webapp:abc123", raw2])
-    on_exit fn() ->
-      Redis.command(["DEL", "ello_serve:webapp:current"])
-      Redis.command(["DEL", "ello_serve:webapp:abc123"])
-    end
     author = Factory.insert(:user, username: "archer", bad_for_seo?: false)
     Factory.add_assets(Factory.insert(:post, author: author, token: "abc123"))
     author2 = Factory.insert(:user, username: "lana", bad_for_seo?: true)
     Factory.insert(:post, author: author2, token: "def345")
-    {:ok, conn: conn, raw: raw}
+    {:ok, conn: conn}
   end
 
   test "it renders - active version", %{conn: conn} do

@@ -10,6 +10,7 @@ defmodule Ello.Serve do
     children = [
       # Start the endpoint when the application starts
       supervisor(Ello.Serve.Endpoint, []),
+      supervisor(Ello.Serve.VersionStore.Redis.Client, []),
       # Start your own worker by calling: Ello.Serve.Worker.start_link(arg1, arg2, arg3)
       # worker(Ello.Serve.Worker, [arg1, arg2, arg3]),
     ]
