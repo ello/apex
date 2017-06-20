@@ -23,22 +23,22 @@ defmodule Ello.Feeds.EditorialView do
   end
 
   def image_url(%{one_by_one_image_struct: image}) do
-    version = hdpi_version(image)
+    version = fetch_version(image)
     image_url(image.path, version.filename)
   end
 
   def image_type(%{one_by_one_image_struct: image}) do
-    version = hdpi_version(image)
+    version = fetch_version(image)
     version.type
   end
 
   def image_length(%{one_by_one_image_struct: image}) do
-    version = hdpi_version(image)
+    version = fetch_version(image)
     version.size
   end
 
-  defp hdpi_version(%{versions: versions}) do
-    Enum.find(versions, &(&1.name == "hdpi"))
+  defp fetch_version(%{versions: versions}) do
+    Enum.find(versions, &(&1.name == "xhdpi"))
   end
 
   def categories(%{kind: "post", post: post}) do
