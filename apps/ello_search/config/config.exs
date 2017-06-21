@@ -2,8 +2,13 @@ use Mix.Config
 
 config :ello_search, ecto_repos: []
 
+config :elastix,
+  custom_headers: {Ello.Search.Client, :headers, []},
+  httpoison_options: [hackney: [pool: :elastix_pool]]
+
 config :ello_search,
   es_url:                       System.get_env("ES_URL") || "http://localhost:9200",
+  aws_es_url:                   System.get_env("AWS_ES_URL"),
   es_prefix:                    System.get_env("ES_PREFIX"),
   following_search_boost_limit: String.to_integer(System.get_env("FOLLOWING_SEARCH_BOOST_LIMIT") || "1000"),
   following_search_boost:       String.to_float(System.get_env("FOLLOWING_SEARCH_BOOST") || "15.0"),

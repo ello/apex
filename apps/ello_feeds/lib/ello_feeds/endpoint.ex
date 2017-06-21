@@ -1,7 +1,7 @@
 # Note: When running in an umbrella we do not start this endpoint directly.
 # Instead Ello.Dispatch.Endpoint is run.
-defmodule Ello.V2.Endpoint do
-  use Phoenix.Endpoint, otp_app: :ello_v2
+defmodule Ello.Feeds.Endpoint do
+  use Phoenix.Endpoint, otp_app: :ello_feeds
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
@@ -17,5 +17,5 @@ defmodule Ello.V2.Endpoint do
     pass: ["*/*"],
     json_decoder: Poison
 
-  plug Ello.V2.Router
+  plug Ello.Feeds.Router
 end

@@ -7,7 +7,7 @@ defmodule Ello.V2.CategoryController do
 
   Render index listing of categories in existing v2 API format.
 
-  Supports `meta=true` and `all=true` params.
+  Supports `meta=true`, `all=true`, `creator_types=true` params.
   """
   def index(conn, params) do
     api_render_if_stale(conn, data: categories(conn, params))
@@ -27,6 +27,8 @@ defmodule Ello.V2.CategoryController do
     do: Discovery.categories(standard_params(conn, %{meta: true, inactive: true, promotionals: true}))
   defp categories(conn, %{"meta" => _}),
     do: Discovery.categories(standard_params(conn, %{meta: true, promotionals: true}))
+  defp categories(conn, %{"creator_types" => _}),
+    do: Discovery.categories(standard_params(conn, %{creator_types: true, promotionals: true}))
   defp categories(conn, _),
     do: Discovery.categories(standard_params(conn, %{promotionals: true}))
 end

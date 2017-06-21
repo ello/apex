@@ -13,7 +13,8 @@
   "decorators": {:hex, :decorators, "0.1.0", "1f4fd3682de23c6bce769201613812f5eaf809310a27e35ddbfd91e53b126267", [:rebar3], [{:parse_trans, "2.9.0", [hex: :parse_trans, optional: false]}]},
   "ecto": {:hex, :ecto, "2.1.3", "ffb24e150b519a4c0e4c84f9eabc8587199389bc499195d5d1a93cd3b2d9a045", [:mix], [{:db_connection, "~> 1.1", [hex: :db_connection, optional: true]}, {:decimal, "~> 1.2", [hex: :decimal, optional: false]}, {:mariaex, "~> 0.8.0", [hex: :mariaex, optional: true]}, {:poison, "~> 2.2 or ~> 3.0", [hex: :poison, optional: true]}, {:poolboy, "~> 1.5", [hex: :poolboy, optional: false]}, {:postgrex, "~> 0.13.0", [hex: :postgrex, optional: true]}, {:sbroker, "~> 1.0", [hex: :sbroker, optional: true]}]},
   "edown": {:hex, :edown, "0.8.1", "7333b6f6b7bbc736c263e9ceb8261667d7c8f7d92e251829f1a9fe8f24e7b694", [:rebar3], []},
-  "elastix": {:hex, :elastix, "0.3.2", "b838dfbe00010946e46392cdda0692834dc5b3b83c810c9761ac81f3e7e5416d", [:mix], [{:httpoison, "~> 0.11", [hex: :httpoison, optional: false]}, {:poison, "~> 3.1", [hex: :poison, optional: false]}]},
+  "elastix": {:git, "https://github.com/ello/elastix.git", "18aaeae17624b5a767bf3a37f17dc43d7c2af6b5", [branch: "custom-header-support"]},
+  "ex_aws": {:hex, :ex_aws, "1.1.2", "b78416d0a84efe92c22e5df8ba7ca028d63b2b4228f95871a1ecf10324b6493b", [:mix], [{:configparser_ex, "~> 0.2.1", [hex: :configparser_ex, optional: true]}, {:hackney, "1.6.3 or 1.6.5 or 1.7.1", [hex: :hackney, optional: true]}, {:jsx, "~> 2.8", [hex: :jsx, optional: true]}, {:poison, ">= 1.2.0", [hex: :poison, optional: true]}, {:sweet_xml, "~> 0.6", [hex: :sweet_xml, optional: true]}, {:xml_builder, "~> 0.0.6", [hex: :xml_builder, optional: true]}]},
   "ex_json_schema": {:hex, :ex_json_schema, "0.5.3", "f2db8eb71ca7a836607d67021d1b9c24f192dd5d1ec6b6b1c89bc934fec3bf5e", [:mix], []},
   "ex_machina": {:hex, :ex_machina, "1.0.2", "1cc49e1a09e3f7ab2ecb630c17f14c2872dc4ec145d6d05a9c3621936a63e34f", [:mix], [{:ecto, "~> 2.0", [hex: :ecto, optional: true]}]},
   "gettext": {:hex, :gettext, "0.13.0", "daafbddc5cda12738bb93b01d84105fe75b916a302f1c50ab9fb066b95ec9db4", [:mix], []},
@@ -46,6 +47,8 @@
   "redix": {:hex, :redix, "0.4.0", "c8cfad755252e5441c4119437ba3a8989518af7aa90dbd6f4ff7207b72e4a967", [:mix], [{:connection, "~> 1.0.0", [hex: :connection, optional: false]}]},
   "ssl_verify_fun": {:hex, :ssl_verify_fun, "1.1.1", "28a4d65b7f59893bc2c7de786dec1e1555bd742d336043fe644ae956c3497fbe", [:make, :rebar], []},
   "statman": {:hex, :statman, "0.5.0", "3b130ed01bca478d34631752f678dc43ffe09d46d2e526554e285673c3497270", [:rebar3], [{:decorators, "0.1.0", [hex: :decorators, optional: false]}]},
+  "sweet_xml": {:hex, :sweet_xml, "0.6.5", "dd9cde443212b505d1b5f9758feb2000e66a14d3c449f04c572f3048c66e6697", [:mix], []},
   "timex": {:hex, :timex, "3.1.13", "48b33162e3ec33e9a08fb5f98e3f3c19c3e328dded3156096c1969b77d33eef0", [:mix], [{:combine, "~> 0.7", [hex: :combine, optional: false]}, {:gettext, "~> 0.10", [hex: :gettext, optional: false]}, {:tzdata, "~> 0.1.8 or ~> 0.5", [hex: :tzdata, optional: false]}]},
   "tzdata": {:hex, :tzdata, "0.5.12", "1c17b68692c6ba5b6ab15db3d64cc8baa0f182043d5ae9d4b6d35d70af76f67b", [:mix], [{:hackney, "~> 1.0", [hex: :hackney, optional: false]}]},
+  "unicode_util_compat": {:hex, :unicode_util_compat, "0.2.0", "dbbccf6781821b1c0701845eaf966c9b6d83d7c3bfc65ca2b78b88b8678bfa35", [:rebar3], []},
   "uuid": {:hex, :uuid, "1.1.6", "4927232f244e69c6e255643014c2d639dad5b8313dc2a6976ee1c3724e6ca60d", [:mix], []}}

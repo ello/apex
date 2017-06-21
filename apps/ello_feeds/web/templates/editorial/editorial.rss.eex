@@ -1,0 +1,15 @@
+<item>
+  <title><%= title(@editorial) %></title>
+  <description>
+    <![CDATA[
+      <img src="<%= image_url(@editorial) %>"/>
+      <p><%= description(@editorial) %></p>
+    ]]>
+  </description>
+  <link><%= editorial_link(@editorial) %></link>
+  <guid isPermaLink="false"><%= guid(@editorial) %></guid>
+  <enclosure url="<%= image_url(@editorial) %>" type="<%= image_type(@editorial) %>" length="<%= image_length(@editorial) %>" />
+  <%= for category <- categories(@editorial) do %>
+    <category><%= category %></category>
+  <% end %>
+</item>

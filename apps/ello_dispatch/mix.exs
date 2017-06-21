@@ -31,7 +31,8 @@ defmodule Ello.Dispatch.Mixfile do
 
       {:newrelic_phoenix, github: "ello/newrelic_phoenix", branch: "master"},
 
-      {:ello_v2, in_umbrella: true},
+      {:ello_v2,    in_umbrella: true},
+      {:ello_feeds, in_umbrella: true},
       {:ello_serve, in_umbrella: true},
     ]
   end

@@ -14,6 +14,7 @@ defmodule Ello.Repo.Migrations.CreateCategory do
       add :allow_in_onboarding, :boolean, default: false
       add :description, :text
       add :is_sponsored, :boolean, default: false
+      add :is_creator_type, :boolean, default: false
       add :header, :string
       add :cta_caption, :string
       add :cta_href, :string
