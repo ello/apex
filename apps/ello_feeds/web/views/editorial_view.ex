@@ -3,7 +3,7 @@ defmodule Ello.Feeds.EditorialView do
   import Ello.V2.ImageView, only: [image_url: 2]
 
   def webapp_url do
-    "https://" <> Application.get_env(:ello_feeds, :webapp_host)
+    "https://" <> Application.get_env(:ello_feeds, :webapp_host) <> "/"
   end
 
   def title(editorial), do: editorial.content["title"]
