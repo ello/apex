@@ -11,6 +11,13 @@ defmodule Ello.Serve.API.VersionController do
     end
   end
 
+  def activate(conn, params) do
+    case VersionStore.activate_version(params["app"], params["version"], params["environment"]) do
+      :ok -> send_resp(conn, 200, "")
+      _   -> send_resp(conn, 422, "")
+    end
+  end
+
   defp require_auth(conn, _) do
     encoded = basic_auth_header()
     case get_req_header(conn, "authorization") do

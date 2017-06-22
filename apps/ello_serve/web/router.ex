@@ -18,7 +18,7 @@ defmodule Ello.Serve.Router do
 
   scope "/api/serve/v1", Ello.Serve.API do
     post "/versions", VersionController, :create
-    # post "/versions/:version/activate", VersionController, :activate
+    post "/versions/activate", VersionController, :activate
     # post "/slack/command", SlackController, :callback
   end
 
