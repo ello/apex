@@ -8,7 +8,9 @@ config :ello_serve, Ello.Serve.Endpoint,
 
 config :ello_serve,
   apple_app_id: "1234567",
-  webapp_host: "ello.co"
+  webapp_host: "ello.co",
+  api_username: "test",
+  api_password: "only"
 
 
 # Print only warnings and errors during test

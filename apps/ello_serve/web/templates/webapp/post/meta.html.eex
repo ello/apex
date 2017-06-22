@@ -8,7 +8,7 @@
   <meta property="og:image" content="<%= image_url %>"/>
 <% end %>
 
-<% for embed_url <- embed_urls(@post) do %>
+<%= for embed_url <- embed_urls(@post) do %>
   <meta property="og:video" content="<%= embed_url %>"/>
 <% end %>
 

@@ -17,7 +17,10 @@ config :ello_serve,
   redis_pool_size: String.to_integer(System.get_env("SERVE_REDIS_POOL_SIZE") || "5"),
   redis_timeout: String.to_integer(System.get_env("SERVE_REDIS_TIMEOUT") || "5000"),
   environments: String.split(System.get_env("SERVE_ENVIRONMENTS") || "test,dev", ","),
-  current_environment: System.get_env("SERVE_CURRENT_ENVIRONMENT") || "test"
+  current_environment: System.get_env("SERVE_CURRENT_ENVIRONMENT") || "test",
+  api_username: System.get_env("SERVE_API_USERNAME"),
+  api_password: System.get_env("SERVE_API_PASSWORD")
+
 
 
 

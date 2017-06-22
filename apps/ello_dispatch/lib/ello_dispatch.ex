@@ -16,6 +16,8 @@ defmodule Ello.Dispatch do
     do: Ello.Feeds.Router.call(conn, [])
   def dispatch(%{path_info: ["api", "v2" | _]} = conn, _),
     do: Ello.V2.Router.call(conn, [])
+  def dispatch(%{path_info: ["api", "serve" | _]} = conn, _),
+    do: Ello.Serve.Router.call(conn, [])
   def dispatch(%{method: "GET"} = conn, _),
     do: Ello.Serve.Router.call(conn, [])
   def dispatch(conn, _),
