@@ -1,4 +1,6 @@
 defmodule Ello.Serve.VersionStore do
+  alias Ello.Serve.VersionStore.SlackNotifications
+
   @type app :: String.t
   @type version :: String.t
   @type html :: String.t
@@ -34,7 +36,14 @@ defmodule Ello.Serve.VersionStore do
   end
 
   @doc "Pass put_version/2 to current adapter"
-  def put_version(app, ver, html), do: adapter().put_version(app, ver, html)
+  def put_version(app, ver, html) do
+    case adapter().put_version(app, ver, html) do
+      :ok ->
+        SlackNotifications.new_version(app, ver)
+        :ok
+      error -> error
+    end
+  end
 
   @doc "Pass activate_version/2 to current adapter - default to current env"
   def activate_version(app, ver, env \\ nil)
@@ -43,7 +52,12 @@ defmodule Ello.Serve.VersionStore do
   end
   def activate_version(app, ver, env) do
     verify_env!(env)
-    adapter().activate_version(app, ver, env)
+    case adapter().activate_version(app, ver, env) do
+      :ok ->
+        SlackNotifications.version_activated(app, ver, env)
+        :ok
+      error -> error
+    end
   end
 
   @doc """

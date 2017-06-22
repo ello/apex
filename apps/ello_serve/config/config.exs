@@ -19,7 +19,8 @@ config :ello_serve,
   environments: String.split(System.get_env("SERVE_ENVIRONMENTS") || "test,dev", ","),
   current_environment: System.get_env("SERVE_CURRENT_ENVIRONMENT") || "test",
   api_username: System.get_env("SERVE_API_USERNAME"),
-  api_password: System.get_env("SERVE_API_PASSWORD")
+  api_password: System.get_env("SERVE_API_PASSWORD"),
+  slack_webhook_url: System.get_env("SERVE_SLACK_WEBHOOK_URL")
 
 
 
