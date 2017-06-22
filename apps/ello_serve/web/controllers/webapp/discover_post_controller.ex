@@ -5,7 +5,7 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
   def trending(conn, _) do
     render_html(conn, %{
       title: "Ello | The Creators Network",
-      description: "Explore trending work on Ello in Art, Fashion, Photography, Design, Architecture, Illustration, GIFs, 3D, Writing, Music, Textile, Skate and Cycling."
+      description: "Explore trending work on Ello in Art, Fashion, Photography, Design, Architecture, Illustration, GIFs, 3D, Writing, Music, Textile, Skate and Cycling.",
     })
   end
 
@@ -19,7 +19,7 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
   def featured(conn, _) do
     render_html(conn, %{
       title: "Ello | The Creators Network",
-      description: "Welcome to the Creators Network. Ello is a community to discover, discuss, publish, share and promote the things you are passionate about."
+      description: "Welcome to the Creators Network. Ello is a community to discover, discuss, publish, share and promote the things you are passionate about.",
     })
   end
 end

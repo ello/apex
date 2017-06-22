@@ -8,6 +8,7 @@ defmodule Ello.Serve.Router do
   pipeline :webapp do
     plug :accepts, ["html"]
     plug Ello.Serve.SetApp, app: "webapp"
+    plug Ello.Serve.SkipPrerender
     plug Ello.Serve.FetchVersion
   end
 
@@ -48,11 +49,11 @@ defmodule Ello.Serve.Router do
     get "/forgot",                NoContentController, :forgot
 
     # User routes
-    # get "/:username",             UserController, :show
     get "/:username/post/:token", PostController, :show
     # get "/:username/following",   UserController, :following
     # get "/:username/followers",   UserController, :following
     # get "/:username/loves",       UserController, :loves
+    # get "/:username",             UserController, :show
 
     # Fallback for any other route
     get "/*rest",                 NoContentController, :show

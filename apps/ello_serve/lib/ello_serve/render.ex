@@ -2,8 +2,16 @@ defmodule Ello.Serve.Render do
   import Phoenix.Controller, only: [view_module: 1, html: 2]
   import Phoenix.View, only: [render_to_iodata: 3]
 
-  def render_html(conn, data \\ []) do
-    data     = Enum.into(data, %{})
+  def render_html(conn, data \\ [])
+  def render_html(%{assigns: %{prerender: false, html: html}} = conn, _) do
+    html(conn, html)
+  end
+  def render_html(conn, data) do
+    # Execute any functions
+    data = Enum.reduce data, %{conn: conn}, fn
+      ({key, fun}, accum) when is_function(fun) ->  Map.put(accum, key, fun.())
+      ({key, val}, accum) -> Map.put(accum, key, val)
+    end
     meta     = render_meta(conn, data)
     noscript = render_noscript(conn, data)
     body     = conn.assigns.html
@@ -14,17 +22,16 @@ defmodule Ello.Serve.Render do
 
   defp render_meta(conn, data) do
     view = view_module(conn)
-    render_to_iodata(view, "meta.html", Map.put(data, :conn, conn))
+    render_to_iodata(view, "meta.html", data)
   end
 
   defp inject_meta(body, meta) do
     String.replace(body, "</head>", "#{meta}</head>", global: false)
   end
 
-  # TODO: skip noscript if known user with javascript (eg, skip prerender cookie set)
   defp render_noscript(conn, data) do
     view = view_module(conn)
-    render_to_iodata(view, "noscript.html", Map.put(data, :conn, conn))
+    render_to_iodata(view, "noscript.html", data)
   end
 
   defp inject_noscript(body, noscript) do
