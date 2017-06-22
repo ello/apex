@@ -37,8 +37,8 @@ defmodule Ello.Serve.ConnCase do
     Application.put_env(:ello_serve, :version_store_adapter, VersionStore.Memory)
     VersionStore.Memory.start()
     html = File.read!("test/support/ello.co.html")
-    VersionStore.put_version(:webapp, "ello", html)
-    VersionStore.activate_version(:webapp, "ello")
+    VersionStore.put_version("webapp", "ello", html)
+    VersionStore.activate_version("webapp", "ello")
     on_exit fn() ->
       VersionStore.Memory.reset()
     end

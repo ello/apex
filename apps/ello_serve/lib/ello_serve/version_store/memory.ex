@@ -15,7 +15,7 @@ defmodule Ello.Serve.VersionStore.Memory do
     end
   end
 
-  def put_version(app, version, html) when is_binary(version) and is_binary(html) do
+  def put_version(app, version, html) when is_binary(app) and is_binary(version) and is_binary(html) do
     Agent.update(@name, fn(state) ->
       state
       |> update_in([:versions], &Map.put_new(&1, app, %{}))

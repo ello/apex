@@ -14,13 +14,13 @@ defmodule Ello.Serve.VersionStore.RedisTest do
   end
 
   test "versions can be put and fetched" do
-    assert :ok = Redis.put_version(:webapp, "abc123", "<h1>Hello</h1>")
-    assert {:ok, "<h1>Hello</h1>"} = Redis.fetch_version(:webapp, "abc123", "test")
+    assert :ok = Redis.put_version("webapp", "abc123", "<h1>Hello</h1>")
+    assert {:ok, "<h1>Hello</h1>"} = Redis.fetch_version("webapp", "abc123", "test")
   end
 
   test "versions can be activated and fetched" do
-    assert :ok = Redis.put_version(:webapp, "abc123", "<h1>Hello</h1>")
-    assert :ok = Redis.activate_version(:webapp, "abc123", "test")
-    assert {:ok, "<h1>Hello</h1>"} = Redis.fetch_version(:webapp, nil, "test")
+    assert :ok = Redis.put_version("webapp", "abc123", "<h1>Hello</h1>")
+    assert :ok = Redis.activate_version("webapp", "abc123", "test")
+    assert {:ok, "<h1>Hello</h1>"} = Redis.fetch_version("webapp", nil, "test")
   end
 end

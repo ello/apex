@@ -1,5 +1,5 @@
 defmodule Ello.Serve.VersionStore do
-  @type app :: atom
+  @type app :: String.t
   @type version :: String.t
   @type html :: String.t
   @type environment :: String.t

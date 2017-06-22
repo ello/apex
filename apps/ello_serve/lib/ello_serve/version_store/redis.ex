@@ -17,7 +17,7 @@ defmodule Ello.Serve.VersionStore.Redis do
     end
   end
 
-  def put_version(app, version, html) when is_binary(version) and is_binary(html) do
+  def put_version(app, version, html) when is_binary(app) and is_binary(version) and is_binary(html) do
     case Client.command(["HSET", app_key(app), version, html]) do
       {:ok, _} -> :ok
       error    -> error

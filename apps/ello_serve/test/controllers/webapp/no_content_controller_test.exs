@@ -4,7 +4,7 @@ defmodule Ello.Serve.Webapp.NoContentControllerTest do
 
   setup %{conn: conn} do
     raw2 = File.read!("test/support/ello.co.2.html")
-    :ok = VersionStore.put_version(:webapp, "abc123", raw2)
+    :ok = VersionStore.put_version("webapp", "abc123", raw2)
     {:ok, conn: conn}
   end
 

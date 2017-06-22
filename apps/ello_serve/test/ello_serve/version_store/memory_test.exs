@@ -12,13 +12,13 @@ defmodule Ello.Serve.VersionStore.MemoryTest do
   end
 
   test "versions can be put and fetched" do
-    assert :ok = Memory.put_version(:webapp, "abc123", "<h1>Hello</h1>")
-    assert {:ok, "<h1>Hello</h1>"} = Memory.fetch_version(:webapp, "abc123", "test")
+    assert :ok = Memory.put_version("webapp", "abc123", "<h1>Hello</h1>")
+    assert {:ok, "<h1>Hello</h1>"} = Memory.fetch_version("webapp", "abc123", "test")
   end
 
   test "versions can be activated and fetched" do
-    assert :ok = Memory.put_version(:webapp, "abc123", "<h1>Hello</h1>")
-    assert :ok = Memory.activate_version(:webapp, "abc123", "test")
-    assert {:ok, "<h1>Hello</h1>"} = Memory.fetch_version(:webapp, nil, "test")
+    assert :ok = Memory.put_version("webapp", "abc123", "<h1>Hello</h1>")
+    assert :ok = Memory.activate_version("webapp", "abc123", "test")
+    assert {:ok, "<h1>Hello</h1>"} = Memory.fetch_version("webapp", nil, "test")
   end
 end

@@ -7,7 +7,7 @@ defmodule Ello.Serve.Router do
 
   pipeline :webapp do
     plug :accepts, ["html"]
-    plug Ello.Serve.SetApp, app: :webapp
+    plug Ello.Serve.SetApp, app: "webapp"
     plug Ello.Serve.FetchVersion
   end
 
