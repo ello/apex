@@ -10,7 +10,8 @@ config :ello_serve,
   apple_app_id: "1234567",
   webapp_host: "ello.co",
   api_username: "test",
-  api_password: "only"
+  api_password: "only",
+  slack_token: "slack-ello"
 
 
 # Print only warnings and errors during test

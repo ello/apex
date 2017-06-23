@@ -16,7 +16,7 @@ defmodule Ello.Serve.Render do
     # Execute any functions
     measure_segment {__MODULE__, :lazy_load} do
       data = Enum.reduce data, %{conn: conn}, fn
-        ({key, fun}, accum) when is_function(fun) ->  Map.put(accum, key, fun.())
+        ({key, fun}, accum) when is_function(fun) -> Map.put(accum, key, fun.())
         ({key, val}, accum) -> Map.put(accum, key, val)
       end
     end

@@ -20,7 +20,8 @@ config :ello_serve,
   current_environment: System.get_env("SERVE_CURRENT_ENVIRONMENT") || "test",
   api_username: System.get_env("SERVE_API_USERNAME"),
   api_password: System.get_env("SERVE_API_PASSWORD"),
-  slack_webhook_url: System.get_env("SERVE_SLACK_WEBHOOK_URL")
+  slack_webhook_url: System.get_env("SERVE_SLACK_WEBHOOK_URL"),
+  slack_token: System.get_env("SERVE_SLACK_TOKEN")
 
 config :ello_serve, :webapp_config,
   logo_mark: System.get_env("WEBAPP_LOGO_MARK") || "normal",
@@ -37,7 +38,8 @@ config :ello_serve, Ello.Serve.Endpoint,
   secret_key_base: "lSJy8ebzMtK1z4TNiYXhnLrYRjg7YDgpLR/FRI2HBUuSTbbMxwlq7qj46M5oTCmD",
   render_errors: [view: Ello.Serve.ErrorView, accepts: ~w(html json)],
   pubsub: [name: Ello.Serve.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+           adapter: Phoenix.PubSub.PG2],
+  server: false
 
 # Configures Elixir's Logger
 config :logger, :console,

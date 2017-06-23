@@ -11,7 +11,8 @@ config :ello_feeds, Ello.Feeds.Endpoint,
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
-  watchers: []
+  watchers: [],
+  server: false
 
 
 # Watch static and templates for browser reloading.
