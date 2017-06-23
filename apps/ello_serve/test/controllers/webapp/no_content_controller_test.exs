@@ -23,7 +23,24 @@ defmodule Ello.Serve.Webapp.NoContentControllerTest do
     assert html =~ ~r(AUTH_DOMAIN:.*"https://ello.co",)s
     assert html =~ ~r(LOGO_MARK:.*"normal",)s
     assert html =~ ~r(PROMO_HOST:.*"https://d9ww8oh3n3brk.cloudfront.net",)s
-    assert html =~ ~r(SEGMENT_WRITE_KEY:.*"segment_key",)s
+    assert html =~ ~r(SEGMENT_WRITE_KEY:.*"segment_key")s
+    refute html =~ ~r"HONEYBADGER"
+  end
+
+  test "following - it renders config - with honeybadger", %{conn: conn} do
+    old = Application.get_env(:ello_serve, :webapp_config)
+    Application.put_env(:ello_serve, :webapp_config, Keyword.put(old, :honeybadger_api_key, "abc123"))
+    resp = get(conn, "/following")
+    Application.put_env(:ello_serve, :webapp_config, old)
+    html = html_response(resp, 200)
+    assert html =~ ~r"<body><script>.*window.webappEnv = {.*</script>"s
+    assert html =~ ~r(AUTH_CLIENT_ID:.*"client_id",)s
+    assert html =~ ~r(AUTH_DOMAIN:.*"https://ello.co",)s
+    assert html =~ ~r(LOGO_MARK:.*"normal",)s
+    assert html =~ ~r(PROMO_HOST:.*"https://d9ww8oh3n3brk.cloudfront.net",)s
+    assert html =~ ~r(SEGMENT_WRITE_KEY:.*"segment_key")s
+    assert html =~ ~r(HONEYBADGER_API_KEY:.*"abc123")s
+    assert html =~ ~r(HONEYBADGER_ENVIRONMENT:.*"production")s
   end
 
   test "following - it renders - preview version", %{conn: conn} do

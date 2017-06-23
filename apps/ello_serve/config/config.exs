@@ -26,8 +26,9 @@ config :ello_serve, :webapp_config,
   logo_mark: System.get_env("WEBAPP_LOGO_MARK") || "normal",
   app_debug: System.get_env("WEBAPP_APP_DEBUG") || "false",
   promo_host: System.get_env("WEBAPP_PROMO_HOST") || "https://d9ww8oh3n3brk.cloudfront.net",
-  segment_write_key: System.get_env("WEBAPP_SEGMENT_WRITE_KEY") || "segment_key"
-
+  segment_write_key: System.get_env("WEBAPP_SEGMENT_WRITE_KEY") || "segment_key",
+  honeybadger_api_key: System.get_env("WEBAPP_HONEYBADGER_API_KEY"),
+  honeybadger_environment: System.get_env("WEBAPP_HONEYBADGER_ENVIRONMENT") || "production"
 
 
 # Configures the endpoint

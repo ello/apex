@@ -24,4 +24,13 @@ defmodule Ello.Serve.Webapp.ConfigView do
   def segment_write_key() do
     Application.get_env(:ello_serve, :webapp_config)[:segment_write_key]
   end
+
+  def honeybadger_config() do
+    case Application.get_env(:ello_serve, :webapp_config)[:honeybadger_api_key] do
+      nil -> nil
+      key ->
+        env = Application.get_env(:ello_serve, :webapp_config)[:honeybadger_environment]
+        {key, env}
+    end
+  end
 end

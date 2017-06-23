@@ -5,6 +5,12 @@
     LOGO_MARK:         "<%= logo_mark() %>",
     APP_DEBUG:         <%= app_debug() %>,
     PROMO_HOST:        "<%= promo_host() %>",
-    SEGMENT_WRITE_KEY: "<%= segment_write_key() %>",
+    SEGMENT_WRITE_KEY: "<%= segment_write_key() %>"
+    <%= case honeybadger_config() do%>
+      <% {key, env} -> %>
+      , HONEYBADGER_API_KEY: "<%= key %>"
+      , HONEYBADGER_ENVIRONMENT: "<%= env %>"
+      <% _ -> %>
+    <% end %>
   }
 </script>
