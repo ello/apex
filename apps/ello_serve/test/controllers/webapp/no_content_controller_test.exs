@@ -15,6 +15,17 @@ defmodule Ello.Serve.Webapp.NoContentControllerTest do
     assert html =~ "@elloworld"
   end
 
+  test "following - it renders config", %{conn: conn} do
+    resp = get(conn, "/following")
+    html = html_response(resp, 200)
+    assert html =~ ~r"<body><script>.*window.webappEnv = {.*</script>"s
+    assert html =~ ~r(AUTH_CLIENT_ID:.*"client_id",)s
+    assert html =~ ~r(AUTH_DOMAIN:.*"https://ello.co",)s
+    assert html =~ ~r(LOGO_MARK:.*"normal",)s
+    assert html =~ ~r(PROMO_HOST:.*"https://d9ww8oh3n3brk.cloudfront.net",)s
+    assert html =~ ~r(SEGMENT_WRITE_KEY:.*"segment_key",)s
+  end
+
   test "following - it renders - preview version", %{conn: conn} do
     resp = get(conn, "/following", %{"version" => "abc123"})
     html = html_response(resp, 200)
