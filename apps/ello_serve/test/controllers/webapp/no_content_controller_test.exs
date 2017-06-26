@@ -50,6 +50,26 @@ defmodule Ello.Serve.Webapp.NoContentControllerTest do
     assert html =~ "@ellohype"
   end
 
+  test "following - skip prerender via param", %{conn: conn} do
+    resp = get(conn, "/following", %{"prerender" => "false"})
+    html = html_response(resp, 200)
+    # No title etc
+    refute html =~ "Ello | The Creators Network"
+    # Has config
+    assert html =~ ~r"<body><script>.*window.webappEnv = {.*</script>"s
+  end
+
+  test "following - skip prerender via cookie", %{conn: conn} do
+    resp = conn
+           |> put_req_cookie("ello_skip_prerender", "true")
+           |> get("/following")
+    html = html_response(resp, 200)
+    # No title etc
+    refute html =~ "Ello | The Creators Network"
+    # Has config
+    assert html =~ ~r"<body><script>.*window.webappEnv = {.*</script>"s
+  end
+
   @tag :meta
   test "enter - it renders - active version", %{conn: conn} do
     resp = get(conn, "/enter")

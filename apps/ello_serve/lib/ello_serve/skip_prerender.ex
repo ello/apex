@@ -1,15 +1,15 @@
 defmodule Ello.Serve.SkipPrerender do
-  @behaviour Plug
-  import Plug.Conn
+  use Plug.Builder
 
-  def init(opts), do: opts
+  plug :do_fetch_cookies
+  plug :set_prerender
 
-  def call(conn, _) do
-    assign(conn, :prerender, prerender?(conn))
-  end
+  def do_fetch_cookies(conn, _), do: fetch_cookies(conn)
 
-  defp prerender?(%{params: %{"prerender" => "false"}}) do
-    false
-  end
-  defp prerender?(_), do: true
+  defp set_prerender(%{params: %{"prerender" => "false"}} = conn, _),
+    do: assign(conn, :prerender, false)
+  defp set_prerender(%{cookies: %{"ello_skip_prerender" => "true"}} = conn, _),
+    do: assign(conn, :prerender, false)
+  defp set_prerender(conn, _),
+    do: assign(conn, :prerender, true)
 end
