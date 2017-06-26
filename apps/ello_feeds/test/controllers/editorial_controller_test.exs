@@ -15,7 +15,7 @@ defmodule Ello.Feeds.EditorialControllerTest do
 
   test "GET /feeds/editorials - as rss", %{conn: conn} do
     assert %{status: 200, resp_body: body} = get(conn, "/feeds/editorials")
-    assert xpath(body, ~x"/rss/channel/title/text()"s) == "Ello Editorials"
+    assert xpath(body, ~x"/rss/channel/title/text()"s) == "Ello"
     assert xpath(body, ~x"/rss/channel/description/text()"s)
     assert xpath(body, ~x"/rss/channel/link/text()"s)
     assert xpath(body, ~x"/rss/channel/image/link/text()"s) == "https://ello.co"
