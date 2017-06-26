@@ -2,7 +2,7 @@ defmodule Ello.Core.Network do
   import Ecto.Query
   import NewRelicPhoenix, only: [measure_segment: 2]
   alias Ello.Core.{Repo, Redis}
-  alias __MODULE__.{User, Preload}
+  alias __MODULE__.{User, Preload, Relationship}
 
   @moduledoc """
   Responsible for retrieving and loading users and relationships.
@@ -77,6 +77,37 @@ defmodule Ello.Core.Network do
     |> Repo.all
     |> user_sorting(ids)
     |> Preload.users(options)
+  end
+
+  def relationships(%{followers: %{id: user_id}} = options) do
+    Relationship
+    |> where([r], r.subject_id == ^user_id)
+    |> where([r], r.priority in ["friend", "noise"]) # Need to optimize
+    |> paginate(options)
+    |> Repo.all
+    |> Preload.relationships(options)
+  end
+
+  def relationships(%{following: %{id: user_id}} = options) do
+    Relationship
+    |> where([r], r.owner_id == ^user_id)
+    |> where([r], r.priority in ["friend", "noise"]) # Need to optimize
+    |> paginate(options)
+    |> Repo.all
+    |> Preload.relationships(options)
+  end
+
+  def paginate(query, options) do
+    per_page = options[:per_page] || 25
+
+    query = case options[:before] do
+      nil -> query
+      b4  -> where(query, [r], r.created_at < ^b4)
+    end
+
+    query
+    |> order_by([r], desc: r.created_at)
+    |> limit(^per_page)
   end
 
   defp user_sorting(users, ids) do

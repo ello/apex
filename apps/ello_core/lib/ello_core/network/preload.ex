@@ -3,6 +3,14 @@ defmodule Ello.Core.Network.Preload do
   alias Ello.Core.{Repo,Redis,Network,Discovery}
   alias Network.{User,Relationship}
 
+  def relationships([], _), do: []
+  def relationships(rels, options) do
+    Repo.preload(rels, [
+      owner:   &Network.users(%{ids: &1, current_user: options[:current_user]}),
+      subject: &Network.users(%{ids: &1, current_user: options[:current_user]}),
+    ])
+  end
+
   def users(nil, _), do: nil
   def users([], _),  do: []
   def users(user_or_users, %{preload: false}), do: user_or_users
