@@ -51,10 +51,10 @@ defmodule Ello.Serve.Router do
 
     # User routes
     get "/:username/post/:token", PostController, :show
-    # get "/:username/following",   UserController, :following
-    # get "/:username/followers",   UserController, :following
-    # get "/:username/loves",       UserController, :loves
-    # get "/:username",             UserController, :show
+    # get "/:username/following",   RelationshipController, :following
+    # get "/:username/followers",   RelationshipController, :followers
+    # get "/:username/loves",       LoveController, :index
+    get "/:username",             UserController, :show
 
     # Fallback for any other route
     get "/*rest",                 NoContentController, :show

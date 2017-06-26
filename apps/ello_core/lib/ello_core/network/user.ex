@@ -101,4 +101,28 @@ defmodule Ello.Core.Network.User do
     |> Enum.map(&String.to_integer/1)
     |> MapSet.new
   end
+
+  def seo_description(%{formatted_short_bio: nil} = user),
+    do: default_description(user)
+  def seo_description(user) do
+    user.formatted_short_bio
+    |> Curtail.truncate(length: 160)
+    |> HtmlSanitizeEx.strip_tags
+    |> String.trim
+    |> case do
+        ""    -> default_description(user)
+        desc  -> desc
+    end
+  end
+
+  defp default_description(%{name: nil, username: username}),
+    do: "See @#{username}'s work on Ello"
+  defp default_description(%{name: name}),
+    do: "See #{name}'s work on Ello"
+
+  def title(%{name: nil, username: username}), do: "@#{username} | Ello"
+  def title(user), do: "#{user.name} (@#{user.username}) | Ello"
+
+  def robots(%{bad_for_seo: true}), do: "noindex, follow"
+  def robots(_), do: "index, follow"
 end

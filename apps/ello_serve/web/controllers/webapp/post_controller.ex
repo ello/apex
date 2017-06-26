@@ -12,7 +12,6 @@ defmodule Ello.Serve.Webapp.PostController do
     end
   end
 
-  # TODO: NSFW? Etc?
   defp load_post(%{"token" => token}) do
     Content.post(%{
       id_or_token:  "~" <> token,
