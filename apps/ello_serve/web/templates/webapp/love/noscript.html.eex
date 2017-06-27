@@ -1,0 +1,9 @@
+<%= render Ello.Serve.Webapp.UserView, "user_header.html", assigns %>
+
+<%= for post <- @loved_posts do %>
+  <%= render Ello.Serve.Webapp.PostView, "summary.html", Map.put(assigns, :post, post) %>
+<% end %>
+
+<%= if Enum.count(@loves) > 0 do %>
+  <%= link "Next Page", to: next_love_page_url(@user, @loves) %>
+<% end %>
