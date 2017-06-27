@@ -2,11 +2,13 @@ defmodule Ello.Core.Content do
   import NewRelicPhoenix, only: [measure_segment: 2]
   import Ecto.Query
   alias Ello.Core.Repo
+  alias Ello.Core.Network
   alias __MODULE__.{
     PostsPage,
     Filter,
     Preload,
     Post,
+    Love,
   }
 
   @moduledoc """
@@ -106,6 +108,14 @@ defmodule Ello.Core.Content do
       |> Enum.uniq
       |> Enum.flat_map(&(mapped[&1] || []))
     end
+  end
+
+  def loves(%{user: %{id: user_id}} = options) do
+    Love
+    |> where([l], l.user_id == ^user_id)
+    |> Network.paginate(options)
+    |> Repo.all
+    |> Preload.loves(options)
   end
 
   @spec posts_page(options) :: PostsPage.t

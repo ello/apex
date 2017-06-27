@@ -334,4 +334,20 @@ defmodule Ello.Core.ContentTest do
     assert r4 in post_ids
     assert r5 in post_ids
   end
+
+  test "loves/1 - returns all loved posts for a user", %{user: user} do
+    post1 = Factory.insert(:post)
+    post2 = Factory.insert(:post)
+    post3 = Factory.insert(:post)
+
+    love1 = Factory.insert(:love, %{post: post1, user: user, created_at: DateTime.from_unix!(1000000)})
+    love2 = Factory.insert(:love, %{post: post2, user: user, created_at: DateTime.from_unix!(2000000)})
+    love3 = Factory.insert(:love, %{post: post3, user: user, created_at: DateTime.from_unix!(3000000)})
+
+    assert [l3, l2] = Content.loves(%{user: user, current_user: nil, per_page: 2})
+    assert [l3.post_id, l2.post_id] == [post3.id, post2.id]
+
+    assert [l1] = Content.loves(%{user: user, current_user: nil, per_page: 2, before: l2.created_at})
+    assert [l1] = [post1.id]
+  end
 end
