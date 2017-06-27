@@ -29,15 +29,11 @@ defmodule Ello.Serve.Webapp.PostView do
     do: Post.ordered_embed_urls(post)
 
   def post_url(post) do
-    "https://#{webapp_host()}/#{post.author.username}/post/#{post.token}"
+    webapp_url("#{post.author.username}/post/#{post.token}")
   end
 
   defp robots(%{author: %{bad_for_seo?: true}}), do: "noindex, follow"
   defp robots(_), do: "index, follow"
-
-  defp webapp_host() do
-    Application.get_env(:ello_serve, :webapp_host)
-  end
 
   # TODO: Copied from post meta attributes serializer.
   defp image_for_asset(%{attachment_struct: %{filename: orig, path: path, versions: versions}}) do

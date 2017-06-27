@@ -1,7 +1,7 @@
 <script>
   window.webappEnv = {
     AUTH_CLIENT_ID:    "<%= client_id() %>",
-    AUTH_DOMAIN:       "<%= webapp_domain() %>",
+    AUTH_DOMAIN:       "<%= webapp_url("") %>",
     LOGO_MARK:         "<%= logo_mark() %>",
     APP_DEBUG:         <%= app_debug() %>,
     PROMO_HOST:        "<%= promo_host() %>",

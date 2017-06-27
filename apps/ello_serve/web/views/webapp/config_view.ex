@@ -5,10 +5,6 @@ defmodule Ello.Serve.Webapp.ConfigView do
     Application.get_env(:ello_serve, :webapp_oauth_client_id)
   end
 
-  def webapp_domain() do
-    "https://" <> Application.get_env(:ello_serve, :webapp_host)
-  end
-
   def logo_mark() do
     Application.get_env(:ello_serve, :webapp_config)[:logo_mark]
   end

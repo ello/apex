@@ -8,7 +8,7 @@ defmodule Ello.Serve.Webapp.MetaView do
 
   def current_url(%{url: url}), do: url
   def current_url(assigns) do
-    "https://" <> Application.get_env(:ello_serve, :webapp_host) <> current_path(assigns)
+    webapp_url(current_path(assigns))
   end
 
   def title(%{title: title}), do: title

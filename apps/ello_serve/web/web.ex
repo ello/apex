@@ -45,6 +45,7 @@ defmodule Ello.Serve.Web do
       import Ello.Serve.Router.Helpers
       import Ello.Serve.ErrorHelpers
       import Ello.Serve.Gettext
+      import Ello.Serve.WebappHelpers
     end
   end
 
