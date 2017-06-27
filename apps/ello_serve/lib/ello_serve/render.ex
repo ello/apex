@@ -49,6 +49,7 @@ defmodule Ello.Serve.Render do
   defp render_noscript(conn, data) do
     measure_segment {:render, "noscript.html"} do
       view = view_module(conn)
+      data = Map.put(data, :layout, {Webapp.NoscriptView, "layout.html"})
       render_to_iodata(view, "noscript.html", data)
     end
   end
