@@ -1,0 +1,30 @@
+<header>
+  <img src="<%= avatar_url(@user) %>" alt="<%= username(@user) %> Avatar" />
+  <img src="<%= cover_image_url(@user) %>" alt="<%= username(@user) %> Cover Image" />
+  <h2><%= username(@user) %></h2>
+  <%= raw(@user.formatted_short_bio) %>
+  <%= if @user.location do %>
+    <p>Location: <%= @user.location %></p>
+  <% end %>
+  <p><%= @user.total_views_count %> Total post views</p>
+  <%= if @user.rendered_links do %>
+    <ul>
+      <%= for l <- @user.rendered_links do %>
+        <li>
+          <a href="<%= l["url"] %>" >
+            <img src="<%= l["icon"] %>" alt="<%= l["type"] %>" />
+            <%= l["text"] %>
+          </a>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+  <nav>
+    <ul>
+      <li><%= link "#{@user.posts_count} Posts", to: webapp_url(@user.username) %></li>
+      <li><%= link "#{@user.following_count} Following", to: webapp_url(@user.username <> "/following") %></li>
+      <li><%= link "#{@user.followers_count} Followers", to: webapp_url(@user.username <> "/followers") %></li>
+      <li><%= link "#{@user.loves_count} Loves", to: webapp_url(@user.username <> "/loves") %></li>
+    </ul>
+  </nav>
+</header>

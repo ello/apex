@@ -1,0 +1,9 @@
+<%= render Ello.Serve.Webapp.UserView, "user_header.html", assigns %>
+
+<%= for post <- @posts_page.posts do %>
+  <%= render Ello.Serve.Webapp.PostView, "summary.html", Map.put(assigns, :post, post) %>
+<% end %>
+
+<%= if @posts_page.total_pages_remaining > 0 do %>
+  <%= link "Next Page", to: next_post_page_url(@user, @posts_page) %>
+<% end %>

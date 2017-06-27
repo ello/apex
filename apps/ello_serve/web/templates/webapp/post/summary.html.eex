@@ -1,0 +1,9 @@
+<article>
+  <%= render __MODULE__, "header.html", assigns %>
+
+  <%= for block <- summary(@post) do %>
+    <%= render __MODULE__, "block.html", Map.put(assigns, :block, block) %>
+  <% end %>
+
+  <%= render __MODULE__, "footer.html", assigns %>
+</article>

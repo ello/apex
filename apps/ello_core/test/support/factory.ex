@@ -58,13 +58,19 @@ defmodule Ello.Core.Factory do
   end
 
   @doc "add given assets to a post"
-  def add_assets(%Post{body: body} = post, assets) do
+  def add_assets(%Post{body: body, rendered_content: rendered} = post, assets) do
     new_bodies = Enum.map assets, fn(%{id: id}) ->
       %{"kind" => "image", "data" => %{asset_id: id, url: "skipped"}}
     end
 
+    new_content = Enum.map assets, fn(%{id: id}) ->
+      %{"kind" => "image", "data" => %{asset_id: id, url: "skipped"}, "links" => %{"assets" => "#{id}"}}
+    end
+
     post
     |> Ecto.Changeset.change(body: new_bodies ++ body)
+    |> Ecto.Changeset.change(rendered_content: new_content ++ rendered)
+    |> Ecto.Changeset.change(rendered_summary: new_content ++ rendered)
     |> Repo.update!
     |> Repo.preload(:assets)
   end

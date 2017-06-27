@@ -1,9 +1,23 @@
 defmodule Ello.Serve.WebappHelpers do
-  def webapp_url(path) do
+  def webapp_url(path, params \\ nil)
+  def webapp_url(path, params) when is_list(params),
+    do: webapp_url(path, Enum.into(params, %{}))
+  def webapp_url(path, %{} = params),
+    do: webapp_url(path, URI.encode_query(params))
+  def webapp_url("/" <> path, params),
+    do: webapp_url(path, params)
+  def webapp_url("", params) do
     %URI{
       scheme: "https",
       host:   webapp_host(),
-      path:   path,
+    } |> URI.to_string
+  end
+  def webapp_url(path, params) do
+    %URI{
+      scheme: "https",
+      host:   webapp_host(),
+      path:   "/" <> path,
+      query:  params,
     } |> URI.to_string
   end
 

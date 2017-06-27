@@ -1,19 +1,14 @@
 <article>
-  <header>
-    <h4>
-      Post by <%= link username(@post.author), to: webapp_url(@post.author.username) %>
-      on <span><%= time(@post.created_at) %></span>
-    </h4>
-  </header>
+  <%= render __MODULE__, "header.html", assigns %>
+
+  <%= if repost?(@post) do %>
+    <%= for block <- @post.reposted_source.rendered_content do %>
+      <%= render __MODULE__, "block.html", Map.put(assigns, :block, block) %>
+    <% end %>
+  <% end %>
   <%= for block <- @post.rendered_content do %>
     <%= render __MODULE__, "block.html", Map.put(assigns, :block, block) %>
   <% end %>
-  <footer>
-    <ul>
-      <li><%= @post.loves_count %> Loves</li>
-      <li><%= @post.comments_count %> Comments</li>
-      <li><%= @post.reposts_count %> Reposts</li>
-      <li><%= @post.views_count %> Views</li>
-    </ul>
-  </footer>
+
+  <%= render __MODULE__, "footer.html", assigns %>
 </article>

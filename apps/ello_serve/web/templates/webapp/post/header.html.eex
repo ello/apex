@@ -1,0 +1,20 @@
+<header>
+  <%= if repost?(@post) do %>
+    <h5>
+      Post by <%= link username(@post.reposted_source.author), to: webapp_url(@post.reposted_source.author.username) %>
+      on <span><%= time(@post.reposted_source.created_at) %></span>
+    </h5>
+    <h6>
+      Reposted by <%= link username(@post.author), to: webapp_url(@post.author.username) %>
+      on <span><%= time(@post.created_at) %></span>
+    </h6>
+    <%= link "View Original Post", to: post_url(@post.reposted_source) %>
+    <%= link "View Full Post", to: post_url(@post) %>
+  <% else %>
+    <h5>
+      Post by <%= link username(@post.author), to: webapp_url(@post.author.username) %>
+      on <span><%= time(@post.created_at) %></span>
+    </h5>
+    <%= link "View Full Post", to: post_url(@post) %>
+  <% end %>
+</header>

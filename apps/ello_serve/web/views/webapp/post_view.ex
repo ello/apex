@@ -32,6 +32,24 @@ defmodule Ello.Serve.Webapp.PostView do
     webapp_url("#{post.author.username}/post/#{post.token}")
   end
 
+  def repost?(%{reposted_source: %{}}), do: true
+  def repost?(_), do: false
+
+  def summary(%{reposted_source: %{rendered_summary: summary}}), do: summary
+  def summary(%{rendered_summary: post_summary}), do: post_summary
+
+  def loves_count(%{reposted_source: %{loves_count: count}}), do: count
+  def loves_count(%{loves_count: count}), do: count
+
+  def comments_count(%{reposted_source: %{comments_count: count}}), do: count
+  def comments_count(%{comments_count: count}), do: count
+
+  def reposts_count(%{reposted_source: %{reposts_count: count}}), do: count
+  def reposts_count(%{reposts_count: count}), do: count
+
+  def views_count(%{reposted_source: %{views_count: count}}), do: count
+  def views_count(%{views_count: count}), do: count
+
   defp robots(%{author: %{bad_for_seo?: true}}), do: "noindex, follow"
   defp robots(_), do: "index, follow"
 
@@ -43,6 +61,11 @@ defmodule Ello.Serve.Webapp.PostView do
       Enum.find(versions, &(&1.name == "hdpi"))
     end
     image_url(path, version.filename)
+  end
+
+  def block_image_url(%{block: block, post: post}) do
+    asset = Enum.find(post.assets, &("#{&1.id}" == block["links"]["assets"]))
+    image_for_asset(asset)
   end
 
   defp twitter_card(%{assets: [], reposted_source: %{assets: []}}), do: "summary"

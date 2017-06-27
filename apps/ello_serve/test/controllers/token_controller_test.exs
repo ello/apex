@@ -5,7 +5,7 @@ defmodule Ello.Serve.TokenControllerTest do
     {:ok, conn: conn}
   end
 
-  test "/api/webapp-token", %{conn: conn} do
+  test "GET /api/webapp-token", %{conn: conn} do
     Application.put_env(:ello_auth, :http_client, __MODULE__.ClientMock)
     resp = get(conn, "/api/webapp-token")
     Application.delete_env(:ello_auth, :http_client)
