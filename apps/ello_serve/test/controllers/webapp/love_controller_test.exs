@@ -10,16 +10,16 @@ defmodule Ello.Serve.Webapp.LoveControllerTest do
   test "/:username/loves - it renders the proper meta", %{conn: conn} do
     resp = get(conn, "/archer/loves")
     html = html_response(resp, 200)
-    # assert html =~ "<title>Following | @archer | Ello</title>"
-    # assert has_meta(html, name: "name", content: "Following | @archer | Ello")
-    # assert has_meta(html, name: "url", content: "https://ello.co/archer/following")
-    # assert has_meta(html, name: "description", content: "People following @archer | Ello")
+    assert html =~ "<title>Posts loved by @archer | Ello</title>"
+    assert has_meta(html, name: "name", content: "Loves | @archer | Ello")
+    assert has_meta(html, name: "url", content: "https://ello.co/archer/loves")
+    assert has_meta(html, name: "description", content: "Posts loved by @archer | Ello")
 
-    # assert has_meta(html, property: "og:url", content: "https://ello.co/archer/following")
-    # assert has_meta(html, property: "og:title", content: "Following | @archer | Ello")
-    # assert has_meta(html, property: "og:description", content: "People following @archer | Ello")
+    assert has_meta(html, property: "og:url", content: "https://ello.co/archer/loves")
+    assert has_meta(html, property: "og:title", content: "Posts loved by @archer | Ello")
+    assert has_meta(html, property: "og:description", content: "Posts loved by @archer | Ello")
 
-    # assert has_meta(html, name: "twitter:card", content: "summary_large_image")
-    # assert has_meta(html, name: "robots", content: "index, follow")
+    assert has_meta(html, name: "twitter:card", content: "summary_large_image")
+    assert has_meta(html, name: "robots", content: "index, follow")
   end
 end
