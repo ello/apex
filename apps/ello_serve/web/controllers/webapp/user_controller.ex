@@ -15,7 +15,8 @@ defmodule Ello.Serve.Webapp.UserController do
 
   defp posts_page(conn, user) do
     Content.posts_page(standard_params(conn, %{
-      user_id: user.id}
-    ))
+      user_id: user.id,
+      default: %{per_page: 10}
+    }))
   end
 end

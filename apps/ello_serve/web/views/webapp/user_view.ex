@@ -25,6 +25,6 @@ defmodule Ello.Serve.Webapp.UserView do
   end
 
   def next_post_page_url(user, posts_page) do
-    webapp_url("#{user.username}/posts", before: posts_page.before)
+    webapp_url(user.username, before: DateTime.to_iso8601(posts_page.before))
   end
 end
