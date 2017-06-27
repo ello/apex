@@ -1,8 +1,7 @@
 defmodule Ello.Serve.Webapp.RelationshipController do
   use Ello.Serve.Web, :controller
   alias Ello.Core.Network
-
-  plug :find_user
+  plug Ello.Serve.FindUser
 
   def followers(conn, _) do
     render_html conn, %{
@@ -30,12 +29,5 @@ defmodule Ello.Serve.Webapp.RelationshipController do
       following:    user,
       current_user: nil,
     })
-  end
-
-  def find_user(%{params: %{"username" => username}} = conn, _) do
-    case Network.user(%{id_or_username: "~" <> username, current_user: nil}) do
-      nil ->  halt send_resp(conn, 404, "")
-      user -> assign(conn, :user, user)
-    end
   end
 end
