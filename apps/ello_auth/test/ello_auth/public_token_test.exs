@@ -43,7 +43,7 @@ defmodule Ello.Auth.PublicTokenTest do
       token_json = %{
         "access_token" => Ello.Auth.JWT.generate(),
         "token_type"   => "bearer",
-        "expires_in"   => 86400,
+        "expires_in"   => 86_400,
         "scope"        => "public scoped_refresh_token",
         "created_at"   => created_at, #seconds utc
       }

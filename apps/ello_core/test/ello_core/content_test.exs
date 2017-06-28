@@ -340,9 +340,9 @@ defmodule Ello.Core.ContentTest do
     post2 = Factory.insert(:post)
     post3 = Factory.insert(:post)
 
-    love1 = Factory.insert(:love, %{post: post1, user: user, created_at: DateTime.from_unix!(1000000)})
-    love2 = Factory.insert(:love, %{post: post2, user: user, created_at: DateTime.from_unix!(2000000)})
-    love3 = Factory.insert(:love, %{post: post3, user: user, created_at: DateTime.from_unix!(3000000)})
+    love1 = Factory.insert(:love, %{post: post1, user: user, created_at: DateTime.from_unix!(1_000_000)})
+    love2 = Factory.insert(:love, %{post: post2, user: user, created_at: DateTime.from_unix!(2_000_000)})
+    love3 = Factory.insert(:love, %{post: post3, user: user, created_at: DateTime.from_unix!(3_000_000)})
 
     assert [l3, l2] = Content.loves(%{user: user, current_user: nil, per_page: 2})
     assert [l3.post_id, l2.post_id] == [post3.id, post2.id]

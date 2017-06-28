@@ -183,19 +183,19 @@ defmodule Ello.Core.NetworkTest do
     followed = Factory.insert(:user)
     f1 = Factory.insert(:relationship,
      subject:    followed,
-     created_at: DateTime.from_unix!(1000000),
+     created_at: DateTime.from_unix!(1_000_000),
     ).owner
     f2 = Factory.insert(:relationship,
      subject:    followed,
-     created_at: DateTime.from_unix!(2000000),
+     created_at: DateTime.from_unix!(2_000_000),
     ).owner
     f3 = Factory.insert(:relationship,
      subject:    followed,
-     created_at: DateTime.from_unix!(3000000),
+     created_at: DateTime.from_unix!(3_000_000),
     ).owner
     f4 = Factory.insert(:relationship,
      subject:    followed,
-     created_at: DateTime.from_unix!(4000000),
+     created_at: DateTime.from_unix!(4_000_000),
     ).owner
 
     assert [r1, r2] = Network.relationships(%{followers: followed, per_page: 2})
@@ -209,19 +209,19 @@ defmodule Ello.Core.NetworkTest do
     follower = Factory.insert(:user)
     _f1 = Factory.insert(:relationship,
      owner:      follower,
-     created_at: DateTime.from_unix!(1000000),
+     created_at: DateTime.from_unix!(1_000_000),
     ).subject
     _f2 = Factory.insert(:relationship,
      owner:      follower,
-     created_at: DateTime.from_unix!(2000000),
+     created_at: DateTime.from_unix!(2_000_000),
     ).subject
     f3 = Factory.insert(:relationship,
      owner:      follower,
-     created_at: DateTime.from_unix!(3000000),
+     created_at: DateTime.from_unix!(3_000_000),
     ).subject
     f4 = Factory.insert(:relationship,
      owner:      follower,
-     created_at: DateTime.from_unix!(4000000),
+     created_at: DateTime.from_unix!(4_000_000),
     ).subject
 
     assert [r1, r2] = Network.relationships(%{following: follower, per_page: 2})

@@ -33,8 +33,6 @@ defmodule Ello.Serve.Router do
     get "/discover/recent",       DiscoverPostController, :recent
     get "/discover/all",          CategoryController, :index
     get "/discover/:category",    CategoryPostController, :recent
-
-    # TODO: Custom noscript & meta for search
     get "/search",                SearchController, :index
 
     # Logged in only routes - no fallback content required

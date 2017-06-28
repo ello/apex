@@ -1,7 +1,6 @@
 defmodule Ello.Serve.Webapp.EditorialController do
   use Ello.Serve.Web, :controller
 
-  # TODO: fallback content
   def index(conn, _) do
     render_html(conn, %{
       title: "Ello | The Creators Network",

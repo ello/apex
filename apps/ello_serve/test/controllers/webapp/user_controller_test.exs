@@ -36,9 +36,9 @@ defmodule Ello.Serve.Webapp.UserControllerTest do
 
     source_post = Factory.insert(:post)
 
-    Factory.insert(:post, author: user) |> Factory.add_assets
+    Factory.add_assets(Factory.insert(:post, author: user))
     Factory.insert(:post, author: user)
-    Factory.insert(:post, author: user) |> Factory.add_assets
+    Factory.add_assets(Factory.insert(:post, author: user))
     Factory.insert(:post, author: user, reposted_source: source_post)
 
     resp = get(conn, "/archer", %{"per_page" => "2"})

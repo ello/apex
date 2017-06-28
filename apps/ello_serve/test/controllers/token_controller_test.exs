@@ -20,7 +20,7 @@ defmodule Ello.Serve.TokenControllerTest do
       token_json = %{
         "access_token" => Ello.Auth.JWT.generate(),
         "token_type"   => "bearer",
-        "expires_in"   => 86400,
+        "expires_in"   => 86_400,
         "created_at"   => created_at, #seconds utc
       }
       {:ok, token_json}

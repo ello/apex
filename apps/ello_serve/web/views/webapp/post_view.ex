@@ -56,7 +56,6 @@ defmodule Ello.Serve.Webapp.PostView do
   defp robots(%{author: %{bad_for_seo?: true}}), do: "noindex, follow"
   defp robots(_), do: "index, follow"
 
-  # TODO: Copied from post meta attributes serializer.
   defp image_for_asset(%{attachment_struct: %{filename: orig, path: path, versions: versions}}) do
     version = if Regex.match?(~r(\.gif$), orig) do
       Enum.find(versions, &(&1.name == "optimized"))

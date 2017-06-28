@@ -27,11 +27,11 @@ defmodule Ello.Serve.Webapp.LoveControllerTest do
   test "/:username/loves - it renders noscript with post summaries", %{conn: conn, user: user} do
     source_post = Factory.insert(:post)
 
-    post1 = Factory.insert(:post, author: user) |> Factory.add_assets
+    post1 = Factory.add_assets(Factory.insert(:post, author: user))
     post2 = Factory.insert(:post, author: user, reposted_source: source_post)
 
-    Factory.insert(:love, %{post: post1, user: user, created_at: DateTime.from_unix!(1000000)})
-    Factory.insert(:love, %{post: post2, user: user, created_at: DateTime.from_unix!(2000000)})
+    Factory.insert(:love, %{post: post1, user: user, created_at: DateTime.from_unix!(1_000_000)})
+    Factory.insert(:love, %{post: post2, user: user, created_at: DateTime.from_unix!(2_000_000)})
 
     resp = get(conn, "/archer/loves", %{"per_page" => "2"})
     html = html_response(resp, 200)

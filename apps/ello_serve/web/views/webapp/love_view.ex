@@ -12,7 +12,7 @@ defmodule Ello.Serve.Webapp.LoveView do
     render_template("meta.html", assigns)
   end
 
-  def render("noscript.html", %{loves: loves, user: user} = assigns) do
+  def render("noscript.html", %{loves: loves} = assigns) do
     assigns = assigns
               |> Map.put(:loves, loves)
               |> Map.put(:loved_posts, Enum.map(loves, &(&1.post)))

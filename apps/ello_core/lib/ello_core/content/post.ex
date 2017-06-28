@@ -74,7 +74,6 @@ defmodule Ello.Core.Content.Post do
   @doc """
   Generate the post's SEO level description
   """
-  # TODO: Should this take reposted_source into account?
   def seo_description(%__MODULE__{} = post) do
     post.body
     |> Enum.filter(&(&1["kind"] == "text"))
