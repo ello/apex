@@ -13,6 +13,6 @@ defmodule Ello.Serve.Webapp.LoveController do
   defp load_loves(conn) do
     Content.loves(standard_params(conn, %{
       user: conn.assigns.user,
-    }))# |> Enum.map(&(&1.post))
+    }))
   end
 end

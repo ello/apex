@@ -2,6 +2,7 @@ defmodule Ello.Serve.Webapp.UserView do
   use Ello.Serve.Web, :view
   alias Ello.Core.Network.User
   import Ello.V2.ImageView, only: [image_url: 2]
+  require IEx
 
   def render("meta.html", %{user: user} = assigns) do
     assigns = assigns

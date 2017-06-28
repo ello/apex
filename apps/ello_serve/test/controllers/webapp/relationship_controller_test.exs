@@ -2,8 +2,11 @@ defmodule Ello.Serve.Webapp.RelationshipControllerTest do
   use Ello.Serve.ConnCase
 
   setup %{conn: conn} do
+    Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
     user = Factory.insert(:user, username: "archer")
-    {:ok, conn: conn, user: user}
+    user1 = Factory.insert(:user)
+    user2 = Factory.insert(:user)
+    {:ok, conn: conn, user: user, user1: user1, user2: user2}
   end
 
   @tag :meta
@@ -38,5 +41,31 @@ defmodule Ello.Serve.Webapp.RelationshipControllerTest do
 
     assert has_meta(html, name: "twitter:card", content: "summary_large_image")
     assert has_meta(html, name: "robots", content: "index, follow")
+  end
+
+  test "/:username/following - it renders noscript", %{conn: conn, user: user, user1: user1, user2: user2} do
+    Factory.insert(:relationship, owner: user, subject: user1)
+    Factory.insert(:relationship, owner: user, subject: user2)
+
+    resp = get(conn, "/archer/following", %{"per_page" => "2"})
+    html = html_response(resp, 200)
+
+    assert html =~ "<noscript>"
+    assert html =~ "<h2>@archer</h2>"
+    assert html =~ "<h2>@#{user1.username()}</h2>"
+    assert html =~ "<h2>@#{user2.username()}</h2>"
+  end
+
+  test "/:username/followers - it renders noscript", %{conn: conn, user: user, user1: user1, user2: user2} do
+    Factory.insert(:relationship, owner: user1, subject: user)
+    Factory.insert(:relationship, owner: user2, subject: user)
+
+    resp = get(conn, "/archer/followers", %{"per_page" => "2"})
+    html = html_response(resp, 200)
+
+    assert html =~ "<noscript>"
+    assert html =~ "<h2>@archer</h2>"
+    assert html =~ "<h2>@#{user1.username()}</h2>"
+    assert html =~ "<h2>@#{user2.username()}</h2>"
   end
 end

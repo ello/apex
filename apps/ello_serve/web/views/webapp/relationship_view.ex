@@ -21,8 +21,30 @@ defmodule Ello.Serve.Webapp.RelationshipView do
     render_template("meta.html", assigns)
   end
 
+  def render("noscript.html", %{following: following, user: user} = assigns) do
+    assigns = assigns
+              |> Map.put(:relationships, following)
+              |> Map.put(:relationship_type, "following")
+              |> Map.put(:relationship_users, Enum.map(following, &(&1.subject)))
+              |> Map.put(:user, user)
+    render_template("noscript.html", assigns)
+  end
+
+  def render("noscript.html", %{followers: followers, user: user} = assigns) do
+    assigns = assigns
+              |> Map.put(:relationships, followers)
+              |> Map.put(:relationship_type, "followers")
+              |> Map.put(:relationship_users, Enum.map(followers, &(&1.owner)))
+              |> Map.put(:user, user)
+    render_template("noscript.html", assigns)
+  end
+
   def user_image(user) do
     version = Enum.find(user.cover_image_struct.versions, &(&1.name == "optimized"))
     image_url(user.cover_image_struct.path, version.filename)
+  end
+
+  def next_relationship_page_url(user, relationships, relationship_type) do
+    webapp_url("#{user.username}/#{relationship_type}", before: List.last(relationships).created_at)
   end
 end

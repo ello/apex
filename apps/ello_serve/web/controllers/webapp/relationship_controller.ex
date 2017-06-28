@@ -6,28 +6,26 @@ defmodule Ello.Serve.Webapp.RelationshipController do
   def followers(conn, _) do
     render_html conn, %{
       user: conn.assigns.user,
-      followers: fn -> load_followers(conn.assigns.user) end
+      followers: fn -> load_followers(conn) end
     }
   end
 
   def following(conn, _) do
     render_html conn, %{
       user: conn.assigns.user,
-      following: fn -> load_following(conn.assigns.user) end
+      following: fn -> load_following(conn) end
     }
   end
 
-  defp load_followers(user) do
-    Network.relationships(%{
-      followers:    user,
-      current_user: nil,
-    })
+  defp load_followers(conn) do
+    Network.relationships(standard_params(conn, %{
+      followers: conn.assigns.user,
+    }))
   end
 
-  defp load_following(user) do
-    Network.relationships(%{
-      following:    user,
-      current_user: nil,
-    })
+  defp load_following(conn) do
+    Network.relationships(standard_params(conn, %{
+      following: conn.assigns.user,
+    }))
   end
 end
