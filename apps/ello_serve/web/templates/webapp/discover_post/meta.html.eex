@@ -2,4 +2,7 @@
 <%= render Ello.Serve.Webapp.MetaView, "_shared.html", assigns %>
 
 <% # Custom meta tags %>
+<%= if more_pages?(@posts) do %>
+  <link rel="next" href="<%= next_page_url(@conn.request_path, @posts) %>" />
+<% end %>
 

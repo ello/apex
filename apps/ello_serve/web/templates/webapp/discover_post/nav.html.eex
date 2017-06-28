@@ -1,0 +1,10 @@
+<nav>
+  <ul>
+    <li><%= link "Featured", to: webapp_url("/discover") %></li>
+    <li><%= link "Trending", to: webapp_url("/discover/trending") %></li>
+    <li><%= link "Recent", to: webapp_url("/discover/recent") %></li>
+    <%= for cat <- @categories do %>
+      <li><%= link cat.name, to: webapp_url("/discover/" <> cat.slug) %></li>
+    <% end %>
+  </ul>
+</nav>

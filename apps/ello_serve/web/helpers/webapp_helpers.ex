@@ -10,6 +10,7 @@ defmodule Ello.Serve.WebappHelpers do
     %URI{
       scheme: "https",
       host:   webapp_host(),
+      query:  params,
     } |> URI.to_string
   end
   def webapp_url(path, params) do
