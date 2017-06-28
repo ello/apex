@@ -9,6 +9,9 @@ defmodule Ello.Serve.Webapp.PostView do
   def render("block.html", %{block: %{"kind" => "text"}} = assigns),
     do: render("html_block.html", assigns)
 
+  def render("block.html", %{block: %{"kind" => "embed"}} = assigns),
+    do: render("embed_block.html", assigns)
+
   def render("meta.html", %{post: post} = assigns) do
     assigns = assigns
               |> Map.put(:title, post.seo_title)
