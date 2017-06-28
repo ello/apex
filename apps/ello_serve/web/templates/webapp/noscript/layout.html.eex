@@ -1,6 +1,6 @@
 <noscript>
   <header>
-    <img alt="Ello Logo" src="<%= webapp_url("/ello-logo.svg") %>" />
+    <img alt="Ello Logo" src="<%= webapp_url("/ello-icon.svg") %>" />
     <h1>Ello</h1>
   </header>
 

@@ -64,8 +64,10 @@ defmodule Ello.Serve.Webapp.PostView do
   end
 
   def block_image_url(%{block: block, post: post}) do
-    asset = Enum.find(post.assets, &("#{&1.id}" == block["links"]["assets"]))
-    image_for_asset(asset)
+    case Enum.find(post.assets, &("#{&1.id}" == block["links"]["assets"])) do
+      nil   -> block["data"]["url"]
+      asset -> image_for_asset(asset)
+    end
   end
 
   defp twitter_card(%{assets: [], reposted_source: %{assets: []}}), do: "summary"
