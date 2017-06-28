@@ -64,7 +64,7 @@ defmodule Ello.Core.Factory do
     end
 
     new_content = Enum.map assets, fn(%{id: id}) ->
-      %{"kind" => "image", "data" => %{asset_id: id, url: "skipped"}, "links" => %{"assets" => "#{id}"}}
+      %{"kind" => "image", "data" => %{url: "www.asdf.com", alt: "asdf"}, "links" => %{"assets" => "#{id}"}}
     end
 
     post
