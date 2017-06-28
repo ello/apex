@@ -31,6 +31,13 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
     })
   end
 
+  def category(conn, %{"category" => slug}) do
+    render_html(conn, %{
+      categories: fn -> categories(conn) end,
+      posts:      fn -> category_posts(conn, slug) end,
+    })
+  end
+
   defp trending_posts(conn) do
     Search.post_search(standard_params(conn, %{
       trending:     true,
@@ -49,6 +56,13 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
 
     Stream.fetch(standard_params(conn, %{
       keys:         Enum.map(categories, &category_stream_key/1),
+      allow_nsfw:   true, # No NSFW in categories, reduces slop.
+    }))
+  end
+
+  defp category_posts(conn, slug) do
+    Stream.fetch(standard_params(conn, %{
+      keys:         [category_stream_key(%{slug: slug})],
       allow_nsfw:   true, # No NSFW in categories, reduces slop.
     }))
   end

@@ -87,4 +87,20 @@ defmodule Ello.Serve.Webapp.DiscoverPostControllerTest do
     assert html =~ "token-p4"
     assert html =~ ~r(<a href="https://ello\.co/discover/recent\?before=.*">Next Page</a>)
   end
+
+  @tag :meta
+  test "/discover/cat1 - meta", %{conn: conn} do
+    resp = get(conn, "/discover/cat1")
+    html = html_response(resp, 200)
+    assert html =~ "Ello | The Creators Network"
+  end
+
+  test "/discover/cat1 - noscript", %{conn: conn} do
+    resp = get(conn, "/discover/cat1", %{"per_page" => "2"})
+    html = html_response(resp, 200)
+    assert html =~ "<noscript>"
+    assert html =~ "token-p3"
+    assert html =~ "token-p4"
+    assert html =~ ~r(<a href="https://ello\.co/discover/cat1\?before=.*">Next Page</a>)
+  end
 end
