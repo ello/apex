@@ -21,7 +21,7 @@ defmodule Ello.Serve.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {Ello.Serve, []},
-     applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext]]
+     extra_applications: [:logger]]
   end
 
   # Specifies which paths to compile per environment.
@@ -37,9 +37,12 @@ defmodule Ello.Serve.Mixfile do
       {:cowboy, "~> 1.0"},
       {:poison, "~> 3.1", override: true},
       {:html_sanitize_ex, "~> 1.0.0"},
+      {:timex, "~> 3.0"},
 
       {:ello_core, in_umbrella: true},
       {:ello_auth, in_umbrella: true},
+      {:ello_search, in_umbrella: true},
+      {:ello_stream, in_umbrella: true},
       {:ello_v2, in_umbrella: true}, # for image_url generation
    ]
   end

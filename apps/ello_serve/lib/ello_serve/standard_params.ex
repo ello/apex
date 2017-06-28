@@ -2,7 +2,7 @@ defmodule Ello.Serve.StandardParams do
   alias Plug.Conn
   @max_page_size 50
 
-  def standard_params(%Conn{params: params, assigns: assigns}, overrides \\ %{}) do
+  def standard_params(%Conn{params: params}, overrides \\ %{}) do
     Map.merge(%{
       current_user: nil,
       allow_nsfw:   true,
