@@ -106,6 +106,7 @@ defmodule Ello.Core.Discovery do
     |> limit(^options[:per_page])
     |> Repo.all
     |> Preload.editorials(options)
+    |> filter_missing_posts
   end
   def editorials(%{preview: true} = options) do
     Editorial
@@ -115,12 +116,20 @@ defmodule Ello.Core.Discovery do
     |> limit(^options[:per_page])
     |> Repo.all
     |> Preload.editorials(options)
+    |> filter_missing_posts
   end
 
   defp filter_kinds(query, nil), do: query
   defp filter_kinds(query, []), do: query
   defp filter_kinds(query, kinds) do
     where(query, [e], e.kind in ^kinds)
+  end
+
+  defp filter_missing_posts(editorials) do
+    Enum.reject editorials, fn
+      %{kind: "post", post: nil} -> true
+      _ -> false
+    end
   end
 
   defp editorial_cursor(query, %{before: nil}), do: query
