@@ -10,7 +10,8 @@ defmodule Ello.Serve.Webapp.LoveControllerTest do
   @tag :meta
   test "/:username/loves - it renders the proper meta", %{conn: conn} do
     resp = get(conn, "/archer/loves")
-    html = html_response(resp, 200) assert html =~ "<title>Posts loved by @archer | Ello</title>"
+    html = html_response(resp, 200)
+    assert html =~ "<title>Posts loved by @archer | Ello</title>"
     assert has_meta(html, name: "name", content: "Loves | @archer | Ello")
     assert has_meta(html, name: "url", content: "https://ello.co/archer/loves")
     assert has_meta(html, name: "description", content: "Posts loved by @archer | Ello")
