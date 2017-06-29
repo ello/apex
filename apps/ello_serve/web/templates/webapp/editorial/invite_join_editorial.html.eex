@@ -1,0 +1,7 @@
+<h2>Join The Creators Network.</h2>
+<p>
+  Be part of what's next in art, design, fashion, web culture &amp; more.
+</p>
+<p>
+  <%= link "Join Ello", to: webapp_url("/join") %>
+</p>
