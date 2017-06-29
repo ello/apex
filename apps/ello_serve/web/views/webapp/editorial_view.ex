@@ -73,7 +73,11 @@ defmodule Ello.Serve.Webapp.EditorialView do
     else
       Enum.find(versions, &(&1.name == "hdpi"))
     end
-    image_url(path, version.filename)
+    if version do
+      image_url(path, version.filename)
+    else
+      ""
+    end
   end
 
   def post_image_url(post) do
