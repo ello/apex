@@ -62,14 +62,12 @@ defmodule Ello.Serve.Webapp.SearchControllerTest do
 
     resp = get(conn, "/search", %{type: "users", terms: "username", per_page: 2})
     html = html_response(resp, 200)
-    IO.puts html
 
     assert html =~ "<noscript>"
     assert html =~ "@username"
 
     resp = get(conn, "/search", %{type: "users", terms: "username", page: 2, per_page: 2})
     html = html_response(resp, 200)
-    IO.puts html
 
     assert html =~ "<noscript>"
     assert html =~ "@username"
