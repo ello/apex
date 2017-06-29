@@ -47,10 +47,12 @@ defmodule Ello.Serve.Webapp.EditorialControllerTest do
 
   @tag :meta
   test "editorial - meta", %{conn: conn} do
-    resp = get(conn, "/")
+    resp = get(conn, "/", %{"per_page" => "7"})
     html = html_response(resp, 200)
     assert html =~ "Ello | The Creators Network"
     assert has_meta(html, name: "description", content: "Welcome .*")
+    assert html =~ ~r(<link rel="next" href="https://ello\.co\?before=5" />)s
+    assert html =~ ~r(<link rel="alternate".*href="https://ello\.co/feeds/editorials".*/>)s
   end
 
   test "editorial - noscript", %{conn: conn} do
@@ -77,5 +79,7 @@ defmodule Ello.Serve.Webapp.EditorialControllerTest do
 
     assert html =~ "Post Editorial"
     assert html =~ ~r(<a href="https://ello\.co/.*/post/.*">)
+
+    assert html =~ ~r(<a href="https://ello\.co\?before=5">Next Page</a>)s
   end
 end

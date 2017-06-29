@@ -3,3 +3,7 @@
     <%= render __MODULE__, "editorial.html", Map.put(assigns, :editorial, editorial) %>
   </article>
 <% end %>
+
+<%= if more_editorials?(assigns) do %>
+  <%= link "Next Page", to: next_page_url(assigns) %>
+<% end %>

@@ -80,4 +80,12 @@ defmodule Ello.Serve.Webapp.EditorialView do
     block = Enum.find(post.rendered_content, &(&1["kind"] == "image"))
     PostView.block_image_url(%{block: block, post: post})
   end
+
+  def more_editorials?(%{editorials: []}), do: false
+  def more_editorials?(%{editorials: _}), do: true
+
+  def next_page_url(%{editorials: editorials}) do
+    last_editorial = List.last(editorials)
+    webapp_url("", %{before: last_editorial.published_position})
+  end
 end
