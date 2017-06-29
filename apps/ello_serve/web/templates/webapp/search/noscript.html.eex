@@ -1,0 +1,11 @@
+<%= for item <- @search.results do %>
+  <%= if @type == "posts" do %>
+    <%= render Ello.Serve.Webapp.PostView, "summary.html", Map.put(assigns, :post, item) %>
+  <% else %>
+    <%= render Ello.Serve.Webapp.UserView, "summary.html", Map.put(assigns, :user, item) %>
+  <% end %>
+<% end %>
+
+<%= if @search.total_pages_remaining > 0 do %>
+  <%= link "Next Page", to: next_search_page_url(@search, @type) %>
+<% end %>
