@@ -30,15 +30,26 @@ defmodule Ello.Serve.VersionStore.Memory do
       state
       |> update_in([:active], &Map.put_new(&1, app, %{}))
       |> update_in([:active, app], &(Map.put(&1, env, html)))
+      |> update_in([:history], &Map.put_new(&1, app, %{}))
+      |> update_in([:history, app], &Map.put_new(&1, env, []))
+      |> update_in([:history, app, env], &([version | &1]))
     end)
     :ok
   end
 
+  def version_history(app, env) do
+    case Agent.get(@name, &(&1[:history][app][env])) do
+      nil  -> [:none]
+      []   -> [:none]
+      list -> list
+    end
+  end
+
   def start() do
-    Agent.start(fn() -> %{active: %{}, versions: %{}} end, name: @name)
+    Agent.start(fn() -> %{active: %{}, versions: %{}, history: %{}} end, name: @name)
   end
 
   def reset() do
-    Agent.update(@name, fn(_state) -> %{active: %{}, versions: %{}} end)
+    Agent.update(@name, fn(_state) -> %{active: %{}, versions: %{}, history: %{}} end)
   end
 end

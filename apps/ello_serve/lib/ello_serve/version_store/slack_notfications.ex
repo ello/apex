@@ -67,7 +67,7 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
     end
   end
 
-  def version_activated("webapp", ver, env) do
+  def version_activated("webapp", ver, env, nil) do
     Task.async fn ->
       notify_slack(%{
         attachments: [
@@ -77,6 +77,41 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
             color: "good",
           }
         ]
+      })
+    end
+  end
+
+  def version_activated("webapp", ver, env, previous) do
+    Task.async fn ->
+      notify_slack(%{
+        attachments: [
+          %{
+            title: "New version published for all users on #{env}.",
+            text:  "Version `#{ver}`",
+            color: "good",
+          },
+          %{
+            title: "Rollback",
+            text: "Rollback version `#{ver}` to `#{previous}` on #{env}?",
+            color: "warning",
+            callback_id: "publish:webapp",
+            actions: [
+              %{
+                name: env,
+                text: "Rollback!",
+                value: previous,
+                style: "danger",
+                type: "button",
+                confirm: %{
+                  title: "Are you sure?",
+                  text: "You are about to rollback this version for all users.",
+                  ok_text: "I got this",
+                  dismiss_text: "Nope.",
+                },
+              },
+            ],
+          },
+        ],
       })
     end
   end

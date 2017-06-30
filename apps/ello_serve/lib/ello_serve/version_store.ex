@@ -25,6 +25,11 @@ defmodule Ello.Serve.VersionStore do
   """
   @callback activate_version(app, version, environment) :: :ok | :error
 
+  @doc """
+  Return the previous versions for the app/environment.
+  """
+  @callback version_history(app, environment) :: [version]
+
   @doc "Pass fetch_version/2 to current adapter"
   def fetch_version(app, ver \\ nil, env \\ nil)
   def fetch_version(app, ver, nil) do
@@ -54,9 +59,26 @@ defmodule Ello.Serve.VersionStore do
     verify_env!(env)
     case adapter().activate_version(app, ver, env) do
       :ok ->
-        SlackNotifications.version_activated(app, ver, env)
+        previous = previous_version(app, env)
+        SlackNotifications.version_activated(app, ver, env, previous)
         :ok
       error -> error
+    end
+  end
+
+  @doc "pass version_history/1 to current adpater - default to current env"
+  def version_history(app, env \\ nil)
+  def version_history(app, nil) do
+    adapter().version_history(app, Application.get_env(:ello_serve, :current_environment))
+  end
+  def version_history(app, env) do
+    adapter().version_history(app, env)
+  end
+
+  defp previous_version(app, env) do
+    case version_history(app, env) do
+      [_, previous | _] -> previous
+      _                 -> nil
     end
   end
 
