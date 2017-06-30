@@ -84,17 +84,32 @@ defmodule Ello.Core.Content.Filter do
   """
   def loves_query(query, options) do
     query
+    |> loves_filter_joins
+    |> filter_banned_loves
     |> filter_private_loves(options)
+    |> filter_nsfw_loves(options)
+    |> filter_nudity_loves(options)
   end
 
-  defp filter_private_loves(query, %{current_user: nil}) do
+  defp filter_banned_loves(query) do
+    where(query, [l, p, a, rp, rpa], is_nil(a.locked_at) and is_nil(rpa.locked_at))
+  end
+
+  defp loves_filter_joins(query) do
     query
     |> join(:inner, [l], p in assoc(l, :post))
     |> join(:inner, [l, p], a in assoc(p, :author))
     |> join(:left, [l, p, a], rp in assoc(p, :reposted_source))
     |> join(:left, [l, p, a, rp], rpa in assoc(rp, :author))
-    |> where([l, p, a, rp, rpa], a.is_public and (is_nil(rpa.is_public) or rpa.is_public))
+  end
+
+  defp filter_private_loves(query, %{current_user: nil}) do
+    where(query, [l, p, a, rp, rpa], a.is_public and (is_nil(rpa.is_public) or rpa.is_public))
   end
   defp filter_private_loves(query, _), do: query
 
+  defp filter_nsfw_loves(query, %{allow_nsfw: true}), do: query
+  defp filter_nsfw_loves(query, _), do: where(query, [l, p], not p.is_adult_content)
+  defp filter_nudity_loves(query, %{allow_nudity: true}), do: query
+  defp filter_nudity_loves(query, _), do: where(query, [l, p], not p.has_nudity)
 end

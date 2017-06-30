@@ -337,18 +337,24 @@ defmodule Ello.Core.ContentTest do
 
   test "loves/1 - returns all loved posts for a user", %{user: user} do
     post1 = Factory.insert(:post)
-    post2 = Factory.insert(:post)
-    post3 = Factory.insert(:post)
+    post2 = Factory.insert(:post, has_nudity: true)
+    post3 = Factory.insert(:post, is_adult_content: true, has_nudity: true)
     private_author = Factory.insert(:user, %{is_public: false})
     private_post = Factory.insert(:post, %{author: private_author})
 
     _love1 = Factory.insert(:love, %{post: post1, user: user, created_at: DateTime.from_unix!(1_000_000)})
-    _love2 = Factory.insert(:love, %{post: post2, user: user, created_at: DateTime.from_unix!(2_000_000)})
-    _love3 = Factory.insert(:love, %{post: post3, user: user, created_at: DateTime.from_unix!(3_000_000)})
+    love2 = Factory.insert(:love, %{post: post2, user: user, created_at: DateTime.from_unix!(2_000_000)})
+    love3 = Factory.insert(:love, %{post: post3, user: user, created_at: DateTime.from_unix!(3_000_000)})
     love4 = Factory.insert(:love, %{post: private_post, user: user, created_at: DateTime.from_unix!(4_000_000)})
 
     # Page 1
-    assert [l3, l2] = Content.loves(%{user: user, current_user: nil, per_page: 2})
+    assert [l3, l2] = Content.loves(%{
+      user: user,
+      current_user: nil,
+      per_page: 2,
+      allow_nsfw: true,
+      allow_nudity: true,
+    })
     assert [l3.post_id, l2.post_id] == [post3.id, post2.id]
 
     # Page 2
@@ -356,7 +362,40 @@ defmodule Ello.Core.ContentTest do
     assert [l1.post_id] == [post1.id]
 
     # All
-    loves = Content.loves(%{user: user, current_user: nil})
+    loves = Content.loves(%{
+      user: user,
+      current_user: nil,
+      allow_nsfw: true,
+      allow_nudity: true
+    })
+
+    # Don't include private
     refute love4.id in Enum.map(loves, &(&1.id))
+
+    # Do include NSFW (and load the post)
+    assert post3.id in Enum.map(loves, &(&1.post.id))
+
+    # No NSFW
+    loves = Content.loves(%{
+      user: user,
+      current_user: nil,
+      allow_nsfw: false,
+      allow_nudity: true,
+    })
+
+    # Don't includ nsfw loves
+    refute love3.id in Enum.map(loves, &(&1.id))
+
+    # No Nudity
+    loves = Content.loves(%{
+      user: user,
+      current_user: nil,
+      allow_nsfw: false,
+      allow_nudity: false,
+    })
+
+    # Don't includ nudity loves
+    refute love3.id in Enum.map(loves, &(&1.id))
+    refute love2.id in Enum.map(loves, &(&1.id))
   end
 end

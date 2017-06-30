@@ -27,8 +27,8 @@ defmodule Ello.Core.Content.Preload do
   def loves([], _), do: []
   def loves(loves, options) do
     Repo.preload(loves, [
-      user: &Network.users(%{ids: &1, current_user: options[:current_user]}),
-      post: &Content.posts(%{ids: &1, current_user: options[:current_user]}),
+      user: &Network.users(Map.put(options, :ids, &1)),
+      post: &Content.posts(Map.put(options, :ids, &1)),
     ])
   end
 
