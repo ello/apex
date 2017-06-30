@@ -35,14 +35,14 @@ defmodule Ello.Serve.Webapp.SearchControllerTest do
     PostIndex.add(post2)
     PostIndex.add(post3)
 
-    resp = get(conn, "/search", %{terms: "Phrasing", per_page: 2})
+    resp = get(conn, "/search", %{terms: "Phrasing", per_page: "2"})
     html = html_response(resp, 200)
 
     assert html =~ "<noscript>"
     assert html =~ "@#{post3.author.username()}"
     assert html =~ "@#{post2.author.username()}"
 
-    resp = get(conn, "/search", %{terms: "Phrasing", page: 2, per_page: 2})
+    resp = get(conn, "/search", %{terms: "Phrasing", page: "2", per_page: "2"})
     html = html_response(resp, 200)
 
     assert html =~ "<noscript>"
@@ -60,13 +60,13 @@ defmodule Ello.Serve.Webapp.SearchControllerTest do
     UserIndex.add(user2)
     UserIndex.add(user3)
 
-    resp = get(conn, "/search", %{type: "users", terms: "username", per_page: 2})
+    resp = get(conn, "/search", %{type: "users", terms: "username", per_page: "2"})
     html = html_response(resp, 200)
 
     assert html =~ "<noscript>"
     assert html =~ "@username"
 
-    resp = get(conn, "/search", %{type: "users", terms: "username", page: 2, per_page: 2})
+    resp = get(conn, "/search", %{type: "users", terms: "username", page: "2", per_page: "2"})
     html = html_response(resp, 200)
 
     assert html =~ "<noscript>"
