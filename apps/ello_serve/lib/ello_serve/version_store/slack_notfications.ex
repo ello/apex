@@ -6,16 +6,30 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
         text: "New version of `webapp` available: `#{ver}`",
         attachments: [
           %{
-            title: "Preview",
-            text: "Previews are available only by accessing the app with the url with the version link. You will continue seeing the preview version until you refresh.\n\nYou may preview in any environment:",
+            title: "Compare",
+            text: """
+            Compare to the active version in each env:\n\n
+              #{compare_link(ver, "stage1")}
+              #{compare_link(ver, "stage2")}
+              #{compare_link(ver, "ninja")}
+              #{compare_link(ver, "rainbow")}
+              #{compare_link(ver, "production")}
+            """,
             color: "good",
-            fields: [
-              %{value: "<https://ello-fg-stage1.herokuapp.com?version=#{ver}|stage1>", short: true},
-              %{value: "<https://ello-fg-stage2.herokuapp.com?version=#{ver}|stage2>", short: true},
-              %{value: "<https://ello.ninja?version=#{ver}|ninja>", short: true},
-              %{value: "<https://ello-fg-rainbow.herokuapp.com?version=#{ver}|rainbow>", short: true},
-              %{value: "<https://ello.co?version=#{ver}|production>"}
-            ]
+          },
+          %{
+            title: "Preview",
+            text: """
+            Previews are available only by accessing the app with the url with the version link.
+            You will continue seeing the preview version until you refresh.\n\n
+            You may preview in any environment:\n\n
+              <https://ello-fg-stage1.herokuapp.com?version=#{ver}|stage1>
+              <https://ello-fg-stage2.herokuapp.com?version=#{ver}|stage2>
+              <https://ello.ninja?version=#{ver}|ninja>
+              <https://ello-fg-rainbow.herokuapp.com?version=#{ver}|rainbow>
+              <https://ello.co?version=#{ver}|production>
+            """,
+            color: "good",
           },
           %{
             title: "Publish",
@@ -126,5 +140,12 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
 
   defp webhook_url do
     Application.get_env(:ello_serve, :slack_webhook_url)
+  end
+
+  defp compare_link(ver, env) do
+    case Ello.Serve.VersionStore.version_history("webapp", env) do
+      [_, prev | _] -> "<https://github.com/ello/webapp/compare/#{ver}...#{prev}|#{env}>"
+      _             -> ""
+    end
   end
 end
