@@ -3,31 +3,22 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
   def new_version("webapp", ver) do
     Task.async fn ->
       notify_slack(%{
-        text: "New version of `webapp` available: `#{ver}`",
+        text: "New version of `webapp` available: #{version_link(ver)}",
         attachments: [
           %{
             title: "Compare",
             text: """
-            Compare to the active version in each env:\n\n
-              #{compare_link(ver, "stage1")}
-              #{compare_link(ver, "stage2")}
-              #{compare_link(ver, "ninja")}
-              #{compare_link(ver, "rainbow")}
-              #{compare_link(ver, "production")}
+            Compare to the active version in each env:
+            #{compare_link(ver, "stage1")} #{compare_link(ver, "stage2")} #{compare_link(ver, "ninja")} #{compare_link(ver, "rainbow")} #{compare_link(ver, "production")}
             """,
-            color: "good",
+            color: "#0366d6",
           },
           %{
             title: "Preview",
             text: """
-            Previews are available only by accessing the app with the url with the version link.
-            You will continue seeing the preview version until you refresh.\n\n
-            You may preview in any environment:\n\n
-              <https://ello-fg-stage1.herokuapp.com?version=#{ver}|stage1>
-              <https://ello-fg-stage2.herokuapp.com?version=#{ver}|stage2>
-              <https://ello.ninja?version=#{ver}|ninja>
-              <https://ello-fg-rainbow.herokuapp.com?version=#{ver}|rainbow>
-              <https://ello.co?version=#{ver}|production>
+            Previews are available only by accessing the app with the url with the version link. You will continue seeing the preview version until you refresh.
+            You may preview in any environment:
+            <https://ello-fg-stage1.herokuapp.com?version=#{ver}|stage1> <https://ello-fg-stage2.herokuapp.com?version=#{ver}|stage2> <https://ello.ninja?version=#{ver}|ninja> <https://ello-fg-rainbow.herokuapp.com?version=#{ver}|rainbow> <https://ello.co?version=#{ver}|production>
             """,
             color: "good",
           },
@@ -87,7 +78,7 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
         attachments: [
           %{
             title: "New version published for all users on #{env}.",
-            text:  "Version `#{ver}`",
+            text:  "Version #{version_link(ver)}",
             color: "good",
           }
         ]
@@ -101,12 +92,12 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
         attachments: [
           %{
             title: "New version published for all users on #{env}.",
-            text:  "Version `#{ver}`",
+            text:  "Version #{version_link(ver)}",
             color: "good",
           },
           %{
             title: "Rollback",
-            text: "Rollback version `#{ver}` to `#{previous}` on #{env}?",
+            text: "Rollback version #{version_link(ver)} to #{version_link(previous)} on #{env}?",
             color: "warning",
             callback_id: "publish:webapp",
             actions: [
@@ -147,5 +138,10 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
       [_, prev | _] -> "<https://github.com/ello/webapp/compare/#{ver}...#{prev}|#{env}>"
       _             -> ""
     end
+  end
+
+  def version_link(ver) do
+    nice = String.slice(ver, 0, 7)
+    "<https://github.com/ello/webapp/commit/#{ver}|#{nice}>"
   end
 end
