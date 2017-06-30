@@ -70,4 +70,31 @@ defmodule Ello.Core.Content.Filter do
     do: id in blocked || rp_id in blocked
   defp is_blocked(%{author_id: id}, blocked),
     do: id in blocked
+
+  @doc """
+  Takes a loves query and adds filtering clauses to it.
+
+  Currently filters:
+    * nsfw posts/reposts if allow_nsfw != true
+    * nudity posts/reposts if allow_nudity != true
+    * private posts/reposts if there is no current_user
+    * banned users' posts/reposts
+
+  See post_list/1 for filtering blocked users/posts.
+  """
+  def loves_query(query, options) do
+    query
+    |> filter_private_loves(options)
+  end
+
+  defp filter_private_loves(query, %{current_user: nil}) do
+    query
+    |> join(:inner, [l], p in assoc(l, :post))
+    |> join(:inner, [l, p], a in assoc(p, :author))
+    |> join(:left, [l, p, a], rp in assoc(p, :reposted_source))
+    |> join(:left, [l, p, a, rp], rpa in assoc(rp, :author))
+    |> where([l, p, a, rp, rpa], a.is_public and (is_nil(rpa.is_public) or rpa.is_public))
+  end
+  defp filter_private_loves(query, _), do: query
+
 end

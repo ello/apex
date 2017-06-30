@@ -339,15 +339,24 @@ defmodule Ello.Core.ContentTest do
     post1 = Factory.insert(:post)
     post2 = Factory.insert(:post)
     post3 = Factory.insert(:post)
+    private_author = Factory.insert(:user, %{is_public: false})
+    private_post = Factory.insert(:post, %{author: private_author})
 
-    love1 = Factory.insert(:love, %{post: post1, user: user, created_at: DateTime.from_unix!(1_000_000)})
-    love2 = Factory.insert(:love, %{post: post2, user: user, created_at: DateTime.from_unix!(2_000_000)})
-    love3 = Factory.insert(:love, %{post: post3, user: user, created_at: DateTime.from_unix!(3_000_000)})
+    _love1 = Factory.insert(:love, %{post: post1, user: user, created_at: DateTime.from_unix!(1_000_000)})
+    _love2 = Factory.insert(:love, %{post: post2, user: user, created_at: DateTime.from_unix!(2_000_000)})
+    _love3 = Factory.insert(:love, %{post: post3, user: user, created_at: DateTime.from_unix!(3_000_000)})
+    love4 = Factory.insert(:love, %{post: private_post, user: user, created_at: DateTime.from_unix!(4_000_000)})
 
+    # Page 1
     assert [l3, l2] = Content.loves(%{user: user, current_user: nil, per_page: 2})
     assert [l3.post_id, l2.post_id] == [post3.id, post2.id]
 
+    # Page 2
     assert [l1] = Content.loves(%{user: user, current_user: nil, per_page: 2, before: l2.created_at})
-    assert [l1] = [post1.id]
+    assert [l1.post_id] == [post1.id]
+
+    # All
+    loves = Content.loves(%{user: user, current_user: nil})
+    refute love4.id in Enum.map(loves, &(&1.id))
   end
 end
