@@ -11,8 +11,10 @@ defmodule Ello.Serve.Webapp.LoveController do
   end
 
   defp load_loves(conn) do
-    Content.loves(standard_params(conn, %{
+    loves = Content.loves(standard_params(conn, %{
       user: conn.assigns.user,
     }))
+    track(conn, loves, steam_kind: "loves", stream_id: conn.assigns.user.id)
+    loves
   end
 end

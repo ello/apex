@@ -39,12 +39,14 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
   end
 
   defp trending_posts(conn) do
-    Search.post_search(standard_params(conn, %{
+    search = Search.post_search(standard_params(conn, %{
       trending:     true,
       within_days:  14,
       allow_nsfw:   false,
       images_only:  false,
     }))
+    track(conn, search.results, steam_kind: "trending")
+    search
   end
 
   defp featured_posts(conn) do
@@ -54,27 +56,33 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
       promotionals: false,
     }))
 
-    Stream.fetch(standard_params(conn, %{
+    stream = Stream.fetch(standard_params(conn, %{
       keys:         Enum.map(categories, &category_stream_key/1),
       allow_nsfw:   true, # No NSFW in categories, reduces slop.
     }))
+    track(conn, stream.posts, steam_kind: "featured")
+    stream
   end
 
   defp category_posts(conn, slug) do
-    Stream.fetch(standard_params(conn, %{
+    stream = Stream.fetch(standard_params(conn, %{
       keys:         [category_stream_key(%{slug: slug})],
       allow_nsfw:   true, # No NSFW in categories, reduces slop.
     }))
+    track(conn, stream.posts, steam_kind: "category")
+    stream
   end
 
   defp category_stream_key(%{slug: slug}), do: "categories:v1:#{slug}"
 
   @recent_stream "all_post_firehose"
   defp recent_posts(conn) do
-    Stream.fetch(standard_params(conn, %{
+    stream = Stream.fetch(standard_params(conn, %{
       keys:         [@recent_stream],
       allow_nsfw:   true, # No NSFW in categories, reduces slop.
     }))
+    track(conn, stream.posts, steam_kind: "recent")
+    stream
   end
 
   defp categories(conn) do

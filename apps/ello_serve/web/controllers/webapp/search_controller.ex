@@ -23,8 +23,11 @@ defmodule Ello.Serve.Webapp.SearchController do
     })
   end
 
-  defp load_post_search(conn),
-    do: PostSearch.post_search(standard_params(conn, search_params(conn)))
+  defp load_post_search(conn) do
+    search = PostSearch.post_search(standard_params(conn, search_params(conn)))
+    track(conn, search.results, steam_kind: "search")
+    search
+  end
 
   defp load_user_search(conn),
     do: UserSearch.user_search(standard_params(conn, search_params(conn)))

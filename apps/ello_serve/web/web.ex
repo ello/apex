@@ -30,6 +30,8 @@ defmodule Ello.Serve.Web do
       import Ello.Serve.Gettext
       import Ello.Serve.Render
       import Ello.Serve.StandardParams
+
+      import Ello.Events.TrackPostViews, only: [track: 2, track: 3]
     end
   end
 
