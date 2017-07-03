@@ -69,7 +69,7 @@ defmodule Ello.Serve.Webapp.EditorialView do
 
   def editorial_image_url(%{one_by_one_image_struct: %{filename: orig, path: path, versions: versions}}) do
     version = if Regex.match?(~r(\.gif$), orig) do
-      Enum.find(versions, &(&1.name == "optimized"))
+      Enum.find(versions, &(&1.name == "original"))
     else
       Enum.find(versions, &(&1.name == "hdpi"))
     end
