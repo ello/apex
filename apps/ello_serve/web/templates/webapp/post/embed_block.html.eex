@@ -1,0 +1,5 @@
+<section>
+  <a href="<%= @block["data"]["url"] %>">
+    <img src="<%= @block["data"]["thumbnail_large_url"] %>" />
+  </a>
+</section>

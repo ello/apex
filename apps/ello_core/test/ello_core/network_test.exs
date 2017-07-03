@@ -4,6 +4,7 @@ defmodule Ello.Core.NetworkTest do
   alias Ello.Core.Image
 
   setup do
+    Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
     current = Factory.insert(:user)
     category = Factory.insert(:category)
     {:ok,
@@ -176,6 +177,55 @@ defmodule Ello.Core.NetworkTest do
       Redis.command(["DEL", "user:#{id}:loves_counter"])
       Redis.command(["DEL", "user:#{id}:total_post_views_counter"])
     end
+  end
+
+  test "users/2 - get followers" do
+    followed = Factory.insert(:user)
+    f1 = Factory.insert(:relationship,
+     subject:    followed,
+     created_at: DateTime.from_unix!(1_000_000),
+    ).owner
+    f2 = Factory.insert(:relationship,
+     subject:    followed,
+     created_at: DateTime.from_unix!(2_000_000),
+    ).owner
+    f3 = Factory.insert(:relationship,
+     subject:    followed,
+     created_at: DateTime.from_unix!(3_000_000),
+    ).owner
+    f4 = Factory.insert(:relationship,
+     subject:    followed,
+     created_at: DateTime.from_unix!(4_000_000),
+    ).owner
+
+    assert [r1, r2] = Network.relationships(%{followers: followed, per_page: 2})
+    assert [f4.id, f3.id] == [r1.owner.id, r2.owner.id]
+
+    assert [r3, r4] = Network.relationships(%{followers: followed, per_page: 2, before: r2.created_at})
+    assert [f2.id, f1.id] == [r3.owner.id, r4.owner.id]
+  end
+
+  test "users/2 - get following" do
+    follower = Factory.insert(:user)
+    _f1 = Factory.insert(:relationship,
+     owner:      follower,
+     created_at: DateTime.from_unix!(1_000_000),
+    ).subject
+    _f2 = Factory.insert(:relationship,
+     owner:      follower,
+     created_at: DateTime.from_unix!(2_000_000),
+    ).subject
+    f3 = Factory.insert(:relationship,
+     owner:      follower,
+     created_at: DateTime.from_unix!(3_000_000),
+    ).subject
+    f4 = Factory.insert(:relationship,
+     owner:      follower,
+     created_at: DateTime.from_unix!(4_000_000),
+    ).subject
+
+    assert [r1, r2] = Network.relationships(%{following: follower, per_page: 2})
+    assert [f4.id, f3.id] == [r1.subject.id, r2.subject.id]
   end
 
   test "following_ids/1 - returns folling user ids", %{current: current} do

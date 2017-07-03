@@ -9,7 +9,7 @@ defmodule Ello.V2.EditorialController do
     editorials = editorials(conn)
 
     conn
-    |> track_post_view(Enum.map(editorials, &(&1.post)), stream_kind: "editorials")
+    |> track_post_view(editorials, stream_kind: "editorials")
     |> add_pagination_headers("/editorials", next_page_params(editorials, conn))
     |> last_page_header(editorials)
     |> api_render_if_stale(data: editorials)

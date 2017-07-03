@@ -1,0 +1,35 @@
+<noscript>
+  <header>
+    <img alt="Ello Logo" src="<%= webapp_url("/ello-icon.svg") %>" height="150px" width="150px" />
+    <h1>Ello</h1>
+  </header>
+
+  <nav>
+    <ul>
+      <li><%= link "Editorials", to: webapp_url("/") %></li>
+      <li><%= link "Discover", to: webapp_url("/discover") %></li>
+      <li><%= link "Search", to: webapp_url("/search") %></li>
+      <li><%= link "Log In", to: webapp_url("/enter") %></li>
+      <li><%= link "Sign Up", to: webapp_url("/join") %></li>
+    </ul>
+  </nav>
+
+  <main>
+    <%= render @view_module, @view_template, assigns %>
+  </main>
+
+  <footer>
+    <nav>
+      <ul>
+        <li><%= link "About", to: webapp_url("/wtf/about/ello") %></li>
+        <li><%= link "Help", to: webapp_url("/wtf") %></li>
+        <li><%= link "Blog", to: webapp_url("/elloblog") %></li>
+        <li><%= link "Magazine", to: "https://notforprint.co" %></li>
+        <li><%= link "Shop", to: webapp_url("/discover/shop") %></li>
+        <li><%= link "Apps", to: webapp_url("/wtf/resources/apps") %></li>
+        <li><%= link "Terms", to: webapp_url("/wtf/policies/terms") %></li>
+        <li><%= link "Privacy", to: webapp_url("/wtf/policies/privacy") %></li>
+      </ul>
+    </nav>
+  </footer>
+</noscript>

@@ -1,0 +1,8 @@
+<%= for post <- trending_posts(assigns) do %>
+  <section>
+    <a href="<%= post_url(post) %>">
+      <h2>Trending on Ello: @<%= post.author.username %></h2>
+      <img src="<%= post_image_url(post) %>" />
+    </a>
+  </section>
+<% end %>

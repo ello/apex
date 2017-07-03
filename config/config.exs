@@ -9,7 +9,7 @@ use Mix.Config
 # back to each application for organization purposes.
 import_config "../apps/*/config/config.exs"
 
-# If local overrides exist, load them last
-if File.exists?("config/config.local.exs") do
+# If local overrides exist, load them last. When in an app directory (/apps/ello_v2/) we must check down a dir.
+if File.exists?("config/config.local.exs") || File.exists?("../../config/config.local.exs") do
   import_config "config.local.exs"
 end

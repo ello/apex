@@ -1,0 +1,10 @@
+<% # Shared meta tags %>
+<%= render Ello.Serve.Webapp.MetaView, "_shared.html", assigns %>
+
+<% # Custom meta tags %>
+<%= if more_editorials?(assigns) do %>
+  <link rel="next" href="<%= next_page_url(assigns) %>" />
+<% end %>
+
+<link rel="alternate" type="application/rss+xml" title="Ello RSS Feed"
+      href="https://ello.co/feeds/editorials">

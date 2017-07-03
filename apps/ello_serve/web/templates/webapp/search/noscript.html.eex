@@ -1,0 +1,28 @@
+<%= if @type == "posts" do %>
+  <h2>Post Search</h2>
+  <form method="GET" action="<%= webapp_url("/search") %>">
+    <input type="search" name="terms" />
+    <button type="submit">Search</button>
+  </form>
+  <%= link "User Search", to: webapp_url("/search", type: "users") %>
+<% else %>
+  <h2>User Search</h2>
+  <form method="GET" action="<%= webapp_url("/search") %>">
+    <input type="hidden" name="type" value="users" />
+    <input type="search" name="terms" />
+    <button type="submit">Search</button>
+  </form>
+  <%= link "Post Search", to: webapp_url("/search") %>
+<% end %>
+
+<%= for item <- @search.results do %>
+  <%= if @type == "posts" do %>
+    <%= render Ello.Serve.Webapp.PostView, "summary.html", Map.put(assigns, :post, item) %>
+  <% else %>
+    <%= render Ello.Serve.Webapp.UserView, "summary.html", Map.put(assigns, :user, item) %>
+  <% end %>
+<% end %>
+
+<%= if @search.total_pages_remaining > 0 do %>
+  <%= link "Next Page", to: next_search_page_url(@search, @type) %>
+<% end %>

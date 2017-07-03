@@ -1,0 +1,3 @@
+<section>
+  <img src="<%= block_image_url(assigns) %>" alt="<%= @block["data"]["alt"] %>" />
+</section>

@@ -1,0 +1,8 @@
+<footer>
+  <ul>
+    <li><%= loves_count(@post) %> Loves</li>
+    <li><%= comments_count(@post) %> Comments</li>
+    <li><%= reposts_count(@post) %> Reposts</li>
+    <li><%= views_count(@post) %> Views</li>
+  </ul>
+</footer>

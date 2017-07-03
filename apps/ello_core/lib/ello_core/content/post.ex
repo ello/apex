@@ -70,4 +70,54 @@ defmodule Ello.Core.Content.Post do
 
     %{post | assets: filtered_assets}
   end
+
+  @doc """
+  Generate the post's SEO level description
+  """
+  def seo_description(%__MODULE__{} = post) do
+    post.body
+    |> Enum.filter(&(&1["kind"] == "text"))
+    |> Enum.map_join(" ", &(String.trim(&1["data"])))
+    |> HtmlSanitizeEx.strip_tags
+    |> String.trim
+    |> case do
+        ""   -> "Discover more amazing work like this on Ello."
+        text -> text
+    end
+  end
+
+  @doc """
+  Get the assets associated with a post in order the body defines.
+
+  Includes assets from the reposeted source if present.
+  """
+  def ordered_assets(nil), do: []
+  def ordered_assets(%__MODULE__{assets: assets} = post) do
+    ordered_asset_ids = Enum.reduce post.body, [], fn
+      (%{"kind" => "image", "data" => %{"asset_id" => id}}, ids) when is_binary(id) -> [String.to_integer(id) | ids]
+      (%{"kind" => "image", "data" => %{"asset_id" => id}}, ids) -> [id | ids]
+      (_, ids) -> ids
+    end
+    mapped = Enum.group_by(assets, &(&1.id))
+    assets = ordered_asset_ids
+             |> Enum.reverse
+             |> Enum.flat_map(&(mapped[&1] || []))
+    ordered_assets(post.reposted_source) ++ assets
+  end
+
+  @doc """
+  Get the embed urls associated with a post in order the body defines.
+
+  Includes embeds from the reposeted source if present.
+  """
+  def ordered_embed_urls(%{reposted_source: %__MODULE__{} = repost} = post),
+    do: do_ordered_embed_urls(repost.body ++ post.body)
+  def ordered_embed_urls(post),
+    do: do_ordered_embed_urls(post.body)
+
+  defp do_ordered_embed_urls(body) do
+    body
+    |> Enum.filter(&(&1["kind"] == "embed"))
+    |> Enum.map(&(&1["data"]["url"]))
+  end
 end

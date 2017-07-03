@@ -1,0 +1,5 @@
+<a href="<%= external_url(@editorial) %>">
+  <h2><%= title(@editorial) %></h2>
+  <h3><%= subtitle(@editorial) %></h3>
+  <img src="<%= editorial_image_url(@editorial) %>" />
+</a>

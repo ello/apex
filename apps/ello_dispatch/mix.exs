@@ -33,6 +33,7 @@ defmodule Ello.Dispatch.Mixfile do
 
       {:ello_v2,    in_umbrella: true},
       {:ello_feeds, in_umbrella: true},
+      {:ello_serve, in_umbrella: true},
     ]
   end
 end

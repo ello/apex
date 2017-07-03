@@ -1,0 +1,3 @@
+<section>
+  <%= raw(@block["data"]) %>
+</section>

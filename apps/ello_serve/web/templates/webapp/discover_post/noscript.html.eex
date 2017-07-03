@@ -1,0 +1,9 @@
+<%= render __MODULE__, "nav.html", assigns %>
+
+<%= for post <- posts(@posts) do %>
+  <%= render Ello.Serve.Webapp.PostView, "summary.html", Map.put(assigns, :post, post) %>
+<% end %>
+
+<%= if more_pages?(@posts) do %>
+  <%= link "Next Page", to: next_page_url(@conn.request_path, @posts) %>
+<% end %>

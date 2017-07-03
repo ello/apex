@@ -1,0 +1,14 @@
+<article>
+  <%= render __MODULE__, "header.html", assigns %>
+
+  <%= if repost?(@post) do %>
+    <%= for block <- @post.reposted_source.rendered_content do %>
+      <%= render __MODULE__, "block.html", Map.put(assigns, :block, block) %>
+    <% end %>
+  <% end %>
+  <%= for block <- @post.rendered_content do %>
+    <%= render __MODULE__, "block.html", Map.put(assigns, :block, block) %>
+  <% end %>
+
+  <%= render __MODULE__, "footer.html", assigns %>
+</article>

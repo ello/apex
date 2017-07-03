@@ -1,0 +1,10 @@
+<ul>
+  <%= for category <- @categories do %>
+    <li>
+      <a href="<%= webapp_url("discover/#{category.slug}") %>">
+        <img src="<%= category_image_url(category) %>" alt="<%= category.name %> Posts" />
+        <%= category.name %> posts
+      </a>
+    </li>
+  <% end %>
+</ul>

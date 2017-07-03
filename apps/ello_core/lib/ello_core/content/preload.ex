@@ -24,6 +24,14 @@ defmodule Ello.Core.Content.Preload do
     |> prefetch_reposted_source(options)
   end
 
+  def loves([], _), do: []
+  def loves(loves, options) do
+    Repo.preload(loves, [
+      user: &Network.users(Map.put(options, :ids, &1)),
+      post: &Content.posts(Map.put(options, :ids, &1)),
+    ])
+  end
+
   defp post_and_repost_preloads(posts, options) do
     posts
     |> prefetch_categories

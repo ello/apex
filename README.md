@@ -60,6 +60,19 @@ To learn more
 about how we handle and serve time ordered streams check out or Go and Roshi
 based 
 
+### `Ello.Search`
+
+Ello Search provides a wrapper around our ElasticSearch cluster. Ello.Search
+powers our trending algorithm in addition to the search page. [README](/apps/ello_search/).
+
+### `Ello.Serve`
+
+Ello Serve is resonsible for serving the HTML that powers our webapp. The webapp
+builds html and pushes it to Ello.Serve. We can then activate specific versions
+of the app in a given environment. Ello.Serve is also responsible for serving up
+basic html for clients not supporting Javascript. [README](/apps/ello_serve/).
+
+
 ## Getting Started
 
 ### Requirements
@@ -67,6 +80,11 @@ based
 * Elixir 1.4 - Installation via asdf or exenv recommended.
 * Postgres - Posgres.app suggested running on localhost.
 * Redis - Redis.app suggested running on localhost.
+* Docker & docker-compose - docker-compose up boots:
+  * Ello Streams API (golang) - What Ello.Stream elixir app uses.
+  * Roshi - powers Ello Streams API
+  * Redis - powers Roshi.
+  * ElasticSearch 5.1 - Powers Ello.Searc
 
 ### Configuration
 

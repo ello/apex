@@ -5,7 +5,7 @@ defmodule Ello.V2.PostMetaAttributesView do
 
   def render("post.json", %{post: post}) do
     %{
-      description: description(post),
+      description: Post.seo_description(post),
       images: images(post),
       embeds: embeds(post),
       robots: robots(post),
@@ -15,33 +15,10 @@ defmodule Ello.V2.PostMetaAttributesView do
     }
   end
 
-  defp description(post) do
-    post.body
-    |> Enum.filter(&(&1["kind"] == "text"))
-    |> Enum.map_join(" ", &(String.trim(&1["data"])))
-    |> HtmlSanitizeEx.strip_tags
-    |> String.trim
-    |> case do
-        ""   -> "Discover more amazing work like this on Ello."
-        text -> text
-    end
-  end
-
-  defp images(nil), do: []
   defp images(post) do
-    ordered_asset_ids = Enum.reduce post.body, [], fn
-      (%{"kind" => "image", "data" => %{"asset_id" => id}}, ids) when is_binary(id) -> [String.to_integer(id) | ids]
-      (%{"kind" => "image", "data" => %{"asset_id" => id}}, ids) -> [id | ids]
-      (_, ids) -> ids
-    end
-
-    mapped = Enum.group_by(post.assets, &(&1.id))
-    images = ordered_asset_ids
-             |> Enum.reverse
-             |> Enum.flat_map(&(mapped[&1] || []))
-             |> Enum.map(&image_for_asset/1)
-
-    images(post.reposted_source) ++ images
+    post
+    |> Post.ordered_assets
+    |> Enum.map(&image_for_asset/1)
   end
 
   defp image_for_asset(%{attachment_struct: %{filename: orig, path: path, versions: versions}}) do
@@ -54,16 +31,13 @@ defmodule Ello.V2.PostMetaAttributesView do
   end
 
   defp embeds(post) do
-    post.body
-    |> Enum.filter(&(&1["kind"] == "embed"))
-    |> Enum.map(&(&1["data"]["url"]))
-    |> case do
+    case Post.ordered_embed_urls(post) do
       []   -> nil
       urls -> urls
     end
   end
 
-  defp robots(%{author: %{bad_for_seo: true}}), do: "noindex, follow"
+  defp robots(%{author: %{bad_for_seo?: true}}), do: "noindex, follow"
   defp robots(_), do: "index, follow"
 
   defp post_url(post) do

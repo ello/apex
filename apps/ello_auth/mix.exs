@@ -19,7 +19,8 @@ defmodule Ello.Auth.Mixfile do
   def elixirc_paths(_),     do: ["lib"]
 
   def application do
-    [extra_applications: [:logger]]
+    [extra_applications: [:logger],
+     mod: {Ello.Auth.Application, []}]
   end
 
   defp deps do
@@ -28,8 +29,9 @@ defmodule Ello.Auth.Mixfile do
 
       {:honeybadger, "~> 0.6"},
       {:joken, "~> 1.3.0"},
-      {:poison, ">= 2.2.0"},
+      {:poison, ">= 3.0.0", override: true},
       {:plug, "~> 1.3.0"},
+      {:httpoison, "~> 0.11.1"},
     ]
   end
 end
