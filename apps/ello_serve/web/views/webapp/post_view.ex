@@ -38,8 +38,13 @@ defmodule Ello.Serve.Webapp.PostView do
   def repost?(%{reposted_source: %{}}), do: true
   def repost?(_), do: false
 
-  def summary(%{reposted_source: %{rendered_summary: summary}}), do: summary
-  def summary(%{rendered_summary: post_summary}), do: post_summary
+  def summary(%{reposted_source: %{rendered_summary: summary}})
+    when is_list(summary),
+    do: summary
+  def summary(%{rendered_summary: post_summary})
+    when is_list(post_summary),
+    do: post_summary
+  def summary(_), do: [] # Handle failed renders gracefully
 
   def loves_count(%{reposted_source: %{loves_count: count}}), do: count
   def loves_count(%{loves_count: count}), do: count
