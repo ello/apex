@@ -14,11 +14,9 @@ defmodule Ello.Serve.Render do
   end
   def render_html(conn, data) do
     # Execute any functions
-    measure_segment {__MODULE__, :lazy_load} do
-      data = Enum.reduce data, %{conn: conn}, fn
-        ({key, fun}, accum) when is_function(fun) -> Map.put(accum, key, fun.())
-        ({key, val}, accum) -> Map.put(accum, key, val)
-      end
+    data = Enum.reduce data, %{conn: conn}, fn
+      ({key, fun}, accum) when is_function(fun) -> Map.put(accum, key, fun.())
+      ({key, val}, accum) -> Map.put(accum, key, val)
     end
 
     meta     = render_meta(conn, data)
