@@ -6,6 +6,7 @@ defmodule Ello.Serve.Router do
   end
 
   pipeline :webapp do
+    plug Ello.Serve.DefaultToHTML
     plug :accepts, ["html"]
     plug Ello.Serve.SetApp, app: "webapp"
     plug Ello.Serve.SkipPrerender
