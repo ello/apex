@@ -3,6 +3,7 @@ defmodule Ello.V2.EditorialViewTest do
   import Phoenix.View #For render/2
   alias Ello.V2.EditorialView
   alias Ello.Core.Discovery.Editorial
+  alias Ello.Core.Redis
 
   setup %{conn: conn} do
     {:ok, conn: conn}
@@ -85,7 +86,27 @@ defmodule Ello.V2.EditorialViewTest do
     assert json[:links][:post_stream][:href]
   end
 
-  test "editorial.json - following kind - authenticated", context do
+  test "editorial.json - following kind - authenticated - is following", context do
+    user = Factory.build(:user)
+    conn = assign(context.conn, :current_user, user)
+    editorial = Editorial.build_images(Factory.insert(:following_editorial))
+
+    redis_key = "user:#{user.id}:followed_users_id_cache"
+    Redis.command(["SADD", redis_key, Factory.insert(:user).id])
+    json = render(EditorialView, "editorial.json",
+      editorial: editorial,
+      conn: conn
+    )
+    Redis.command(["DEL", redis_key])
+    assert json[:id] == "#{editorial.id}"
+    assert json[:kind] == "post_stream"
+    refute json[:subtitle]
+    refute json[:url]
+    assert json[:links][:post_stream][:type] == "posts"
+    assert json[:links][:post_stream][:href] == "/api/v2/following/posts/trending?stream_source=editorial&per_page=5&images_only=true"
+  end
+
+  test "editorial.json - following kind - authenticated no followers", context do
     user = Factory.build(:user)
     conn = assign(context.conn, :current_user, user)
     editorial = Editorial.build_images(Factory.insert(:following_editorial))
@@ -98,7 +119,7 @@ defmodule Ello.V2.EditorialViewTest do
     refute json[:subtitle]
     refute json[:url]
     assert json[:links][:post_stream][:type] == "posts"
-    assert json[:links][:post_stream][:href] == "/api/v2/following/posts/trending?stream_source=editorial&per_page=5&images_only=true"
+    assert json[:links][:post_stream][:href] == "/api/v2/discover/posts/trending?stream_source=editorial&per_page=5&images_only=true"
   end
 
   test "editorial.json - following kind - anonymous", context do

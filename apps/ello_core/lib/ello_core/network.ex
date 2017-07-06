@@ -126,10 +126,10 @@ defmodule Ello.Core.Network do
   @doc """
   Gets all the user ids that are followed by a user.
   """
-  @spec following_ids(user :: User.t) :: [integer]
-  def following_ids(user) do
+  @spec following_ids(user :: User.t, limit :: integer) :: [integer]
+  def following_ids(user, limit \\ @following_ids_limit) do
     redis_key = "user:#{user.id}:followed_users_id_cache"
-    {:ok, [_, following_ids]} = Redis.command(["SSCAN", redis_key, 0, "COUNT", @following_ids_limit], name: :following_ids)
+    {:ok, [_, following_ids]} = Redis.command(["SSCAN", redis_key, 0, "COUNT", limit], name: :following_ids)
     following_ids
   end
 end

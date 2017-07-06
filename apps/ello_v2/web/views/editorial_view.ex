@@ -1,6 +1,7 @@
 defmodule Ello.V2.EditorialView do
   use Ello.V2.Web, :view
   use Ello.V2.JSONAPI
+  alias Ello.Core.Network
   alias Ello.V2.{
     PostView,
     CategoryView,
@@ -76,12 +77,16 @@ defmodule Ello.V2.EditorialView do
     }
   end
   def links(%{kind: "following"}, %{assigns: %{current_user: user}}) when not is_nil(user) do
-    %{
-      post_stream: %{
-        type: "posts",
-        href: "/api/v2/following/posts/trending?stream_source=editorial&per_page=#{per_page()}&images_only=true",
-      }
-    }
+    case Network.following_ids(user, 1) do
+      [_] ->
+        %{
+          post_stream: %{
+            type: "posts",
+            href: "/api/v2/following/posts/trending?stream_source=editorial&per_page=#{per_page()}&images_only=true",
+          }
+        }
+      _ -> links(%{kind: "following"}, %{})
+    end
   end
   def links(%{kind: "following"}, _conn) do
     %{
