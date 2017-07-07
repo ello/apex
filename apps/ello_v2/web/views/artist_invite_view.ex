@@ -1,7 +1,7 @@
 defmodule Ello.V2.ArtistInviteView do
   use Ello.V2.Web, :view
   use Ello.V2.JSONAPI
-  alias Ello.V2.UserView
+  alias Ello.V2.{UserView, ImageView}
 
   def stale_checks(_, %{data: artist_invites}) do
     [etag: etag(artist_invites)]
@@ -17,4 +17,33 @@ defmodule Ello.V2.ArtistInviteView do
 
   def render("artist_invite.json", %{artist_invite: artist_invite} = opts), do:
     render_self(artist_invite, __MODULE__, opts)
+
+  def attributes, do: [
+    :title,
+    :slug,
+    :invite_type,
+    :opened_at,
+    :closed_at,
+    :status,
+    :short_description,
+    :submission_body_block,
+  ]
+
+  def computed_attributes, do: [
+    :header_image,
+    :logo_image,
+    :description,
+    :guide,
+  ]
+
+  def header_image(artist_invite, conn),
+    do: render(ImageView, "image.json", conn: conn, image: artist_invite.header_image_struct)
+
+  def logo_image(artist_invite, conn),
+    do: render(ImageView, "image.json", conn: conn, image: artist_invite.logo_image_struct)
+
+  def description(artist_invite, _),
+    do: artist_invite.rendered_description
+
+  def guide(artist_invite, _), do: artist_invite.guide
 end
