@@ -1,8 +1,9 @@
 defmodule Ello.Core.Factory do
-  alias Ello.Core.{Repo, Discovery, Network, Content}
+  alias Ello.Core.{Repo, Discovery, Network, Content, Contest}
   alias Discovery.{Category, Promotional, Editorial}
   alias Network.{User, Relationship}
   alias Content.{Post, Love, Watch, Asset}
+  alias Contest.ArtistInvite
   use ExMachina.Ecto, repo: Repo
 
   def user_factory do
@@ -280,6 +281,23 @@ defmodule Ello.Core.Factory do
       priority: "friend",
       owner:    build(:user),
       subject:  build(:user),
+    }
+  end
+
+  def artist_invite_factory do
+    %ArtistInvite{
+      title: "Foo Brand",
+      invite_type: "Art Exhibition",
+      slug: sequence(:slug, &"foo-brand-#{&1}"),
+      brand_account: build(:user),
+      opened_at: DateTime.utc_now,
+      closed_at: DateTime.utc_now,
+      raw_description: "Foo brand is looking for artists",
+      short_description: "Bar",
+      submission_body_block: "#FooBrand @FooBrand",
+      guide: [%{title: "How To Submit", raw_body: "To submit...", rendered_body: "<p>To submit...</p>"}],
+      created_at: DateTime.utc_now,
+      updated_at: DateTime.utc_now,
     }
   end
 

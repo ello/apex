@@ -1,5 +1,6 @@
 defmodule Ello.Core.Contest.ArtistInvite do
   use Ecto.Schema
+  alias Ello.Core.Network.User
 
   schema "artist_invites" do
     field :title, :string
