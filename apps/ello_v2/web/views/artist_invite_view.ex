@@ -25,7 +25,6 @@ defmodule Ello.V2.ArtistInviteView do
     :opened_at,
     :closed_at,
     :status,
-    :short_description,
     :submission_body_block,
   ]
 
@@ -33,6 +32,7 @@ defmodule Ello.V2.ArtistInviteView do
     :header_image,
     :logo_image,
     :description,
+    :short_description,
     :guide,
   ]
 
@@ -44,6 +44,9 @@ defmodule Ello.V2.ArtistInviteView do
 
   def description(artist_invite, _),
     do: artist_invite.rendered_description
+
+  def short_description(artist_invite, _),
+    do: artist_invite.rendered_short_description
 
   def guide(artist_invite, _), do: artist_invite.guide
 end

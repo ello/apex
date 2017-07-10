@@ -15,7 +15,8 @@ defmodule Ello.Core.Repo.Migrations.CreateArtistInviteTable do
       add :closed_at, :utc_datetime
       add :raw_description, :text
       add :rendered_description, :text
-      add :short_description, :text
+      add :raw_short_description, :text
+      add :rendered_short_description, :text
       add :submission_body_block, :string
       add :guide, :json
       add :selected_tokens, {:array, :string}, default: []

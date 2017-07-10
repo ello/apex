@@ -17,12 +17,13 @@ defmodule Ello.Core.Contest.ArtistInvite do
     field :logo_image_metadata, :map
 
     field :invite_type, :string
-    field :status, :string
+    field :status, :string, default: "preview"
     field :opened_at, :utc_datetime
     field :closed_at, :utc_datetime
     field :raw_description, :string
     field :rendered_description, :string
-    field :short_description, :string
+    field :raw_short_description, :string
+    field :rendered_short_description, :string
     field :submission_body_block, :string
     field :guide, {:array, :map}, default: []
     field :selected_tokens, {:array, :string}, default: []
