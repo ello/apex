@@ -341,7 +341,7 @@ defmodule Ello.Core.Factory do
       },
       created_at: DateTime.utc_now,
       updated_at: DateTime.utc_now,
-    } |> ArtistInvite.load_images
+    }
   end
 
   defmodule Script do
