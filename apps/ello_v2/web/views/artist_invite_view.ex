@@ -15,6 +15,12 @@ defmodule Ello.V2.ArtistInviteView do
     |> include_linked(:users, users, UserView, opts)
   end
 
+  def render("show.json", %{data: artist_invite} = opts) do
+    json_response()
+    |> render_resource(:artist_invites, artist_invite, __MODULE__, opts)
+    |> include_linked(:users, artist_invite.brand_account, UserView, opts)
+  end
+
   def render("artist_invite.json", %{artist_invite: artist_invite} = opts), do:
     render_self(artist_invite, __MODULE__, opts)
 

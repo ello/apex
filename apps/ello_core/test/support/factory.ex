@@ -294,7 +294,7 @@ defmodule Ello.Core.Factory do
       closed_at: DateTime.utc_now,
       status: "closed",
       raw_description: "Foo brand is looking for artists",
-      rendered_description: "<p>Foo brand is looking for artists<p>",
+      rendered_description: "<p>Foo brand is looking for artists</p>",
       raw_short_description: "Bar",
       rendered_short_description: "<p>Bar</p>",
       submission_body_block: "#FooBrand @FooBrand",
