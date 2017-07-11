@@ -25,6 +25,23 @@ defmodule Ello.Serve.Webapp.PostControllerTest do
     assert resp.status == 404
   end
 
+  test "it 404s if user is private and user is not known", %{conn: conn} do
+    author2 = Factory.insert(:user, username: "private", is_public: false)
+    Factory.insert(:post, author: author2, token: "ghi789")
+    resp = get(conn, "/private/post/ghi789")
+    assert resp.status == 404
+  end
+
+  test "it 200s if user is private and user is known", %{conn: conn} do
+    author2 = Factory.insert(:user, username: "private", is_public: false)
+    Factory.insert(:post, author: author2, token: "ghi789")
+
+    resp = conn
+           |> put_req_cookie("ello_skip_prerender", "true")
+           |> get("/private/post/ghi789")
+    assert resp.status == 200
+  end
+
   test "it 404s if post not found", %{conn: conn} do
     resp = get(conn, "/archer/post/wrong")
     assert resp.status == 404
@@ -73,12 +90,5 @@ defmodule Ello.Serve.Webapp.PostControllerTest do
 
     refute has_meta(html, name: "image")
     refute has_meta(html, property: "og:image")
-  end
-
-  @tag skip: "not implemented"
-  test "noscript content", %{conn: conn} do
-    resp = get(conn, "/archer/post/abc123")
-    html = html_response(resp, 200)
-    assert html =~ "sdfasdfsdf"
   end
 end

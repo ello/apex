@@ -15,6 +15,25 @@ defmodule Ello.Serve.Webapp.UserControllerTest do
     {:ok, conn: conn, user: user}
   end
 
+  test "it renders 404 if user does not exist", %{conn: conn} do
+    resp = get(conn, "/nopenopenope")
+    assert resp.status == 404
+  end
+
+  test "it renders 404 if private user and no known logged in user", %{conn: conn} do
+    Factory.insert(:user, %{username: "private", is_public: false})
+    resp = get(conn, "/private")
+    assert resp.status == 404
+  end
+
+  test "it renders 200 if private user and known logged in user", %{conn: conn} do
+    Factory.insert(:user, %{username: "private", is_public: false})
+    resp = conn
+           |> put_req_cookie("ello_skip_prerender", "true")
+           |> get("/private")
+    assert resp.status == 200
+  end
+
   @tag :meta
   test "it renders the proper meta", %{conn: conn} do
     resp = get(conn, "/archer")
