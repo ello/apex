@@ -8,7 +8,12 @@ defmodule Ello.Serve.Webapp.PostController do
          true           <- owned_by_user(post, params) do
       render_html(conn, post: post)
     else
-      _ -> send_resp(conn, 404, "")
+      _ ->
+        if conn.assigns.logged_in_user? do
+          render_html(conn)
+        else
+          send_resp(conn, 404, "")
+        end
     end
   end
 
