@@ -93,6 +93,7 @@ defmodule Ello.V2.EditorialViewTest do
 
     redis_key = "user:#{user.id}:followed_users_id_cache"
     Redis.command(["SADD", redis_key, Factory.insert(:user).id])
+    Redis.command(["SADD", redis_key, Factory.insert(:user).id])
     json = render(EditorialView, "editorial.json",
       editorial: editorial,
       conn: conn
