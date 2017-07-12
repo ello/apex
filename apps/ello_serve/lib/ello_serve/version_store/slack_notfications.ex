@@ -135,7 +135,7 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
 
   defp compare_link(ver, env) do
     case Ello.Serve.VersionStore.version_history("webapp", env) do
-      [_, prev | _] -> "<https://github.com/ello/webapp/compare/#{ver}...#{prev}|#{env}>"
+      [prev | _] -> "<https://github.com/ello/webapp/compare/#{prev}...#{ver}|#{env}>"
       _             -> ""
     end
   end
