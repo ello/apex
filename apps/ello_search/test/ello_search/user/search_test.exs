@@ -136,6 +136,11 @@ defmodule Ello.Search.User.SearchTest do
     assert context.lanabandero.id in Enum.map(results, &(&1.id))
   end
 
+  test "username_search - dashes supported", context do
+    results = Search.username_search(%{terms: "lana-", current_user: context.current_user}).results
+    assert context.lanabandero.id in Enum.map(results, &(&1.id))
+  end
+
   test "username_search - @todd test", context do
     Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.toddreed.id])
     Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.todd.id])
