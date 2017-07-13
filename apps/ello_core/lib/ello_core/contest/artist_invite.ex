@@ -1,7 +1,7 @@
 defmodule Ello.Core.Contest.ArtistInvite do
   use Ecto.Schema
   alias Ello.Core.Network.User
-  alias Ello.Core.Contest.ArtistInvite.{HeaderImage, LogoImage}
+  alias __MODULE__.{HeaderImage, LogoImage}
 
   schema "artist_invites" do
     field :title, :string

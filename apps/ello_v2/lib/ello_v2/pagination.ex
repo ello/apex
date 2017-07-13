@@ -2,6 +2,7 @@ defmodule Ello.V2.Pagination do
   import Plug.Conn
   alias Ello.Stream
   alias Ello.Core.Content.PostsPage
+  alias Ello.Core.Contest.ArtistInviteSubmission
   alias Ello.Search.Post.Search, as: PostSearch
   alias Ello.Search.User.Search, as: UserSearch
 
@@ -35,6 +36,14 @@ defmodule Ello.V2.Pagination do
     |> put_resp_header("x-total-count", "#{search.total_count}")
     |> put_resp_header("x-total-pages-remaining", "#{search.total_pages_remaining}")
     |> put_resp_header("link", ~s(<#{next}>; rel="next"))
+  end
+  def add_pagination_headers(conn, path, [%ArtistInviteSubmission{} | _] = subs) do
+    last = List.last(subs)
+    add_pagination_headers(conn, path, %{
+      before:   last.created_at,
+      per_page: conn.params["per_page"] || 10,
+      status:   conn.params["status"] || "approved",
+    })
   end
   def add_pagination_headers(conn, path, params) do
     next = pagination_link(path, params)

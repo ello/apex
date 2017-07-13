@@ -3,7 +3,7 @@ defmodule Ello.Core.Factory do
   alias Discovery.{Category, Promotional, Editorial}
   alias Network.{User, Relationship}
   alias Content.{Post, Love, Watch, Asset}
-  alias Contest.ArtistInvite
+  alias Contest.{ArtistInvite, ArtistInviteSubmission}
   use ExMachina.Ecto, repo: Repo
 
   def user_factory do
@@ -342,6 +342,16 @@ defmodule Ello.Core.Factory do
       },
       created_at: DateTime.utc_now,
       updated_at: DateTime.utc_now,
+    }
+  end
+
+  def artist_invite_submission_factory do
+    %ArtistInviteSubmission{
+      artist_invite: build(:artist_invite),
+      post:          build(:post),
+      status:        "submitted",
+      created_at:    DateTime.utc_now,
+      updated_at:    DateTime.utc_now,
     }
   end
 
