@@ -33,9 +33,8 @@ defmodule Ello.V2.ArtistInviteSubmissionView do
   end
 
   def attributes,          do: [:created_at, :updated_at]
-  def computed_attributes, do: [:status]
+  def computed_attributes, do: [:status, :actions]
 
-  # TODO: action links
   def links(submission, _conn) do
     %{
       post: %{
@@ -46,7 +45,6 @@ defmodule Ello.V2.ArtistInviteSubmissionView do
     }
   end
 
-  # TODO: test/verify this logic
   def status(submission, %{assigns: %{
     current_user: %{is_staff: true},
   }}), do: submission.status
@@ -55,4 +53,52 @@ defmodule Ello.V2.ArtistInviteSubmissionView do
     current_user: %{id: user_id},
   }}), do: submission.status
   def status(_, _), do: nil
+
+  def actions(submission, %{assigns: %{
+    current_user: %{is_staff: true},
+  }}), do: actions_map(submission)
+  def actions(submission, %{assigns: %{
+    invite:       %{brand_account_id: user_id},
+    current_user: %{id: user_id},
+  }}), do: actions_map(submission)
+  def actions(_, _), do: nil
+
+  defp actions_map(%{status: "unapproved", id: id}) do
+    %{
+      approve: %{
+        label:  "Approve",
+        href:   "/api/v2/artist_invite_submissions/#{id}",
+        method: "PATCH",
+        body:   %{status: "approved"},
+      }
+    }
+  end
+
+  defp actions_map(%{status: "approved", id: id}) do
+    %{
+      unapprove: %{
+        label:  "Unapprove",
+        href:   "/api/v2/artist_invite_submissions/#{id}",
+        method: "PATCH",
+        body:   %{status: "unapproved"},
+      },
+      select: %{
+        label:  "Select",
+        href:   "/api/v2/artist_invite_submissions/#{id}",
+        method: "PATCH",
+        body:   %{status: "selected"},
+      }
+    }
+  end
+
+  defp actions_map(%{status: "selected", id: id}) do
+    %{
+      unselect: %{
+        label:  "Unselect",
+        href:   "/api/v2/artist_invite_submissions/#{id}",
+        method: "PATCH",
+        body:   %{status: "approved"},
+      }
+    }
+  end
 end
