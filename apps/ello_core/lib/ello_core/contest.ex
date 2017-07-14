@@ -1,9 +1,6 @@
 defmodule Ello.Core.Contest do
   import Ecto.Query
-  alias Ello.Core.{
-    Repo,
-    Content,
-  }
+  alias Ello.Core.Repo
   alias __MODULE__.{
     ArtistInvite,
     ArtistInviteSubmission,
@@ -64,7 +61,7 @@ defmodule Ello.Core.Contest do
   @doc """
   Return artist invite submissions for a given invite.
   """
-  # TODO: pagination, refactor
+  # TODO: refactor
   def artist_invite_submissions(%{
     status:       "submitted",
     invite:       %{brand_account_id: user_id},
@@ -73,6 +70,7 @@ defmodule Ello.Core.Contest do
     ArtistInviteSubmission
     |> for_invite(options)
     |> where([s], s.status == "submitted")
+    |> paginate_submissions(options)
     |> Repo.all
     |> Preload.artist_invite_submissions(options)
   end
@@ -83,6 +81,7 @@ defmodule Ello.Core.Contest do
     ArtistInviteSubmission
     |> for_invite(options)
     |> where([s], s.status == "submitted")
+    |> paginate_submissions(options)
     |> Repo.all
     |> Preload.artist_invite_submissions(options)
   end
@@ -94,6 +93,7 @@ defmodule Ello.Core.Contest do
     ArtistInviteSubmission
     |> for_invite(options)
     |> where([s], s.status in ["approved", "selected"])
+    |> paginate_submissions(options)
     |> Repo.all
     |> Preload.artist_invite_submissions(options)
   end
@@ -104,6 +104,7 @@ defmodule Ello.Core.Contest do
     ArtistInviteSubmission
     |> for_invite(options)
     |> where([s], s.status == "approved")
+    |> paginate_submissions(options)
     |> Repo.all
     |> Preload.artist_invite_submissions(options)
   end
@@ -114,6 +115,7 @@ defmodule Ello.Core.Contest do
     ArtistInviteSubmission
     |> for_invite(options)
     |> where([s], s.status == "selected")
+    |> paginate_submissions(options)
     |> Repo.all
     |> Preload.artist_invite_submissions(options)
   end
@@ -124,6 +126,7 @@ defmodule Ello.Core.Contest do
     ArtistInviteSubmission
     |> for_invite(options)
     |> where([s], s.status == "selected")
+    |> paginate_submissions(options)
     |> Repo.all
     |> Preload.artist_invite_submissions(options)
   end
@@ -135,6 +138,7 @@ defmodule Ello.Core.Contest do
     ArtistInviteSubmission
     |> for_invite(options)
     |> where([s], s.status == "selected")
+    |> paginate_submissions(options)
     |> Repo.all
     |> Preload.artist_invite_submissions(options)
   end
@@ -142,5 +146,15 @@ defmodule Ello.Core.Contest do
 
   defp for_invite(query, %{invite: %{id: id}}) do
     where(query, [s], s.artist_invite_id == ^id)
+  end
+
+  defp paginate_submissions(q, %{before: nil, per_page: per}), do: limit(q, ^per)
+  defp paginate_submissions(query, %{before: before, per_page: per}) do
+    {:ok, before, _} = before
+                       |> URI.decode
+                       |> DateTime.from_iso8601
+    query
+    |> where([s], s.created_at < ^before)
+    |> limit(^per)
   end
 end
