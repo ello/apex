@@ -61,92 +61,66 @@ defmodule Ello.Core.Contest do
   @doc """
   Return artist invite submissions for a given invite.
   """
-  # TODO: refactor
   def artist_invite_submissions(%{
-    status:       "submitted",
+    status:       "unapproved",
     invite:       %{brand_account_id: user_id},
-    current_user: %{id: user_id}
-  } = options) do
-    ArtistInviteSubmission
-    |> for_invite(options)
-    |> where([s], s.status == "submitted")
-    |> paginate_submissions(options)
-    |> Repo.all
-    |> Preload.artist_invite_submissions(options)
-  end
+    current_user: %{id: user_id},
+  } = options),
+    do: get_submissions_by_status(options, "unapproved")
   def artist_invite_submissions(%{
-    status:       "submitted",
+    status:       "unapproved",
     current_user: %{is_staff: true},
-  } = options) do
-    ArtistInviteSubmission
-    |> for_invite(options)
-    |> where([s], s.status == "submitted")
-    |> paginate_submissions(options)
-    |> Repo.all
-    |> Preload.artist_invite_submissions(options)
-  end
-  def artist_invite_submissions(%{status: "submitted"}), do: []
+  } = options),
+    do: get_submissions_by_status(options, "unapproved")
+  def artist_invite_submissions(%{
+    status: "unapproved"
+  }),
+    do: []
   def artist_invite_submissions(%{
     status: "approved",
     invite: %{status: "open"},
-  } = options) do
-    ArtistInviteSubmission
-    |> for_invite(options)
-    |> where([s], s.status in ["approved", "selected"])
-    |> paginate_submissions(options)
-    |> Repo.all
-    |> Preload.artist_invite_submissions(options)
-  end
+  } = options),
+    do: get_submissions_by_status(options, ["approved", "selected"])
   def artist_invite_submissions(%{
     status: "approved",
     invite: %{status: "closed"},
-  } = options) do
-    ArtistInviteSubmission
-    |> for_invite(options)
-    |> where([s], s.status == "approved")
-    |> paginate_submissions(options)
-    |> Repo.all
-    |> Preload.artist_invite_submissions(options)
-  end
+  } = options),
+    do: get_submissions_by_status(options, "approved")
   def artist_invite_submissions(%{
     status: "selected",
     invite: %{status: "closed"},
-  } = options) do
-    ArtistInviteSubmission
-    |> for_invite(options)
-    |> where([s], s.status == "selected")
-    |> paginate_submissions(options)
-    |> Repo.all
-    |> Preload.artist_invite_submissions(options)
-  end
+  } = options),
+    do: get_submissions_by_status(options, "selected")
   def artist_invite_submissions(%{
-    status: "selected",
+    status:       "selected",
     current_user: %{is_staff: true},
-  } = options) do
-    ArtistInviteSubmission
-    |> for_invite(options)
-    |> where([s], s.status == "selected")
-    |> paginate_submissions(options)
-    |> Repo.all
-    |> Preload.artist_invite_submissions(options)
-  end
+  } = options),
+    do: get_submissions_by_status(options, "selected")
   def artist_invite_submissions(%{
-    status: "selected",
+    status:       "selected",
     invite:       %{brand_account_id: user_id},
     current_user: %{id: user_id}
-  } = options) do
+  } = options),
+    do: get_submissions_by_status(options, "selected")
+  def artist_invite_submissions(_),
+    do: []
+
+  defp get_submissions_by_status(options, status) do
     ArtistInviteSubmission
     |> for_invite(options)
-    |> where([s], s.status == "selected")
+    |> by_status(status)
     |> paginate_submissions(options)
     |> Repo.all
     |> Preload.artist_invite_submissions(options)
   end
-  def artist_invite_submissions(_), do: []
 
-  defp for_invite(query, %{invite: %{id: id}}) do
-    where(query, [s], s.artist_invite_id == ^id)
-  end
+  defp for_invite(query, %{invite: %{id: id}}),
+    do: where(query, [s], s.artist_invite_id == ^id)
+
+  defp by_status(query, status) when is_binary(status),
+    do: where(query, [s], s.status == ^status)
+  defp by_status(query, status) when is_list(status),
+    do: where(query, [s], s.status in ^status)
 
   defp paginate_submissions(q, %{before: nil, per_page: per}), do: limit(q, ^per)
   defp paginate_submissions(query, %{before: before, per_page: per}) do
