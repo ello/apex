@@ -9,6 +9,9 @@ defmodule Ello.Events.TrackPostViews do
   alias Ello.Core.Discovery.{
     Editorial,
   }
+  alias Ello.Core.Contest.{
+    ArtistInviteSubmission,
+  }
   import Phoenix.Controller, only: [action_name: 1]
 
   @moduledoc """
@@ -51,15 +54,9 @@ defmodule Ello.Events.TrackPostViews do
   defp post_ids([%Post{} | _] = posts),
     do: Enum.map(posts, &(&1.id))
 
-  defp post_ids([%Editorial{} | _] = editorials) do
-    editorials
-    |> Enum.map(&(&1.post))
-    |> Enum.reject(&is_nil/1)
-    |> post_ids
-  end
-
-  defp post_ids([%Love{} | _] = loves) do
-    loves
+  @post_wrappers [Editorial, Love, ArtistInviteSubmission]
+  defp post_ids([%{__struct__: kind} | _] = model) when kind in @post_wrappers do
+    model
     |> Enum.map(&(&1.post))
     |> Enum.reject(&is_nil/1)
     |> post_ids

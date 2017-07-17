@@ -5,16 +5,30 @@ defmodule Ello.V2.ArtistInviteViewTest do
   alias Ello.Core.Contest.ArtistInvite
 
   setup %{conn: conn} do
-    a_inv1 = Factory.insert(:artist_invite) |> ArtistInvite.load_images
-    a_inv2 = Factory.insert(:artist_invite) |> ArtistInvite.load_images
-    {:ok, conn: conn, a_inv1: a_inv1, a_inv2: a_inv2}
+    brand = Factory.insert(:user)
+    staff = Factory.insert(:user, is_staff: true)
+    a_inv1 = ArtistInvite.load_images(Factory.insert(:artist_invite, %{
+      status:        "open",
+      brand_account: brand,
+    }))
+    a_inv2 = ArtistInvite.load_images(Factory.insert(:artist_invite, %{
+      status:        "closed",
+      brand_account: brand,
+    }))
+    {:ok, [
+      conn:       conn,
+      staff_conn: user_conn(conn, staff),
+      brand_conn: user_conn(conn, brand),
+      a_inv1:     a_inv1,
+      a_inv2:     a_inv2,
+    ]}
   end
 
   test "index.json - renders each artist invite and brand account", context do
     assert %{
       artist_invites: [_, _],
       linked: %{
-        users: [_, _],
+        users: [_],
       }
     } = render(ArtistInviteView, "index.json",
       data: [context.a_inv1, context.a_inv2],
@@ -23,7 +37,6 @@ defmodule Ello.V2.ArtistInviteViewTest do
   end
 
   test "artist_invite.json - with images", context do
-    id = "#{context.a_inv2.id}"
     assert %{
       id: _,
       title: _,
@@ -55,5 +68,67 @@ defmodule Ello.V2.ArtistInviteViewTest do
                   artist_invite: context.a_inv2,
                   conn: context.conn
     )
+  end
+
+  test "artist_invite.json - links - open - as public", context do
+    json = ArtistInviteView.render("artist_invite.json", %{
+      artist_invite: context.a_inv1,
+      conn:          context.conn,
+    })
+
+    assert json[:links][:brand_account][:type] == "users"
+    assert json[:links][:brand_account][:id]
+    assert json[:links][:brand_account][:href] =~ ~r"/api/v2/users/.*"
+
+    refute json[:links][:unapproved_submissions]
+    refute json[:links][:selected_submissions]
+
+    assert json[:links][:approved_submissions][:type] == "artist_invite_submission_stream"
+    assert json[:links][:approved_submissions][:href] =~ ~r"/api/v2/artist_invites/\d*/submissions\?status=approved"
+  end
+
+  test "artist_invite.json - links - closed - as public", context do
+    json = ArtistInviteView.render("artist_invite.json", %{
+      artist_invite: context.a_inv2,
+      conn:          context.conn,
+    })
+
+    assert json[:links][:brand_account]
+
+    refute json[:links][:unapproved_submissions]
+
+    assert json[:links][:approved_submissions][:type] == "artist_invite_submission_stream"
+    assert json[:links][:approved_submissions][:href] =~ ~r"/api/v2/artist_invites/\d*/submissions\?status=approved"
+
+    assert json[:links][:selected_submissions][:type] == "artist_invite_submission_stream"
+    assert json[:links][:selected_submissions][:href] =~ ~r"/api/v2/artist_invites/\d*/submissions\?status=selected"
+  end
+
+  test "artist_invite.json - links - as staff", context do
+    json = ArtistInviteView.render("artist_invite.json", %{
+      artist_invite: context.a_inv1,
+      conn:          context.staff_conn,
+    })
+
+    assert json[:links][:brand_account]
+
+    assert json[:links][:unapproved_submissions][:type] == "artist_invite_submission_stream"
+    assert json[:links][:unapproved_submissions][:href] =~ ~r"/api/v2/artist_invites/\d*/submissions\?status=unapproved"
+
+    assert json[:links][:approved_submissions]
+    assert json[:links][:selected_submissions]
+  end
+
+
+  test "artist_invite.json - links - as brand", context do
+    json = ArtistInviteView.render("artist_invite.json", %{
+      artist_invite: context.a_inv1,
+      conn:          context.brand_conn,
+    })
+
+    assert json[:links][:brand_account]
+    assert json[:links][:unapproved_submissions]
+    assert json[:links][:approved_submissions]
+    assert json[:links][:selected_submissions]
   end
 end
