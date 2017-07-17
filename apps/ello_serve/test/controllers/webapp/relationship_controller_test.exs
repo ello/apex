@@ -57,9 +57,18 @@ defmodule Ello.Serve.Webapp.RelationshipControllerTest do
   end
 
   test "/:username/followers - it renders noscript", %{conn: conn, user: user, user1: user1, user2: user2} do
-    Factory.insert(:relationship, owner: user1, subject: user)
-    Factory.insert(:relationship, owner: user2, subject: user)
-
+    user3 = Factory.insert(:user)
+    user4 = Factory.insert(:user)
+    [user4, user3, user2, user1]
+    |> Enum.with_index(DateTime.to_unix(DateTime.utc_now))
+    |> Enum.each(fn({owner, time}) ->
+      {:ok, created_at} = DateTime.from_unix(time)
+      Factory.insert(:relationship, %{
+        owner:      owner,
+        subject:    user,
+        created_at: created_at,
+      })
+    end)
     resp = get(conn, "/archer/followers", %{"per_page" => "2"})
     html = html_response(resp, 200)
 
@@ -67,5 +76,16 @@ defmodule Ello.Serve.Webapp.RelationshipControllerTest do
     assert html =~ "<h2>@archer</h2>"
     assert html =~ "<h2>@#{user1.username()}</h2>"
     assert html =~ "<h2>@#{user2.username()}</h2>"
+
+    assert [_, before] = Regex.run(~r'"https://ello.co/archer/followers\?before=([^&]*)">Next Page</a>', html) 
+
+    resp2 = get(conn, "/archer/followers", %{"per_page" => "2", "before" => before})
+    html2 = html_response(resp2, 200)
+
+    refute html2 == html
+    assert html2 =~ "<noscript>"
+    assert html2 =~ "<h2>@archer</h2>"
+    assert html2 =~ "<h2>@#{user3.username()}</h2>"
+    assert html2 =~ "<h2>@#{user4.username()}</h2>"
   end
 end

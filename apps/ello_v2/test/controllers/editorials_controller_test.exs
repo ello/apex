@@ -98,7 +98,7 @@ defmodule Ello.V2.EditorialControllerTest do
 
   test "GET /v2/categories - last page", %{public_conn: conn, editorials: editorials} do
     [_e1, _e2, _e3, _e4, e5, _e6, _e7] = editorials
-    conn = get(conn, editorial_path(conn, :index), %{per_page: "4", before: "#{e5.published_position}"})
+    conn = get(conn, editorial_path(conn, :index), %{per_page: "4", before: "#{e5.published_position}/"})
     assert ["0"] = get_resp_header(conn, "x-total-pages-remaining")
   end
 

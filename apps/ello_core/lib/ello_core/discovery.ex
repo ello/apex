@@ -133,10 +133,20 @@ defmodule Ello.Core.Discovery do
   end
 
   defp editorial_cursor(query, %{before: nil}), do: query
-  defp editorial_cursor(query, %{preview: true, before: before}),
-    do: where(query, [e], e.preview_position < ^before)
-  defp editorial_cursor(query, %{preview: false, before: before}),
-    do: where(query, [e], e.published_position < ^before)
+  defp editorial_cursor(query, %{preview: true, before: before}) do
+    case editorial_before(before) do
+      nil    -> query
+      before -> where(query, [e], e.preview_position < ^before)
+    end
+  end
+  defp editorial_cursor(query, %{preview: false, before: before}) do
+    case editorial_before(before) do
+      nil    -> query
+      before -> where(query, [e], e.published_position < ^before)
+    end
+  end
+
+  defp editorial_before(before), do: String.replace(before, ~r"\D", "")
 
   @type categorizable :: User.t | Post.t | [User.t | Post.t]
 
