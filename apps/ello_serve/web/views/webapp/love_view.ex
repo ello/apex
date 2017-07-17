@@ -25,6 +25,10 @@ defmodule Ello.Serve.Webapp.LoveView do
   end
 
   def next_love_page_url(user, loves) do
-    webapp_url("#{user.username}/loves", before: List.last(loves).created_at)
+    before = loves
+             |> List.last
+             |> Map.get(:created_at)
+             |> DateTime.to_iso8601
+    webapp_url("#{user.username}/loves", before: before)
   end
 end
