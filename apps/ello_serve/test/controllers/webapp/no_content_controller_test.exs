@@ -70,6 +70,15 @@ defmodule Ello.Serve.Webapp.NoContentControllerTest do
     assert html =~ ~r"<body><script>.*window.webappEnv = {.*</script>"s
   end
 
+  test "notifications", %{conn: conn} do
+    resp = get(conn, "/notifications")
+    html = html_response(resp, 200)
+    # No title etc
+    assert html =~ "Ello | The Creators Network"
+    # Has config
+    assert html =~ ~r"<body><script>.*window.webappEnv = {.*</script>"s
+  end
+
   @tag :meta
   test "enter - it renders - active version", %{conn: conn} do
     resp = get(conn, "/enter")
