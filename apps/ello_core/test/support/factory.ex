@@ -349,7 +349,7 @@ defmodule Ello.Core.Factory do
     %ArtistInviteSubmission{
       artist_invite: build(:artist_invite),
       post:          build(:post),
-      status:        "submitted",
+      status:        "unapproved",
       created_at:    DateTime.utc_now,
       updated_at:    DateTime.utc_now,
     }

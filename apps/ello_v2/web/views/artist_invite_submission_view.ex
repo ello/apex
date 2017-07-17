@@ -14,15 +14,13 @@ defmodule Ello.V2.ArtistInviteSubmissionView do
 
   def render("index.json", %{data: submissions} = opts) do
     posts     = submissions |> Enum.map(&(&1.post)) |> Enum.reject(&is_nil/1)
-    reposts   = posts |> Enum.map(&(&1.reposted_source)) |> Enum.reject(&is_nil/1)
-    all_posts = posts ++ reposts
-    users     = Enum.map(all_posts, &(&1.author))
-    assets    = Enum.flat_map(all_posts, &(&1.assets))
-    categories = Enum.flat_map(all_posts ++ users, &(&1.categories))
+    users     = Enum.map(posts, &(&1.author))
+    assets    = Enum.flat_map(posts, &(&1.assets))
+    categories = Enum.flat_map(posts ++ users, &(&1.categories))
 
     json_response()
     |> render_resource(:artist_invite_submissions, submissions, __MODULE__, opts)
-    |> include_linked(:posts, all_posts, PostView, opts)
+    |> include_linked(:posts, posts, PostView, opts)
     |> include_linked(:users, users, UserView, opts)
     |> include_linked(:categories, categories, CategoryView, opts)
     |> include_linked(:assets, assets, AssetView, opts)

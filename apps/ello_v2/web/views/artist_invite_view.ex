@@ -56,17 +56,6 @@ defmodule Ello.V2.ArtistInviteView do
 
   def guide(artist_invite, _), do: artist_invite.guide
 
-  # def links(artist_invite, %{assigns: %{current_user: %{is_staff: true}}}),
-  #   do: admin_links(artist_invite)
-  # def links(%{brand_account_id: user_id} = artist_invite, %{
-  #   assigns: %{current_user: %{id: id}}
-  # }),
-  #   do: admin_links(artist_invite)
-  # def links(artist_invite, _), do: public_links(artist_invite)
-
-  # def admin_links
-  #
-  #
   def links(invite, conn) do
     links = %{
       brand_account: %{
