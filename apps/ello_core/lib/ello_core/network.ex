@@ -1,4 +1,5 @@
 defmodule Ello.Core.Network do
+  import Ello.Core
   import Ecto.Query
   import NewRelicPhoenix, only: [measure_segment: 2]
   alias Ello.Core.{Repo, Redis}
@@ -100,9 +101,10 @@ defmodule Ello.Core.Network do
   def paginate(query, options) do
     per_page = options[:per_page] || 25
 
-    query = case options[:before] do
-      nil -> query
-      b4  -> where(query, [r], r.created_at < ^b4)
+    query = case parse_before(options[:before]) do
+      nil    -> query
+      before ->
+        where(query, [r], r.created_at < ^before)
     end
 
     query

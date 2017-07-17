@@ -1,6 +1,7 @@
 defmodule Ello.Core.Content do
   import NewRelicPhoenix, only: [measure_segment: 2]
   import Ecto.Query
+  import Ello.Core
   alias Ello.Core.Repo
   alias Ello.Core.Network
   alias __MODULE__.{
@@ -148,18 +149,6 @@ defmodule Ello.Core.Content do
       per_page: per_page,
       before: last_post_date,
     }
-  end
-
-  defp parse_before(%DateTime{} = before), do: before
-  defp parse_before(nil), do: nil
-  defp parse_before(before) do
-    before
-    |> URI.decode
-    |> DateTime.from_iso8601
-    |> case do
-      {:ok, date, _} -> date
-      _ -> nil
-    end
   end
 
   defp total_posts_by_user_query(%{user_id: user_id} = options) do
