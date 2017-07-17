@@ -6,14 +6,16 @@ defmodule Ello.Serve.Webapp.RelationshipController do
   def followers(conn, _) do
     render_html conn, %{
       user: conn.assigns.user,
-      followers: fn -> load_followers(conn) end
+      type: :followers,
+      relationships: fn -> load_followers(conn) end
     }
   end
 
   def following(conn, _) do
     render_html conn, %{
       user: conn.assigns.user,
-      following: fn -> load_following(conn) end
+      type: :following,
+      relationships: fn -> load_following(conn) end
     }
   end
 

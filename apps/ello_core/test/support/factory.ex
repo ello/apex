@@ -281,6 +281,8 @@ defmodule Ello.Core.Factory do
       priority: "friend",
       owner:    build(:user),
       subject:  build(:user),
+      created_at: DateTime.utc_now,
+      updated_at: DateTime.utc_now,
     }
   end
 

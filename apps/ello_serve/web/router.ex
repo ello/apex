@@ -38,6 +38,7 @@ defmodule Ello.Serve.Router do
 
     # Logged in only routes - no fallback content required
     get "/following",             NoContentController, :show
+    get "/notifications",         NoContentController, :show
     get "/invitations",           NoContentController, :show
     get "/settings",              NoContentController, :show
     get "/onboarding",            NoContentController, :show

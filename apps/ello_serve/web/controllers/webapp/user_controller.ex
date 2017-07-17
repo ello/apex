@@ -1,16 +1,13 @@
 defmodule Ello.Serve.Webapp.UserController do
   use Ello.Serve.Web, :controller
-  alias Ello.Core.{Network, Content}
+  alias Ello.Core.Content
+  plug Ello.Serve.FindUser
 
-  def show(conn, %{"username" => username}) do
-    case Network.user(%{id_or_username: "~" <> username, current_user: nil}) do
-      nil ->  send_resp(conn, 404, "")
-      user ->
-        render_html(conn, %{
-          user:       user,
-          posts_page: fn -> posts_page(conn, user) end,
-        })
-    end
+  def show(conn, _) do
+    render_html(conn, %{
+      user:       conn.assigns.user,
+      posts_page: fn -> posts_page(conn, conn.assigns.user) end,
+    })
   end
 
   defp posts_page(conn, user) do

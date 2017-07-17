@@ -1,9 +1,9 @@
 <%= render Ello.Serve.Webapp.UserView, "user_header.html", assigns %>
 
-<%= for relationship_user <- @relationship_users do %>
+<%= for relationship_user <- relationship_users(assigns) do %>
   <%= render Ello.Serve.Webapp.UserView, "summary.html", Map.put(assigns, :user, relationship_user) %>
 <% end %>
 
 <%= if Enum.count(@relationships) > 0 do %>
-  <%= link "Next Page", to: next_relationship_page_url(@user, @relationships, @relationship_type) %>
+  <%= link "Next Page", to: next_relationship_page_url(@user, @relationships, @type) %>
 <% end %>
