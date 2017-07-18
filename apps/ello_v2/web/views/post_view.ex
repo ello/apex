@@ -6,9 +6,11 @@ defmodule Ello.V2.PostView do
     UserView,
     AssetView,
     PostMetaAttributesView,
+    ArtistInviteView,
   }
   alias Ello.Core.Network.{User}
   alias Ello.Core.Content.{Post,Love,Watch}
+  require IEx
 
   def stale_checks(_, %{data: posts}) do
     [etag: etag(posts)]
@@ -16,11 +18,12 @@ defmodule Ello.V2.PostView do
 
   @doc "Render a list of posts and relations for /api/v2/user/:id/posts"
   def render("index.json", %{data: posts} = opts) do
-    users     = post_users(posts)
-    assets    = post_assets(posts)
-    reposts   = Enum.map(posts, &(&1.reposted_source))
-    all_posts = post_and_reposts(posts)
-    categories = Enum.flat_map(all_posts ++ users, &(&1.categories))
+    users          = post_users(posts)
+    assets         = post_assets(posts)
+    reposts        = Enum.map(posts, &(&1.reposted_source))
+    all_posts      = post_and_reposts(posts)
+    artist_invites = post_artist_invites(posts)
+    categories     = Enum.flat_map(all_posts ++ users, &(&1.categories))
 
     json_response()
     |> render_resource(:posts, posts, __MODULE__, opts)
@@ -28,14 +31,16 @@ defmodule Ello.V2.PostView do
     |> include_linked(:users, users, UserView, opts)
     |> include_linked(:posts, reposts, __MODULE__, opts)
     |> include_linked(:assets, assets, AssetView, opts)
+    |> include_linked(:artist_invites, artist_invites, ArtistInviteView, opts)
   end
 
   @doc "Render a post and relations for /api/v2/posts/:id"
   def render("show.json", %{data: post} = opts) do
-    users      = post_users(post, post.reposted_source)
-    assets     = post_assets(post, post.reposted_source)
-    posts      = post_and_reposts(post, post.reposted_source)
-    categories = Enum.flat_map(posts ++ users, &(&1.categories))
+    users          = post_users(post, post.reposted_source)
+    assets         = post_assets(post, post.reposted_source)
+    posts          = post_and_reposts(post, post.reposted_source)
+    artist_invites = post_artist_invites(post, post.reposted_source)
+    categories     = Enum.flat_map(posts ++ users, &(&1.categories))
 
     json_response()
     |> render_resource(:posts, post, __MODULE__, Map.merge(opts, %{meta: true}))
@@ -43,6 +48,7 @@ defmodule Ello.V2.PostView do
     |> include_linked(:users, users, UserView, opts)
     |> include_linked(:posts, [post.reposted_source], __MODULE__, opts)
     |> include_linked(:assets, assets, AssetView, opts)
+    |> include_linked(:artist_invites, artist_invites, ArtistInviteView, opts)
   end
 
   @doc "Render a single post as included in other reponses"
@@ -74,6 +80,7 @@ defmodule Ello.V2.PostView do
     :comments_count,
     :reposts_count,
     :views_count,
+    :artist_invite_id,
   ]
 
   defp post_users(posts) when is_list(posts), do: Enum.flat_map(posts, &(post_users(&1, &1.reposted_source)))
@@ -87,6 +94,10 @@ defmodule Ello.V2.PostView do
   defp post_and_reposts(posts) when is_list(posts), do: Enum.flat_map(posts, &(post_and_reposts(&1, &1.reposted_source)))
   defp post_and_reposts(post, %Post{} = repost), do: [post, repost]
   defp post_and_reposts(post, _), do: [post]
+
+  defp post_artist_invites(posts) when is_list(posts), do: Enum.flat_map(posts, &(post_artist_invites(&1, &1.reposted_source)))
+  defp post_artist_invites(_, %{artist_invite: artist_invite}), do: [artist_invite]
+  defp post_artist_invites(%{artist_invite: artist_invite}, _), do: [artist_invite]
 
   def href(%{id: id}, _), do: "/api/v2/posts/#{id}"
 
@@ -102,6 +113,9 @@ defmodule Ello.V2.PostView do
   def repost_id(_, _), do: ""
 
   def author_id(post, _), do: "#{post.author.id}"
+
+  def artist_invite_id(%{reposted_source: %{artist_invite: a_inv}}, _), do: "#{a_inv.id}"
+  def artist_invite_id(post, _), do: "#{post.artist_invite.id}"
 
   def links(%{reposted_source: %Post{} = reposted} = post, conn) do
     post

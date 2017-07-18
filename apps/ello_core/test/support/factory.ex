@@ -294,7 +294,7 @@ defmodule Ello.Core.Factory do
       brand_account: build(:user),
       opened_at: DateTime.utc_now,
       closed_at: DateTime.utc_now,
-      status: "closed",
+      status: "open",
       raw_description: "Foo brand is looking for artists",
       rendered_description: "<p>Foo brand is looking for artists</p>",
       raw_short_description: "Bar",

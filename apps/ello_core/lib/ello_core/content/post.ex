@@ -1,6 +1,7 @@
 defmodule Ello.Core.Content.Post do
   use Ecto.Schema
   alias Ello.Core.Network.User
+  alias Ello.Core.Contest.{ArtistInviteSubmission}
   alias Ello.Core.Content.{Love, Watch, Asset}
 
   @type t :: %__MODULE__{}
@@ -46,6 +47,9 @@ defmodule Ello.Core.Content.Post do
     field :comments_count, :integer, virtual: true
     field :reposts_count, :integer, virtual: true
     field :views_count, :integer, virtual: true
+
+    has_one :artist_invite_submission, ArtistInviteSubmission
+    has_one :artist_invite, through: [:artist_invite_submission, :artist_invite]
   end
 
 

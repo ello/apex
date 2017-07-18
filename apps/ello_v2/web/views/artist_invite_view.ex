@@ -23,6 +23,8 @@ defmodule Ello.V2.ArtistInviteView do
 
   def render("artist_invite.json", %{artist_invite: artist_invite} = opts), do:
     render_self(artist_invite, __MODULE__, opts)
+  def render("artist_invite.json", %{artist_invite: artist_invite} = opts), do:
+    render_self(artist_invite, __MODULE__, opts)
 
   def attributes, do: [
     :title,
