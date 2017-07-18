@@ -31,4 +31,28 @@ defmodule Ello.Serve.Webapp.ConfigView do
         {key, env}
     end
   end
+
+  def encoded_env() do
+    webapp_env()
+    |> Poison.encode!
+    |> URI.encode
+  end
+
+  defp webapp_env() do
+    env = %{
+      "AUTH_CLIENT_ID"    => client_id(),
+      "AUTH_DOMAIN"       => webapp_url(""),
+      "APP_DEBUG"         => app_debug(),
+      "PROMO_HOST"        => promo_host(),
+      "SEGMENT_WRITE_KEY" => segment_write_key(),
+    }
+    case honeybadger_config() do
+      {key, env_name} ->
+        Map.merge(env, %{
+          "HONEYBADGER_API_KEY"     => key,
+          "HONEYBADGER_ENVIRONMENT" => env_name,
+        })
+      _ -> env
+    end
+  end
 end

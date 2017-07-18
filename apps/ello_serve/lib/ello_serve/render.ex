@@ -9,9 +9,12 @@ defmodule Ello.Serve.Render do
     data = data
            |> Enum.into(%{})
            |> Map.put(:conn, conn)
-    config = render_config(conn, data)
+    config      = render_config(conn, data)
+    meta_config = render_meta_config(conn, data)
     measure_segment {__MODULE__, :inject_without_prerender} do
-      html = inject_config(html, config)
+      html = html
+             |> inject_config(config)
+             |> inject_meta(meta_config)
     end
     html(conn, html)
   end
@@ -22,15 +25,17 @@ defmodule Ello.Serve.Render do
       ({key, val}, accum) -> Map.put(accum, key, val)
     end
 
-    meta     = render_meta(conn, data)
-    noscript = render_noscript(conn, data)
-    config   = render_config(conn, data)
+    meta        = render_meta(conn, data)
+    noscript    = render_noscript(conn, data)
+    config      = render_config(conn, data)
+    meta_config = render_meta_config(conn, data)
 
     measure_segment {__MODULE__, :inject} do
       body = conn.assigns.html
              |> inject_meta(meta)
              |> inject_noscript(noscript)
              |> inject_config(config)
+             |> inject_meta(meta_config)
     end
 
     html(conn, body)
@@ -65,6 +70,13 @@ defmodule Ello.Serve.Render do
     end
   end
   defp render_config(_, _), do: ""
+
+  defp render_meta_config(%{assigns: %{app: "webapp"}}, _) do
+    measure_segment {:render, "meta_config.html"} do
+      render_to_iodata(Webapp.ConfigView, "meta.html", [])
+    end
+  end
+  defp render_meta_config(_, _), do: ""
 
   defp inject_config(html, config) do
     String.replace(html, "<body>", "<body>#{config}", global: false)
