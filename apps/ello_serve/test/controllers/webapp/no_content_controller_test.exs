@@ -25,16 +25,8 @@ defmodule Ello.Serve.Webapp.NoContentControllerTest do
     assert config["AUTH_DOMAIN"] == "https://ello.co"
     assert config["PROMO_HOST"] == "https://d9ww8oh3n3brk.cloudfront.net"
     assert config["SEGMENT_WRITE_KEY"] == "segment_key"
+    assert config["APP_DEBUG"] == false
     refute config["HONEYBADGER_API_KEY"]
-
-    assert html =~ ~r"<body><script>.*window.webappEnv = {.*</script>"s
-    assert html =~ ~r(AUTH_CLIENT_ID:.*"client_id",)s
-    assert html =~ ~r(AUTH_DOMAIN:.*"https://ello.co",)s
-    assert html =~ ~r(LOGO_MARK:.*"normal",)s
-    assert html =~ ~r(APP_DEBUG:.*false,)s
-    assert html =~ ~r(PROMO_HOST:.*"https://d9ww8oh3n3brk.cloudfront.net",)s
-    assert html =~ ~r(SEGMENT_WRITE_KEY:.*"segment_key")s
-    refute html =~ ~r"HONEYBADGER"
   end
 
   test "following - it renders config - with honeybadger", %{conn: conn} do
@@ -48,27 +40,20 @@ defmodule Ello.Serve.Webapp.NoContentControllerTest do
     config = content |> URI.decode() |> Poison.decode!
     assert config["HONEYBADGER_API_KEY"] == "abc123"
     assert config["HONEYBADGER_ENVIRONMENT"] == "production"
-
-    assert html =~ ~r"<body><script>.*window.webappEnv = {.*</script>"s
-    assert html =~ ~r(AUTH_CLIENT_ID:.*"client_id",)s
-    assert html =~ ~r(AUTH_DOMAIN:.*"https://ello.co",)s
-    assert html =~ ~r(PROMO_HOST:.*"https://d9ww8oh3n3brk.cloudfront.net",)s
-    assert html =~ ~r(SEGMENT_WRITE_KEY:.*"segment_key")s
-    assert html =~ ~r(HONEYBADGER_API_KEY:.*"abc123")s
-    assert html =~ ~r(HONEYBADGER_ENVIRONMENT:.*"production")s
   end
 
   test "following - it renders config - with debug flag", %{conn: conn} do
-    old = Application.get_env(:ello_serve, :webapp_config)
     resp = get(conn, "/following", %{"debug" => "false"})
     html = html_response(resp, 200)
-    assert html =~ ~r"<body><script>.*window.webappEnv = {.*</script>"s
-    assert html =~ ~r(APP_DEBUG:.*false,)s
+    assert [_, content] = Regex.run(~r{<meta name="webappEnv" content="([^"]*)" />}s, html)
+    config = content |> URI.decode() |> Poison.decode!
+    assert config["APP_DEBUG"] == false
 
     resp = get(conn, "/following", %{"debug" => "true"})
     html = html_response(resp, 200)
-    assert html =~ ~r"<body><script>.*window.webappEnv = {.*</script>"s
-    assert html =~ ~r(APP_DEBUG:.*true,)s
+    assert [_, content] = Regex.run(~r{<meta name="webappEnv" content="([^"]*)" />}s, html)
+    config = content |> URI.decode() |> Poison.decode!
+    assert config["APP_DEBUG"] == true
   end
 
   test "following - it renders - preview version", %{conn: conn} do
@@ -84,7 +69,7 @@ defmodule Ello.Serve.Webapp.NoContentControllerTest do
     # No title etc
     refute html =~ "Ello | The Creators Network"
     # Has config
-    assert html =~ ~r"<body><script>.*window.webappEnv = {.*</script>"s
+    assert html =~ ~r(<meta name="webappEnv" content="[^"]*" />)
   end
 
   test "following - skip prerender via cookie", %{conn: conn} do
@@ -95,7 +80,7 @@ defmodule Ello.Serve.Webapp.NoContentControllerTest do
     # No title etc
     refute html =~ "Ello | The Creators Network"
     # Has config
-    assert html =~ ~r"<body><script>.*window.webappEnv = {.*</script>"s
+    assert html =~ ~r(<meta name="webappEnv" content="[^"]*" />)
   end
 
   test "notifications", %{conn: conn} do
@@ -104,7 +89,7 @@ defmodule Ello.Serve.Webapp.NoContentControllerTest do
     # No title etc
     assert html =~ "Ello | The Creators Network"
     # Has config
-    assert html =~ ~r"<body><script>.*window.webappEnv = {.*</script>"s
+    assert html =~ ~r(<meta name="webappEnv" content="[^"]*" />)
   end
 
   @tag :meta
