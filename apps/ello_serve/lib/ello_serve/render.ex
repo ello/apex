@@ -6,6 +6,9 @@ defmodule Ello.Serve.Render do
 
   def render_html(conn, data \\ [])
   def render_html(%{assigns: %{prerender: false, html: html}} = conn, data) do
+    data = data
+           |> Enum.into(%{})
+           |> Map.put(:conn, conn)
     config = render_config(conn, data)
     measure_segment {__MODULE__, :inject_without_prerender} do
       html = inject_config(html, config)
@@ -56,9 +59,9 @@ defmodule Ello.Serve.Render do
     String.replace(body, "</body>", "#{noscript}</body>", global: false)
   end
 
-  defp render_config(%{assigns: %{app: "webapp"}}, _) do
+  defp render_config(%{assigns: %{app: "webapp"}}, data) do
     measure_segment {:render, "config.html"} do
-      render_to_iodata(Webapp.ConfigView, "script.html", [])
+      render_to_iodata(Webapp.ConfigView, "script.html", data)
     end
   end
   defp render_config(_, _), do: ""

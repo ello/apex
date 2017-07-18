@@ -9,7 +9,9 @@ defmodule Ello.Serve.Webapp.ConfigView do
     Application.get_env(:ello_serve, :webapp_config)[:logo_mark]
   end
 
-  def app_debug() do
+  def app_debug(%{assigns: %{debug: true}}),  do: true
+  def app_debug(%{assigns: %{debug: false}}), do: false
+  def app_debug(_) do
     Application.get_env(:ello_serve, :webapp_config)[:app_debug]
   end
 
