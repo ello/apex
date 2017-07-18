@@ -1,1 +1,1 @@
-<meta name="webappEnv" content="<%= encoded_env() %>" />
+<meta name="webappEnv" content="<%= encoded_env(@conn) %>" />
