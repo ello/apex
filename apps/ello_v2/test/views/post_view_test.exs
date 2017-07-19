@@ -4,7 +4,6 @@ defmodule Ello.V2.PostViewTest do
   alias Ello.V2.PostView
   alias Ello.Core.Content.{Post,Love,Watch,Asset}
   alias Ello.Core.Contest.{ArtistInvite}
-  require IEx
 
   setup %{conn: conn} do
     archer = Script.build(:archer)

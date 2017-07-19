@@ -10,7 +10,6 @@ defmodule Ello.V2.PostView do
   }
   alias Ello.Core.Network.{User}
   alias Ello.Core.Content.{Post,Love,Watch}
-  require IEx
 
   def stale_checks(_, %{data: posts}) do
     [etag: etag(posts)]
