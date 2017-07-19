@@ -1,0 +1,1 @@
+<meta name="webappEnv" content="<%= encoded_env(@conn) %>" />

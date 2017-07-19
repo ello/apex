@@ -12,7 +12,7 @@ defmodule Ello.Serve.Webapp.ConfigView do
   def app_debug(%{assigns: %{debug: true}}),  do: true
   def app_debug(%{assigns: %{debug: false}}), do: false
   def app_debug(_) do
-    Application.get_env(:ello_serve, :webapp_config)[:app_debug]
+    Application.get_env(:ello_serve, :webapp_config)[:app_debug] == "true"
   end
 
   def promo_host() do
@@ -29,6 +29,31 @@ defmodule Ello.Serve.Webapp.ConfigView do
       key ->
         env = Application.get_env(:ello_serve, :webapp_config)[:honeybadger_environment]
         {key, env}
+    end
+  end
+
+  def encoded_env(conn) do
+    conn
+    |> webapp_env()
+    |> Poison.encode!
+    |> URI.encode
+  end
+
+  defp webapp_env(conn) do
+    env = %{
+      "AUTH_CLIENT_ID"    => client_id(),
+      "AUTH_DOMAIN"       => webapp_url(""),
+      "APP_DEBUG"         => app_debug(conn),
+      "PROMO_HOST"        => promo_host(),
+      "SEGMENT_WRITE_KEY" => segment_write_key(),
+    }
+    case honeybadger_config() do
+      {key, env_name} ->
+        Map.merge(env, %{
+          "HONEYBADGER_API_KEY"     => key,
+          "HONEYBADGER_ENVIRONMENT" => env_name,
+        })
+      _ -> env
     end
   end
 end

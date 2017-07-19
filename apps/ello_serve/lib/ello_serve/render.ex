@@ -11,7 +11,7 @@ defmodule Ello.Serve.Render do
            |> Map.put(:conn, conn)
     config = render_config(conn, data)
     measure_segment {__MODULE__, :inject_without_prerender} do
-      html = inject_config(html, config)
+      html = inject_end_head(html, config)
     end
     html(conn, html)
   end
@@ -28,9 +28,9 @@ defmodule Ello.Serve.Render do
 
     measure_segment {__MODULE__, :inject} do
       body = conn.assigns.html
-             |> inject_meta(meta)
-             |> inject_noscript(noscript)
-             |> inject_config(config)
+             |> inject_end_head(meta)
+             |> inject_end_body(noscript)
+             |> inject_end_head(config)
     end
 
     html(conn, body)
@@ -43,10 +43,6 @@ defmodule Ello.Serve.Render do
     end
   end
 
-  defp inject_meta(body, meta) do
-    String.replace(body, "</head>", "#{meta}</head>", global: false)
-  end
-
   defp render_noscript(conn, data) do
     measure_segment {:render, "noscript.html"} do
       view = view_module(conn)
@@ -55,18 +51,18 @@ defmodule Ello.Serve.Render do
     end
   end
 
-  defp inject_noscript(body, noscript) do
-    String.replace(body, "</body>", "#{noscript}</body>", global: false)
-  end
-
   defp render_config(%{assigns: %{app: "webapp"}}, data) do
     measure_segment {:render, "config.html"} do
-      render_to_iodata(Webapp.ConfigView, "script.html", data)
+      render_to_iodata(Webapp.ConfigView, "meta.html", data)
     end
   end
   defp render_config(_, _), do: ""
 
-  defp inject_config(html, config) do
-    String.replace(html, "<body>", "<body>#{config}", global: false)
+  defp inject_end_head(html, fragment) do
+    String.replace(html, "</head>", "#{fragment}</head>", global: false)
+  end
+
+  defp inject_end_body(html, fragment) do
+    String.replace(html, "</body>", "#{fragment}</body>", global: false)
   end
 end
