@@ -16,7 +16,6 @@ defmodule Ello.V2.PostViewTest do
       id: 1,
       author: archer,
       assets: [asset],
-      artist_invite: a_inv,
       reposted_source: nil,
       repost_from_current_user: nil,
       love_from_current_user: nil,
@@ -26,8 +25,7 @@ defmodule Ello.V2.PostViewTest do
       ],
       categories: [category],
       category_ids: [category.id],
-    })
-    Factory.build(:artist_invite_submission, %{post: post, artist_invite: a_inv})
+    }) |> load_artist_invite_submission(a_inv)
     repost = Factory.build(:post, %{
       id: 2,
       author: reposter,
@@ -49,11 +47,11 @@ defmodule Ello.V2.PostViewTest do
         post: post,
         repost: repost,
         reposter: reposter,
-        a_inv1: a_inv,
+        a_inv: a_inv,
     ]}
   end
 
-  test "post.json - it renders the post", %{category: category, post: post, archer: user, conn: conn} do
+  test "post.json - it renders the post", %{category: category, post: post, archer: user, conn: conn, a_inv: a_inv} do
     assert %{
       id: "#{post.id}",
       href: "/api/v2/posts/#{post.id}",
@@ -61,7 +59,7 @@ defmodule Ello.V2.PostViewTest do
       summary: [%{"data" => "<p>Post</p>", "kind" => "text", "link_url" => nil}],
       content: [%{"data" => "<p>Phrasing!</p>", "kind" => "text", "link_url" => nil}],
       author_id: "#{user.id}",
-      artist_invite_id: "#{post.artist_invite.id}",
+      artist_invite_id: "#{a_inv.id}",
       is_adult_content: post.is_adult_content,
       body: [%{"data" => "Phrasing!", "kind" => "text"}],
       loves_count: 1,
@@ -90,17 +88,17 @@ defmodule Ello.V2.PostViewTest do
     )
   end
 
-  test "post.json - it renders a repost", %{post: post, repost: repost, conn: conn} do
+  test "post.json - it renders a repost", %{post: post, repost: repost, conn: conn, a_inv: a_inv} do
     reposted_id = "#{post.id}"
     reposted_author_id = "#{post.author.id}"
     repost_id = "#{repost.id}"
     repost_author_id = "#{repost.author.id}"
-    repost_artist_invite_id = "#{post.artist_invite.id}"
+    artist_invite_id = "#{a_inv.id}"
     assert %{
       id: ^repost_id,
       repost_id: ^reposted_id,
       author_id: ^repost_author_id,
-      artist_invite_id: ^repost_artist_invite_id,
+      artist_invite_id: ^artist_invite_id,
       repost_content: [%{"kind" => "text", "data" => "<p>Phrasing!</p>"}],
       summary: [%{"kind" => "text", "data" => "<p>Post</p>"}],
       loves_count: 1,
@@ -181,7 +179,6 @@ defmodule Ello.V2.PostViewTest do
     post_id = "#{post.id}"
     post_token = post.token
     asset_id = "#{hd(post.assets).id}"
-    artist_invite_id = "#{post.artist_invite.id}"
     assert %{
       posts: %{
         id: ^post_id,
@@ -199,7 +196,6 @@ defmodule Ello.V2.PostViewTest do
         categories: [%{id: ^category_id}],
         users: [%{id: ^user_id}],
         assets: [%{id: ^asset_id}],
-        artist_invites: %{id: ^artist_invite_id},
       }
     } = render(PostView, "show.json",
       data: post,
@@ -226,7 +222,6 @@ defmodule Ello.V2.PostViewTest do
     repost_id = "#{repost.id}"
     post_id = "#{post.id}"
     asset_id = "#{hd(post.assets).id}"
-    artist_invite_id = "#{post.artist_invite.id}"
     assert %{
       posts: %{
         id: ^repost_id,
@@ -235,7 +230,6 @@ defmodule Ello.V2.PostViewTest do
         users: users,
         posts: [%{id: ^post_id}],
         assets: [%{id: ^asset_id}],
-        artist_invites: %{id: ^artist_invite_id},
       }
     } = render(PostView, "show.json",
       data: repost,
@@ -267,7 +261,7 @@ defmodule Ello.V2.PostViewTest do
     )
   end
 
-  test "index.json - it renders a list of posts with linked reposts and assets", %{archer: archer, reposter: reposter, conn: conn, a_inv1: a_inv1} do
+  test "index.json - it renders a list of posts with linked reposts and assets", %{archer: archer, reposter: reposter, conn: conn} do
     user_id1 = "#{archer.id}"
     user_id2 = "#{reposter.id}"
 
@@ -275,18 +269,13 @@ defmodule Ello.V2.PostViewTest do
     asset_id1 = "11"
     post_id2 = "2"
     asset_id2 = "22"
-    post_id3 = "3"
-    asset_id4 = "44"
     reposted_source_id = "3"
     asset_id3 = "33"
-
-    a_inv2 = ArtistInvite.load_images(Factory.insert(:artist_invite, %{id: 2}))
 
     post1 = Factory.build(:post, %{
       id: post_id1,
       author: archer,
       assets: [Asset.build_attachment(Factory.build(:asset, %{id: asset_id1}))],
-      artist_invite: a_inv1,
       reposted_source: nil,
     })
     post2 = Factory.build(:post, %{
@@ -300,33 +289,20 @@ defmodule Ello.V2.PostViewTest do
         reposted_source: nil,
       }),
     })
-    post3 = Factory.build(:post, %{
-      id: post_id3,
-      author: archer,
-      assets: [Asset.build_attachment(Factory.build(:asset, %{id: asset_id4}))],
-      artist_invite: a_inv2,
-      reposted_source: nil,
-    })
-
-    Factory.build(:artist_invite_submission, %{post: post1, artist_invite: a_inv1})
-    Factory.build(:artist_invite_submission, %{post: post3, artist_invite: a_inv2})
 
     posts = [
       post1,
       post2,
-      post3,
     ]
     assert %{
       posts: [
         %{id: ^post_id1, author_id: ^user_id1},
         %{id: ^post_id2, author_id: ^user_id1},
-        %{id: ^post_id3, author_id: ^user_id1},
       ],
       linked: %{
         users: users,
         posts: [%{id: ^reposted_source_id}],
         assets: assets,
-        artist_invites: [%{id: ^a_inv1}, %{id: ^a_inv2}],
       }
     } = render(PostView, "index.json",
       data: posts,
@@ -342,4 +318,7 @@ defmodule Ello.V2.PostViewTest do
     assert Enum.any?(assets, &(&1.id == asset_id2))
     assert Enum.any?(assets, &(&1.id == asset_id3))
   end
+
+  def load_artist_invite_submission(post, a_inv),
+    do: Map.put(post, :artist_invite_submission, Factory.build(:artist_invite_submission, %{post: post, artist_invite: a_inv}))
 end

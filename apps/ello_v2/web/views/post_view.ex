@@ -31,7 +31,6 @@ defmodule Ello.V2.PostView do
     |> include_linked(:users, users, UserView, opts)
     |> include_linked(:posts, reposts, __MODULE__, opts)
     |> include_linked(:assets, assets, AssetView, opts)
-    |> include_linked(:artist_invites, artist_invites, ArtistInviteView, opts)
   end
 
   @doc "Render a post and relations for /api/v2/posts/:id"
@@ -48,7 +47,6 @@ defmodule Ello.V2.PostView do
     |> include_linked(:users, users, UserView, opts)
     |> include_linked(:posts, [post.reposted_source], __MODULE__, opts)
     |> include_linked(:assets, assets, AssetView, opts)
-    |> include_linked(:artist_invites, artist_invites, ArtistInviteView, opts)
   end
 
   @doc "Render a single post as included in other reponses"
@@ -114,8 +112,9 @@ defmodule Ello.V2.PostView do
 
   def author_id(post, _), do: "#{post.author.id}"
 
-  def artist_invite_id(%{reposted_source: %{artist_invite: a_inv}}, _), do: "#{a_inv.id}"
-  def artist_invite_id(post, _), do: "#{post.artist_invite.id}"
+  def artist_invite_id(%{reposted_source: %{artist_invite_submission: %{artist_invite: a_inv}}}, _), do: "#{a_inv.id}"
+  def artist_invite_id(%{artist_invite_submission: %{artist_invite: a_inv}}, _), do: "#{a_inv.id}"
+  def artist_invite_id(_, _), do: nil
 
   def links(%{reposted_source: %Post{} = reposted} = post, conn) do
     post
