@@ -26,7 +26,6 @@ defmodule Ello.Core.Contest.ArtistInvite do
     field :rendered_short_description, :string
     field :submission_body_block, :string
     field :guide, {:array, :map}, default: []
-    field :selected_tokens, {:array, :string}, default: []
 
     belongs_to :brand_account, User
   end
