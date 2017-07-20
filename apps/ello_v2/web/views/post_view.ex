@@ -106,7 +106,7 @@ defmodule Ello.V2.PostView do
   def author_id(post, _), do: "#{post.author.id}"
 
   def artist_invite_id(%{reposted_source: %{artist_invite_submission: %{artist_invite_id: id}}}, _), do: "#{id}"
-  def artist_invite_id(%{artist_invite_submission: %{artist_invite_id: id} = sub} , _), do: "#{id}"
+  def artist_invite_id(%{artist_invite_submission: %{artist_invite_id: id}} , _), do: "#{id}"
   def artist_invite_id(_, _), do: nil
 
   def links(%{reposted_source: %Post{} = reposted} = post, conn) do

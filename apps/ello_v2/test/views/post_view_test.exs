@@ -11,20 +11,22 @@ defmodule Ello.V2.PostViewTest do
     category = Factory.build(:category, id: 3)
     asset = Asset.build_attachment(Factory.build(:asset, id: 1))
     a_inv = ArtistInvite.load_images(Factory.insert(:artist_invite, %{id: 1}))
-    post = Factory.build(:post, %{
-      id: 1,
-      author: archer,
-      assets: [asset],
-      reposted_source: nil,
-      repost_from_current_user: nil,
-      love_from_current_user: nil,
-      watch_from_current_user: nil,
-      rendered_summary: [
-        %{"data" => "<p>Post</p>", "kind" => "text", "link_url" => nil}
-      ],
-      categories: [category],
-      category_ids: [category.id],
-    }) |> load_artist_invite_submission(a_inv)
+    post = :post
+           |> Factory.build(%{
+             id: 1,
+             author: archer,
+             assets: [asset],
+             reposted_source: nil,
+             repost_from_current_user: nil,
+             love_from_current_user: nil,
+             watch_from_current_user: nil,
+             rendered_summary: [
+               %{"data" => "<p>Post</p>", "kind" => "text", "link_url" => nil}
+             ],
+             categories: [category],
+             category_ids: [category.id],
+           })
+           |> load_artist_invite_submission(a_inv)
     repost = Factory.build(:post, %{
       id: 2,
       author: reposter,
