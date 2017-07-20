@@ -6,7 +6,6 @@ defmodule Ello.V2.PostView do
     UserView,
     AssetView,
     PostMetaAttributesView,
-    ArtistInviteView,
   }
   alias Ello.Core.Network.{User}
   alias Ello.Core.Content.{Post,Love,Watch}
