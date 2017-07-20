@@ -21,7 +21,6 @@ defmodule Ello.V2.PostView do
     assets         = post_assets(posts)
     reposts        = Enum.map(posts, &(&1.reposted_source))
     all_posts      = post_and_reposts(posts)
-    artist_invites = post_artist_invites(posts)
     categories     = Enum.flat_map(all_posts ++ users, &(&1.categories))
 
     json_response()
@@ -37,7 +36,6 @@ defmodule Ello.V2.PostView do
     users          = post_users(post, post.reposted_source)
     assets         = post_assets(post, post.reposted_source)
     posts          = post_and_reposts(post, post.reposted_source)
-    artist_invites = post_artist_invites(post, post.reposted_source)
     categories     = Enum.flat_map(posts ++ users, &(&1.categories))
 
     json_response()
@@ -92,10 +90,6 @@ defmodule Ello.V2.PostView do
   defp post_and_reposts(post, %Post{} = repost), do: [post, repost]
   defp post_and_reposts(post, _), do: [post]
 
-  defp post_artist_invites(posts) when is_list(posts), do: Enum.flat_map(posts, &(post_artist_invites(&1, &1.reposted_source)))
-  defp post_artist_invites(_, %{artist_invite: artist_invite}), do: [artist_invite]
-  defp post_artist_invites(%{artist_invite: artist_invite}, _), do: [artist_invite]
-
   def href(%{id: id}, _), do: "/api/v2/posts/#{id}"
 
   def summary(%{reposted_source: %{rendered_summary: summary}}, _), do: summary
@@ -111,8 +105,8 @@ defmodule Ello.V2.PostView do
 
   def author_id(post, _), do: "#{post.author.id}"
 
-  def artist_invite_id(%{reposted_source: %{artist_invite_submission: %{artist_invite: a_inv}}}, _), do: "#{a_inv.id}"
-  def artist_invite_id(%{artist_invite_submission: %{artist_invite: a_inv}}, _), do: "#{a_inv.id}"
+  def artist_invite_id(%{reposted_source: %{artist_invite_submission: %{artist_invite_id: id}}}, _), do: "#{id}"
+  def artist_invite_id(%{artist_invite_submission: %{artist_invite_id: id} = sub} , _), do: "#{id}"
   def artist_invite_id(_, _), do: nil
 
   def links(%{reposted_source: %Post{} = reposted} = post, conn) do

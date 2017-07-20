@@ -319,5 +319,5 @@ defmodule Ello.V2.PostViewTest do
   end
 
   def load_artist_invite_submission(post, a_inv),
-    do: Map.put(post, :artist_invite_submission, Factory.build(:artist_invite_submission, %{post: post, artist_invite: a_inv}))
+    do: Map.put(post, :artist_invite_submission, Factory.build(:artist_invite_submission, %{post: post, artist_invite: a_inv, artist_invite_id: a_inv.id}))
 end
