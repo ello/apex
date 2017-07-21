@@ -15,4 +15,14 @@ defmodule Ello.Serve.Webapp.ArtistInviteView do
     version = Enum.find(versions, &(&1.name == "hdpi"))
     image_url(path, version.filename)
   end
+
+  def next_artist_invite_page_url(%{"page" => page}) do
+    page = page
+           |> String.to_integer
+           |> (fn(n) -> n + 1 end).()
+           |> Integer.to_string
+    webapp_url("artist-invites", page: page)
+  end
+  def next_artist_invite_page_url(_),
+    do: webapp_url("artist-invites", page: "2")
 end
