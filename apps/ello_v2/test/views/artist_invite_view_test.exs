@@ -131,4 +131,64 @@ defmodule Ello.V2.ArtistInviteViewTest do
     assert json[:links][:approved_submissions]
     assert json[:links][:selected_submissions]
   end
+
+  test "artist_invit.json - status - preview", context do
+    inv = %{context.a_inv1 | status: "preview"}
+    json = ArtistInviteView.render("artist_invite.json", %{
+      artist_invite: inv,
+      conn:          context.brand_conn,
+    })
+    assert json[:status] == "preview"
+  end
+
+  test "artist_invit.json - status - upcoming", context do
+    now = DateTime.utc_now |> DateTime.to_unix
+    inv = %{context.a_inv1 |
+      status: "open",
+      opened_at: DateTime.from_unix!(now + 1_000_000),
+      closed_at: DateTime.from_unix!(now + 2_000_000),
+    }
+    json = ArtistInviteView.render("artist_invite.json", %{
+      artist_invite: inv,
+      conn:          context.conn,
+    })
+    assert json[:status] == "upcoming"
+  end
+
+  test "artist_invit.json - status - open", context do
+    now = DateTime.utc_now |> DateTime.to_unix
+    inv = %{context.a_inv1 |
+      status:    "open",
+      opened_at: DateTime.from_unix!(now - 1_000_000),
+      closed_at: DateTime.from_unix!(now + 1_000_000),
+    }
+    json = ArtistInviteView.render("artist_invite.json", %{
+      artist_invite: inv,
+      conn:          context.conn,
+    })
+    assert json[:status] == "open"
+  end
+
+  test "artist_invit.json - status - selecting", context do
+    now = DateTime.utc_now |> DateTime.to_unix
+    inv = %{context.a_inv1 |
+      status:    "open",
+      opened_at: DateTime.from_unix!(now - 2_000_000),
+      closed_at: DateTime.from_unix!(now - 1_000_000),
+    }
+    json = ArtistInviteView.render("artist_invite.json", %{
+      artist_invite: inv,
+      conn:          context.conn,
+    })
+    assert json[:status] == "selecting"
+  end
+
+  test "artist_invit.json - status - closed", context do
+    inv = %{context.a_inv1 | status: "closed"}
+    json = ArtistInviteView.render("artist_invite.json", %{
+      artist_invite: inv,
+      conn:          context.conn,
+    })
+    assert json[:status] == "closed"
+  end
 end

@@ -30,7 +30,6 @@ defmodule Ello.V2.ArtistInviteView do
     :invite_type,
     :opened_at,
     :closed_at,
-    :status,
     :submission_body_block,
   ]
 
@@ -40,6 +39,7 @@ defmodule Ello.V2.ArtistInviteView do
     :description,
     :short_description,
     :guide,
+    :status,
   ]
 
   def header_image(artist_invite, conn),
@@ -112,4 +112,18 @@ defmodule Ello.V2.ArtistInviteView do
     })
   end
   defp add_selected_link(links, _, _), do: links
+
+  def status(%{status: "open", closed_at: nil}, _), do: "open"
+  def status(%{status: "open", opened_at: nil}, _), do: "upcoming"
+  def status(%{status: "open"} = invite, _) do
+    now    = DateTime.utc_now |> DateTime.to_unix
+    open   = DateTime.to_unix(invite.opened_at)
+    closed = DateTime.to_unix(invite.closed_at)
+    cond do
+      now < open   -> "upcoming"
+      now > closed -> "selecting"
+      true         -> "open"
+    end
+  end
+  def status(%{status: status}, _), do: status
 end
