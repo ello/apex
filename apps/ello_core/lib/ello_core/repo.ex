@@ -9,8 +9,11 @@ defmodule Ello.Core.Repo do
 
   def get_by_id_or_slug(query, id_or_slug: "~" <> slug),
     do: __MODULE__.get_by(query, slug: slug)
-  def get_by_id_or_slug(query, id_or_slug: id) do
+  def get_by_id_or_slug(query, id_or_slug: id) when is_binary(id) do
     id = String.to_integer(id)
+    __MODULE__.get(query, id)
+  end
+  def get_by_id_or_slug(query, id_or_slug: id) do
     __MODULE__.get(query, id)
   end
 end
