@@ -1,0 +1,11 @@
+<ul>
+  <%= for artist_invite <- @artist_invites do %>
+    <li>
+      <a href="<%= webapp_url("artist_invites/#{artist_invite.slug}") %>">
+        <img src="<%= artist_invite_image_url(artist_invite) %>" alt="<%= artist_invite.title %>" />
+        <h2><%= artist_invite.title %></h2>
+      </a>
+      <p><%= artist_invite.raw_short_description %></p>
+    </li>
+  <% end %>
+</ul>
