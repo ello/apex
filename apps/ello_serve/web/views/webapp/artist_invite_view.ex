@@ -3,6 +3,13 @@ defmodule Ello.Serve.Webapp.ArtistInviteView do
   import Ello.V2.ImageView, only: [image_url: 2]
 
   # TODO: Figure out content for meta tags for title, description, etc.
+  def render("meta.html", %{artist_invite: artist_invite} = assigns) do
+    assigns = assigns
+              |> Map.put(:title, "#{artist_invite.title} | Ello")
+              |> Map.put(:description, artist_invite.raw_short_description)
+              |> Map.put(:robots, "index, follow")
+    render_template("meta.html", assigns)
+  end
   def render("meta.html", assigns) do
     assigns = assigns
               |> Map.put(:title, "Artist Invites | Ello")
@@ -11,7 +18,7 @@ defmodule Ello.Serve.Webapp.ArtistInviteView do
     render_template("meta.html", assigns)
   end
 
-  def artist_invite_image_url(%{logo_image_struct: %{path: path, versions: versions}}) do
+  def artist_invite_image_url(%{header_image_struct: %{path: path, versions: versions}}) do
     version = Enum.find(versions, &(&1.name == "hdpi"))
     image_url(path, version.filename)
   end

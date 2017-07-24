@@ -36,6 +36,7 @@ defmodule Ello.Serve.Router do
     get "/discover/:category",    DiscoverPostController, :category
     get "/search",                SearchController, :index
     get "/artist-invites",        ArtistInviteController, :index
+    get "/artist-invites/:id",    ArtistInviteController, :show
 
     # Logged in only routes - no fallback content required
     get "/following",             NoContentController, :show

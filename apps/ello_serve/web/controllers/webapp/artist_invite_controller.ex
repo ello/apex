@@ -8,7 +8,17 @@ defmodule Ello.Serve.Webapp.ArtistInviteController do
     })
   end
 
+  def show(conn, %{"id" => id_or_slug}) do
+    render_html(conn, %{
+      artist_invite: fn -> artist_invite(conn, id_or_slug) end
+    })
+  end
+
   defp artist_invites(conn) do
     Contest.artist_invites(standard_params(conn))
+  end
+
+  defp artist_invite(conn, id_or_slug) do
+    Contest.artist_invite(standard_params(conn, %{id_or_slug: id_or_slug}))
   end
 end
