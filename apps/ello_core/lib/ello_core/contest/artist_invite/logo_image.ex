@@ -9,8 +9,8 @@ defmodule Ello.Core.Contest.ArtistInvite.LogoImage do
       versions: Image.Version.from_metadata_with_defaults(%{
         metadata: artist_invite.logo_image_metadata,
         original: artist_invite.logo_image,
-        required_versions: [:optimized, :xhdpi, :hdpi],
-        default_type: "image/jpeg",
+        required_versions: [:optimized],
+        default_type: "image/png",
       }),
     }
   end
