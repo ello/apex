@@ -10,7 +10,8 @@ defmodule Ello.Serve.Webapp.ArtistInviteController do
 
   def show(conn, %{"id" => id_or_slug}) do
     render_html(conn, %{
-      artist_invite: fn -> artist_invite(conn, id_or_slug) end
+      artist_invite: fn -> artist_invite(conn, id_or_slug) end,
+      submissions: fn -> submissions(conn, id_or_slug) end,
     })
   end
 
@@ -19,6 +20,13 @@ defmodule Ello.Serve.Webapp.ArtistInviteController do
   end
 
   defp artist_invite(conn, id_or_slug) do
-    Contest.artist_invite(standard_params(conn, %{id_or_slug: id_or_slug}))
+    Contest.artist_invite(%{id_or_slug: id_or_slug})
+  end
+
+  defp submissions(conn, id_or_slug) do
+    Contest.artist_invite_submissions(standard_params(conn, %{
+      invite: Contest.artist_invite(%{id_or_slug: id_or_slug}),
+      status: "approved",
+    }))
   end
 end
