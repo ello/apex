@@ -1,0 +1,32 @@
+<img src="<%= artist_invite_image_url(@artist_invite) %>" alt="<%= @artist_invite.title %>" />
+<h1><%= @artist_invite.title %></h1>
+<h3><%= @artist_invite.invite_type %></h3>
+<h2><%= @artist_invite.status %></h2>
+<p><%= @artist_invite.opened_at %> - <%= @artist_invite.closed_at %></p>
+<p><%= @artist_invite.raw_description %></p>
+<%= for guide_section <- @artist_invite.guide do %>
+  <h3><%= guide_section["title"] %></h3>
+  <p><%= guide_section["raw_body"] %></p>
+<% end %>
+
+<%= if assigns[:selections] do %>
+  <h2>Selections</h2>
+  <%= for selection <- @selections do %>
+    <%= render PostView, "summary.html", Map.put(assigns, :post, selection.post) %>
+  <% end %>
+<% end %>
+
+<h2>Submissions</h2>
+<%= for submission <- @submissions do %>
+  <%= render PostView, "header.html", Map.put(assigns, :post, submission.post) %>
+
+  <%= for block <- (submission.post.rendered_content || []) do %>
+    <%= render PostView, "block.html", Map.put(assigns, :block, block) %>
+  <% end %>
+
+  <%= render PostView, "footer.html", Map.put(assigns, :post, submission.post) %>
+<% end %>
+
+<%= if Enum.count(@submissions) > 0 do %>
+  <%= link "Next Page", to: next_artist_invite_submission_page_url(@artist_invite.id, @submissions) %>
+<% end %>
