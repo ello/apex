@@ -51,7 +51,6 @@ defmodule Ello.V2.ArtistInviteControllerTest do
 
   test "GET /v2/artist_invites - normal users can't preview artist invites", %{conn: conn, a_inv1: a_inv1, a_inv2: a_inv2, a_inv3: a_inv3} do
     conn = get(conn, artist_invite_path(conn, :index), %{preview: true})
-    response = json_response(conn, 200)
 
     assert %{"artist_invites" => artist_invites} = json_response(conn, 200)
     assert Enum.member?(artist_invite_ids(artist_invites), "#{a_inv1.id}")

@@ -73,42 +73,48 @@ defmodule Ello.V2.ArtistInviteView do
 
   defp add_unapproved_link(links, %{id: id, brand_account_id: user_id}, %{id: user_id}) do
     Map.put(links, :unapproved_submissions, %{
-      type: "artist_invite_submission_stream",
-      href: "/api/v2/artist_invites/#{id}/submissions?status=unapproved",
+      label: "To Review",
+      type:  "artist_invite_submission_stream",
+      href:  "/api/v2/artist_invites/#{id}/submissions?status=unapproved",
     })
   end
   defp add_unapproved_link(links, %{id: id}, %{is_staff: true}) do
     Map.put(links, :unapproved_submissions, %{
-      type: "artist_invite_submission_stream",
-      href: "/api/v2/artist_invites/#{id}/submissions?status=unapproved",
+      label: "To Review",
+      type:  "artist_invite_submission_stream",
+      href:  "/api/v2/artist_invites/#{id}/submissions?status=unapproved",
     })
   end
   defp add_unapproved_link(links, _, _), do: links
 
   defp add_approved_link(links, %{id: id, status: status}, _) when status in ["open", "closed"] do
     Map.put(links, :approved_submissions, %{
-      type: "artist_invite_submission_stream",
-      href: "/api/v2/artist_invites/#{id}/submissions?status=approved",
+      label: "Selected",
+      type:  "artist_invite_submission_stream",
+      href:  "/api/v2/artist_invites/#{id}/submissions?status=approved",
     })
   end
   defp add_approved_link(links, _, _), do: links
 
   defp add_selected_link(links, %{id: id, brand_account_id: user_id}, %{id: user_id}) do
     Map.put(links, :selected_submissions, %{
-      type: "artist_invite_submission_stream",
-      href: "/api/v2/artist_invites/#{id}/submissions?status=selected",
+      label: "Selected",
+      type:  "artist_invite_submission_stream",
+      href:  "/api/v2/artist_invites/#{id}/submissions?status=selected",
     })
   end
   defp add_selected_link(links, %{id: id}, %{is_staff: true}) do
     Map.put(links, :selected_submissions, %{
-      type: "artist_invite_submission_stream",
-      href: "/api/v2/artist_invites/#{id}/submissions?status=selected",
+      label: "Selected",
+      type:  "artist_invite_submission_stream",
+      href:  "/api/v2/artist_invites/#{id}/submissions?status=selected",
     })
   end
   defp add_selected_link(links, %{id: id, status: "closed"}, _) do
     Map.put(links, :selected_submissions, %{
-      type: "artist_invite_submission_stream",
-      href: "/api/v2/artist_invites/#{id}/submissions?status=selected",
+      label: "Selected",
+      type:  "artist_invite_submission_stream",
+      href:  "/api/v2/artist_invites/#{id}/submissions?status=selected",
     })
   end
   defp add_selected_link(links, _, _), do: links
