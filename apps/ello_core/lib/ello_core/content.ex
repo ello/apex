@@ -5,7 +5,6 @@ defmodule Ello.Core.Content do
   alias Ello.Core.Repo
   alias Ello.Core.Network
   alias __MODULE__.{
-    PostsPage,
     Filter,
     Preload,
     Post,
@@ -67,6 +66,7 @@ defmodule Ello.Core.Content do
     * ids - Finds by post ids, posts returned in same order as ids.
     * tokens - Finds by post tokens, posts returned in same order as tokens.
     * related_to - Finds posts related to the post passed in.
+    * user_id - Finds posts authored/reposted by the given user.
 
   Posts are returned in the order the ids are given.
   """
@@ -101,6 +101,16 @@ defmodule Ello.Core.Content do
     |> Preload.post_list(options)
     |> Filter.post_list(options)
   end
+  def posts(%{user_id: user_id} = options) do
+    Post
+    |> Filter.post_query(options)
+    |> where([p], p.author_id == ^user_id)
+    |> where([p], is_nil(p.parent_post_id))
+    |> post_pagination(options)
+    |> Repo.all
+    |> Preload.post_list(options)
+    |> Filter.post_list(options)
+  end
 
   defp post_sorting(posts, field, values) do
     measure_segment {__MODULE__, "post_sorting"} do
@@ -111,6 +121,19 @@ defmodule Ello.Core.Content do
     end
   end
 
+  defp post_pagination(query, %{before: nil, per_page: per_page}) do
+    query
+    |> order_by([p], [desc: p.created_at])
+    |> limit(^per_page)
+  end
+  defp post_pagination(query, %{before: before, per_page: per_page}) do
+    before = parse_before(before)
+    query
+    |> order_by([p], [desc: p.created_at])
+    |> where([p], p.created_at < ^before)
+    |> limit(^per_page)
+  end
+
   def loves(%{user: %{id: user_id}} = options) do
     Love
     |> where([l], l.user_id == ^user_id)
@@ -118,66 +141,5 @@ defmodule Ello.Core.Content do
     |> Network.paginate(options)
     |> Repo.all
     |> Preload.loves(options)
-  end
-
-  @spec posts_page(options) :: PostsPage.t
-  def posts_page(%{per_page: per_page} = options) do
-    before = parse_before(options[:before])
-
-    total_query = total_posts_by_user_query(options)
-    remaining_query = remaining_posts_by_user_query(total_query, before)
-
-    measure_segment {:db, "Ecto.UserPostsQuery"} do
-      posts_task = Task.async(__MODULE__, :page_of_posts_by_user_query, [remaining_query, options])
-      total_count_task = Task.async(__MODULE__, :count_and_pages_calc, [total_query, per_page])
-      remaining_count_task = Task.async(__MODULE__, :count_and_pages_calc, [remaining_query, per_page])
-
-      query_wait_time = Application.get_env(:ello_core, :user_post_query_timeout)
-
-      posts = Task.await(posts_task, query_wait_time)
-      {total_count, total_pages} = Task.await(total_count_task, query_wait_time)
-      {_, remaining_pages} = Task.await(remaining_count_task, query_wait_time)
-    end
-
-    last_post_date = get_last_post_created_at(posts)
-
-    %PostsPage{
-      posts: posts,
-      total_pages: total_pages,
-      total_count: total_count,
-      total_pages_remaining: remaining_pages,
-      per_page: per_page,
-      before: last_post_date,
-    }
-  end
-
-  defp total_posts_by_user_query(%{user_id: user_id} = options) do
-    Post
-    |> Filter.post_query(options)
-    |> where([p], p.author_id == ^user_id and is_nil(p.parent_post_id))
-  end
-
-  defp remaining_posts_by_user_query(total_query, nil), do: total_query
-  defp remaining_posts_by_user_query(total_query, date) do
-    where(total_query, [p], p.created_at < ^date)
-  end
-
-  def page_of_posts_by_user_query(remaining_query, %{per_page: per_page} = options) do
-    remaining_query
-    |> order_by([p], [desc: p.created_at])
-    |> limit(^per_page)
-    |> Repo.all
-    |> Preload.post_list(options)
-    |> Filter.post_list(options)
-  end
-
-  defp get_last_post_created_at([]), do: nil
-  defp get_last_post_created_at(posts) do
-    List.last(posts).created_at
-  end
-
-  def count_and_pages_calc(query, per_page) do
-    count = Repo.aggregate(query, :count, :id)
-    {count, round(Float.ceil(count / per_page))}
   end
 end

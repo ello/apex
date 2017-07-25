@@ -41,6 +41,7 @@ defmodule Ello.Core.Mixfile do
       {:redix,        "~> 0.4.0"},
       {:poison,       ">= 2.2.0"},
       {:ex_machina,   "~> 1.0.2"},
+      {:timex,        "~> 3.0"},
 
       {:newrelic_phoenix, github: "ello/newrelic_phoenix", branch: "master"},
     ]

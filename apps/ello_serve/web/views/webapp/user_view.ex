@@ -24,7 +24,7 @@ defmodule Ello.Serve.Webapp.UserView do
     image_url(user.avatar_struct.path, version.filename)
   end
 
-  def next_post_page_url(user, posts_page) do
-    webapp_url(user.username, before: DateTime.to_iso8601(posts_page.before))
+  def next_post_page_url(user, posts) do
+    webapp_url(user.username, before: DateTime.to_iso8601(List.last(posts).created_at))
   end
 end

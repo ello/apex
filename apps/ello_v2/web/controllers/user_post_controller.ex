@@ -17,18 +17,21 @@ defmodule Ello.V2.UserPostController do
       preload:        false
     })
     if can_view_user?(conn, user) do
-      posts_page = fetch_posts_page(conn, user)
+      posts = fetch_posts(conn, user)
 
       conn
-      |> track_post_view(posts_page.posts, stream_kind: "user", stream_id: user.id)
-      |> add_pagination_headers("/users/#{user.id}/posts", posts_page)
-      |> api_render_if_stale(PostView, :index, data: posts_page.posts)
+      |> track_post_view(posts, stream_kind: "user", stream_id: user.id)
+      |> add_pagination_headers("/users/#{user.id}/posts", posts)
+      |> api_render_if_stale(PostView, :index, data: posts)
     else
       send_resp(conn, 404, "")
     end
   end
 
-  defp fetch_posts_page(conn, user) do
-    Content.posts_page(standard_params(conn, %{user_id: user.id}))
+  defp fetch_posts(conn, user) do
+    Content.posts(standard_params(conn, %{
+      user_id: user.id,
+      default: %{per_page: 10},
+    }))
   end
 end
