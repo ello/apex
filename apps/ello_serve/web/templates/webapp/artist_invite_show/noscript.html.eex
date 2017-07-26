@@ -18,13 +18,7 @@
 
 <h2>Submissions</h2>
 <%= for submission <- @submissions do %>
-  <%= render PostView, "header.html", Map.put(assigns, :post, submission.post) %>
-
-  <%= for block <- (submission.post.rendered_content || []) do %>
-    <%= render PostView, "block.html", Map.put(assigns, :block, block) %>
-  <% end %>
-
-  <%= render PostView, "footer.html", Map.put(assigns, :post, submission.post) %>
+  <%= render PostView, "summary.html", Map.put(assigns, :post, submission.post) %>
 <% end %>
 
 <%= if Enum.count(@submissions) > 0 do %>
