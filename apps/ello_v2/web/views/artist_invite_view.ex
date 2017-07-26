@@ -89,7 +89,7 @@ defmodule Ello.V2.ArtistInviteView do
 
   defp add_approved_link(links, %{id: id, status: status}, _) when status in ["open", "closed"] do
     Map.put(links, :approved_submissions, %{
-      label: "Selected",
+      label: "Approved",
       type:  "artist_invite_submission_stream",
       href:  "/api/v2/artist_invites/#{id}/submissions?status=approved",
     })
