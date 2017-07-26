@@ -22,12 +22,12 @@ defmodule Ello.Serve.Webapp.ArtistInviteShowView do
     image_url(path, version.filename)
   end
 
-  def next_artist_invite_submission_page_url(id, submissions) do
+  def next_artist_invite_submission_page_url(slug, submissions) do
     before = submissions
              |> List.last
              |> Map.get(:created_at)
              |> DateTime.to_iso8601
-    webapp_url("artist-invites/#{id}", before: before)
+    webapp_url("artist-invites/#{slug}", before: before)
   end
 
   defp selections(invite) do

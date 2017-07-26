@@ -22,5 +22,5 @@
 <% end %>
 
 <%= if Enum.count(@submissions) > 0 do %>
-  <%= link "Next Page", to: next_artist_invite_submission_page_url(@artist_invite.id, @submissions) %>
+  <%= link "Next Page", to: next_artist_invite_submission_page_url(@artist_invite.slug, @submissions) %>
 <% end %>
