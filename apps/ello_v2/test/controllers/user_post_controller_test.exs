@@ -15,7 +15,15 @@ defmodule Ello.V2.UserPostControllerTest do
       })
     end
     post = hd(posts)
-    {:ok, conn: auth_conn(conn, user), user: user, author: author, posts: posts, post: post}
+    {:ok, [
+      conn: auth_conn(conn, user),
+      public_conn: public_conn(conn),
+      author_conn: auth_conn(conn, author),
+      user: user,
+      author: author,
+      posts: posts,
+      post: post
+    ]}
   end
 
   test "GET /v2/users/:id/posts", %{conn: conn, author: author} do
@@ -97,4 +105,14 @@ defmodule Ello.V2.UserPostControllerTest do
     assert response.status == 404
   end
 
+  test "GET /v2/profile/posts - without current user", %{public_conn: conn} do
+    response = get(conn, "/api/v2/profile/posts")
+    assert response.status == 401
+  end
+
+  test "GET /v2/profile/posts - with current user", %{author_conn: conn} do
+    response = get(conn, "/api/v2/profile/posts")
+    json = json_response(response, 200)
+    assert length(json["posts"]) == 8
+  end
 end

@@ -28,6 +28,24 @@ defmodule Ello.V2.UserPostController do
     end
   end
 
+  @doc """
+  GET /v2/profile/posts
+
+  Render posts written by the current user.
+  """
+  def profile(conn, _) do
+    case current_user(conn) do
+      nil  -> send_resp(conn, 401, "")
+      user ->
+        posts = fetch_posts(conn, user)
+
+        conn
+        |> track_post_view(posts, stream_kind: "user", stream_id: user.id)
+        |> add_pagination_headers("/users/#{user.id}/posts", posts)
+        |> api_render_if_stale(PostView, :index, data: posts)
+    end
+  end
+
   defp fetch_posts(conn, user) do
     Content.posts(standard_params(conn, %{
       user_id: user.id,
