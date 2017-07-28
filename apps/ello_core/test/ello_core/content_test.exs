@@ -1,7 +1,6 @@
 defmodule Ello.Core.ContentTest do
   use Ello.Core.Case
   alias Ello.Core.{Content, Image, Repo}
-  alias Ello.Core.Content.{PostsPage}
 
   setup do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
@@ -237,7 +236,7 @@ defmodule Ello.Core.ContentTest do
     assert fetched_post.watch_from_current_user.id == watch.id
   end
 
-  test "posts_page/1 - returns a page of results, and paginates", %{user: user} do
+  test "posts/1 - by user - returns a page of posts", %{user: user} do
     author = Factory.insert(:user)
     now_date = DateTime.utc_now
     {:ok, earlier_date} = now_date
@@ -251,26 +250,22 @@ defmodule Ello.Core.ContentTest do
       Factory.insert(:post, %{author: author, created_at: earlier_date}),
       Factory.insert(:post, %{author: author, created_at: earlier_date}),
       Factory.insert(:post, %{author: author, created_at: earlier_date}),
-      Factory.insert(:post, %{author: author, created_at: DateTime.utc_now}),
-      Factory.insert(:post, %{author: author, created_at: DateTime.utc_now}),
-      Factory.insert(:post, %{author: author, created_at: DateTime.utc_now}),
+      Factory.insert(:post, %{author: author, created_at: now_date}),
+      Factory.insert(:post, %{author: author, created_at: now_date}),
+      Factory.insert(:post, %{author: author, created_at: now_date}),
     ]
 
-    posts_page = Content.posts_page(%{
+    posts = Content.posts(%{
       user_id:      author.id,
       current_user: user,
       allow_nsfw:   true,
       allow_nudity: true,
       per_page:     3,
+      before:       nil,
     })
-    assert %PostsPage{} = posts_page
-    assert posts_page.total_pages == 3
-    assert posts_page.total_count == 9
-    assert posts_page.total_pages_remaining == 3
-    assert posts_page.per_page == 3
-    assert (Map.put(posts_page.before, :microsecond, 0)) == (Map.put(now_date, :microsecond, 0))
+    assert Timex.diff(List.last(posts).created_at, now_date) < 1
 
-    posts_page = Content.posts_page(%{
+    posts2 = Content.posts(%{
       user_id:      author.id,
       current_user: user,
       allow_nsfw:   true,
@@ -278,12 +273,7 @@ defmodule Ello.Core.ContentTest do
       per_page:     3,
       before:       now_date,
     })
-    assert %PostsPage{} = posts_page
-    assert posts_page.total_pages == 3
-    assert posts_page.total_count == 9
-    assert posts_page.total_pages_remaining == 2
-    assert posts_page.per_page == 3
-    assert (Map.put(posts_page.before, :microsecond, 0)) == (Map.put(earlier_date, :microsecond, 0))
+    assert Timex.diff(List.last(posts2).created_at, earlier_date) < 1
   end
 
   test "posts/1 - by ids - does not include duplicates" do
