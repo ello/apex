@@ -111,6 +111,21 @@ defmodule Ello.V2.ArtistInviteSubmissionControllerTest do
     end
   end
 
+  test "GET /v2/artist_invites/~:slug/submissions?status=approved - submissions are in descending order", %{conn: conn} = c do
+    {:ok, _} = Repo.update(Ecto.Changeset.change(c[:invite], status: "closed"))
+    resp = get(conn, "/api/v2/artist_invites/~test/submissions", %{"status" => "approved"})
+    json = json_response(resp, 200)
+    # require IEx; IEx.pry
+    [sub1, sub2, sub3, sub4] = json["artist_invite_submissions"]
+    {:ok, date1, _} = DateTime.from_iso8601(sub1["created_at"])
+    {:ok, date2, _} = DateTime.from_iso8601(sub2["created_at"])
+    {:ok, date3, _} = DateTime.from_iso8601(sub3["created_at"])
+    {:ok, date4, _} = DateTime.from_iso8601(sub4["created_at"])
+    assert date1 > date2
+    assert date2 > date3
+    assert date3 > date4
+  end
+
   test "GET /v2/artist_invites/~:slug/submissions?status=approved - regular user - invite closed", %{conn: conn} = c do
     {:ok, _} = Repo.update(Ecto.Changeset.change(c[:invite], status: "closed"))
     resp = get(conn, "/api/v2/artist_invites/~test/submissions", %{"status" => "approved"})

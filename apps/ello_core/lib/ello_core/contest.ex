@@ -109,6 +109,7 @@ defmodule Ello.Core.Contest do
     ArtistInviteSubmission
     |> for_invite(options)
     |> by_status(status)
+    |> order_by([s], [desc: s.created_at])
     |> paginate_submissions(options)
     |> Repo.all
     |> Preload.artist_invite_submissions(options)
