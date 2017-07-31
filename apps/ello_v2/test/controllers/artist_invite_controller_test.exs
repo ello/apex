@@ -32,7 +32,7 @@ defmodule Ello.V2.ArtistInviteControllerTest do
   end
 
   test "GET /v2/artist_invites - staff can preview artist invites", %{staff_conn: conn, a_inv1: a_inv1, a_inv2: a_inv2, a_inv3: a_inv3} do
-    conn = get(conn, artist_invite_path(conn, :index), %{preview: true})
+    conn = get(conn, artist_invite_path(conn, :index), %{preview: "true"})
 
     assert %{"artist_invites" => artist_invites} = json_response(conn, 200)
     assert Enum.member?(artist_invite_ids(artist_invites), "#{a_inv1.id}")
@@ -41,7 +41,7 @@ defmodule Ello.V2.ArtistInviteControllerTest do
   end
 
   test "GET /v2/artist_invites - brand accounts can preview their own artist invite", %{brand_conn: conn, a_inv1: a_inv1, a_inv2: a_inv2, a_inv3: a_inv3} do
-    conn = get(conn, artist_invite_path(conn, :index), %{preview: true})
+    conn = get(conn, artist_invite_path(conn, :index), %{preview: "true"})
 
     assert %{"artist_invites" => artist_invites} = json_response(conn, 200)
     assert Enum.member?(artist_invite_ids(artist_invites), "#{a_inv1.id}")
@@ -50,7 +50,7 @@ defmodule Ello.V2.ArtistInviteControllerTest do
   end
 
   test "GET /v2/artist_invites - normal users can't preview artist invites", %{conn: conn, a_inv1: a_inv1, a_inv2: a_inv2, a_inv3: a_inv3} do
-    conn = get(conn, artist_invite_path(conn, :index), %{preview: true})
+    conn = get(conn, artist_invite_path(conn, :index), %{preview: "true"})
 
     assert %{"artist_invites" => artist_invites} = json_response(conn, 200)
     assert Enum.member?(artist_invite_ids(artist_invites), "#{a_inv1.id}")
@@ -78,22 +78,22 @@ defmodule Ello.V2.ArtistInviteControllerTest do
   end
 
   test "GET /v2/artist_invites/:id - staff can preview artist invites", %{staff_conn: conn, a_inv2: a_inv2} do
-    conn = get(conn, artist_invite_path(conn, :show, "~#{a_inv2.slug}"), %{preview: true})
+    conn = get(conn, artist_invite_path(conn, :show, "~#{a_inv2.slug}"), %{preview: "true"})
     assert conn.status == 200
   end
 
   test "GET /v2/artist_invites/:id - brand accounts can preview their own artist invite", %{brand_conn: conn, a_inv3: a_inv3} do
-    conn = get(conn, artist_invite_path(conn, :show, "~#{a_inv3.slug}"), %{preview: true})
+    conn = get(conn, artist_invite_path(conn, :show, "~#{a_inv3.slug}"), %{preview: "true"})
     assert conn.status == 200
   end
 
   test "GET /v2/artist_invites/:id - brand accounts can't preview other artist invites", %{brand_conn: conn, a_inv2: a_inv2} do
-    conn = get(conn, artist_invite_path(conn, :show, "~#{a_inv2.slug}"), %{preview: true})
+    conn = get(conn, artist_invite_path(conn, :show, "~#{a_inv2.slug}"), %{preview: "true"})
     assert conn.status == 404
   end
 
   test "GET /v2/artist_invites/:id - normal users can't view preview artist invites", %{conn: conn, a_inv2: a_inv2} do
-    conn = get(conn, artist_invite_path(conn, :show, "~#{a_inv2.slug}"), %{preview: true})
+    conn = get(conn, artist_invite_path(conn, :show, "~#{a_inv2.slug}"), %{preview: "true"})
     assert conn.status == 404
   end
 
