@@ -29,6 +29,7 @@ defmodule Ello.V2.Router do
     resources "/users", UserController, only: [:show, :index] do
       resources "/posts", UserPostController, only: [:index], name: :post
     end
+    get "/profile/posts", UserPostController, :profile
     resources "/posts", PostController, only: [:show, :index] do
       resources "/related", RelatedPostController, only: [:index], name: :related
     end

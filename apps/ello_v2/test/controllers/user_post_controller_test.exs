@@ -7,23 +7,23 @@ defmodule Ello.V2.UserPostControllerTest do
 
     user = Factory.insert(:user)
     author = Factory.insert(:user)
-    {:ok, earlier_date} = DateTime.utc_now
-                  |> DateTime.to_unix
-                  |> Kernel.-(3600)
-                  |> DateTime.from_unix
-    posts = [
-      Factory.insert(:post, %{author: author, created_at: earlier_date}),
-      Factory.insert(:post, %{author: author, created_at: earlier_date}),
-      Factory.insert(:post, %{author: author, created_at: earlier_date}),
-      Factory.insert(:post, %{author: author, created_at: earlier_date}),
-      Factory.insert(:post, %{author: author, created_at: earlier_date}),
-      Factory.insert(:post, %{author: author, created_at: DateTime.utc_now}),
-      Factory.insert(:post, %{author: author, created_at: DateTime.utc_now}),
-      Factory.insert(:post, %{author: author, created_at: DateTime.utc_now}),
-      Factory.insert(:post, %{author: author, created_at: DateTime.utc_now}),
-    ]
+    now = DateTime.utc_now |> DateTime.to_unix
+    posts = Enum.map 1..8, fn (i) ->
+      Factory.insert(:post, %{
+        author:     author,
+        created_at: DateTime.from_unix!(now - (i * 1000))
+      })
+    end
     post = hd(posts)
-    {:ok, conn: auth_conn(conn, user), user: user, author: author, posts: posts, post: post}
+    {:ok, [
+      conn: auth_conn(conn, user),
+      public_conn: public_conn(conn),
+      author_conn: auth_conn(conn, author),
+      user: user,
+      author: author,
+      posts: posts,
+      post: post
+    ]}
   end
 
   test "GET /v2/users/:id/posts", %{conn: conn, author: author} do
@@ -54,9 +54,8 @@ defmodule Ello.V2.UserPostControllerTest do
 
   test "GET /v2/users/:id/posts - returns page headers", %{conn: conn, author: author} do
     response = get(conn, user_post_path(conn, :index, author), %{per_page: "2"})
-    assert get_resp_header(response, "x-total-pages") == ["5"]
-    assert get_resp_header(response, "x-total-count") == ["9"]
-    assert get_resp_header(response, "x-total-pages-remaining") == ["5"]
+    refute get_resp_header(response, "x-last-page") == "true"
+    refute get_resp_header(response, "x-total-pages-remaining") == ["0"]
 
     assert [link] = get_resp_header(response, "link")
     link_regex = ~r/(^|, *)<(.*?)>; rel="next"(,|$)/
@@ -79,21 +78,26 @@ defmodule Ello.V2.UserPostControllerTest do
 
     before = "#{year}-#{month}-#{day}T#{hour}:#{minute}:#{second}Z"
     response = get(conn, user_post_path(conn, :index, author), %{per_page: "2", before: before})
-    assert get_resp_header(response, "x-total-pages") == ["5"]
-    assert get_resp_header(response, "x-total-count") == ["9"]
-    assert get_resp_header(response, "x-total-pages-remaining") == ["3"]
+    assert ["<https://ello.co/api/v2/users/" <> _] = get_resp_header(response, "link")
+    refute get_resp_header(response, "x-last-page") == "true"
+    refute get_resp_header(response, "x-total-pages-remaining") == ["0"]
   end
 
   test "GET /v2/users/:id/posts - using link headers to fetch next page returns results", %{conn: conn, author: author} do
-    response = get(conn, user_post_path(conn, :index, author), %{per_page: "2"})
+    response = get(conn, user_post_path(conn, :index, author), %{per_page: "7"})
+    assert response.status == 200
+    refute get_resp_header(response, "x-last-page") == "true"
+    refute get_resp_header(response, "x-total-pages-remaining") == ["0"]
     assert [link] = get_resp_header(response, "link")
+
     [_, url | _] = Regex.run(~r/<(.*?)>; rel="next"/, link)
     [_, before | _] = Regex.run(~r/[?&]before=(.*?)(&|$)/, url)
     [_, per_page | _] = Regex.run(~r/[?&]per_page=(.*?)(&|$)/, url)
-    response = get(conn, user_post_path(conn, :index, author), %{before: before, per_page: per_page})
-    assert get_resp_header(response, "x-total-pages") == ["5"]
-    assert get_resp_header(response, "x-total-count") == ["9"]
-    assert get_resp_header(response, "x-total-pages-remaining") == ["4"]
+
+    response2 = get(conn, user_post_path(conn, :index, author), %{before: before, per_page: per_page})
+    assert response2.status == 200
+    assert get_resp_header(response2, "x-last-page") == ["true"]
+    assert get_resp_header(response2, "x-total-pages-remaining") == ["0"]
   end
 
   test "GET /v2/users/:id/posts 404s", %{conn: conn} do
@@ -101,4 +105,14 @@ defmodule Ello.V2.UserPostControllerTest do
     assert response.status == 404
   end
 
+  test "GET /v2/profile/posts - without current user", %{public_conn: conn} do
+    response = get(conn, "/api/v2/profile/posts")
+    assert response.status == 401
+  end
+
+  test "GET /v2/profile/posts - with current user", %{author_conn: conn} do
+    response = get(conn, "/api/v2/profile/posts")
+    json = json_response(response, 200)
+    assert length(json["posts"]) == 8
+  end
 end

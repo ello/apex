@@ -5,17 +5,17 @@ defmodule Ello.Serve.Webapp.UserController do
 
   def show(conn, _) do
     render_html(conn, %{
-      user:       conn.assigns.user,
-      posts_page: fn -> posts_page(conn, conn.assigns.user) end,
+      user:  conn.assigns.user,
+      posts: fn -> posts(conn, conn.assigns.user) end,
     })
   end
 
-  defp posts_page(conn, user) do
-    page = Content.posts_page(standard_params(conn, %{
+  defp posts(conn, user) do
+    posts = Content.posts(standard_params(conn, %{
       user_id: user.id,
-      default: %{per_page: 10}
+      default: %{per_page: 10},
     }))
-    track(conn, page.posts, steam_kind: "user", stream_id: user.id)
-    page
+    track(conn, posts, steam_kind: "user", stream_id: user.id)
+    posts
   end
 end

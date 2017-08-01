@@ -11,6 +11,7 @@ defmodule Ello.Serve.Router do
     plug Ello.Serve.SetApp, app: "webapp"
     plug Ello.Serve.SkipPrerender
     plug Ello.Serve.FetchVersion
+    plug Ello.Serve.XFrameOptions, :deny
   end
 
   scope "/api/webapp-token", Ello.Serve do

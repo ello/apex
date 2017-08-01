@@ -10,7 +10,7 @@ defmodule Ello.V2.Render do
       # use . notation here to force exception if data key not passed in
       case opts.data do
         nil  -> send_resp(conn, 404, ~s({"error": "Not found"}))
-        []   -> send_resp(conn, 204, "")
+        []   -> send_204(conn)
         data -> unquote(code)
       end
     end
@@ -38,5 +38,11 @@ defmodule Ello.V2.Render do
     with_data conn, opts do
       render_if_stale(conn, view, template, opts)
     end
+  end
+
+  defp send_204(conn) do
+    conn
+    |> put_resp_header("x-total-pages-remaining", "0")
+    |> send_resp(204, "")
   end
 end
