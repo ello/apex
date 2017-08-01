@@ -1,8 +1,6 @@
 defmodule Ello.Serve.Webapp.ArtistInviteIndexView do
   use Ello.Serve.Web, :view
   import Ello.V2.ImageView, only: [image_url: 2]
-  alias Ello.Serve.Webapp.PostView
-  alias Ello.Core.Contest
 
   def render("meta.html", assigns) do
     assigns = assigns

@@ -12,7 +12,7 @@ defmodule Ello.Serve.Webapp.ArtistInviteShowController do
     end
   end
 
-  defp artist_invite(conn, slug),
+  defp artist_invite(_conn, slug),
     do: Contest.artist_invite(%{id_or_slug: "~#{slug}"})
 
   defp submissions(conn, slug) do

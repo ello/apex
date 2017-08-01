@@ -1,4 +1,4 @@
-defmodule Ello.Serve.Webapp.ArtistInviteControllerTest do
+defmodule Ello.Serve.Webapp.ArtistInviteShowControllerTest do
   use Ello.Serve.ConnCase
 
   setup %{conn: conn} do
