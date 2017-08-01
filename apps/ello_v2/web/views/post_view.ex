@@ -16,11 +16,11 @@ defmodule Ello.V2.PostView do
 
   @doc "Render a list of posts and relations for /api/v2/user/:id/posts"
   def render("index.json", %{data: posts} = opts) do
-    users     = post_users(posts)
-    assets    = post_assets(posts)
-    reposts   = Enum.map(posts, &(&1.reposted_source))
-    all_posts = post_and_reposts(posts)
-    categories = Enum.flat_map(all_posts ++ users, &(&1.categories))
+    users          = post_users(posts)
+    assets         = post_assets(posts)
+    reposts        = Enum.map(posts, &(&1.reposted_source))
+    all_posts      = post_and_reposts(posts)
+    categories     = Enum.flat_map(all_posts ++ users, &(&1.categories))
 
     json_response()
     |> render_resource(:posts, posts, __MODULE__, opts)
@@ -32,10 +32,10 @@ defmodule Ello.V2.PostView do
 
   @doc "Render a post and relations for /api/v2/posts/:id"
   def render("show.json", %{data: post} = opts) do
-    users      = post_users(post, post.reposted_source)
-    assets     = post_assets(post, post.reposted_source)
-    posts      = post_and_reposts(post, post.reposted_source)
-    categories = Enum.flat_map(posts ++ users, &(&1.categories))
+    users          = post_users(post, post.reposted_source)
+    assets         = post_assets(post, post.reposted_source)
+    posts          = post_and_reposts(post, post.reposted_source)
+    categories     = Enum.flat_map(posts ++ users, &(&1.categories))
 
     json_response()
     |> render_resource(:posts, post, __MODULE__, Map.merge(opts, %{meta: true}))
@@ -74,6 +74,7 @@ defmodule Ello.V2.PostView do
     :comments_count,
     :reposts_count,
     :views_count,
+    :artist_invite_id,
   ]
 
   defp post_users(posts) when is_list(posts), do: Enum.flat_map(posts, &(post_users(&1, &1.reposted_source)))
@@ -102,6 +103,10 @@ defmodule Ello.V2.PostView do
   def repost_id(_, _), do: ""
 
   def author_id(post, _), do: "#{post.author.id}"
+
+  def artist_invite_id(%{reposted_source: %{artist_invite_submission: %{artist_invite_id: id}}}, _), do: "#{id}"
+  def artist_invite_id(%{artist_invite_submission: %{artist_invite_id: id}} , _), do: "#{id}"
+  def artist_invite_id(_, _), do: nil
 
   def links(%{reposted_source: %Post{} = reposted} = post, conn) do
     post

@@ -113,3 +113,31 @@ defimpl Ello.V2.ConditionalGet, for: Ello.Core.Discovery.Editorial do
     |> Ello.V2.ConditionalGet.etag
   end
 end
+
+defimpl Ello.V2.ConditionalGet, for: Ello.Core.Contest.ArtistInvite do
+  def etag(artist_invite) do
+    values = [
+      :artist_invite,
+      artist_invite.id,
+      artist_invite.updated_at,
+      Ello.V2.ConditionalGet.etag(artist_invite.brand_account),
+    ]
+    values
+    |> :erlang.term_to_binary
+    |> Ello.V2.ConditionalGet.etag
+  end
+end
+
+defimpl Ello.V2.ConditionalGet, for: Ello.Core.Contest.ArtistInviteSubmission do
+  def etag(submision) do
+    values = [
+      :artist_invite_submission,
+      submision.id,
+      submision.updated_at,
+      Ello.V2.ConditionalGet.etag(submision.post),
+    ]
+    values
+    |> :erlang.term_to_binary
+    |> Ello.V2.ConditionalGet.etag
+  end
+end
