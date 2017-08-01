@@ -26,7 +26,9 @@ defmodule Ello.V2.Pagination do
   end
   def add_pagination_headers(conn, path, [%ArtistInviteSubmission{} | _] = subs) do
     last = List.last(subs)
-    add_pagination_headers(conn, path, %{
+    conn
+    |> add_last_page_header(subs)
+    |> add_pagination_headers(path, %{
       before:   DateTime.to_iso8601(last.created_at),
       per_page: conn.params["per_page"] || 10,
       status:   conn.params["status"] || "approved",

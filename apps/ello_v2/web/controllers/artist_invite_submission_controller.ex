@@ -8,7 +8,7 @@ defmodule Ello.V2.ArtistInviteSubmissionController do
     subs = load_submissions(conn, invite)
     conn
     |> track_post_view(subs, stream_kind: "artist_invite_submissions", stream_id: invite.id)
-    |> add_pagination_headers("/artist_invites/#{invite.id}/submission", subs)
+    |> add_pagination_headers("/artist_invites/#{invite.id}/submissions", subs)
     |> api_render_if_stale(ArtistInviteSubmissionView, :index, data: subs)
   end
 
