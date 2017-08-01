@@ -12,9 +12,9 @@ defmodule Ello.Core.Contest do
     |> Repo.get_by_id_or_slug(id_or_slug: id_or_slug)
     |> Preload.artist_invites(options)
   end
-  def artist_invite(%{id_or_slug: id_or_slug, preview: "true", current_user: current_user} = options) do
+  def artist_invite(%{id_or_slug: id_or_slug, preview: "true", current_user: %{id: current_user_id}} = options) do
     ArtistInvite
-    |> where([ai], ai.brand_account_id == ^current_user.id or ai.status != "preview")
+    |> where([ai], ai.brand_account_id == ^current_user_id or ai.status != "preview")
     |> Repo.get_by_id_or_slug(id_or_slug: id_or_slug)
     |> Preload.artist_invites(options)
   end
@@ -35,11 +35,11 @@ defmodule Ello.Core.Contest do
     |> Repo.all
     |> Preload.artist_invites(options)
   end
-  def artist_invites(%{page: page, per_page: per_page, preview: "true", current_user: current_user} = options) do
+  def artist_invites(%{page: page, per_page: per_page, preview: "true", current_user: %{id: current_user_id}} = options) do
     offset = per_page * (page - 1)
 
     ArtistInvite
-    |> where([ai], ai.brand_account_id == ^current_user.id or ai.status != "preview")
+    |> where([ai], ai.brand_account_id == ^current_user_id or ai.status != "preview")
     |> order_by(desc: :created_at)
     |> limit(^per_page)
     |> offset(^offset)
