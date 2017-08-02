@@ -113,6 +113,7 @@ defmodule Ello.Core.Contest do
     |> paginate_submissions(options)
     |> Repo.all
     |> Preload.artist_invite_submissions(options)
+    |> filter_postless
   end
 
   defp for_invite(query, %{invite: %{id: id}}),
@@ -131,5 +132,9 @@ defmodule Ello.Core.Contest do
     query
     |> where([s], s.created_at < ^before)
     |> limit(^per)
+  end
+
+  defp filter_postless(submissions) do
+    Enum.reject(submissions, &(is_nil(&1.post)))
   end
 end

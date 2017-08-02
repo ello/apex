@@ -7,7 +7,8 @@ defmodule Ello.Serve.Webapp.ArtistInviteShowController do
       nil    -> send_resp(conn, 404, "")
       invite -> render_html(conn, %{
         artist_invite: invite,
-        submissions: fn -> submissions(conn, slug) end,
+        submissions: fn -> submissions(conn, invite, "approved") end,
+        selections:  fn -> submissions(conn, invite, "selected") end,
       })
     end
   end
@@ -15,10 +16,10 @@ defmodule Ello.Serve.Webapp.ArtistInviteShowController do
   defp artist_invite(conn, slug),
     do: Contest.artist_invite(standard_params(conn, %{id_or_slug: "~#{slug}"}))
 
-  defp submissions(conn, slug) do
+  defp submissions(conn, invite, status) do
     Contest.artist_invite_submissions(standard_params(conn, %{
-      invite: Contest.artist_invite(%{id_or_slug: "~#{slug}"}),
-      status: "approved",
+      invite: invite,
+      status: status,
     }))
   end
 end
