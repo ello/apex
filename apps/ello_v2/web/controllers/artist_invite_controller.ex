@@ -6,16 +6,19 @@ defmodule Ello.V2.ArtistInviteController do
   GET /v2/artist_invites
   """
   def index(conn, params) do
-    artist_invites = conn
-                     |> standard_params(%{preview: params["preview"]})
-                     |> Contest.artist_invites
-    api_render_if_stale(conn, data: artist_invites)
+    artist_invites = Contest.artist_invites(standard_params(conn, %{
+      preview: params["preview"]
+    }))
+    conn
+    |> add_pagination_headers("/artist_invites", artist_invites)
+    |> api_render_if_stale(data: artist_invites)
   end
 
   def show(conn, %{"id" => id_or_slug} = params) do
-    artist_invite = conn
-                    |> standard_params(%{id_or_slug: id_or_slug, preview: params["preview"]})
-                    |> Contest.artist_invite
+    artist_invite = Contest.artist_invite(standard_params(conn, %{
+      id_or_slug: id_or_slug,
+      preview: params["preview"]
+    }))
     api_render_if_stale(conn, data: artist_invite)
   end
 end

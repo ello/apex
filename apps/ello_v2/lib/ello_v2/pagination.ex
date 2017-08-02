@@ -2,7 +2,10 @@ defmodule Ello.V2.Pagination do
   import Plug.Conn
   alias Ello.Stream
   alias Ello.Core.Content.Post
-  alias Ello.Core.Contest.ArtistInviteSubmission
+  alias Ello.Core.Contest.{
+    ArtistInvite,
+    ArtistInviteSubmission,
+  }
   alias Ello.Search.Post.Search, as: PostSearch
   alias Ello.Search.User.Search, as: UserSearch
   import Ello.V2.StandardParams
@@ -43,6 +46,14 @@ defmodule Ello.V2.Pagination do
       per_page: conn.params["per_page"] || 25
     })
   end
+  def add_pagination_headers(conn, path, [%ArtistInvite{} | _] = invites) do
+    conn
+    |> add_last_page_header(invites, 0)
+    |> add_pagination_headers(path, %{
+      page:     String.to_integer(conn.params["page"] || "1") + 1,
+      per_page: conn.params["per_page"] || 25
+    })
+  end
   def add_pagination_headers(conn, path, params) do
     next = pagination_link(path, params)
     put_resp_header(conn, "link", ~s(<#{next}>; rel="next"))
@@ -58,9 +69,9 @@ defmodule Ello.V2.Pagination do
   end
 
   @filter_slop 3 # Don't 204 if one blocked post gets filtered out
-  defp add_last_page_header(conn, structs) do
+  defp add_last_page_header(conn, structs, filter_slop \\ @filter_slop) do
     requested = standard_params(conn, %{})[:per_page]
-    if requested - @filter_slop > length(structs) do
+    if requested - filter_slop > length(structs) do
       conn
       |> put_resp_header("x-last-page", "true")
       |> put_resp_header("x-total-pages-remaining", "0")

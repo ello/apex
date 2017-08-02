@@ -40,6 +40,33 @@ defmodule Ello.V2.ArtistInviteControllerTest do
     assert Enum.member?(artist_invite_ids(artist_invites), "#{a_inv3.id}")
   end
 
+
+  test "GET /v2/artist_invites - pagination", %{staff_conn: conn, a_inv1: a_inv1, a_inv2: a_inv2, a_inv3: a_inv3} do
+    resp = get(conn, artist_invite_path(conn, :index), %{
+      preview:  "true",
+      per_page: "2",
+    })
+
+    assert %{"artist_invites" => artist_invites} = json_response(resp, 200)
+    refute Enum.member?(artist_invite_ids(artist_invites), "#{a_inv1.id}")
+    assert Enum.member?(artist_invite_ids(artist_invites), "#{a_inv2.id}")
+    assert Enum.member?(artist_invite_ids(artist_invites), "#{a_inv3.id}")
+
+    [link] = get_resp_header(resp, "link")
+    assert [_, "2"] = Regex.run(~r/page=([^&]*)&/, link)
+
+    resp2 = get(conn, "/api/v2/artist_invites/", %{
+      "preview"  => "true",
+      "per_page" => "2",
+      "page"     => "2",
+    })
+
+    assert %{"artist_invites" => artist_invites2} = json_response(resp2, 200)
+    assert Enum.member?(artist_invite_ids(artist_invites2), "#{a_inv1.id}")
+    refute Enum.member?(artist_invite_ids(artist_invites2), "#{a_inv2.id}")
+    refute Enum.member?(artist_invite_ids(artist_invites2), "#{a_inv3.id}")
+  end
+
   test "GET /v2/artist_invites - brand accounts can preview their own artist invite", %{brand_conn: conn, a_inv1: a_inv1, a_inv2: a_inv2, a_inv3: a_inv3} do
     conn = get(conn, artist_invite_path(conn, :index), %{preview: "true"})
 
