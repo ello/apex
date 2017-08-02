@@ -9,7 +9,7 @@
   <p><%= guide_section["raw_body"] %></p>
 <% end %>
 
-<%= if assigns[:selections] do %>
+<%= if length(assigns[:selections]) > 0 do %>
   <h2>Selections</h2>
   <%= for selection <- @selections do %>
     <%= render PostView, "summary.html", Map.put(assigns, :post, selection.post) %>

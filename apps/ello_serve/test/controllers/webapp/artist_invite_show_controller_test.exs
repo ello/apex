@@ -11,6 +11,10 @@ defmodule Ello.Serve.Webapp.ArtistInviteShowControllerTest do
     sub1 = Factory.insert(:artist_invite_submission, %{artist_invite: a_inv1, status: "selected", created_at: DateTime.from_unix!(3_000_000)})
     sub2 = Factory.insert(:artist_invite_submission, %{artist_invite: a_inv1, status: "approved", created_at: DateTime.from_unix!(2_000_000)})
     sub3 = Factory.insert(:artist_invite_submission, %{artist_invite: a_inv1, status: "approved", created_at: DateTime.from_unix!(1_000_000)})
+    _sub4 = Factory.insert(:artist_invite_submission, %{
+      artist_invite: a_inv2,
+      status: "selected"
+    })
     {:ok,
       a_inv1: a_inv1,
       a_inv2: a_inv2,
