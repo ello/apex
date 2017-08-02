@@ -12,8 +12,8 @@ defmodule Ello.Serve.Webapp.ArtistInviteShowController do
     end
   end
 
-  defp artist_invite(_conn, slug),
-    do: Contest.artist_invite(%{id_or_slug: "~#{slug}"})
+  defp artist_invite(conn, slug),
+    do: Contest.artist_invite(standard_params(conn, %{id_or_slug: "~#{slug}"}))
 
   defp submissions(conn, slug) do
     Contest.artist_invite_submissions(standard_params(conn, %{
