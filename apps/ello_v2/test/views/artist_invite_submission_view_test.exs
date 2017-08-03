@@ -66,7 +66,7 @@ defmodule Ello.V2.ViewTest do
     assert json[:status] == "approved"
     assert json[:links][:post][:id]
     assert json[:actions][:unapprove] == %{
-      label:  "Unapprove",
+      label:  "Approved",
       href:   "/api/v2/artist_invite_submissions/#{context[:unapproved].id}",
       method: "PATCH",
       body:   %{status: "unapproved"},
@@ -87,7 +87,7 @@ defmodule Ello.V2.ViewTest do
     assert json[:status] == "selected"
     assert json[:links][:post][:id]
     assert json[:actions][:unselect] == %{
-      label:  "Unselect",
+      label:  "Selected",
       href:   "/api/v2/artist_invite_submissions/#{context[:selected].id}",
       method: "PATCH",
       body:   %{status: "approved"},

@@ -75,7 +75,7 @@ defmodule Ello.V2.ArtistInviteSubmissionView do
   defp actions_map(%{status: "approved", id: id}) do
     %{
       unapprove: %{
-        label:  "Unapprove",
+        label:  "Approved",
         href:   "/api/v2/artist_invite_submissions/#{id}",
         method: "PATCH",
         body:   %{status: "unapproved"},
@@ -92,7 +92,7 @@ defmodule Ello.V2.ArtistInviteSubmissionView do
   defp actions_map(%{status: "selected", id: id}) do
     %{
       unselect: %{
-        label:  "Unselect",
+        label:  "Selected",
         href:   "/api/v2/artist_invite_submissions/#{id}",
         method: "PATCH",
         body:   %{status: "approved"},
