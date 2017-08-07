@@ -11,7 +11,6 @@ defmodule Ello.Core.Contest.Preload do
   def artist_invites([], _),  do: []
   def artist_invites(artist_invites, options) do
     artist_invites
-    |> include_brand_accounts(options)
     |> build_image_structs
   end
 
