@@ -53,7 +53,6 @@ defmodule Ello.V2.ArtistInviteView do
   def guide(%{guide: guide}, _),
     do: Enum.map(guide, &(Map.delete(&1, "raw_body")))
 
-  def links(_, %{private: %{phoenix_action: :index}}), do: nil
   def links(invite, conn) do
     user = conn.assigns[:current_user]
 
