@@ -3,7 +3,7 @@
     <img src="<%= artist_invite_image_url(artist_invite) %>" alt="<%= artist_invite.title %>" />
     <h2><%= artist_invite.title %></h2>
   </a>
-  <p><%= artist_invite.raw_short_description %></p>
+  <%= raw(artist_invite.rendered_short_description) %>
 <% end %>
 
 <%= if Enum.count(@artist_invites) > 0 do %>

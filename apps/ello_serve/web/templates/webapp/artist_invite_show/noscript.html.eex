@@ -3,10 +3,10 @@
 <h3><%= @artist_invite.invite_type %></h3>
 <h2><%= @artist_invite.status %></h2>
 <p><%= @artist_invite.opened_at %> - <%= @artist_invite.closed_at %></p>
-<p><%= @artist_invite.raw_description %></p>
+<%= raw(@artist_invite.rendered_description) %>
 <%= for guide_section <- @artist_invite.guide do %>
   <h3><%= guide_section["title"] %></h3>
-  <p><%= guide_section["raw_body"] %></p>
+  <%= raw(guide_section["rendered_body"]) %>
 <% end %>
 
 <%= if length(assigns[:selections]) > 0 do %>
