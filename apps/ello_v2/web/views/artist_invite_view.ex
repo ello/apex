@@ -50,11 +50,14 @@ defmodule Ello.V2.ArtistInviteView do
   def short_description(artist_invite, _),
     do: artist_invite.rendered_short_description
 
-  def guide(artist_invite, _), do: artist_invite.guide
+  def guide(%{guide: guide}, _),
+    do: Enum.map(guide, &(Map.delete(&1, "raw_body")))
 
+  def links(_, %{private: %{phoenix_action: :index}}), do: nil
   def links(invite, conn) do
     user = conn.assigns[:current_user]
-    links
+
+    %{}
     |> add_unapproved_link(invite, user)
     |> add_approved_link(invite, user)
     |> add_selected_link(invite, user)

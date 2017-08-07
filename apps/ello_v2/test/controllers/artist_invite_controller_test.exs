@@ -31,6 +31,13 @@ defmodule Ello.V2.ArtistInviteControllerTest do
     assert conn.status == 200
   end
 
+  @tag :json_schema
+  test "GET /v2/artist_invites - json schema", %{conn: conn} do
+    conn = get(conn, artist_invite_path(conn, :index))
+    json_response(conn, 200)
+    assert :ok = validate_json("artist_invite", json_response(conn, 200))
+  end
+
   test "GET /v2/artist_invites - staff can preview artist invites", %{staff_conn: conn, a_inv1: a_inv1, a_inv2: a_inv2, a_inv3: a_inv3} do
     conn = get(conn, artist_invite_path(conn, :index), %{preview: "true"})
 
@@ -103,6 +110,14 @@ defmodule Ello.V2.ArtistInviteControllerTest do
     conn = get(conn, artist_invite_path(conn, :show, a_inv1.id))
     assert conn.status == 200
   end
+
+  @tag :json_schema
+  test "GET /v2/artist_invites/:slug - json schema", %{conn: conn, a_inv1: a_inv1} do
+    conn = get(conn, artist_invite_path(conn, :show, a_inv1.id))
+    json_response(conn, 200)
+    assert :ok = validate_json("artist_invite", json_response(conn, 200))
+  end
+
 
   test "GET /v2/artist_invites/:id - staff can preview artist invites", %{staff_conn: conn, a_inv2: a_inv2} do
     conn = get(conn, artist_invite_path(conn, :show, "~#{a_inv2.slug}"), %{preview: "true"})
