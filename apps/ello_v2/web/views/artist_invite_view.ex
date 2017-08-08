@@ -1,24 +1,20 @@
 defmodule Ello.V2.ArtistInviteView do
   use Ello.V2.Web, :view
   use Ello.V2.JSONAPI
-  alias Ello.V2.{UserView, ImageView}
+  alias Ello.V2.{ImageView}
 
   def stale_checks(_, %{data: artist_invites}) do
     [etag: etag(artist_invites)]
   end
 
   def render("index.json", %{data: artist_invites} = opts) do
-    users = Enum.map(artist_invites, &(&1.brand_account))
-
     json_response()
     |> render_resource(:artist_invites, artist_invites, __MODULE__, opts)
-    |> include_linked(:users, users, UserView, opts)
   end
 
   def render("show.json", %{data: artist_invite} = opts) do
     json_response()
     |> render_resource(:artist_invites, artist_invite, __MODULE__, opts)
-    |> include_linked(:users, artist_invite.brand_account, UserView, opts)
   end
 
   def render("artist_invite.json", %{artist_invite: artist_invite} = opts), do:
@@ -54,18 +50,13 @@ defmodule Ello.V2.ArtistInviteView do
   def short_description(artist_invite, _),
     do: artist_invite.rendered_short_description
 
-  def guide(artist_invite, _), do: artist_invite.guide
+  def guide(%{guide: guide}, _),
+    do: Enum.map(guide, &(Map.delete(&1, "raw_body")))
 
   def links(invite, conn) do
-    links = %{
-      brand_account: %{
-        type: "users",
-        id:   "#{invite.brand_account_id}",
-        href: "/api/v2/users/#{invite.brand_account_id}",
-      }
-    }
     user = conn.assigns[:current_user]
-    links
+
+    %{}
     |> add_unapproved_link(invite, user)
     |> add_approved_link(invite, user)
     |> add_selected_link(invite, user)

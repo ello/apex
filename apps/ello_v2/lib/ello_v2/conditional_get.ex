@@ -120,7 +120,6 @@ defimpl Ello.V2.ConditionalGet, for: Ello.Core.Contest.ArtistInvite do
       :artist_invite,
       artist_invite.id,
       artist_invite.updated_at,
-      Ello.V2.ConditionalGet.etag(artist_invite.brand_account),
     ]
     values
     |> :erlang.term_to_binary
