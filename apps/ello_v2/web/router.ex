@@ -32,7 +32,9 @@ defmodule Ello.V2.Router do
     get "/profile/posts", UserPostController, :profile
     resources "/posts", PostController, only: [:show, :index] do
       resources "/related", RelatedPostController, only: [:index], name: :related
+      resources "/comments", CommentController, only: [:index], name: :comments
     end
+
 
     # Following
     head "/following/posts/recent", FollowingPostController, :recent_updated

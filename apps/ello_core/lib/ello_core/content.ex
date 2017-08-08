@@ -134,6 +134,22 @@ defmodule Ello.Core.Content do
     |> limit(^per_page)
   end
 
+  @doc """
+  Get all comments for a post_id
+
+  """
+  def comments(%{post: %{id: post_id}} = options) do
+    # We don't filter NSFW users from comments
+    options = Map.merge(options, %{allow_nsfw: true, allow_nudity: true})
+    Post
+    |> where([p], p.parent_post_id == ^post_id)
+    |> Filter.post_query(options)
+    |> post_pagination(options)
+    |> Repo.all
+    |> Preload.comment_list(options)
+    |> Filter.post_list(options)
+  end
+
   def loves(%{user: %{id: user_id}} = options) do
     Love
     |> where([l], l.user_id == ^user_id)

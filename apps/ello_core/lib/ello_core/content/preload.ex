@@ -24,6 +24,12 @@ defmodule Ello.Core.Content.Preload do
     |> prefetch_reposted_source(options)
   end
 
+  def comment_list(nil, _), do: nil
+  def comment_list([], _), do: []
+  def comment_list(comments, options) do
+    prefetch_assets_and_author(comments, options)
+  end
+
   def loves([], _), do: []
   def loves(loves, options) do
     Repo.preload(loves, [
