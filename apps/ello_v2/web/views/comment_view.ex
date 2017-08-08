@@ -24,19 +24,30 @@ defmodule Ello.V2.CommentView do
     |> include_linked(:parent_post, [parent], PostView, opts)
   end
 
+  @doc "Render a single comment and relations"
+  def render("show.json", %{data: comment} = opts) do
+    parent = opts[:conn].assigns[:post]
+
+    json_response()
+    |> render_resource(:comments, comment, __MODULE__, opts)
+    |> include_linked(:users, comment.author, UserView, opts)
+    |> include_linked(:assets, comment.assets, AssetView, opts)
+    |> include_linked(:parent_post, [parent], PostView, opts)
+  end
+
   @doc "Render a single comment as included in other reponses"
   def render("comment.json", %{comment: comment} = opts) do
     render_self(comment, __MODULE__, opts)
   end
 
   def attributes, do: [
-    :body,
     :created_at,
   ]
 
   def computed_attributes, do: [
     :summary,
     :content,
+    :body,
     :post_id,
     :author_id,
   ]
@@ -44,6 +55,10 @@ defmodule Ello.V2.CommentView do
   def summary(%{rendered_summary: summary}, _), do: summary
 
   def content(%{rendered_content: content}, _), do: content
+
+  def body(%{body: body, author_id: id}, %{assigns: %{current_user: %{id: id}}}),
+    do: body
+  def body(_, _), do: []
 
   def post_id(%{parent_post_id: id}, _), do: "#{id}"
 

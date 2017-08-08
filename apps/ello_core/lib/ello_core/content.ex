@@ -136,7 +136,6 @@ defmodule Ello.Core.Content do
 
   @doc """
   Get all comments for a post_id
-
   """
   def comments(%{post: %{id: post_id}} = options) do
     # We don't filter NSFW users from comments
@@ -146,6 +145,21 @@ defmodule Ello.Core.Content do
     |> Filter.post_query(options)
     |> post_pagination(options)
     |> Repo.all
+    |> Preload.comment_list(options)
+    |> Filter.post_list(options)
+  end
+
+  @doc """
+  Get a comments by post_id and id
+  """
+  def comment(%{post: %{id: post_id}, id: id} = options) do
+    # We don't filter NSFW users from comments
+    options = Map.merge(options, %{allow_nsfw: true, allow_nudity: true})
+    Post
+    |> where([p], p.parent_post_id == ^post_id)
+    |> Filter.post_query(options)
+    |> post_pagination(options)
+    |> Repo.get(id)
     |> Preload.comment_list(options)
     |> Filter.post_list(options)
   end

@@ -6,7 +6,7 @@ defmodule Ello.V2.CommentControllerTest do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
 
     post = Factory.insert(:post)
-    _comment1 = Factory.insert(:post, %{
+    comment1 = Factory.insert(:post, %{
       parent_post: post,
       created_at:  DateTime.from_unix!(100_000_000)
     })
@@ -19,7 +19,7 @@ defmodule Ello.V2.CommentControllerTest do
       created_at:  DateTime.from_unix!(100_000_200)
     })
     user = Factory.insert(:user)
-    {:ok, conn: auth_conn(conn, user), post: post}
+    {:ok, conn: auth_conn(conn, user), post: post, comment: comment1}
   end
 
   test "GET /v2/posts/:id/comments", %{conn: conn, post: post} do
@@ -39,6 +39,18 @@ defmodule Ello.V2.CommentControllerTest do
   @tag :json_schema
   test "GET /v2/posts/:id/comments - json schema", %{conn: conn, post: post} do
     resp = get(conn, "/api/v2/posts/#{post.id}/comments")
+    assert :ok = validate_json("comment", json_response(resp, 200))
+  end
+
+  test "GET /v2/posts/:post_id/comments/:id", %{conn: conn, post: post, comment: comment} do
+    resp = get(conn, "/api/v2/posts/#{post.id}/comments/#{comment.id}")
+    json = json_response(resp, 200)
+    assert %{"id" => _} = json["comments"]
+  end
+
+  @tag :json_schema
+  test "GET /v2/posts/:post_id/comments/:id - json schema", %{conn: conn, post: post, comment: comment} do
+    resp = get(conn, "/api/v2/posts/#{post.id}/comments/#{comment.id}")
     assert :ok = validate_json("comment", json_response(resp, 200))
   end
 end

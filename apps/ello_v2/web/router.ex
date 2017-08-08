@@ -26,13 +26,13 @@ defmodule Ello.V2.Router do
 
     # Users And Posts
     get "/users/autocomplete", UserController, :autocomplete
-    resources "/users", UserController, only: [:show, :index] do
+    resources "/users", UserController, only: @read do
       resources "/posts", UserPostController, only: [:index], name: :post
     end
     get "/profile/posts", UserPostController, :profile
-    resources "/posts", PostController, only: [:show, :index] do
+    resources "/posts", PostController, only: @read do
       resources "/related", RelatedPostController, only: [:index], name: :related
-      resources "/comments", CommentController, only: [:index], name: :comments
+      resources "/comments", CommentController, only: @read, name: :comments
     end
 
 
@@ -42,7 +42,7 @@ defmodule Ello.V2.Router do
     get "/following/posts/trending", FollowingPostController, :trending
 
     # Artist Invites
-    resources "/artist_invites", ArtistInviteController, only: [:index, :show] do
+    resources "/artist_invites", ArtistInviteController, only: @read do
       resources "/submissions", ArtistInviteSubmissionController, only: [:index]
     end
   end

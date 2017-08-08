@@ -14,6 +14,13 @@ defmodule Ello.V2.CommentController do
     |> api_render_if_stale(CommentView, "index.json", data: comments)
   end
 
+  def show(conn, %{"id" => id}) do
+    comment = find_comment(conn, conn.assigns.post, id)
+    conn
+    |> track_post_view([comment], stream_kind: "comment")
+    |> api_render_if_stale(CommentView, "show.json", data: comment)
+  end
+
   defp find_post(conn, _) do
     id_or_token = conn.params["post_id"]
     case Content.post(standard_params(conn, %{id_or_token: id_or_token})) do
@@ -32,5 +39,9 @@ defmodule Ello.V2.CommentController do
 
   defp find_comments(conn, post) do
     Content.comments(standard_params(conn, %{post: post}))
+  end
+
+  defp find_comment(conn, post, id) do
+    Content.comment(standard_params(conn, %{post: post, id: id}))
   end
 end
