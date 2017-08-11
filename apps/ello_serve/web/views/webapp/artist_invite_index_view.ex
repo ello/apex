@@ -10,8 +10,8 @@ defmodule Ello.Serve.Webapp.ArtistInviteIndexView do
     render_template("meta.html", assigns)
   end
 
-  def artist_invite_image_url(%{header_image_struct: %{path: path, versions: versions}}) do
-    version = Enum.find(versions, &(&1.name == "hdpi"))
+  def artist_invite_image_url(%{og_image_struct: %{path: path, versions: versions}}) do
+    version = Enum.find(versions, &(&1.name == "optimized"))
     image_url(path, version.filename)
   end
 

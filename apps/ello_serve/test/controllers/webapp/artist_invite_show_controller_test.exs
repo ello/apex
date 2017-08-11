@@ -29,9 +29,9 @@ defmodule Ello.Serve.Webapp.ArtistInviteShowControllerTest do
     resp = get(conn, artist_invite_show_path(conn, :show, a_inv1.slug))
     html = html_response(resp, 200)
 
-    assert html =~ "<title>Foo Brand | Ello</title>"
-    assert has_meta(html, property: "og:title", content: "Foo Brand | Ello")
-    assert has_meta(html, property: "og:description", content: "Bar")
+    assert html =~ "<title>Foo Brand Art Exhibition Contest | Ello</title>"
+    assert has_meta(html, property: "og:title", content: "Foo Brand Art Exhibition Contest | Ello")
+    assert has_meta(html, property: "og:description", content: "Foo brand wants to pay you to exhibit your art. Enter to win.")
     assert has_meta(html, name: "robots", content: "index, follow")
   end
 
@@ -39,7 +39,7 @@ defmodule Ello.Serve.Webapp.ArtistInviteShowControllerTest do
     resp = get(conn, artist_invite_show_path(conn, :show, a_inv1.slug), %{"per_page" => "2"})
     html = html_response(resp, 200)
 
-    assert html =~ "<title>Foo Brand | Ello</title>"
+    assert html =~ "<title>Foo Brand Art Exhibition Contest | Ello</title>"
     assert html =~ "<h1>#{a_inv1.title}</h1>"
     assert html =~ "<h3>#{a_inv1.invite_type}</h3>"
     assert html =~ "<h2>#{a_inv1.status}</h2>"

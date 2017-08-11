@@ -5,14 +5,15 @@ defmodule Ello.Serve.Webapp.ArtistInviteShowView do
 
   def render("meta.html", %{artist_invite: artist_invite} = assigns) do
     assigns = assigns
-              |> Map.put(:title, "#{artist_invite.title} | Ello")
-              |> Map.put(:description, artist_invite.raw_short_description)
+              |> Map.put(:title, "#{artist_invite.meta_title} | Ello")
+              |> Map.put(:description, artist_invite.meta_description)
+              |> Map.put(:image, artist_invite_image_url(artist_invite))
               |> Map.put(:robots, "index, follow")
     render_template("meta.html", assigns)
   end
 
-  def artist_invite_image_url(%{header_image_struct: %{path: path, versions: versions}}) do
-    version = Enum.find(versions, &(&1.name == "hdpi"))
+  def artist_invite_image_url(%{og_image_struct: %{path: path, versions: versions}}) do
+    version = Enum.find(versions, &(&1.name == "optimized"))
     image_url(path, version.filename)
   end
 

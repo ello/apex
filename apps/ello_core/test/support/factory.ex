@@ -289,6 +289,7 @@ defmodule Ello.Core.Factory do
   def artist_invite_factory do
     %ArtistInvite{
       title: "Foo Brand",
+      meta_title: "Foo Brand Art Exhibition Contest",
       invite_type: "Art Exhibition",
       slug: sequence(:slug, &"foo-brand-#{&1}"),
       brand_account: build(:user),
@@ -297,6 +298,7 @@ defmodule Ello.Core.Factory do
       status: "open",
       raw_description: "Foo brand is looking for artists",
       rendered_description: "<p>Foo brand is looking for artists</p>",
+      meta_description: "Foo brand wants to pay you to exhibit your art. Enter to win.",
       raw_short_description: "Bar",
       rendered_short_description: "<p>Bar</p>",
       submission_body_block: "#FooBrand @FooBrand",
@@ -336,6 +338,14 @@ defmodule Ello.Core.Factory do
       },
       logo_image: "ello-a9c0ede1-aeca-45af-9723-5750babf541e.jpeg",
       logo_image_metadata: %{
+        "optimized" => %{"size" => 555_555, "type" => "image/jpeg", "width" => 1920, "height" => 1920},
+        "xhdpi" => %{"size" => 444_444, "type" => "image/jpeg", "width" => 1500, "height" => 1500},
+        "hdpi" => %{"size" => 333_333, "type" => "image/jpeg", "width" => 750, "height" => 750},
+        "mdpi" => %{"size" => 222_222, "type" => "image/jpeg", "width" => 375, "height" => 375},
+        "ldpi" => %{"size" => 111_111, "type" => "image/jpeg", "width" => 190, "height" => 190},
+      },
+      og_image: "ello-a9c0ede1-aeca-45af-9723-5750babf541e.jpeg",
+      og_image_metadata: %{
         "optimized" => %{"size" => 555_555, "type" => "image/jpeg", "width" => 1920, "height" => 1920},
         "xhdpi" => %{"size" => 444_444, "type" => "image/jpeg", "width" => 1500, "height" => 1500},
         "hdpi" => %{"size" => 333_333, "type" => "image/jpeg", "width" => 750, "height" => 750},

@@ -1,10 +1,11 @@
 defmodule Ello.Core.Contest.ArtistInvite do
   use Ecto.Schema
   alias Ello.Core.Network.User
-  alias __MODULE__.{HeaderImage, LogoImage}
+  alias __MODULE__.{HeaderImage, LogoImage, OGImage}
 
   schema "artist_invites" do
     field :title, :string
+    field :meta_title, :string
     field :slug, :string
     field :created_at, :utc_datetime
     field :updated_at, :utc_datetime
@@ -15,6 +16,8 @@ defmodule Ello.Core.Contest.ArtistInvite do
     field :logo_image_struct, :map, virtual: true
     field :logo_image, :string
     field :logo_image_metadata, :map
+    field :og_image, :string
+    field :og_image_metadata, :map
 
     field :invite_type, :string
     field :status, :string, default: "preview"
@@ -24,6 +27,7 @@ defmodule Ello.Core.Contest.ArtistInvite do
     field :rendered_description, :string
     field :raw_short_description, :string
     field :rendered_short_description, :string
+    field :meta_description, :string
     field :submission_body_block, :string
     field :guide, {:array, :map}, default: []
 
@@ -34,5 +38,6 @@ defmodule Ello.Core.Contest.ArtistInvite do
     artist_invite
     |> Map.put(:header_image_struct, HeaderImage.from_artist_invite(artist_invite))
     |> Map.put(:logo_image_struct, LogoImage.from_artist_invite(artist_invite))
+    |> Map.put(:og_image_struct, OGImage.from_artist_invite(artist_invite))
   end
 end
