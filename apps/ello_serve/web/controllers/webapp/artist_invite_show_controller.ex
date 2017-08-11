@@ -4,7 +4,12 @@ defmodule Ello.Serve.Webapp.ArtistInviteShowController do
 
   def show(conn, %{"id" => slug}) do
     case artist_invite(conn, slug) do
-      nil    -> send_resp(conn, 404, "")
+      nil ->
+        if conn.assigns.logged_in_user? do
+          render_html(conn)
+        else
+          send_resp(conn, 404, "")
+        end
       invite -> render_html(conn, %{
         artist_invite: invite,
         submissions: fn -> submissions(conn, invite, "approved") end,
