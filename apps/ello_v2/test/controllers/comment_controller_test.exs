@@ -10,10 +10,11 @@ defmodule Ello.V2.CommentControllerTest do
       parent_post: post,
       created_at:  DateTime.from_unix!(100_000_000)
     })
-    _comment2 = Factory.insert(:post, %{
+    comment2 = Factory.insert(:post, %{
       parent_post: post,
       created_at:  DateTime.from_unix!(100_000_100)
     })
+    Factory.add_assets(comment2)
     _comment3 = Factory.insert(:post, %{
       parent_post: post,
       created_at:  DateTime.from_unix!(100_000_200)

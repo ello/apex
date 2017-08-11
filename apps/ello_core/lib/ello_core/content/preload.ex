@@ -27,7 +27,9 @@ defmodule Ello.Core.Content.Preload do
   def comment_list(nil, _), do: nil
   def comment_list([], _), do: []
   def comment_list(comments, options) do
-    prefetch_assets_and_author(comments, options)
+    comments
+    |> prefetch_assets_and_author(options)
+    |> build_image_structs
   end
 
   def loves([], _), do: []
