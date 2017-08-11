@@ -5,7 +5,7 @@ defmodule Ello.Serve.Webapp.ArtistInviteIndexView do
   def render("meta.html", assigns) do
     assigns = assigns
               |> Map.put(:title, "Artist Invites | Ello")
-              |> Map.put(:description, "Artist Invites on Ello")
+              |> Map.put(:description, "Submit your work, get published, and earn $$$.")
               |> Map.put(:robots, "index, follow")
     render_template("meta.html", assigns)
   end

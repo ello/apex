@@ -17,7 +17,7 @@ defmodule Ello.Serve.Webapp.ArtistInviteControllerTest do
     html = html_response(resp, 200)
     assert html =~ "<title>Artist Invites | Ello</title>"
     assert has_meta(html, property: "og:title", content: "Artist Invites | Ello")
-    assert has_meta(html, property: "og:description", content: "Artist Invites on Ello")
+    assert has_meta(html, property: "og:description", content: "Submit your work, get published, and earn $$$.")
     assert has_meta(html, name: "robots", content: "index, follow")
   end
 
