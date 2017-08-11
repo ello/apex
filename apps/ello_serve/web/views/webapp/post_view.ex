@@ -59,6 +59,7 @@ defmodule Ello.Serve.Webapp.PostView do
   def views_count(%{views_count: count}), do: count
 
   defp robots(%{author: %{bad_for_seo?: true}}), do: "noindex, follow"
+  defp robots(%{reposted_source: %Post{}}), do: "noindex, follow"
   defp robots(_), do: "index, follow"
 
   defp image_for_asset(%{attachment_struct: %{filename: orig, path: path, versions: versions}}) do
