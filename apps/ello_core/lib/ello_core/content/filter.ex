@@ -21,6 +21,12 @@ defmodule Ello.Core.Content.Filter do
     |> filter_private(options)
   end
 
+  def comments_query(query, options) do
+    query
+    |> filter_banned_comments
+    |> filter_private_comments(options)
+  end
+
   @doc """
   Filters out posts/reposts by users current_user has blocked
 
@@ -45,6 +51,12 @@ defmodule Ello.Core.Content.Filter do
     |> where([p, a, rp, rpa], is_nil(a.locked_at) and is_nil(rpa.locked_at))
   end
 
+  defp filter_banned_comments(query) do
+    query
+    |> join(:inner, [p], a in assoc(p, :author))
+    |> where([p, a], is_nil(a.locked_at))
+  end
+
   defp filter_private(query, %{current_user: nil}) do
     query
     |> join(:inner, [p], a in assoc(p, :author))
@@ -53,6 +65,11 @@ defmodule Ello.Core.Content.Filter do
     |> where([p, a, rp, rpa], a.is_public and (is_nil(rpa.is_public) or rpa.is_public))
   end
   defp filter_private(query, _), do: query
+
+  defp filter_private_comments(query, %{current_user: nil}) do
+    where(query, [p, a], a.is_public)
+  end
+  defp filter_private_comments(query, _), do: query
 
 
   defp filter_blocked(nil, _), do: nil

@@ -358,6 +358,74 @@ defmodule Ello.Core.ContentTest do
     })
   end
 
+  test "comments/1 - with reposts - returns all comments" do
+    post = Factory.insert(:post)
+    post2 = Factory.insert(:post)
+    repost = Factory.insert(:post, reposted_source: post)
+    comment1 = Factory.insert(:post, parent_post_id: post.id)
+    comment2 = Factory.insert(:post, parent_post_id: post.id)
+    comment3 = Factory.insert(:post, parent_post_id: repost.id)
+    comment4 = Factory.insert(:post, parent_post_id: post2.id)
+
+    comments = Content.comments(%{
+      post:         post,
+      current_user: nil,
+      allow_nsfw:   false,
+      allow_nudity: false,
+      per_page:     5,
+      before:       nil,
+    })
+
+    comment_ids = Enum.map(comments, &(&1.id))
+    assert comment1.id in comment_ids
+    assert comment2.id in comment_ids
+    assert comment3.id in comment_ids
+    refute comment4.id in comment_ids
+
+    assert [_, _] = Content.comments(%{
+      post:         post,
+      current_user: nil,
+      allow_nsfw:   false,
+      allow_nudity: false,
+      per_page:     2,
+      before:       nil,
+    })
+  end
+
+  test "comments/1 - when a reposts - returns all comments" do
+    post = Factory.insert(:post)
+    post2 = Factory.insert(:post)
+    repost = Factory.insert(:post, reposted_source: post)
+    comment1 = Factory.insert(:post, parent_post_id: post.id)
+    comment2 = Factory.insert(:post, parent_post_id: post.id)
+    comment3 = Factory.insert(:post, parent_post_id: repost.id)
+    comment4 = Factory.insert(:post, parent_post_id: post2.id)
+
+    comments = Content.comments(%{
+      post:         repost,
+      current_user: nil,
+      allow_nsfw:   false,
+      allow_nudity: false,
+      per_page:     5,
+      before:       nil,
+    })
+
+    comment_ids = Enum.map(comments, &(&1.id))
+    assert comment1.id in comment_ids
+    assert comment2.id in comment_ids
+    assert comment3.id in comment_ids
+    refute comment4.id in comment_ids
+
+    assert [_, _] = Content.comments(%{
+      post:         repost,
+      current_user: nil,
+      allow_nsfw:   false,
+      allow_nudity: false,
+      per_page:     2,
+      before:       nil,
+    })
+  end
+
   test "loves/1 - returns all loved posts for a user", %{user: user} do
     post1 = Factory.insert(:post)
     post2 = Factory.insert(:post, has_nudity: true)

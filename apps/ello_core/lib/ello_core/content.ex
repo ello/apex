@@ -137,12 +137,14 @@ defmodule Ello.Core.Content do
   @doc """
   Get all comments for a post_id
   """
-  def comments(%{post: %{id: post_id}} = options) do
+  def comments(%{post: %{reposted_source: %Post{} = source}} = options),
+    do: comments(Map.put(options, :post, source))
+  def comments(%{post: post} = options) do
     # We don't filter NSFW users from comments
     options = Map.merge(options, %{allow_nsfw: true, allow_nudity: true})
     Post
-    |> where([p], p.parent_post_id == ^post_id)
-    |> Filter.post_query(options)
+    |> Filter.comments_query(options)
+    |> comments_for_post(post)
     |> post_pagination(options)
     |> Repo.all
     |> Preload.comment_list(options)
@@ -152,16 +154,23 @@ defmodule Ello.Core.Content do
   @doc """
   Get a comments by post_id and id
   """
-  def comment(%{post: %{id: post_id}, id: id} = options) do
+  def comment(%{post: %{reposted_source: %Post{} = source}} = options),
+    do: comment(Map.put(options, :post, source))
+  def comment(%{post: post, id: id} = options) do
     # We don't filter NSFW users from comments
     options = Map.merge(options, %{allow_nsfw: true, allow_nudity: true})
     Post
-    |> where([p], p.parent_post_id == ^post_id)
-    |> Filter.post_query(options)
-    |> post_pagination(options)
+    |> Filter.comments_query(options)
+    |> comments_for_post(post)
     |> Repo.get(id)
     |> Preload.comment_list(options)
     |> Filter.post_list(options)
+  end
+
+  defp comments_for_post(q, %{id: id}) do
+    q
+    |> join(:left, [c, a], parent in assoc(c, :parent_post))
+    |> where([c, a, parent], parent.id == ^id or parent.reposted_source_id == ^id)
   end
 
   def loves(%{user: %{id: user_id}} = options) do
