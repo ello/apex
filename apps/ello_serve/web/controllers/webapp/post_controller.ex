@@ -24,7 +24,7 @@ defmodule Ello.Serve.Webapp.PostController do
       allow_nsfw:   true,
       allow_nudity: true,
     })
-    track(conn, post, steam_kind: "post")
+    track(conn, post, stream_kind: "post")
     post
   end
 

@@ -45,7 +45,7 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
       allow_nsfw:   false,
       images_only:  false,
     }))
-    track(conn, search.results, steam_kind: "trending")
+    track(conn, search.results, stream_kind: "trending")
     search
   end
 
@@ -60,7 +60,7 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
       keys:         Enum.map(categories, &category_stream_key/1),
       allow_nsfw:   true, # No NSFW in categories, reduces slop.
     }))
-    track(conn, stream.posts, steam_kind: "featured")
+    track(conn, stream.posts, stream_kind: "featured")
     stream
   end
 
@@ -69,7 +69,7 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
       keys:         [category_stream_key(%{slug: slug})],
       allow_nsfw:   true, # No NSFW in categories, reduces slop.
     }))
-    track(conn, stream.posts, steam_kind: "category")
+    track(conn, stream.posts, stream_kind: "category")
     stream
   end
 
@@ -81,7 +81,7 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
       keys:         [@recent_stream],
       allow_nsfw:   true, # No NSFW in categories, reduces slop.
     }))
-    track(conn, stream.posts, steam_kind: "recent")
+    track(conn, stream.posts, stream_kind: "recent")
     stream
   end
 

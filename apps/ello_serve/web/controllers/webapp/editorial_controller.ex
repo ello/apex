@@ -12,7 +12,7 @@ defmodule Ello.Serve.Webapp.EditorialController do
 
   defp editorials(conn) do
     editorials = Discovery.editorials(standard_params(conn, %{preview: false}))
-    track(conn, editorials, steam_kind: "editorial")
+    track(conn, editorials, stream_kind: "editorial")
     editorials
   end
 end

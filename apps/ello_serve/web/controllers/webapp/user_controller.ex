@@ -15,7 +15,7 @@ defmodule Ello.Serve.Webapp.UserController do
       user_id: user.id,
       default: %{per_page: 10},
     }))
-    track(conn, posts, steam_kind: "user", stream_id: user.id)
+    track(conn, posts, stream_kind: "user", stream_id: user.id)
     posts
   end
 end
