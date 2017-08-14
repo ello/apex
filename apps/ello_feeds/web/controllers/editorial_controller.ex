@@ -6,7 +6,7 @@ defmodule Ello.Feeds.EditorialController do
   def index(conn, _params) do
     editorials = editorials(conn)
     conn
-    |> track(editorials, steam_kind: "editorials_via_#{get_format(conn)}")
+    |> track(editorials, stream_kind: "editorials_via_#{get_format(conn)}")
     |> render(:index, data: editorials)
   end
 

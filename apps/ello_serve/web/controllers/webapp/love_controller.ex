@@ -14,7 +14,7 @@ defmodule Ello.Serve.Webapp.LoveController do
     loves = Content.loves(standard_params(conn, %{
       user: conn.assigns.user,
     }))
-    track(conn, loves, steam_kind: "loves", stream_id: conn.assigns.user.id)
+    track(conn, loves, stream_kind: "loves", stream_id: conn.assigns.user.id)
     loves
   end
 end
