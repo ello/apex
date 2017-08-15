@@ -5,13 +5,13 @@ defmodule Ello.Serve.Webapp.ArtistInviteIndexView do
   def render("meta.html", assigns) do
     assigns = assigns
               |> Map.put(:title, "Artist Invites | Ello")
-              |> Map.put(:description, "Artist Invites on Ello")
+              |> Map.put(:description, "Submit your work, get published, and earn $$$.")
               |> Map.put(:robots, "index, follow")
     render_template("meta.html", assigns)
   end
 
-  def artist_invite_image_url(%{header_image_struct: %{path: path, versions: versions}}) do
-    version = Enum.find(versions, &(&1.name == "hdpi"))
+  def artist_invite_image_url(%{og_image_struct: %{path: path, versions: versions}}) do
+    version = Enum.find(versions, &(&1.name == "optimized"))
     image_url(path, version.filename)
   end
 
