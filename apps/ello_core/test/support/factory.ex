@@ -159,8 +159,10 @@ defmodule Ello.Core.Factory do
       post: build(:post),
       kind: "post",
       content: %{
-        "title"    => "Post Editorial",
-        "subtitle" => "check it out",
+        "title"              => "Post Editorial",
+        "subtitle"           => "check *it* out",
+        "plaintext_subtitle" => "check it out",
+        "rendered_subtitle"  => "<p>check <em>it</em> out</p>",
       }
     })
   end
@@ -169,9 +171,11 @@ defmodule Ello.Core.Factory do
     Map.merge(editorial_factory(), %{
       kind: "external",
       content: %{
-        "title"    => "External Editorial",
-        "subtitle" => "check it out",
-        "url"      => "https://ello.co/wtf",
+        "title"              => "External Editorial",
+        "subtitle"           => "check *it* out",
+        "plaintext_subtitle" => "check it out",
+        "rendered_subtitle"  => "<p>check <em>it</em> out</p>",
+        "url"                => "https://ello.co/wtf",
       }
     })
   end
@@ -180,9 +184,11 @@ defmodule Ello.Core.Factory do
     Map.merge(editorial_factory(), %{
       kind: "internal",
       content: %{
-        "title"    => "Internal Editorial",
-        "subtitle" => "check it out",
-        "path"     => "/discover/recent",
+        "title"              => "Internal Editorial",
+        "subtitle"           => "check *it* out",
+        "plaintext_subtitle" => "check it out",
+        "rendered_subtitle"  => "<p>check <em>it</em> out</p>",
+        "path"               => "/discover/recent",
       }
     })
   end

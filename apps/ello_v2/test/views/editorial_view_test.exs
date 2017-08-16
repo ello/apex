@@ -19,6 +19,7 @@ defmodule Ello.V2.EditorialViewTest do
     assert json[:kind] == "post"
     assert json[:title]
     assert json[:subtitle]
+    assert json[:rendered_subtitle]
     refute json[:url]
     assert json[:links][:post] == %{
       href: "/api/v2/posts/#{editorial.post.id}",
@@ -37,6 +38,7 @@ defmodule Ello.V2.EditorialViewTest do
     assert json[:kind] == "external"
     assert json[:title]
     assert json[:subtitle]
+    assert json[:rendered_subtitle]
     assert json[:url]
     refute json[:links]
   end
@@ -51,6 +53,7 @@ defmodule Ello.V2.EditorialViewTest do
     assert json[:kind] == "internal"
     assert json[:title]
     assert json[:subtitle]
+    assert json[:rendered_subtitle]
     assert json[:path]
     refute json[:links]
     refute json[:url]
@@ -66,6 +69,7 @@ defmodule Ello.V2.EditorialViewTest do
     assert json[:kind] == "post_stream"
     assert json[:title]
     refute json[:subtitle]
+    refute json[:rendered_subtitle]
     refute json[:url]
     assert json[:links][:post_stream][:type] == "posts"
     assert json[:links][:post_stream][:href]
@@ -81,6 +85,7 @@ defmodule Ello.V2.EditorialViewTest do
     assert json[:kind] == "post_stream"
     assert json[:title]
     refute json[:subtitle]
+    refute json[:rendered_subtitle]
     refute json[:url]
     assert json[:links][:post_stream][:type] == "posts"
     assert json[:links][:post_stream][:href]
@@ -102,6 +107,7 @@ defmodule Ello.V2.EditorialViewTest do
     assert json[:id] == "#{editorial.id}"
     assert json[:kind] == "post_stream"
     refute json[:subtitle]
+    refute json[:rendered_subtitle]
     refute json[:url]
     assert json[:links][:post_stream][:type] == "posts"
     assert json[:links][:post_stream][:href] == "/api/v2/following/posts/trending?stream_source=editorial&per_page=5&images_only=true"
@@ -118,6 +124,7 @@ defmodule Ello.V2.EditorialViewTest do
     assert json[:id] == "#{editorial.id}"
     assert json[:kind] == "post_stream"
     refute json[:subtitle]
+    refute json[:rendered_subtitle]
     refute json[:url]
     assert json[:links][:post_stream][:type] == "posts"
     assert json[:links][:post_stream][:href] == "/api/v2/discover/posts/trending?stream_source=editorial&per_page=5&images_only=true"
@@ -132,6 +139,7 @@ defmodule Ello.V2.EditorialViewTest do
     assert json[:id] == "#{editorial.id}"
     assert json[:kind] == "post_stream"
     refute json[:subtitle]
+    refute json[:rendered_subtitle]
     refute json[:url]
     assert json[:links][:post_stream][:type] == "posts"
     assert json[:links][:post_stream][:href] == "/api/v2/discover/posts/trending?stream_source=editorial&per_page=5&images_only=true"

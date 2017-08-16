@@ -62,7 +62,7 @@ defmodule Ello.Serve.Webapp.EditorialView do
 
   def title(%{content: %{"title" => title}}), do: title
 
-  def subtitle(%{content: %{"subtitle" => subtitle}}), do: subtitle
+  def subtitle(%{content: %{"rendered_subtitle" => subtitle}}), do: subtitle
 
   def external_url(%{content: %{"url" => url}}), do: url
   def internal_url(%{content: %{"path" => path}}), do: webapp_url(path)

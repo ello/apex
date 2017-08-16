@@ -106,8 +106,12 @@ defmodule Ello.V2.EditorialView do
   def kind(%{kind: "invite_join"}, _), do: "join"
   def kind(%{kind: kind}, _), do: kind
 
-  defp add_subtitle(json, %{kind: kind} = ed) when kind in ["external", "post", "internal"],
-    do: Map.put(json, :subtitle, ed.content["subtitle"])
+  defp add_subtitle(json, %{kind: kind} = ed)
+    when kind in ["external", "post", "internal"],
+    do: Map.merge(json, %{
+      subtitle:          ed.content["plaintext_subtitle"],
+      rendered_subtitle: ed.content["rendered_subtitle"]
+    })
   defp add_subtitle(json, _), do: json
 
   defp add_url(json, %{kind: "external"} = ed),
