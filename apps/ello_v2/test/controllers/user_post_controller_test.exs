@@ -54,7 +54,7 @@ defmodule Ello.V2.UserPostControllerTest do
 
   test "GET /v2/users/:id/posts - returns page headers", %{conn: conn, author: author} do
     response = get(conn, user_post_path(conn, :index, author), %{per_page: "2"})
-    refute get_resp_header(response, "x-last-page") == "true"
+    refute get_resp_header(response, "x-last-page") == ["true"]
     refute get_resp_header(response, "x-total-pages-remaining") == ["0"]
 
     assert [link] = get_resp_header(response, "link")
@@ -79,14 +79,14 @@ defmodule Ello.V2.UserPostControllerTest do
     before = "#{year}-#{month}-#{day}T#{hour}:#{minute}:#{second}Z"
     response = get(conn, user_post_path(conn, :index, author), %{per_page: "2", before: before})
     assert ["<https://ello.co/api/v2/users/" <> _] = get_resp_header(response, "link")
-    refute get_resp_header(response, "x-last-page") == "true"
+    refute get_resp_header(response, "x-last-page") == ["true"]
     refute get_resp_header(response, "x-total-pages-remaining") == ["0"]
   end
 
   test "GET /v2/users/:id/posts - using link headers to fetch next page returns results", %{conn: conn, author: author} do
     response = get(conn, user_post_path(conn, :index, author), %{per_page: "7"})
     assert response.status == 200
-    refute get_resp_header(response, "x-last-page") == "true"
+    refute get_resp_header(response, "x-last-page") == ["true"]
     refute get_resp_header(response, "x-total-pages-remaining") == ["0"]
     assert [link] = get_resp_header(response, "link")
 
@@ -98,6 +98,7 @@ defmodule Ello.V2.UserPostControllerTest do
     assert response2.status == 200
     assert get_resp_header(response2, "x-last-page") == ["true"]
     assert get_resp_header(response2, "x-total-pages-remaining") == ["0"]
+    assert get_resp_header(response2, "link") == []
   end
 
   test "GET /v2/users/:id/posts 404s", %{conn: conn} do
