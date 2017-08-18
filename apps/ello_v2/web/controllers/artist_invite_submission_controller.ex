@@ -27,8 +27,9 @@ defmodule Ello.V2.ArtistInviteSubmissionController do
 
   defp load_submissions(conn, invite) do
     Contest.artist_invite_submissions(standard_params(conn, %{
-      invite: invite,
-      status: conn.params["status"] || "approved",
+      invite:      invite,
+      status:      conn.params["status"] || "approved",
+      images_only: (not is_nil(conn.params["images_only"])),
     }))
   end
 end
