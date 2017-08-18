@@ -15,9 +15,14 @@ defmodule Ello.V2.ArtistInviteSubmissionControllerTest do
       artist_invite: invite,
       status:        "unapproved",
     })
-    approved = Factory.insert_list(4, :artist_invite_submission, %{
+    approved = Factory.insert_list(2, :artist_invite_submission, %{
       artist_invite: invite,
       status:        "approved",
+    })
+    approved_with_images = Factory.insert_list(2, :artist_invite_submission, %{
+      artist_invite: invite,
+      status:        "approved",
+      post:          Factory.add_assets(Factory.insert(:post)),
     })
     selected = Factory.insert_list(4, :artist_invite_submission, %{
       artist_invite: invite,
@@ -31,6 +36,7 @@ defmodule Ello.V2.ArtistInviteSubmissionControllerTest do
       unapproved: unapproved,
       approved:   approved,
       selected:   selected,
+      approved_with_images: approved_with_images,
     ]}
   end
 
@@ -49,6 +55,9 @@ defmodule Ello.V2.ArtistInviteSubmissionControllerTest do
     Enum.each c[:approved], fn(submission) ->
       refute submission.id in ids
     end
+    Enum.each c[:approved_with_images], fn(submission) ->
+      refute submission.id in ids
+    end
     Enum.each c[:selected], fn(submission) ->
       refute submission.id in ids
     end
@@ -62,6 +71,9 @@ defmodule Ello.V2.ArtistInviteSubmissionControllerTest do
       assert submission.id in ids
     end
     Enum.each c[:approved], fn(submission) ->
+      refute submission.id in ids
+    end
+    Enum.each c[:approved_with_images], fn(submission) ->
       refute submission.id in ids
     end
     Enum.each c[:selected], fn(submission) ->
@@ -106,6 +118,9 @@ defmodule Ello.V2.ArtistInviteSubmissionControllerTest do
     Enum.each c[:approved], fn(submission) ->
       assert submission.id in ids
     end
+    Enum.each c[:approved_with_images], fn(submission) ->
+      assert submission.id in ids
+    end
     Enum.each c[:selected], fn(submission) ->
       assert submission.id in ids
     end
@@ -137,6 +152,9 @@ defmodule Ello.V2.ArtistInviteSubmissionControllerTest do
     Enum.each c[:approved], fn(submission) ->
       assert submission.id in ids
     end
+    Enum.each c[:approved_with_images], fn(submission) ->
+      assert submission.id in ids
+    end
     Enum.each c[:selected], fn(submission) ->
       refute submission.id in ids
     end
@@ -152,6 +170,9 @@ defmodule Ello.V2.ArtistInviteSubmissionControllerTest do
     Enum.each c[:approved], fn(submission) ->
       assert submission.id in ids
     end
+    Enum.each c[:approved_with_images], fn(submission) ->
+      assert submission.id in ids
+    end
     Enum.each c[:selected], fn(submission) ->
       assert submission.id in ids
     end
@@ -165,6 +186,9 @@ defmodule Ello.V2.ArtistInviteSubmissionControllerTest do
       refute submission.id in ids
     end
     Enum.each c[:approved], fn(submission) ->
+      assert submission.id in ids
+    end
+    Enum.each c[:approved_with_images], fn(submission) ->
       assert submission.id in ids
     end
     Enum.each c[:selected], fn(submission) ->
@@ -188,6 +212,9 @@ defmodule Ello.V2.ArtistInviteSubmissionControllerTest do
     Enum.each c[:approved], fn(submission) ->
       refute submission.id in ids
     end
+    Enum.each c[:approved_with_images], fn(submission) ->
+      refute submission.id in ids
+    end
     Enum.each c[:selected], fn(submission) ->
       assert submission.id in ids
     end
@@ -203,6 +230,9 @@ defmodule Ello.V2.ArtistInviteSubmissionControllerTest do
     Enum.each c[:approved], fn(submission) ->
       refute submission.id in ids
     end
+    Enum.each c[:approved_with_images], fn(submission) ->
+      refute submission.id in ids
+    end
     Enum.each c[:selected], fn(submission) ->
       assert submission.id in ids
     end
@@ -216,6 +246,9 @@ defmodule Ello.V2.ArtistInviteSubmissionControllerTest do
       refute submission.id in ids
     end
     Enum.each c[:approved], fn(submission) ->
+      refute submission.id in ids
+    end
+    Enum.each c[:approved_with_images], fn(submission) ->
       refute submission.id in ids
     end
     Enum.each c[:selected], fn(submission) ->

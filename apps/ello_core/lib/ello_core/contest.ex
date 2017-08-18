@@ -109,6 +109,7 @@ defmodule Ello.Core.Contest do
     ArtistInviteSubmission
     |> for_invite(options)
     |> by_status(status)
+    |> filter_imageless(options)
     |> order_by([s], [desc: s.created_at])
     |> paginate_submissions(options)
     |> Repo.all
@@ -136,5 +137,21 @@ defmodule Ello.Core.Contest do
 
   defp filter_postless(submissions) do
     Enum.reject(submissions, &(is_nil(&1.post)))
+  end
+
+  defp filter_imageless(query, %{images_only: false}), do: query
+  defp filter_imageless(query, %{images_only: true}) do
+    # In order to determine if a post has images we have to parse the body
+    # To do so we use a lateral join with a subquery.
+    # The subquery iterates over each post's body as a row and returns a simple
+    # true value if the block is an image.
+    # Next we use the where to filter out all submissions/posts where the subquery
+    # did not find an image.
+    # We then use group by to remove duplicates (due to multiple images)
+    query
+    |> join(:left, [s], p in assoc(s, :post))
+    |> join(:left_lateral, [s, p], o in fragment("SELECT TRUE AS value FROM json_array_elements(?) AS body_block WHERE body_block->>'kind' = 'image'", p.body))
+    |> where([s, p, has_body], not is_nil(has_body.value))
+    |> group_by([s, p, has_body], s.id)
   end
 end

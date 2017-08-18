@@ -55,8 +55,12 @@ defmodule Ello.V2.Pagination do
     })
   end
   def add_pagination_headers(conn, path, params) do
-    next = pagination_link(path, params)
-    put_resp_header(conn, "link", ~s(<#{next}>; rel="next"))
+    case get_resp_header(conn, "x-last-page") do
+      ["true"] -> conn
+      _ ->
+        next = pagination_link(path, params)
+        put_resp_header(conn, "link", ~s(<#{next}>; rel="next"))
+    end
   end
 
   defp pagination_link(path, params) do
