@@ -23,8 +23,9 @@ defmodule Ello.Serve.Webapp.ArtistInviteShowController do
 
   defp submissions(conn, invite, status) do
     subs = Contest.artist_invite_submissions(standard_params(conn, %{
-      invite: invite,
-      status: status,
+      invite:      invite,
+      status:      status,
+      images_only: false,
     }))
     track(conn, subs, stream_kind: "artist_invite_submissions", stream_id: invite.id)
     subs
