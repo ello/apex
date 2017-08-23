@@ -1,0 +1,7 @@
+<%= for post <- artist_invite_posts(assigns) do %>
+  <section>
+    <a href="<%= post_url(post) %>">
+      <h2><%= title(@editorial) %> @<%= post.author.username %></h2>
+      <img src="<%= post_image_url(post) %>" /> </a>
+  </section>
+<% end %>

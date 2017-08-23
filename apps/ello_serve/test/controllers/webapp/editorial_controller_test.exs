@@ -12,7 +12,7 @@ defmodule Ello.Serve.Webapp.EditorialControllerTest do
     Factory.insert(:post_editorial, published_position: 2)
     Factory.insert(:post_editorial, published_position: 3)
     Factory.insert(:post_editorial, published_position: 4)
-    Factory.insert(:post_editorial, published_position: 5)
+    Factory.insert(:artist_invite_editorial, published_position: 5)
     Factory.insert(:external_editorial, published_position: 6)
     Factory.insert(:internal_editorial, published_position: 7)
     Factory.insert(:category_editorial, published_position: 8)
@@ -33,6 +33,12 @@ defmodule Ello.Serve.Webapp.EditorialControllerTest do
     Index.add(p2, post: %{love_count: 100})
     Index.add(p3, post: %{love_count: 10})
     Index.add(p4, post: %{love_count: 1})
+
+    invite = Factory.insert(:artist_invite, slug: "nfp-100", status: "open")
+    Factory.insert(:artist_invite_submission, post: p1, artist_invite: invite, status: "approved")
+    Factory.insert(:artist_invite_submission, post: p2, artist_invite: invite, status: "approved")
+    Factory.insert(:artist_invite_submission, post: p3, artist_invite: invite, status: "approved")
+    Factory.insert(:artist_invite_submission, post: p4, artist_invite: invite, status: "approved")
 
     roshi_items = [
       %Stream.Item{id: "#{p1.id}", stream_id: "categories:v1:cat1", ts: DateTime.utc_now},
@@ -56,7 +62,7 @@ defmodule Ello.Serve.Webapp.EditorialControllerTest do
   end
 
   test "editorial - noscript", %{conn: conn} do
-    resp = get(conn, "/", %{"per_page" => "7"})
+    resp = get(conn, "/", %{"per_page" => "8"})
     html = html_response(resp, 200)
     assert html =~ "<noscript>"
 
@@ -77,9 +83,12 @@ defmodule Ello.Serve.Webapp.EditorialControllerTest do
     assert html =~ "External Editorial"
     assert html =~ ~r(<a href="https://ello\.co/wtf">)
 
+    assert html =~ "Artist Invite Editorial"
+    assert html =~ ~r(<a href="https://ello\.co/.*/post/.*">.*Artist Invite Editorial @.*</a>)s
+
     assert html =~ "Post Editorial"
     assert html =~ ~r(<a href="https://ello\.co/.*/post/.*">)
 
-    assert html =~ ~r(<a href="https://ello\.co\?before=5">Next Page</a>)s
+    assert html =~ ~r(<a href="https://ello\.co\?before=4">Next Page</a>)s
   end
 end

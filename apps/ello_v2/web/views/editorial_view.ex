@@ -76,6 +76,14 @@ defmodule Ello.V2.EditorialView do
       }
     }
   end
+  def links(%{kind: "artist_invite"} = ed, _conn) do
+    %{
+      post_stream: %{
+        type: "posts",
+        href: "/api/v2/artist_invites/~#{ed.content["slug"]}/submissions?stream_source=editorial&per_page=#{per_page()}&images_only=true&status=approved",
+      }
+    }
+  end
   def links(%{kind: "following"}, %{assigns: %{current_user: user}}) when not is_nil(user) do
     case Network.following_ids(user, 1) do
       list when length(list) > 0 ->
@@ -100,7 +108,7 @@ defmodule Ello.V2.EditorialView do
 
   def title(ed, _), do: ed.content["title"]
 
-  def kind(%{kind: kind}, _) when kind in ["category", "curated_posts", "following"],
+  def kind(%{kind: kind}, _) when kind in ["category", "curated_posts", "following", "artist_invite"],
     do: "post_stream"
   def kind(%{kind: "invite_join"}, %{assigns: %{current_user: user}}) when not is_nil(user), do: "invite"
   def kind(%{kind: "invite_join"}, _), do: "join"
