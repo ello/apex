@@ -8,7 +8,7 @@ defmodule Ello.V2.PromotionalView do
     render_self(promo, __MODULE__, opts)
   end
 
-  def attributes, do: []
+  def attributes, do: [:post_token]
   def computed_attributes, do: [
     :image,
     :category_id,

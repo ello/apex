@@ -9,6 +9,7 @@ defmodule Ello.V2.PromotionalViewTest do
       id: "41",
       category_id: "2",
       user_id: "1",
+      post_token: "abc-123",
       links: %{
         user: %{
           href: "/api/v2/users/1",

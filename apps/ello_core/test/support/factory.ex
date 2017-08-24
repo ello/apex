@@ -286,6 +286,7 @@ defmodule Ello.Core.Factory do
     %Promotional{
       image: "ello-optimized-da955f87.jpg",
       image_metadata: %{},
+      post_token: "abc-123",
       user: build(:user),
       created_at: DateTime.utc_now,
       updated_at: DateTime.utc_now,
