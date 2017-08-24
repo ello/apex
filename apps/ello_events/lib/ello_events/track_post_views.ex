@@ -28,8 +28,8 @@ defmodule Ello.Events.TrackPostViews do
   def track(conn, models, options) do
     case post_ids(models) do
       []       -> conn
-      post_ids -> Events.publish(%CountPostView{
-        post_ids:    post_ids,
+      ids -> Events.publish(%CountPostView{
+        post_ids:    ids,
         user_id:     user_id(conn),
         stream_kind: stream_kind(conn, options),
         stream_id:   stream_id(options),

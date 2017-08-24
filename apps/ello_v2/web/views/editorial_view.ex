@@ -80,7 +80,7 @@ defmodule Ello.V2.EditorialView do
     %{
       post_stream: %{
         type: "posts",
-        href: "/api/v2/artist_invites/~#{ed.content["slug"]}/submissions?stream_source=editorial&per_page=#{per_page()}&images_only=true&status=approved",
+        href: "/api/v2/artist_invites/~#{ed.content["slug"]}/submission_posts?stream_source=editorial&per_page=#{per_page()}&images_only=true&status=approved",
       }
     }
   end

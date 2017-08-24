@@ -44,6 +44,7 @@ defmodule Ello.V2.Router do
     # Artist Invites
     resources "/artist_invites", ArtistInviteController, only: @read do
       resources "/submissions", ArtistInviteSubmissionController, only: [:index]
+      get "/submission_posts", ArtistInviteSubmissionController, :posts
     end
   end
 end
