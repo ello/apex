@@ -203,6 +203,16 @@ defmodule Ello.Core.Factory do
     })
   end
 
+  def artist_invite_editorial_factory do
+    Map.merge(editorial_factory(), %{
+      kind: "artist_invite",
+      content: %{
+        "title" => "Artist Invite Editorial",
+        "slug"  => "nfp-100",
+      }
+    })
+  end
+
   def curated_posts_editorial_factory do
     Map.merge(editorial_factory(), %{
       kind: "curated_posts",

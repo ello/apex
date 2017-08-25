@@ -4,7 +4,7 @@ defmodule Ello.Serve.Webapp.EditorialView do
   import Ello.V2.ImageView, only: [image_url: 2]
   alias Ello.Search.Post.Search
   alias Ello.Serve.Webapp.PostView
-  alias Ello.Core.{Content, Discovery}
+  alias Ello.Core.{Content, Discovery, Contest}
 
   def render("editorial.html", %{editorial: %{kind: "post"}} = assigns),
     do: render("post_editorial.html", assigns)
@@ -14,6 +14,8 @@ defmodule Ello.Serve.Webapp.EditorialView do
     do: render("external_editorial.html", assigns)
   def render("editorial.html", %{editorial: %{kind: "category"}} = assigns),
     do: render("category_editorial.html", assigns)
+  def render("editorial.html", %{editorial: %{kind: "artist_invite"}} = assigns),
+    do: render("artist_invite_editorial.html", assigns)
   def render("editorial.html", %{editorial: %{kind: "curated_posts"}} = assigns),
     do: render("curated_posts_editorial.html", assigns)
   def render("editorial.html", %{editorial: %{kind: "following"}} = assigns),
@@ -53,6 +55,22 @@ defmodule Ello.Serve.Webapp.EditorialView do
           per_page:     5,
           category:     category.id,
         })).results
+    end
+  end
+
+  def artist_invite_posts(%{editorial: %{content: %{"slug" => slug}}, conn: conn}) do
+    invite = Contest.artist_invite(standard_params(conn, %{
+      id_or_slug: "~#{slug}",
+    }))
+    case invite do
+      nil -> []
+      _ ->
+        Enum.map(Contest.artist_invite_submissions(standard_params(conn, %{
+          status:      "approved",
+          images_only: true,
+          per_page:    5,
+          invite:      invite,
+        })), &(&1.post))
     end
   end
 

@@ -26,13 +26,16 @@ defmodule Ello.Events.TrackPostViews do
   def track(conn, nil, _options),
     do: conn
   def track(conn, models, options) do
-    Events.publish(%CountPostView{
-      post_ids:    post_ids(models),
-      user_id:     user_id(conn),
-      stream_kind: stream_kind(conn, options),
-      stream_id:   stream_id(options),
-    })
-    conn
+    case post_ids(models) do
+      []       -> conn
+      ids -> Events.publish(%CountPostView{
+        post_ids:    ids,
+        user_id:     user_id(conn),
+        stream_kind: stream_kind(conn, options),
+        stream_id:   stream_id(options),
+      })
+      conn
+    end
   end
 
   defp user_id(%{assigns: %{current_user: %{id: id}}}), do: id
@@ -53,6 +56,7 @@ defmodule Ello.Events.TrackPostViews do
     do: [id]
   defp post_ids([%Post{} | _] = posts),
     do: Enum.map(posts, &(&1.id))
+  defp post_ids([]), do: []
 
   @post_wrappers [Editorial, Love, ArtistInviteSubmission]
   defp post_ids([%{__struct__: kind} | _] = model) when kind in @post_wrappers do

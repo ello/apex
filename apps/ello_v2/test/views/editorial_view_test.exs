@@ -91,6 +91,21 @@ defmodule Ello.V2.EditorialViewTest do
     assert json[:links][:post_stream][:href]
   end
 
+  test "editorial.json - artist_invite kind", context do
+    editorial = Editorial.build_images(Factory.insert(:artist_invite_editorial))
+    json = render(EditorialView, "editorial.json",
+      editorial: editorial,
+      conn: context.conn
+    )
+    assert json[:id] == "#{editorial.id}"
+    assert json[:kind] == "post_stream"
+    assert json[:title]
+    refute json[:subtitle]
+    refute json[:url]
+    assert json[:links][:post_stream][:type] == "posts"
+    assert json[:links][:post_stream][:href]
+  end
+
   test "editorial.json - following kind - authenticated - is following", context do
     user = Factory.build(:user)
     conn = assign(context.conn, :current_user, user)

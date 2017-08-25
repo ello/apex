@@ -255,4 +255,23 @@ defmodule Ello.V2.ArtistInviteSubmissionControllerTest do
       assert submission.id in ids
     end
   end
+
+  test "GET /v2/artist_invites/~:slug/submission_posts?status=approved - as posts - regular user - invite closed", %{conn: conn} = c do
+    {:ok, _} = Repo.update(Ecto.Changeset.change(c[:invite], status: "closed"))
+    resp = get(conn, "/api/v2/artist_invites/~test/submission_posts", %{"status" => "approved"})
+    json = json_response(resp, 200)
+    ids = Enum.map(json["posts"], &String.to_integer(&1["id"]))
+    Enum.each c[:unapproved], fn(submission) ->
+      refute submission.post_id in ids
+    end
+    Enum.each c[:approved], fn(submission) ->
+      assert submission.post_id in ids
+    end
+    Enum.each c[:approved_with_images], fn(submission) ->
+      assert submission.post_id in ids
+    end
+    Enum.each c[:selected], fn(submission) ->
+      refute submission.post_id in ids
+    end
+  end
 end
