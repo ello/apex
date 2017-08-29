@@ -2,6 +2,7 @@ defmodule Ello.V2.ArtistInviteView do
   use Ello.V2.Web, :view
   use Ello.V2.JSONAPI
   alias Ello.V2.{ImageView}
+  alias Ello.Core.Contest.{ArtistInvite}
 
   def stale_checks(_, %{data: artist_invites}) do
     [etag: etag(artist_invites)]
@@ -110,17 +111,5 @@ defmodule Ello.V2.ArtistInviteView do
   end
   defp add_selected_link(links, _, _), do: links
 
-  def status(%{status: "open", closed_at: nil}, _), do: "open"
-  def status(%{status: "open", opened_at: nil}, _), do: "upcoming"
-  def status(%{status: "open"} = invite, _) do
-    now    = DateTime.utc_now |> DateTime.to_unix
-    open   = DateTime.to_unix(invite.opened_at)
-    closed = DateTime.to_unix(invite.closed_at)
-    cond do
-      now < open   -> "upcoming"
-      now > closed -> "selecting"
-      true         -> "open"
-    end
-  end
-  def status(%{status: status}, _), do: status
+  def status(invite, _), do: ArtistInvite.status(invite)
 end

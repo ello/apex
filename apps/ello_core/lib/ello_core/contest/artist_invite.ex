@@ -40,4 +40,18 @@ defmodule Ello.Core.Contest.ArtistInvite do
     |> Map.put(:logo_image_struct, LogoImage.from_artist_invite(artist_invite))
     |> Map.put(:og_image_struct, OGImage.from_artist_invite(artist_invite))
   end
+
+  def status(%{status: "open", closed_at: nil}), do: "open"
+  def status(%{status: "open", opened_at: nil}), do: "upcoming"
+  def status(%{status: "open"} = invite) do
+    now    = DateTime.utc_now |> DateTime.to_unix
+    open   = DateTime.to_unix(invite.opened_at)
+    closed = DateTime.to_unix(invite.closed_at)
+    cond do
+      now < open   -> "upcoming"
+      now > closed -> "selecting"
+      true         -> "open"
+    end
+  end
+  def status(%{status: status}), do: status
 end
