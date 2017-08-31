@@ -10,6 +10,7 @@ defmodule Ello.Repo.Migrations.CreatePromotionals do
 
       add :category_id, :integer
       add :user_id, :integer
+      add :post_token, :string
     end
 
     create_if_not_exists index(:promotionals, [:category_id])

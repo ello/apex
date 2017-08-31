@@ -12,6 +12,7 @@ defmodule Ello.Core.Discovery.Promotional do
     field :image_struct, :map, virtual: true
     field :created_at, :utc_datetime
     field :updated_at, :utc_datetime
+    field :post_token, :string
 
     belongs_to :category, Category
     belongs_to :user, User
