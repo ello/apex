@@ -34,17 +34,17 @@ defmodule Ello.V2.CategoryPostController do
   end
 
   def featured(conn, _params) do
-    categories = Discovery.categories(standard_params(conn, %{
+    categories = Task.async(Discovery, :categories, [standard_params(conn, %{
       primary:      true,
       images:       false,
       promotionals: false,
-    }))
+    })])
 
-    invites = Contest.artist_invites(standard_params(conn, %{
+    invites = Task.async(Contest, :artist_invites, [standard_params(conn, %{
       for_discovery: true,
-    }))
+    })])
 
-    stream = fetch_stream(conn, categories ++ invites)
+    stream = fetch_stream(conn, Task.await(categories) ++ Task.await(invites))
 
     conn
     |> track_post_view(stream.posts, stream_kind: "featured")

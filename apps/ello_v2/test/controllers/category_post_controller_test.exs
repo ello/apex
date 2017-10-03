@@ -140,7 +140,7 @@ defmodule Ello.V2.CategoryPostControllerTest do
     response = get(conn, category_post_path(conn, :trending, "cat1"))
     assert response.status == 200
     json = json_response(response, 200)
-    [p1, p2, p3, p4, p5, p6] = posts
+    [p1, p2, p3, p4, p5, p6 | _ ] = posts
     returned_ids = Enum.map(json["posts"], &(String.to_integer(&1["id"])))
     assert p1.id in returned_ids
     assert p2.id in returned_ids
