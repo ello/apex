@@ -52,8 +52,8 @@ defmodule Ello.V2.ViewTest do
     assert json[:links][:post][:id]
     assert json[:actions][:approve] == %{
       label:  "Approve",
-      href:   "/api/v2/artist_invite_submissions/#{context[:unapproved].id}",
-      method: "PATCH",
+      href:   "/api/v2/artist_invite_submissions/#{context[:unapproved].id}/approve",
+      method: "PUT",
       body:   %{status: "approved"},
     }
   end
@@ -67,14 +67,14 @@ defmodule Ello.V2.ViewTest do
     assert json[:links][:post][:id]
     assert json[:actions][:unapprove] == %{
       label:  "Approved",
-      href:   "/api/v2/artist_invite_submissions/#{context[:unapproved].id}",
-      method: "PATCH",
+      href:   "/api/v2/artist_invite_submissions/#{context[:unapproved].id}/unapprove",
+      method: "PUT",
       body:   %{status: "unapproved"},
     }
     assert json[:actions][:select] == %{
       label:  "Select",
-      href:   "/api/v2/artist_invite_submissions/#{context[:unapproved].id}",
-      method: "PATCH",
+      href:   "/api/v2/artist_invite_submissions/#{context[:unapproved].id}/select",
+      method: "PUT",
       body:   %{status: "selected"},
     }
   end
@@ -88,8 +88,8 @@ defmodule Ello.V2.ViewTest do
     assert json[:links][:post][:id]
     assert json[:actions][:unselect] == %{
       label:  "Selected",
-      href:   "/api/v2/artist_invite_submissions/#{context[:selected].id}",
-      method: "PATCH",
+      href:   "/api/v2/artist_invite_submissions/#{context[:selected].id}/deselect",
+      method: "PUT",
       body:   %{status: "approved"},
     }
   end
