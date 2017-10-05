@@ -46,7 +46,7 @@ defmodule Ello.Core.Contest do
     |> Repo.all
     |> Preload.artist_invites(options)
   end
-  def artist_invites(%{for_discovery: true} = options) do
+  def artist_invites(%{for_discovery: true}) do
     ArtistInvite
     |> where([ai], ai.status == "open")
     |> Repo.all
