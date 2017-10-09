@@ -3,7 +3,9 @@ defmodule Ello.V2.CategoryPostController do
   alias Ello.Stream
   alias Ello.Search.Post.Search
   alias Ello.V2.PostView
-  alias Ello.Core.Discovery
+  alias Ello.Core.{Discovery, Contest}
+  alias Discovery.Category
+  alias Contest.ArtistInvite
 
   def recent(conn, params) do
     case fetch_category(conn, params) do
@@ -32,13 +34,17 @@ defmodule Ello.V2.CategoryPostController do
   end
 
   def featured(conn, _params) do
-    categories = Discovery.categories(standard_params(conn, %{
+    categories = Task.async(Discovery, :categories, [standard_params(conn, %{
       primary:      true,
       images:       false,
       promotionals: false,
-    }))
+    })])
 
-    stream = fetch_stream(conn, categories)
+    invites = Task.async(Contest, :artist_invites, [standard_params(conn, %{
+      for_discovery: true,
+    })])
+
+    stream = fetch_stream(conn, Task.await(categories) ++ Task.await(invites))
 
     conn
     |> track_post_view(stream.posts, stream_kind: "featured")
@@ -46,14 +52,15 @@ defmodule Ello.V2.CategoryPostController do
     |> api_render(PostView, :index, data: stream.posts)
   end
 
-  defp fetch_stream(conn, categories) do
+  defp fetch_stream(conn, models) do
     Stream.fetch(standard_params(conn, %{
-      keys:         Enum.map(categories, &category_stream_key/1),
+      keys:         Enum.map(models, &stream_key/1),
       allow_nsfw:   true, # No NSFW in categories, reduces slop.
     }))
   end
 
-  defp category_stream_key(%{slug: slug}), do: "categories:v1:#{slug}"
+  defp stream_key(%Category{slug: slug}), do: "categories:v1:#{slug}"
+  defp stream_key(%ArtistInvite{id: id}), do: "artist_invite:v1:#{id}"
 
   defp fetch_trending(conn, category) do
     Search.post_search(standard_params(conn, %{

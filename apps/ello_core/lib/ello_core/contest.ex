@@ -46,6 +46,11 @@ defmodule Ello.Core.Contest do
     |> Repo.all
     |> Preload.artist_invites(options)
   end
+  def artist_invites(%{for_discovery: true}) do
+    ArtistInvite
+    |> where([ai], ai.status == "open")
+    |> Repo.all
+  end
   def artist_invites(%{page: page, per_page: per_page} = options) do
     offset = per_page * (page - 1)
 

@@ -12,6 +12,9 @@ defmodule Ello.V2.CategoryPostControllerTest do
 
     cat1 = Factory.insert(:category, slug: "cat1", level: "primary")
     cat2 = Factory.insert(:category, slug: "cat2", level: "primary")
+    inv1 = Factory.insert(:artist_invite, status: "open")
+    inv2 = Factory.insert(:artist_invite, status: "open")
+    inv3 = Factory.insert(:artist_invite, status: "closed")
 
     user = Factory.insert(:user)
     post1 = Factory.insert(:post, category_ids: [cat1.id])
@@ -20,6 +23,12 @@ defmodule Ello.V2.CategoryPostControllerTest do
     post4 = Factory.insert(:post, category_ids: [cat2.id])
     post5 = Factory.insert(:post, category_ids: [cat2.id])
     post6 = Factory.insert(:post, has_nudity: true, category_ids: [cat2.id])
+    post7 = Factory.insert(:post)
+    post8 = Factory.insert(:post, has_nudity: true)
+    post9 = Factory.insert(:post)
+    Factory.insert(:artist_invite_submission, post: post7, artist_invite: inv1)
+    Factory.insert(:artist_invite_submission, post: post8, artist_invite: inv2)
+    Factory.insert(:artist_invite_submission, post: post9, artist_invite: inv3)
     Factory.insert(:love, post: post1, user: user)
     roshi_items = [
       %Item{id: "#{post1.id}", stream_id: "categories:v1:cat1", ts: DateTime.utc_now},
@@ -28,12 +37,15 @@ defmodule Ello.V2.CategoryPostControllerTest do
       %Item{id: "#{post4.id}", stream_id: "categories:v1:cat2", ts: DateTime.utc_now},
       %Item{id: "#{post5.id}", stream_id: "categories:v1:cat2", ts: DateTime.utc_now},
       %Item{id: "#{post6.id}", stream_id: "categories:v1:cat2", ts: DateTime.utc_now},
+      %Item{id: "#{post7.id}", stream_id: "artist_invite:v1:#{inv1.id}", ts: DateTime.utc_now},
+      %Item{id: "#{post8.id}", stream_id: "artist_invite:v1:#{inv2.id}", ts: DateTime.utc_now},
+      %Item{id: "#{post9.id}", stream_id: "artist_invite:v1:#{inv3.id}", ts: DateTime.utc_now},
     ]
     Stream.Client.add_items(roshi_items)
 
     {:ok, [
       conn: auth_conn(conn, user),
-      posts: [post1, post2, post3, post4, post5, post6],
+      posts: [post1, post2, post3, post4, post5, post6, post7, post8, post9],
     ]}
   end
 
@@ -44,7 +56,7 @@ defmodule Ello.V2.CategoryPostControllerTest do
     assert response.status == 200
     json = json_response(response, 200)
     returned_ids = Enum.map(json["posts"], &(String.to_integer(&1["id"])))
-    [p1, p2, p3, p4, p5, p6] = posts
+    [p1, p2, p3, p4, p5, p6 | _] = posts
     assert p1.id in returned_ids
     assert p2.id in returned_ids
     assert p3.id in returned_ids
@@ -61,7 +73,7 @@ defmodule Ello.V2.CategoryPostControllerTest do
     assert response.status == 200
     json = json_response(response, 200)
     returned_ids = Enum.map(json["posts"], &(String.to_integer(&1["id"])))
-    [p1, p2, p3, p4, p5, p6] = posts
+    [p1, p2, p3, p4, p5, p6 | _] = posts
     assert p1.id in returned_ids
     assert p2.id in returned_ids
     refute p3.id in returned_ids
@@ -84,13 +96,16 @@ defmodule Ello.V2.CategoryPostControllerTest do
     assert response.status == 200
     json = json_response(response, 200)
     returned_ids = Enum.map(json["posts"], &(String.to_integer(&1["id"])))
-    [p1, p2, p3, p4, p5, p6] = posts
+    [p1, p2, p3, p4, p5, p6, p7, p8, p9] = posts
     assert p1.id in returned_ids
     assert p2.id in returned_ids
     assert p3.id in returned_ids
     assert p4.id in returned_ids
     assert p5.id in returned_ids
     assert p6.id in returned_ids
+    assert p7.id in returned_ids
+    assert p8.id in returned_ids
+    refute p9.id in returned_ids
     assert Enum.find(json["posts"], &(&1["loved"] == true))
   end
 
@@ -101,13 +116,16 @@ defmodule Ello.V2.CategoryPostControllerTest do
     assert response.status == 200
     json = json_response(response, 200)
     returned_ids = Enum.map(json["posts"], &(String.to_integer(&1["id"])))
-    [p1, p2, p3, p4, p5, p6] = posts
+    [p1, p2, p3, p4, p5, p6, p7, p8, p9] = posts
     assert p1.id in returned_ids
     assert p2.id in returned_ids
     refute p3.id in returned_ids
     assert p4.id in returned_ids
     assert p5.id in returned_ids
     refute p6.id in returned_ids
+    assert p7.id in returned_ids
+    refute p8.id in returned_ids
+    refute p9.id in returned_ids
     assert Enum.find(json["posts"], &(&1["loved"] == true))
   end
 
@@ -122,7 +140,7 @@ defmodule Ello.V2.CategoryPostControllerTest do
     response = get(conn, category_post_path(conn, :trending, "cat1"))
     assert response.status == 200
     json = json_response(response, 200)
-    [p1, p2, p3, p4, p5, p6] = posts
+    [p1, p2, p3, p4, p5, p6 | _] = posts
     returned_ids = Enum.map(json["posts"], &(String.to_integer(&1["id"])))
     assert p1.id in returned_ids
     assert p2.id in returned_ids

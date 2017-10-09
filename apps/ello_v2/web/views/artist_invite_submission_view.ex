@@ -65,8 +65,8 @@ defmodule Ello.V2.ArtistInviteSubmissionView do
     %{
       approve: %{
         label:  "Approve",
-        href:   "/api/v2/artist_invite_submissions/#{id}",
-        method: "PATCH",
+        href:   "/api/v2/artist_invite_submissions/#{id}/approve",
+        method: "PUT",
         body:   %{status: "approved"},
       }
     }
@@ -76,14 +76,14 @@ defmodule Ello.V2.ArtistInviteSubmissionView do
     %{
       unapprove: %{
         label:  "Approved",
-        href:   "/api/v2/artist_invite_submissions/#{id}",
-        method: "PATCH",
+        href:   "/api/v2/artist_invite_submissions/#{id}/unapprove",
+        method: "PUT",
         body:   %{status: "unapproved"},
       },
       select: %{
         label:  "Select",
-        href:   "/api/v2/artist_invite_submissions/#{id}",
-        method: "PATCH",
+        href:   "/api/v2/artist_invite_submissions/#{id}/select",
+        method: "PUT",
         body:   %{status: "selected"},
       }
     }
@@ -93,8 +93,8 @@ defmodule Ello.V2.ArtistInviteSubmissionView do
     %{
       unselect: %{
         label:  "Selected",
-        href:   "/api/v2/artist_invite_submissions/#{id}",
-        method: "PATCH",
+        href:   "/api/v2/artist_invite_submissions/#{id}/deselect",
+        method: "PUT",
         body:   %{status: "approved"},
       }
     }
