@@ -50,6 +50,12 @@ defmodule Ello.V2.ViewTest do
     })
     assert json[:status] == "unapproved"
     assert json[:links][:post][:id]
+    assert json[:actions][:decline] == %{
+      label:  "Decline",
+      href:   "/api/v2/artist_invite_submissions/#{context[:unapproved].id}/decline",
+      method: "PUT",
+      body:   %{status: "declined"},
+    }
     assert json[:actions][:approve] == %{
       label:  "Approve",
       href:   "/api/v2/artist_invite_submissions/#{context[:unapproved].id}/approve",

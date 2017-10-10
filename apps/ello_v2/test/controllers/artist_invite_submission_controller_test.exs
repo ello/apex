@@ -11,6 +11,10 @@ defmodule Ello.V2.ArtistInviteSubmissionControllerTest do
       status:        "open",
       slug:          "test",
     })
+    declined = Factory.insert_list(4, :artist_invite_submission, %{
+      artist_invite: invite,
+      status:        "declined",
+    })
     unapproved = Factory.insert_list(4, :artist_invite_submission, %{
       artist_invite: invite,
       status:        "unapproved",
@@ -33,6 +37,7 @@ defmodule Ello.V2.ArtistInviteSubmissionControllerTest do
       staff_conn: auth_conn(conn, staff),
       brand_conn: auth_conn(conn, brand),
       invite:     invite,
+      declined:   declined,
       unapproved: unapproved,
       approved:   approved,
       selected:   selected,
@@ -43,6 +48,27 @@ defmodule Ello.V2.ArtistInviteSubmissionControllerTest do
   test "GET /v2/artist_invites/~:slug/submissions?status=submitted - regular user", %{conn: conn} do
     resp = get(conn, "/api/v2/artist_invites/~test/submissions", %{"status" => "unapproved"})
     assert resp.status == 204
+  end
+
+  test "GET /v2/artist_invites/~:slug/submissions?status=declined - staff user", %{staff_conn: conn} = c do
+    resp = get(conn, "/api/v2/artist_invites/~test/submissions", %{"status" => "declined"})
+    json = json_response(resp, 200)
+    ids = Enum.map(json["artist_invite_submissions"], &String.to_integer(&1["id"]))
+    Enum.each c[:declined], fn(submission) ->
+      assert submission.id in ids
+    end
+    Enum.each c[:unapproved], fn(submission) ->
+      refute submission.id in ids
+    end
+    Enum.each c[:approved], fn(submission) ->
+      refute submission.id in ids
+    end
+    Enum.each c[:approved_with_images], fn(submission) ->
+      refute submission.id in ids
+    end
+    Enum.each c[:selected], fn(submission) ->
+      refute submission.id in ids
+    end
   end
 
   test "GET /v2/artist_invites/~:slug/submissions?status=submitted - staff user", %{staff_conn: conn} = c do

@@ -58,10 +58,27 @@ defmodule Ello.V2.ArtistInviteView do
     user = conn.assigns[:current_user]
 
     %{}
+    |> add_declined_link(invite, user)
     |> add_unapproved_link(invite, user)
     |> add_approved_link(invite, user)
     |> add_selected_link(invite, user)
   end
+
+  defp add_declined_link(links, %{id: id, brand_account_id: user_id}, %{id: user_id}) do
+    Map.put(links, :declined_submissions, %{
+      label: "Declined",
+      type:  "artist_invite_submission_stream",
+      href:  "/api/v2/artist_invites/#{id}/submissions?status=declined",
+    })
+  end
+  defp add_declined_link(links, %{id: id}, %{is_staff: true}) do
+    Map.put(links, :declined_submissions, %{
+      label: "Declined",
+      type:  "artist_invite_submission_stream",
+      href:  "/api/v2/artist_invites/#{id}/submissions?status=declined",
+    })
+  end
+  defp add_declined_link(links, _, _), do: links
 
   defp add_unapproved_link(links, %{id: id, brand_account_id: user_id}, %{id: user_id}) do
     Map.put(links, :unapproved_submissions, %{

@@ -61,7 +61,7 @@ defmodule Ello.V2.ArtistInviteSubmissionView do
   }}), do: actions_map(submission)
   def actions(_, _), do: nil
 
-  defp actions_map(%{status: "unapproved", id: id}) do
+  defp actions_map(%{status: "declined", id: id}) do
     %{
       approve: %{
         label:  "Approve",
@@ -69,6 +69,23 @@ defmodule Ello.V2.ArtistInviteSubmissionView do
         method: "PUT",
         body:   %{status: "approved"},
       }
+    }
+  end
+
+  defp actions_map(%{status: "unapproved", id: id}) do
+    %{
+      decline: %{
+        label:  "Decline",
+        href:   "/api/v2/artist_invite_submissions/#{id}/decline",
+        method: "PUT",
+        body:   %{status: "declined"},
+      },
+      approve: %{
+        label:  "Approve",
+        href:   "/api/v2/artist_invite_submissions/#{id}/approve",
+        method: "PUT",
+        body:   %{status: "approved"},
+      },
     }
   end
 
