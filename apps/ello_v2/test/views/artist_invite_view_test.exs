@@ -75,6 +75,7 @@ defmodule Ello.V2.ArtistInviteViewTest do
 
     refute json[:links][:unapproved_submissions]
     refute json[:links][:selected_submissions]
+    refute json[:links][:declined_submissions]
 
     assert json[:links][:approved_submissions][:type] == "artist_invite_submission_stream"
     assert json[:links][:approved_submissions][:href] =~ ~r"/api/v2/artist_invites/\d*/submissions\?status=approved"
@@ -87,6 +88,7 @@ defmodule Ello.V2.ArtistInviteViewTest do
     })
 
     refute json[:links][:unapproved_submissions]
+    refute json[:links][:declined_submissions]
 
     assert json[:links][:approved_submissions][:type] == "artist_invite_submission_stream"
     assert json[:links][:approved_submissions][:href] =~ ~r"/api/v2/artist_invites/\d*/submissions\?status=approved"
@@ -104,6 +106,7 @@ defmodule Ello.V2.ArtistInviteViewTest do
     assert json[:links][:unapproved_submissions][:type] == "artist_invite_submission_stream"
     assert json[:links][:unapproved_submissions][:href] =~ ~r"/api/v2/artist_invites/\d*/submissions\?status=unapproved"
 
+    assert json[:links][:declined_submissions]
     assert json[:links][:approved_submissions]
     assert json[:links][:selected_submissions]
   end
@@ -115,6 +118,7 @@ defmodule Ello.V2.ArtistInviteViewTest do
       conn:          context.brand_conn,
     })
 
+    assert json[:links][:declined_submissions]
     assert json[:links][:unapproved_submissions]
     assert json[:links][:approved_submissions]
     assert json[:links][:selected_submissions]

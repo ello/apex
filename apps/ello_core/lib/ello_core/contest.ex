@@ -67,6 +67,17 @@ defmodule Ello.Core.Contest do
   Return artist invite submissions for a given invite.
   """
   def artist_invite_submissions(%{
+    status:       "declined",
+    invite:       %{brand_account_id: user_id},
+    current_user: %{id: user_id},
+  } = options),
+    do: get_submissions_by_status(options, "declined")
+  def artist_invite_submissions(%{
+    status:       "declined",
+    current_user: %{is_staff: true},
+  } = options),
+    do: get_submissions_by_status(options, "declined")
+  def artist_invite_submissions(%{
     status:       "unapproved",
     invite:       %{brand_account_id: user_id},
     current_user: %{id: user_id},
