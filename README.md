@@ -77,7 +77,7 @@ basic html for clients not supporting Javascript. [README](/apps/ello_serve/).
 
 ### Requirements
 
-* Elixir 1.4 - Installation via asdf or exenv recommended.
+* Elixir 1.4.5 - Installation via asdf or exenv recommended.
 * Postgres - Posgres.app suggested running on localhost.
 * Redis - Redis.app suggested running on localhost.
 * Docker & docker-compose - docker-compose up boots:
