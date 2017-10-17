@@ -63,6 +63,20 @@ defmodule Ello.Core.Contest do
     |> Preload.artist_invites(options)
   end
 
+  def my_artist_invites(%{current_user: %{is_staff: true}} = options) do
+    ArtistInvite
+    |> order_by(desc: :created_at)
+    |> Repo.all
+    |> Preload.artist_invites(options)
+  end
+  def my_artist_invites(%{current_user: %{id: current_user_id}} = options) do
+    ArtistInvite
+    |> where([ai], ai.brand_account_id == ^current_user_id)
+    |> order_by(desc: :created_at)
+    |> Repo.all
+    |> Preload.artist_invites(options)
+  end
+
   @doc """
   Return artist invite submissions for a given invite.
   """

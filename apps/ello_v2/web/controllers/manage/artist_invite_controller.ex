@@ -10,7 +10,7 @@ defmodule Ello.V2.Manage.ArtistInviteController do
   GET /v2/manage/artist_invites
   """
   def index(conn, _params) do
-    artist_invites = Contest.artist_invites(standard_params(conn, %{
+    artist_invites = Contest.my_artist_invites(standard_params(conn, %{
       preview: false
     }))
     conn

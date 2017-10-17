@@ -40,4 +40,28 @@ defmodule Ello.V2.Manage.ArtistInviteControllerTest do
     json_response(conn, 200)
     assert :ok = validate_json("artist_invite", json_response(conn, 200))
   end
+
+  test "GET /v2/manage/artist_invites - staff can view all artist invites", %{staff_conn: conn, a_inv1: a_inv1, a_inv2: a_inv2} do
+    conn = get(conn, manage_artist_invite_path(conn, :index))
+
+    assert %{"artist_invites" => artist_invites} = json_response(conn, 200)
+    assert Enum.member?(artist_invite_ids(artist_invites), "#{a_inv1.id}")
+    assert Enum.member?(artist_invite_ids(artist_invites), "#{a_inv2.id}")
+  end
+
+  test "GET /v2/manage/artist_invites - brands can only view their own artist invites", %{brand_conn: conn, a_inv1: a_inv1, a_inv2: a_inv2} do
+    conn = get(conn, manage_artist_invite_path(conn, :index))
+
+    assert %{"artist_invites" => artist_invites} = json_response(conn, 200)
+    refute Enum.member?(artist_invite_ids(artist_invites), "#{a_inv1.id}")
+    assert Enum.member?(artist_invite_ids(artist_invites), "#{a_inv2.id}")
+  end
+
+  test "GET /v2/manage/artist_invites - normal users can't see any artist invites", %{conn: conn} do
+    conn = get(conn, manage_artist_invite_path(conn, :index))
+    assert conn.status == 204
+  end
+
+  defp artist_invite_ids(artist_invites),
+    do: Enum.map(artist_invites, &(&1["id"]))
 end
