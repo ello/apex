@@ -14,4 +14,16 @@ defmodule Ello.V2.Manage.ArtistInviteController do
     conn
     |> api_render_if_stale(ArtistInviteView, :index, data: artist_invites)
   end
+
+  def show(conn, %{"id" => id_or_slug}) do
+    case fetch_artist_invite(conn, id_or_slug) do
+      nil -> send_resp(conn, 403, "")
+      artist_invite ->
+        conn
+        |> api_render_if_stale(ArtistInviteView, :show, data: artist_invite)
+    end
+  end
+
+  defp fetch_artist_invite(conn, id_or_slug), do:
+    Contest.my_artist_invite(standard_params(conn, %{id_or_slug: id_or_slug}))
 end
