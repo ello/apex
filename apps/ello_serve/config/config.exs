@@ -30,6 +30,9 @@ config :ello_serve, :webapp_config,
   honeybadger_api_key: System.get_env("WEBAPP_HONEYBADGER_API_KEY"),
   honeybadger_environment: System.get_env("WEBAPP_HONEYBADGER_ENVIRONMENT") || "production"
 
+config :ello_serve, :bread_config,
+  oauth_client_id: System.get_env("BREAD_OAUTH_CLIENT_ID") || "client_id",
+  app_debug: System.get_env("BREAD_APP_DEBUG") || false
 
 # Configures the endpoint
 config :ello_serve, Ello.Serve.Endpoint,
