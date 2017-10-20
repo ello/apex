@@ -7,12 +7,12 @@ defmodule Ello.Core.Contest do
     Preload,
   }
 
-  def artist_invite(%{id_or_slug: id_or_slug, preview: "true", current_user: %{is_staff: true}} = options) do
+  def artist_invite(%{id_or_slug: id_or_slug, current_user: %{is_staff: true}} = options) do
     ArtistInvite
     |> Repo.get_by_id_or_slug(id_or_slug: id_or_slug)
     |> Preload.artist_invites(options)
   end
-  def artist_invite(%{id_or_slug: id_or_slug, preview: "true", current_user: %{id: current_user_id}} = options) do
+  def artist_invite(%{id_or_slug: id_or_slug, current_user: %{id: current_user_id}} = options) do
     ArtistInvite
     |> where([ai], ai.brand_account_id == ^current_user_id or ai.status != "preview")
     |> Repo.get_by_id_or_slug(id_or_slug: id_or_slug)
