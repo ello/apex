@@ -46,6 +46,16 @@ defmodule Ello.V2.FollowingPostController do
     |> api_render_if_stale(PostView, :index, data: results.results)
   end
 
+  def user(%{assigns: %{current_user: %{is_staff: true}}} = conn, %{"slug" => id_or_username}) do
+    user = Network.user(%{
+      id_or_username: id_or_username,
+      current_user: current_user(conn)
+    })
+    Stream.fetch(standard_params(conn, %{
+      keys: ["#{user.id}" | Network.following_ids(user)],
+    }))
+  end
+
   defp trending_search(conn) do
     Search.post_search(standard_params(conn, %{
       trending:     true,
