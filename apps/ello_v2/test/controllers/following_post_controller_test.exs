@@ -97,7 +97,11 @@ defmodule Ello.V2.FollowingPostControllerTest do
   end
 
   @tag :focus
-  test "GET /v2/following/user/~user", %{conn: conn, following_user: following_user, post: post, my_post: my_post} do
+  test "GET /v2/following/user/~user", %{unauth_conn: unauth_conn, following_user: following_user, post: post, my_post: my_post} do
+    staff_user = Factory.insert(:user, %{is_staff: true})
+    conn = unauth_conn
+           |> auth_conn(staff_user)
+
     response = conn
                |> get(following_post_path(conn, :user, "#{following_user.id}"))
     assert response.status == 200
@@ -105,6 +109,13 @@ defmodule Ello.V2.FollowingPostControllerTest do
     returned_ids = Enum.map(json["posts"], &(String.to_integer(&1["id"])))
     assert post.id in returned_ids
     refute my_post.id in returned_ids
+  end
+
+  @tag :focus
+  test "GET /v2/following/user/~user fails for non-staff", %{conn: conn, following_user: following_user} do
+    response = conn
+               |> get(following_post_path(conn, :user, "#{following_user.id}"))
+    assert response.status == 404
   end
 
   @tag :json_schema
