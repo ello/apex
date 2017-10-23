@@ -119,23 +119,23 @@ defmodule Ello.V2.ArtistInviteControllerTest do
   end
 
 
-  test "GET /v2/artist_invites/:id - staff can preview artist invites", %{staff_conn: conn, a_inv2: a_inv2} do
-    conn = get(conn, artist_invite_path(conn, :show, "~#{a_inv2.slug}"), %{preview: "true"})
+  test "GET /v2/artist_invites/:id - staff can see artist invites in preview", %{staff_conn: conn, a_inv2: a_inv2} do
+    conn = get(conn, artist_invite_path(conn, :show, "~#{a_inv2.slug}"))
     assert conn.status == 200
   end
 
-  test "GET /v2/artist_invites/:id - brand accounts can preview their own artist invite", %{brand_conn: conn, a_inv3: a_inv3} do
-    conn = get(conn, artist_invite_path(conn, :show, "~#{a_inv3.slug}"), %{preview: "true"})
+  test "GET /v2/artist_invites/:id - brand accounts can see their own artist invite in preview", %{brand_conn: conn, a_inv3: a_inv3} do
+    conn = get(conn, artist_invite_path(conn, :show, "~#{a_inv3.slug}"))
     assert conn.status == 200
   end
 
   test "GET /v2/artist_invites/:id - brand accounts can't preview other artist invites", %{brand_conn: conn, a_inv2: a_inv2} do
-    conn = get(conn, artist_invite_path(conn, :show, "~#{a_inv2.slug}"), %{preview: "true"})
+    conn = get(conn, artist_invite_path(conn, :show, "~#{a_inv2.slug}"))
     assert conn.status == 404
   end
 
   test "GET /v2/artist_invites/:id - normal users can't view preview artist invites", %{conn: conn, a_inv2: a_inv2} do
-    conn = get(conn, artist_invite_path(conn, :show, "~#{a_inv2.slug}"), %{preview: "true"})
+    conn = get(conn, artist_invite_path(conn, :show, "~#{a_inv2.slug}"))
     assert conn.status == 404
   end
 

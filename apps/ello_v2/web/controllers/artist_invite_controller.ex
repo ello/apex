@@ -14,10 +14,9 @@ defmodule Ello.V2.ArtistInviteController do
     |> api_render_if_stale(data: artist_invites)
   end
 
-  def show(conn, %{"id" => id_or_slug} = params) do
+  def show(conn, %{"id" => id_or_slug}) do
     artist_invite = Contest.artist_invite(standard_params(conn, %{
       id_or_slug: id_or_slug,
-      preview: params["preview"]
     }))
     api_render_if_stale(conn, data: artist_invite)
   end
