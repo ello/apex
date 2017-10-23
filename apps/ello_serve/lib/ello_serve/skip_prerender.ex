@@ -12,6 +12,9 @@ defmodule Ello.Serve.SkipPrerender do
     do: assign(conn, :prerender, false)
   defp set_prerender(%{cookies: %{"ello_skip_prerender" => "true"}} = conn, _),
     do: assign(conn, :prerender, false)
+  defp set_prerender(%{assigns: %{app: app}} = conn, _)
+    when app in ['bread', 'curator'],
+    do: assign(conn, :prerender, false)
   defp set_prerender(conn, _),
     do: assign(conn, :prerender, true)
 
