@@ -46,5 +46,10 @@ defmodule Ello.V2.Router do
       resources "/submissions", ArtistInviteSubmissionController, only: [:index]
       get "/submission_posts", ArtistInviteSubmissionController, :posts
     end
+
+    scope "/manage", Manage, as: :manage do
+      # "My Artist Invites"
+      resources "/artist_invites", ArtistInviteController, only: [:index, :show]
+    end
   end
 end
