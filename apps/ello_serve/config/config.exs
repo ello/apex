@@ -32,7 +32,8 @@ config :ello_serve, :webapp_config,
 
 config :ello_serve, :bread_config,
   oauth_client_id: System.get_env("BREAD_OAUTH_CLIENT_ID") || "client_id",
-  app_debug: System.get_env("BREAD_APP_DEBUG") || false
+  app_debug: System.get_env("BREAD_APP_DEBUG") || false,
+  basename: System.get_env("BREAD_BASENAME") || false
 
 # Configures the endpoint
 config :ello_serve, Ello.Serve.Endpoint,
