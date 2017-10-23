@@ -41,7 +41,11 @@ defmodule Ello.V2.Router do
     get "/following/posts/recent", FollowingPostController, :recent
     get "/following/posts/trending", FollowingPostController, :trending
 
-    # Artist Invites
+    # Artist Invites (support both _ and proper -)
+    resources "/artist-invites", ArtistInviteController, only: @read do
+      resources "/submissions", ArtistInviteSubmissionController, only: [:index]
+      get "/submission-posts", ArtistInviteSubmissionController, :posts
+    end
     resources "/artist_invites", ArtistInviteController, only: @read do
       resources "/submissions", ArtistInviteSubmissionController, only: [:index]
       get "/submission_posts", ArtistInviteSubmissionController, :posts
@@ -49,7 +53,7 @@ defmodule Ello.V2.Router do
 
     scope "/manage", Manage, as: :manage do
       # "My Artist Invites"
-      resources "/artist_invites", ArtistInviteController, only: [:index, :show]
+      resources "/artist-invites", ArtistInviteController, only: [:index, :show]
     end
   end
 end
