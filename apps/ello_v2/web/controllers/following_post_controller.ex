@@ -56,7 +56,7 @@ defmodule Ello.V2.FollowingPostController do
     }))
 
     conn
-    |> add_pagination_headers("/following/user/#{user.id}/posts/recent", stream)
+    |> add_pagination_headers("/following/users/#{user.id}/posts/recent", stream)
     |> api_render(PostView, :index, data: stream.posts)
   end
   def user(conn, _), do: send_resp(conn, 404, "")

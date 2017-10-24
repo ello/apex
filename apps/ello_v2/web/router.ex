@@ -40,7 +40,7 @@ defmodule Ello.V2.Router do
     head "/following/posts/recent", FollowingPostController, :recent_updated
     get "/following/posts/recent", FollowingPostController, :recent
     get "/following/posts/trending", FollowingPostController, :trending
-    get "/following/user/:slug/posts/recent", FollowingPostController, :user
+    get "/following/users/:slug/posts/recent", FollowingPostController, :user
 
     # Artist Invites
     resources "/artist_invites", ArtistInviteController, only: @read do

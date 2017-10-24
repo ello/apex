@@ -96,7 +96,7 @@ defmodule Ello.V2.FollowingPostControllerTest do
     refute nudity_post.id in returned_ids
   end
 
-  test "GET /v2/following/user/~user", %{unauth_conn: unauth_conn, following_user: following_user, post: post, my_post: my_post} do
+  test "GET /v2/following/users/~user", %{unauth_conn: unauth_conn, following_user: following_user, post: post, my_post: my_post} do
     staff_user = Factory.insert(:user, %{is_staff: true})
     conn = unauth_conn
            |> auth_conn(staff_user)
@@ -110,7 +110,7 @@ defmodule Ello.V2.FollowingPostControllerTest do
     refute my_post.id in returned_ids
   end
 
-  test "GET /v2/following/user/~user fails for non-staff", %{conn: conn, following_user: following_user} do
+  test "GET /v2/following/users/~user fails for non-staff", %{conn: conn, following_user: following_user} do
     response = conn
                |> get(following_post_path(conn, :user, "#{following_user.id}"))
     assert response.status == 404
