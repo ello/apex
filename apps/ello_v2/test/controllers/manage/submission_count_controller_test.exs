@@ -15,7 +15,10 @@ defmodule Ello.V2.Manage.SubmissionCountControllerTest do
     Factory.insert_list(2, :artist_invite_submission, %{artist_invite: a_inv2})
     Factory.insert_list(2, :artist_invite_submission, %{
       artist_invite: a_inv2,
-      post: Factory.insert(:post, %{created_at: yesterday}),
+      post: Factory.insert(:post, %{
+        created_at: yesterday,
+        author: Factory.insert(:user, %{category_ids: [1, 2]})
+      }),
       status: "approved",
     })
     {:ok,
@@ -59,7 +62,7 @@ defmodule Ello.V2.Manage.SubmissionCountControllerTest do
     assert conn.status == 404
   end
 
-  test "GET /api/v2/manage/artist-invites/:id/total-submissions - staff token", %{staff_conn: conn, a_inv2: invite} do
+  test "GET /api/v2/manage/artist-invites/:id/total-submissions - brand token", %{brand_conn: conn, a_inv2: invite} do
     conn = get(conn, "/api/v2/manage/artist-invites/#{invite.id}/total-submissions")
     assert %{"total_submissions" => totals} = json_response(conn, 200)
     assert [t1, t2] = totals
@@ -71,5 +74,19 @@ defmodule Ello.V2.Manage.SubmissionCountControllerTest do
     assert t2["artist_invite_id"]
     assert t2["submissions"] == 2
     assert t2["status"] == "unapproved"
+  end
+
+  test "GET /api/v2/manage/artist-invites/:id/total-participants - brand token", %{brand_conn: conn, a_inv2: invite} do
+    conn = get(conn, "/api/v2/manage/artist-invites/#{invite.id}/total-participants")
+    assert %{"total_participants" => totals} = json_response(conn, 200)
+    assert [p1, p2] = totals
+    assert p1["id"]
+    assert p1["artist_invite_id"]
+    assert p1["participants"] == 2
+    assert p1["type"] == "Influencer"
+    assert p2["id"]
+    assert p2["artist_invite_id"]
+    assert p2["participants"] == 2
+    assert p2["type"] == "Normal"
   end
 end

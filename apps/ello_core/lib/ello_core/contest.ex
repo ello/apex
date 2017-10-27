@@ -219,4 +219,27 @@ defmodule Ello.Core.Contest do
     })
     |> Repo.all
   end
+
+  def total_participants(%{artist_invite: %{id: id}}) do
+    ArtistInviteSubmission
+    |> join(:left, [s], p in assoc(s, :post))
+    |> join(:left, [s, p], u in assoc(p, :author))
+    |> where([s, p, u], s.artist_invite_id == ^id)
+    |> group_by([s, p, u], fragment("""
+      CASE array_length(?, 1) > 0
+        WHEN true THEN 'Influencer'
+        ELSE 'Normal'
+      END
+    """, u.category_ids))
+    |> select([s, p, u], %{
+      participants: count(u.id),
+      type: fragment("""
+        CASE array_length(?, 1) > 0
+          WHEN true THEN 'Influencer'
+          ELSE 'Normal'
+        END
+      """, u.category_ids)
+    })
+    |> Repo.all
+  end
 end

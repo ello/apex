@@ -14,4 +14,9 @@ defmodule Ello.V2.Manage.SubmissionCountController do
     data = Contest.daily_submissions(%{artist_invite: artist_invite})
     api_render(conn, data: data, artist_invite: artist_invite)
   end
+
+  def participants(%{assigns: %{artist_invite: artist_invite}} = conn, _) do
+    data = Contest.total_participants(%{artist_invite: artist_invite})
+    api_render(conn, data: data, artist_invite: artist_invite)
+  end
 end

@@ -31,4 +31,18 @@ defmodule Ello.V2.Manage.SubmissionCountView do
       end)
     }
   end
+
+  def render("participants.json", %{data: data, artist_invite: artist_invite}) do
+    id = "#{artist_invite.id}"
+    %{
+      total_participants: Enum.map(data, fn(group) ->
+        %{
+          id: "total_participants:#{id}:#{group.type}:total",
+          artist_invite_id: id,
+          participants: group.participants,
+          type: group.type,
+        }
+      end)
+    }
+  end
 end
