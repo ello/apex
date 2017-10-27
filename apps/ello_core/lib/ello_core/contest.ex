@@ -208,4 +208,15 @@ defmodule Ello.Core.Contest do
     })
     |> Repo.all
   end
+
+  def total_submissions(%{artist_invite: %{id: id}}) do
+    ArtistInviteSubmission
+    |> where([s], s.artist_invite_id == ^id)
+    |> group_by([s], s.status)
+    |> select([s], %{
+      submissions: count(s.id),
+      status: s.status,
+    })
+    |> Repo.all
+  end
 end

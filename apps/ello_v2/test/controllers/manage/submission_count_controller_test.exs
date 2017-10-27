@@ -15,7 +15,8 @@ defmodule Ello.V2.Manage.SubmissionCountControllerTest do
     Factory.insert_list(2, :artist_invite_submission, %{artist_invite: a_inv2})
     Factory.insert_list(2, :artist_invite_submission, %{
       artist_invite: a_inv2,
-      post: Factory.insert(:post, %{created_at: yesterday})
+      post: Factory.insert(:post, %{created_at: yesterday}),
+      status: "approved",
     })
     {:ok,
       unauth_conn: conn,
@@ -31,14 +32,16 @@ defmodule Ello.V2.Manage.SubmissionCountControllerTest do
     conn = get(conn, "/api/v2/manage/artist-invites/#{invite.id}/daily-submissions")
     assert %{"daily_submissions" => dailys} = json_response(conn, 200)
     assert [d1, d2] = dailys
+    assert d1["id"]
+    assert d1["artist_invite_id"]
     assert d1["date"]
     assert d1["submissions"] == 2
-    assert d1["type"] == "all"
-    assert d1["id"]
+    assert d1["status"] == "all"
+    assert d2["id"]
+    assert d2["artist_invite_id"]
     assert d2["date"]
     assert d2["submissions"] == 2
-    assert d2["type"] == "all"
-    assert d2["id"]
+    assert d2["status"] == "all"
   end
 
   test "GET /api/v2/manage/artist-invites/:id/daily-submissions - brand token", %{brand_conn: conn, a_inv2: invite} do
@@ -54,5 +57,19 @@ defmodule Ello.V2.Manage.SubmissionCountControllerTest do
   test "GET /api/v2/manage/artist-invites/:id/daily-submissions - user token", %{conn: conn, a_inv2: invite} do
     conn = get(conn, "/api/v2/manage/artist-invites/#{invite.id}/daily-submissions")
     assert conn.status == 404
+  end
+
+  test "GET /api/v2/manage/artist-invites/:id/total-submissions - staff token", %{staff_conn: conn, a_inv2: invite} do
+    conn = get(conn, "/api/v2/manage/artist-invites/#{invite.id}/total-submissions")
+    assert %{"total_submissions" => totals} = json_response(conn, 200)
+    assert [t1, t2] = totals
+    assert t1["id"]
+    assert t1["artist_invite_id"]
+    assert t1["submissions"] == 2
+    assert t1["status"] == "approved"
+    assert t2["id"]
+    assert t2["artist_invite_id"]
+    assert t2["submissions"] == 2
+    assert t2["status"] == "unapproved"
   end
 end

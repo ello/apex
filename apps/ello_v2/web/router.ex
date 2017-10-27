@@ -54,7 +54,7 @@ defmodule Ello.V2.Router do
     scope "/manage", Manage, as: :manage do
       # "My Artist Invites"
       resources "/artist-invites", ArtistInviteController, only: [:index, :show] do
-        get "/submission-totals", SubmissionCountController, :totals
+        get "/total-submissions", SubmissionCountController, :total
         get "/daily-submissions", SubmissionCountController, :daily
       end
     end

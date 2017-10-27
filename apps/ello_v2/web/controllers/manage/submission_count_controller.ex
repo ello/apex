@@ -5,16 +5,13 @@ defmodule Ello.V2.Manage.SubmissionCountController do
   plug Ello.Auth.RequireUser
   plug Manage.OwnedArtistInvite
 
-  def totals(%{assigns: %{artist_invite: artist_invite}} = conn, _) do
-    # total = Contest.total_submissions(%{artist_invite: artist_invite})
-    # IO.inspect(total)
-    send_resp(conn, 200, "")
+  def total(%{assigns: %{artist_invite: artist_invite}} = conn, _) do
+    data = Contest.total_submissions(%{artist_invite: artist_invite})
+    api_render(conn, data: data, artist_invite: artist_invite)
   end
 
   def daily(%{assigns: %{artist_invite: artist_invite}} = conn, _) do
-    daily = Contest.daily_submissions(%{artist_invite: artist_invite})
-    api_render(conn, data: daily, artist_invite: artist_invite)
+    data = Contest.daily_submissions(%{artist_invite: artist_invite})
+    api_render(conn, data: data, artist_invite: artist_invite)
   end
-
-
 end
