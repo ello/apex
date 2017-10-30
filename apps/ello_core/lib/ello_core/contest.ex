@@ -196,4 +196,50 @@ defmodule Ello.Core.Contest do
     |> where([s, p, has_body], not is_nil(has_body.value))
     |> group_by([s, p, has_body], s.id)
   end
+
+  def daily_submissions(%{artist_invite: %{id: id}}) do
+    ArtistInviteSubmission
+    |> join(:left, [s], p in assoc(s, :post))
+    |> where([s, p], s.artist_invite_id == ^id)
+    |> group_by([s, p], fragment("date_trunc('day', ?)", p.created_at))
+    |> select([s, p], %{
+      submissions: count(s.id),
+      date: fragment("date_trunc('day', ?)", p.created_at),
+    })
+    |> Repo.all
+  end
+
+  def total_submissions(%{artist_invite: %{id: id}}) do
+    ArtistInviteSubmission
+    |> where([s], s.artist_invite_id == ^id)
+    |> group_by([s], s.status)
+    |> select([s], %{
+      submissions: count(s.id),
+      status: s.status,
+    })
+    |> Repo.all
+  end
+
+  def total_participants(%{artist_invite: %{id: id}}) do
+    ArtistInviteSubmission
+    |> join(:left, [s], p in assoc(s, :post))
+    |> join(:left, [s, p], u in assoc(p, :author))
+    |> where([s, p, u], s.artist_invite_id == ^id)
+    |> group_by([s, p, u], fragment("""
+      CASE array_length(?, 1) > 0
+        WHEN true THEN 'Influencer'
+        ELSE 'Normal'
+      END
+    """, u.category_ids))
+    |> select([s, p, u], %{
+      participants: count(u.id),
+      type: fragment("""
+        CASE array_length(?, 1) > 0
+          WHEN true THEN 'Influencer'
+          ELSE 'Normal'
+        END
+      """, u.category_ids)
+    })
+    |> Repo.all
+  end
 end
