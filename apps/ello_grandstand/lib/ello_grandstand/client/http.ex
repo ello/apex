@@ -13,7 +13,7 @@ defmodule Ello.Grandstand.Client.HTTP do
       hackney: [
         pool: :grandstand,
         recv_timeout: timeout(),
-        basic_auth: {username(), password()}]
+        basic_auth: {username(), password()}
       ],
     ]
     case get!(path, [], opts) do
