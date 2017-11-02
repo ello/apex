@@ -24,6 +24,7 @@ defmodule Ello.Core.Repo.Migrations.CreateArtistInviteTable do
       add :submission_body_block, :string
       add :guide, :json
       add :brand_account_id, :integer
+      add :custom_stats, :json
       add :created_at, :utc_datetime
       add :updated_at, :utc_datetime
     end

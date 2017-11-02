@@ -34,13 +34,6 @@ defmodule Ello.V2.Manage.ArtistInviteControllerTest do
     assert conn.status == 401
   end
 
-  @tag :json_schema
-  test "GET /v2/manage/artist_invites - json schema", %{staff_conn: conn} do
-    conn = get(conn, manage_artist_invite_path(conn, :index))
-    json_response(conn, 200)
-    assert :ok = validate_json("artist_invite", json_response(conn, 200))
-  end
-
   test "GET /v2/manage/artist_invites - staff can view all artist invites", %{staff_conn: conn, a_inv1: a_inv1, a_inv2: a_inv2} do
     conn = get(conn, manage_artist_invite_path(conn, :index))
 
@@ -77,13 +70,6 @@ defmodule Ello.V2.Manage.ArtistInviteControllerTest do
            |> public_conn
            |> get(manage_artist_invite_path(conn, :show, "~#{a_inv2.slug}"))
     assert conn.status == 401
-  end
-
-  @tag :json_schema
-  test "GET /v2/manage/artist_invites/:id - json schema", %{staff_conn: conn, a_inv2: a_inv2} do
-    conn = get(conn, manage_artist_invite_path(conn, :show, "~#{a_inv2.slug}"))
-    json_response(conn, 200)
-    assert :ok = validate_json("artist_invite", json_response(conn, 200))
   end
 
   test "GET /v2/manage/artist_invites/:id - brands can only view their own artist invites", %{brand_conn: conn, a_inv1: a_inv1} do
