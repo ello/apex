@@ -1,11 +1,20 @@
 defmodule Ello.Core.Contest do
   import Ecto.Query
-  alias Ello.Core.Repo
+  alias Ello.Core.{
+    Repo,
+    Content,
+    Network,
+  }
   alias __MODULE__.{
     ArtistInvite,
     ArtistInviteSubmission,
     Preload,
   }
+  alias Content.{
+    Post,
+    Love,
+  }
+  alias Network.Relationship
 
   def artist_invite(%{id_or_slug: id_or_slug, current_user: %{is_staff: true}} = options) do
     ArtistInvite
@@ -241,5 +250,53 @@ defmodule Ello.Core.Contest do
       """, u.category_ids)
     })
     |> Repo.all
+  end
+
+  def artist_invite_comment_count(%{artist_invite: %{id: id}}) do
+    Post
+    |> join(:inner, [c], p in Post, c.parent_post_id == p.id or c.parent_post_id == p.reposted_source_id)
+    |> join(:inner, [c, p], s in ArtistInviteSubmission, p.id == s.post_id or p.reposted_source_id == s.post_id)
+    |> where([c, p, s], s.artist_invite_id == ^id)
+    |> select([c], count(c.id, :distinct))
+    |> Repo.one
+  end
+
+  def artist_invite_love_count(%{artist_invite: %{id: id}}) do
+    Love
+    |> join(:inner, [l], p in Post, l.post_id == p.id or l.post_id == p.reposted_source_id)
+    |> join(:inner, [l, p], s in ArtistInviteSubmission, p.id == s.post_id or p.reposted_source_id == s.post_id)
+    |> where([l, p, s], s.artist_invite_id == ^id)
+    |> select([l], count(l.id, :distinct))
+    |> Repo.one
+  end
+
+  def artist_invite_repost_count(%{artist_invite: %{id: id}}) do
+    Post
+    |> join(:inner, [rp], p in Post, rp.reposted_source_id == p.id)
+    |> join(:inner, [rp, p], s in ArtistInviteSubmission, p.id == s.post_id)
+    |> where([rp, p, s], s.artist_invite_id == ^id)
+    |> select([rp], count(rp.id, :distinct))
+    |> Repo.one
+  end
+
+  def artist_invite_mention_count(%{artist_invite: invite}) do
+    invite = Repo.preload(invite, :brand_account)
+    mention_stop = Timex.add(invite.closed_at, Timex.Duration.from_days(30))
+    Post
+    |> where([p], p.created_at > ^invite.created_at)
+    |> where([p], p.created_at < ^mention_stop)
+    |> where([p], fragment("? = ANY(?)", ^invite.brand_account.username, p.mentioned_usernames))
+    |> select([p], count(p.id, :distinct))
+    |> Repo.one
+  end
+
+  def artist_invite_follower_count(%{artist_invite: invite}) do
+    mention_stop = Timex.add(invite.closed_at, Timex.Duration.from_days(30))
+    Relationship
+    |> where([r], r.created_at > ^invite.created_at)
+    |> where([r], r.created_at < ^mention_stop)
+    |> where([r], r.priority == "friend" and r.subject_id == ^invite.brand_account_id)
+    |> select([p], count(p.id, :distinct))
+    |> Repo.one
   end
 end

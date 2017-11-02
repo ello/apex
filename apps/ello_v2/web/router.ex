@@ -59,6 +59,7 @@ defmodule Ello.V2.Router do
         get "/total-participants", SubmissionCountController, :participants
         get "/daily-impressions", ImpressionCountController, :daily
         get "/total-impressions", ImpressionCountController, :total
+        get "/total-activities", ActivityCountController, :all
       end
     end
   end
