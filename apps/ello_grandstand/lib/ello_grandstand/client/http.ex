@@ -13,6 +13,7 @@ defmodule Ello.Grandstand.Client.HTTP do
       hackney: [
         pool: :grandstand,
         recv_timeout: timeout(),
+        basic_auth: {username(), password()}]
       ],
     ]
     case get!(path, [], opts) do
@@ -35,4 +36,8 @@ defmodule Ello.Grandstand.Client.HTTP do
     do: Application.get_env(:ello_grandstand, :service_url) <> url
 
   defp timeout, do: Application.get_env(:ello_grandstand, :grandstand_timeout)
+
+  defp username, do: Application.get_env(:ello_grandstand, :grandstand_username)
+
+  defp password, do: Application.get_env(:ello_grandstand, :grandstand_password)
 end
