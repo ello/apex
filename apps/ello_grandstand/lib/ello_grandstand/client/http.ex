@@ -18,6 +18,7 @@ defmodule Ello.Grandstand.Client.HTTP do
     ]
     case get!(path, [], opts) do
       %{status_code: 200, body: resp} -> handle_response(resp)
+      %{status_code: 204, body: resp} -> handle_response(resp)
     end
   end
 
