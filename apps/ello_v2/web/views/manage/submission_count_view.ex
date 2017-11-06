@@ -26,7 +26,7 @@ defmodule Ello.V2.Manage.SubmissionCountView do
           id: "total_submissions:#{id}:#{group.status}:total",
           artist_invite_id: id,
           submissions: group.submissions,
-          status: group.status,
+          status: String.capitalize(group.status),
         }
       end)
     }

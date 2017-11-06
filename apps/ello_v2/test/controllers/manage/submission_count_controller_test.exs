@@ -69,11 +69,11 @@ defmodule Ello.V2.Manage.SubmissionCountControllerTest do
     assert t1["id"]
     assert t1["artist_invite_id"]
     assert t1["submissions"] == 2
-    assert t1["status"] in ["approved", "unapproved"]
+    assert t1["status"] in ["Approved", "Unapproved"]
     assert t2["id"]
     assert t2["artist_invite_id"]
     assert t2["submissions"] == 2
-    assert t2["status"] in ["approved", "unapproved"]
+    assert t2["status"] in ["Approved", "Unapproved"]
   end
 
   test "GET /api/v2/manage/artist-invites/:id/total-participants - brand token", %{brand_conn: conn, a_inv2: invite} do
