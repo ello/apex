@@ -2,7 +2,6 @@ defmodule Ello.V2.Manage.ArtistInviteController do
   use Ello.V2.Web, :controller
   alias Ello.Auth.{RequireUser}
   alias Ello.Core.Contest
-  alias Ello.V2.{ArtistInviteView}
 
   plug RequireUser
 
