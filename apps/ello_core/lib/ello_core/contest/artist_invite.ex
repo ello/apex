@@ -30,6 +30,7 @@ defmodule Ello.Core.Contest.ArtistInvite do
     field :meta_description, :string
     field :submission_body_block, :string
     field :guide, {:array, :map}, default: []
+    field :custom_stats, {:array, :map}, default: []
 
     belongs_to :brand_account, User
   end
