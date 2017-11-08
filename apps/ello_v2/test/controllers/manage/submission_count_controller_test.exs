@@ -13,11 +13,12 @@ defmodule Ello.V2.Manage.SubmissionCountControllerTest do
                 |> DateTime.from_unix!()
     Factory.insert_list(2, :artist_invite_submission, %{artist_invite: a_inv1})
     Factory.insert_list(2, :artist_invite_submission, %{artist_invite: a_inv2})
+    featured_user = Factory.insert(:user, %{category_ids: [1, 2]})
     Factory.insert_list(2, :artist_invite_submission, %{
       artist_invite: a_inv2,
       post: Factory.insert(:post, %{
         created_at: yesterday,
-        author: Factory.insert(:user, %{category_ids: [1, 2]})
+        author: featured_user,
       }),
       status: "approved",
     })
@@ -79,14 +80,14 @@ defmodule Ello.V2.Manage.SubmissionCountControllerTest do
   test "GET /api/v2/manage/artist-invites/:id/total-participants - brand token", %{brand_conn: conn, a_inv2: invite} do
     conn = get(conn, "/api/v2/manage/artist-invites/#{invite.id}/total-participants")
     assert %{"total_participants" => totals} = json_response(conn, 200)
-    assert [p1, p2] = totals
-    assert p1["id"]
-    assert p1["artist_invite_id"]
-    assert p1["participants"] == 2
-    assert p1["type"] in ["Influencer", "Normal"]
-    assert p2["id"]
-    assert p2["artist_invite_id"]
-    assert p2["participants"] == 2
-    assert p2["type"] in ["Influencer", "Normal"]
+    influencer = Enum.find(totals, &(&1["type"] == "Influencer"))
+    normal = Enum.find(totals, &(&1["type"] == "Normal"))
+
+    assert influencer["id"]
+    assert influencer["artist_invite_id"]
+    assert influencer["participants"] == 1
+    assert normal["id"]
+    assert normal["artist_invite_id"]
+    assert normal["participants"] == 2
   end
 end

@@ -241,7 +241,7 @@ defmodule Ello.Core.Contest do
       END
     """, u.category_ids))
     |> select([s, p, u], %{
-      participants: count(u.id),
+      participants: count(u.id, :distinct),
       type: fragment("""
         CASE array_length(?, 1) > 0
           WHEN true THEN 'Influencer'
