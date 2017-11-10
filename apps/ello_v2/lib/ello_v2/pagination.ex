@@ -74,7 +74,7 @@ defmodule Ello.V2.Pagination do
 
   @filter_slop 3 # Don't 204 if one blocked post gets filtered out
   defp add_last_page_header(conn, structs, filter_slop \\ @filter_slop) do
-    requested = standard_params(conn, %{})[:per_page]
+    requested = standard_params(conn)[:per_page]
     if requested - filter_slop > length(structs) do
       conn
       |> put_resp_header("x-last-page", "true")

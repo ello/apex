@@ -8,7 +8,6 @@ defmodule Ello.V2.ArtistInviteController do
   def index(conn, params) do
     artist_invites = Contest.artist_invites(standard_params(conn, %{
       preview: params["preview"],
-      default: %{per_page: 20},
     }))
     conn
     |> add_pagination_headers("/artist_invites", artist_invites)
