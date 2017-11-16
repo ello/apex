@@ -1,15 +1,15 @@
 defmodule Ello.Serve.VersionStore.SlackNotifications do
 
-  def new_version("webapp", ver) do
+  def new_version(app, ver) do
     Task.async fn ->
       notify_slack(%{
-        text: "New version of `webapp` available: #{version_link(ver)}",
+        text: "New version of `#{app}` available: #{version_link(app, ver)}",
         attachments: [
           %{
             title: "Compare",
             text: """
             Compare to the active version in each env:
-            #{compare_link(ver, "stage1")} #{compare_link(ver, "stage2")} #{compare_link(ver, "ninja")} #{compare_link(ver, "rainbow")} #{compare_link(ver, "production")}
+            #{compare_link(app, ver, "stage1")} #{compare_link(app, ver, "stage2")} #{compare_link(app, ver, "ninja")} #{compare_link(app, ver, "rainbow")} #{compare_link(app, ver, "production")}
             """,
             color: "#0366d6",
           },
@@ -18,7 +18,7 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
             text: """
             Previews are available only by accessing the app with the url with the version link. You will continue seeing the preview version until you refresh.
             You may preview in any environment:
-            <https://ello-fg-stage1.herokuapp.com?version=#{ver}|stage1> <https://ello-fg-stage2.herokuapp.com?version=#{ver}|stage2> <https://ello.ninja?version=#{ver}|ninja> <https://ello-fg-rainbow.herokuapp.com?version=#{ver}|rainbow> <https://ello.co?version=#{ver}|production>
+            #{preview_link(app, ver, "stage1")} #{preview_link(app, ver, "stage2")} #{preview_link(app, ver, "ninja")} #{preview_link(app, ver, "rainbow")} #{preview_link(app, ver, "production")}
             """,
             color: "good",
           },
@@ -26,31 +26,55 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
             title: "Publish",
             text: "Publishing makes this version of webapp active for all users visiting the environment.\n\nPublish with caution.",
             color: "warning",
-            callback_id: "publish:webapp",
+            callback_id: "publish:#{app}",
             actions: [
               %{
                 name: "stage1",
                 text: "stage1",
                 value: ver,
-                type: "button"
+                type: "button",
+                confirm: %{
+                  title: "Are you sure?",
+                  text: "Publishing this version will push it to stage1 for all users.",
+                  ok_text: "I got this",
+                  dismiss_text: "Nope."
+                }
               },
               %{
                 name: "stage2",
                 text: "stage2",
                 value: ver,
-                type: "button"
+                type: "button",
+                confirm: %{
+                  title: "Are you sure?",
+                  text: "Publishing this version will push it to stage2 for all users.",
+                  ok_text: "I got this",
+                  dismiss_text: "Nope."
+                }
               },
               %{
                 name: "ninja",
                 text: "ninja",
                 value: ver,
-                type: "button"
+                type: "button",
+                confirm: %{
+                  title: "Are you sure?",
+                  text: "Publishing this version will push it to ninja for all users.",
+                  ok_text: "I got this",
+                  dismiss_text: "Nope."
+                }
               },
               %{
                 name: "rainbow",
                 text: "rainbow",
                 value: ver,
-                type: "button"
+                type: "button",
+                confirm: %{
+                  title: "Are you sure?",
+                  text: "Publishing this version will push it to rainbow for all users.",
+                  ok_text: "I got this",
+                  dismiss_text: "Nope."
+                }
               },
               %{
                 name: "production",
@@ -72,13 +96,13 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
     end
   end
 
-  def version_activated("webapp", ver, env, nil) do
+  def version_activated(app, ver, env, nil) do
     Task.async fn ->
       notify_slack(%{
         attachments: [
           %{
-            title: "New version published for all users on #{env}.",
-            text:  "Version #{version_link(ver)}",
+            title: "New `#{app}` version published for all users on #{env}.",
+            text:  "Version #{version_link(app, ver)}",
             color: "good",
           }
         ]
@@ -86,20 +110,20 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
     end
   end
 
-  def version_activated("webapp", ver, env, previous) do
+  def version_activated(app, ver, env, previous) do
     Task.async fn ->
       notify_slack(%{
         attachments: [
           %{
-            title: "New version published for all users on #{env}.",
-            text:  "Version #{version_link(ver)}",
+            title: "New `#{app}` version published for all users on #{env}.",
+            text:  "Version #{version_link(app, ver)}",
             color: "good",
           },
           %{
             title: "Rollback",
-            text: "Rollback version #{version_link(ver)} to #{version_link(previous)} on #{env}?",
+            text: "Rollback version #{version_link(app, ver)} to #{version_link(app, previous)} on #{env}?",
             color: "warning",
-            callback_id: "publish:webapp",
+            callback_id: "publish:#{app}",
             actions: [
               %{
                 name: env,
@@ -133,15 +157,36 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
     Application.get_env(:ello_serve, :slack_webhook_url)
   end
 
-  defp compare_link(ver, env) do
-    case Ello.Serve.VersionStore.version_history("webapp", env) do
-      [prev | _] -> "<https://github.com/ello/webapp/compare/#{prev}...#{ver}|#{env}>"
-      _             -> ""
+  @github %{
+    "webapp" => "https://github.com/ello/webapp",
+    "bread"  => "https://github.com/ello/bread",
+  }
+
+  defp compare_link(app, ver, env) do
+    case Ello.Serve.VersionStore.version_history(app, env) do
+      [prev | _] -> "<#{@github[app]}/compare/#{prev}...#{ver}|#{env}>"
+      _          -> ""
     end
   end
 
-  def version_link(ver) do
+  defp version_link(app, ver) do
     nice = String.slice(ver, 0, 7)
-    "<https://github.com/ello/webapp/commit/#{ver}|#{nice}>"
+    "<#{@github[app]}/commit/#{ver}|#{nice}>"
+  end
+
+  @env_host %{
+    "stage1" => "ello-fg-stage1.herokuapp.com",
+    "stage2" => "ello-fg-stage1.herokuapp.com",
+    "ninja" => "ello.ninja",
+    "rainbow" => "ello-fg-rainbow.herokuapp.com",
+    "production" => "ello.co",
+  }
+
+  defp preview_link("webapp", version, env) do
+    "<https://#{@env_host[env]}?version=#{version}|#{env}>"
+  end
+
+  defp preview_link("bread", version, env) do
+    "<https://#{@env_host[env]}/manage?version=#{version}|#{env}>"
   end
 end
