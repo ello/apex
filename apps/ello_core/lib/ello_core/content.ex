@@ -140,7 +140,7 @@ defmodule Ello.Core.Content do
   """
   def comments(%{post: %{reposted_source: %Post{} = source}} = options),
     do: comments(Map.put(options, :post, source))
-  def comments(%{post: post} = options) do
+  def comments(options) do
     # We don't filter NSFW users from comments
     options = Map.merge(options, %{allow_nsfw: true, allow_nudity: true})
     Post
@@ -157,7 +157,7 @@ defmodule Ello.Core.Content do
   """
   def comment(%{post: %{reposted_source: %Post{} = source}} = options),
     do: comment(Map.put(options, :post, source))
-  def comment(%{post: post, id: id} = options) do
+  def comment(%{id: id} = options) do
     # We don't filter NSFW users from comments
     options = Map.merge(options, %{allow_nsfw: true, allow_nudity: true})
     Post
