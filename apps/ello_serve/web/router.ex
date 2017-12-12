@@ -64,7 +64,7 @@ defmodule Ello.Serve.Router do
     # Join/Auth routes - no fallback content relevant
     get "/enter",                 NoContentController, :enter
     get "/join",                  NoContentController, :join
-    get "/forgot",                NoContentController, :forgot
+    get "/forgot-password",       NoContentController, :forgot
 
     # User routes
     get "/:username/post/:token", PostController, :show
