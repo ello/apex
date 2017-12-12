@@ -1,7 +1,7 @@
 defmodule Ello.Core.Network.User do
   use Ecto.Schema
   alias Ello.Core.Redis
-  alias Ello.Core.Network.{Relationship, User}
+  alias Ello.Core.Network.{Relationship, User, Flag}
   alias User.{Avatar, CoverImage, Settings}
 
   @type t :: %__MODULE__{}
@@ -49,6 +49,9 @@ defmodule Ello.Core.Network.User do
     # Used to eager load user's relationship to current user.
     has_one :relationship_to_current_user, Relationship, foreign_key: :subject_id
 
+    has_many :flags, Flag, foreign_key: :subject_user_id
+    has_many :flaggings, Flag, foreign_key: :reporting_user_id
+
     # Used to hold user counts retreived from Redis
     field :loves_count, :integer, virtual: true
     field :posts_count, :integer, virtual: true
@@ -60,6 +63,9 @@ defmodule Ello.Core.Network.User do
     field :inverse_blocked_ids, {:array, :integer}, default: %MapSet{}, virtual: true
     field :blocked_ids, {:array, :integer}, default: %MapSet{}, virtual: true
     field :all_blocked_ids, {:array, :integer}, default: %MapSet{}, virtual: true
+
+    # Used to hold spam status retreived from DB
+    field :is_spammer, :boolean, default: false, virtual: true
   end
 
   @doc """

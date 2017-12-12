@@ -19,8 +19,23 @@ defmodule Ello.V2.CommentControllerTest do
       parent_post: post,
       created_at:  DateTime.from_unix!(100_000_200)
     })
+    spammer1 = Factory.insert(:user, username: "spammer1")
+    Factory.insert(:flag, subject_user: spammer1)
+    spammer2 = Factory.insert(:user, username: "spammer2")
+    Factory.insert(:flag, subject_user: spammer2)
+    spam_comment = Factory.insert(:post, %{
+      author:      spammer1,
+      parent_post: post,
+      created_at:  DateTime.from_unix!(100_000_200)
+    })
     user = Factory.insert(:user)
-    {:ok, conn: auth_conn(conn, user), post: post, comment: comment1}
+    {:ok, %{
+      conn: auth_conn(conn, user),
+      post: post,
+      comment: comment1,
+      spam_conn: auth_conn(conn, spammer2),
+      spam_comment: spam_comment,
+    }}
   end
 
   test "GET /v2/posts/:id/comments", %{conn: conn, post: post} do
@@ -35,6 +50,20 @@ defmodule Ello.V2.CommentControllerTest do
     resp2 = get(conn, "/api/v2/posts/#{post.id}/comments", %{"per_page" => "2", "before" => before})
     json2 = json_response(resp2, 200)
     assert [_] = json2["comments"]
+  end
+
+  test "GET /v2/posts/:id/comments - hides spammers for normal users", %{conn: conn, post: post, spam_comment: spam_comment} do
+    resp = get(conn, "/api/v2/posts/#{post.id}/comments")
+    json = json_response(resp, 200)
+    assert [_, _, _] = json["comments"]
+    refute spam_comment.id in Enum.map(json["comments"], &(String.to_integer(&1["id"])))
+  end
+
+  test "GET /v2/posts/:id/comments - shows spammers for other spammers", %{spam_conn: conn, post: post, spam_comment: spam_comment} do
+    resp = get(conn, "/api/v2/posts/#{post.id}/comments")
+    json = json_response(resp, 200)
+    assert [_, _, _, _] = json["comments"]
+    assert spam_comment.id in Enum.map(json["comments"], &(String.to_integer(&1["id"])))
   end
 
   @tag :json_schema
