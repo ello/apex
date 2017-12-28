@@ -14,6 +14,15 @@ defmodule Ello.Serve.Router do
     plug Ello.Serve.XFrameOptions, :deny
   end
 
+  pipeline :bread do
+    plug Ello.Serve.DefaultToHTML
+    plug :accepts, ["html"]
+    plug Ello.Serve.SetApp, app: "bread"
+    plug Ello.Serve.SkipPrerender
+    plug Ello.Serve.FetchVersion
+    plug Ello.Serve.XFrameOptions, :deny
+  end
+
   scope "/api/webapp-token", Ello.Serve do
     pipe_through :token
     get "/", TokenController, :show
@@ -24,6 +33,11 @@ defmodule Ello.Serve.Router do
     post "/versions/activate", VersionController, :activate
     post "/slack/action", SlackController, :slack_action
     # post "/slack/command", SlackController, :callback
+  end
+
+  scope "/manage", Ello.Serve.Bread do
+    pipe_through :bread
+    get "/*rest",                 NoContentController, :show
   end
 
   scope "/", Ello.Serve.Webapp do
@@ -50,7 +64,7 @@ defmodule Ello.Serve.Router do
     # Join/Auth routes - no fallback content relevant
     get "/enter",                 NoContentController, :enter
     get "/join",                  NoContentController, :join
-    get "/forgot",                NoContentController, :forgot
+    get "/forgot-password",       NoContentController, :forgot
 
     # User routes
     get "/:username/post/:token", PostController, :show

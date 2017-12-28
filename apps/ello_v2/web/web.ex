@@ -41,6 +41,7 @@ defmodule Ello.V2.Web do
       import Ello.V2.Render
       import Ello.V2.Pagination
       import Ello.V2.StandardParams
+      alias Ello.V2.Manage
     end
   end
 

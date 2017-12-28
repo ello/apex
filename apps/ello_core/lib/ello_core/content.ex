@@ -4,6 +4,7 @@ defmodule Ello.Core.Content do
   import Ello.Core
   alias Ello.Core.Repo
   alias Ello.Core.Network
+  alias Ello.Core.Network.{Flag}
   alias __MODULE__.{
     Filter,
     Preload,
@@ -139,12 +140,12 @@ defmodule Ello.Core.Content do
   """
   def comments(%{post: %{reposted_source: %Post{} = source}} = options),
     do: comments(Map.put(options, :post, source))
-  def comments(%{post: post} = options) do
+  def comments(options) do
     # We don't filter NSFW users from comments
     options = Map.merge(options, %{allow_nsfw: true, allow_nudity: true})
     Post
     |> Filter.comments_query(options)
-    |> comments_for_post(post)
+    |> comments_for_post(options)
     |> post_pagination(options)
     |> Repo.all
     |> Preload.comment_list(options)
@@ -156,21 +157,29 @@ defmodule Ello.Core.Content do
   """
   def comment(%{post: %{reposted_source: %Post{} = source}} = options),
     do: comment(Map.put(options, :post, source))
-  def comment(%{post: post, id: id} = options) do
+  def comment(%{id: id} = options) do
     # We don't filter NSFW users from comments
     options = Map.merge(options, %{allow_nsfw: true, allow_nudity: true})
     Post
     |> Filter.comments_query(options)
-    |> comments_for_post(post)
+    |> comments_for_post(options)
     |> Repo.get(id)
     |> Preload.comment_list(options)
     |> Filter.post_list(options)
   end
 
-  defp comments_for_post(q, %{id: id}) do
+  defp comments_for_post(q, %{post: %{id: id}} = options) do
     q
     |> join(:left, [c, a], parent in assoc(c, :parent_post))
     |> where([c, a, parent], parent.id == ^id or parent.reposted_source_id == ^id)
+    |> filter_spam(options)
+  end
+
+  defp filter_spam(q, %{current_user: %{is_spammer: true}}), do: q
+  defp filter_spam(q, _) do
+    q
+    |> join(:left, [c, a, parent], f in Flag, [subject_user_id: a.id, verified: true, kind: "spam"])
+    |> where([c, a, parent, flags], is_nil(flags.id))
   end
 
   def loves(%{user: %{id: user_id}} = options) do

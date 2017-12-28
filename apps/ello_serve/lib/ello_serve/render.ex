@@ -2,7 +2,7 @@ defmodule Ello.Serve.Render do
   import Phoenix.Controller, only: [view_module: 1, html: 2]
   import Phoenix.View, only: [render_to_iodata: 3]
   import NewRelicPhoenix, only: [measure_segment: 2]
-  alias Ello.Serve.Webapp
+  alias Ello.Serve.{Webapp, Bread}
 
   def render_html(conn, data \\ [])
   def render_html(%{assigns: %{prerender: false, html: html}} = conn, data) do
@@ -54,6 +54,11 @@ defmodule Ello.Serve.Render do
   defp render_config(%{assigns: %{app: "webapp"}}, data) do
     measure_segment {:render, "config.html"} do
       render_to_iodata(Webapp.ConfigView, "meta.html", data)
+    end
+  end
+  defp render_config(%{assigns: %{app: "bread"}}, data) do
+    measure_segment {:render, "config.html"} do
+      render_to_iodata(Bread.ConfigView, "meta.html", data)
     end
   end
   defp render_config(_, _), do: ""

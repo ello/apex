@@ -22,7 +22,8 @@ defmodule Ello.V2.EditorialController do
   defp next_page_params([], _), do: %{}
   defp next_page_params(editorials, conn) do
     last_editorial = List.last(editorials)
-    next = %{per_page: per_page(conn)}
+    per_page = standard_params(conn)[:per_page]
+    next = %{per_page: per_page}
     if preview?(conn) do
       Map.merge(next, %{
         before: last_editorial.preview_position,
@@ -37,17 +38,13 @@ defmodule Ello.V2.EditorialController do
 
   defp last_page_header(conn, editorials) do
     editorials_count = length(editorials)
-    per_page = per_page(conn)
+    per_page = standard_params(conn)[:per_page]
     if editorials_count < per_page do
       put_resp_header(conn, "x-total-pages-remaining", "0")
     else
       put_resp_header(conn, "x-total-pages-remaining", "1")
     end
   end
-
-  defp per_page(%{params: %{"per_page" => per_page}}) when is_binary(per_page), do: String.to_integer(per_page)
-  defp per_page(%{params: %{"per_page" => per_page}}), do: per_page
-  defp per_page(_), do: 25
 
   defp preview?(%{assigns: %{current_user: %{is_staff: true}}, params: %{"preview" => _}}), do: true
   defp preview?(_), do: false

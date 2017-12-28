@@ -22,6 +22,10 @@ defmodule Ello.Core.Network.Preload do
     |> build_image_structs
   end
 
+  def is_spammer(user) do
+    Map.put(user, :is_spammer, Network.flags_exist?(%{user: user, kind: "spam", verified: true}))
+  end
+
   defp preload_current_user_relationship(users, %{current_user: %{id: id}}) do
     current_user_query = where(Relationship, owner_id: ^id)
     Repo.preload(users, [relationship_to_current_user: current_user_query])

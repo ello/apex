@@ -3,7 +3,7 @@ defmodule Ello.Core.Network do
   import Ecto.Query
   import NewRelicPhoenix, only: [measure_segment: 2]
   alias Ello.Core.{Repo, Redis}
-  alias __MODULE__.{User, Preload, Relationship}
+  alias __MODULE__.{User, Preload, Relationship, Flag}
 
   @moduledoc """
   Responsible for retrieving and loading users and relationships.
@@ -62,6 +62,7 @@ defmodule Ello.Core.Network do
     User
     |> Repo.get(id)
     |> User.preload_blocked_ids
+    |> Preload.is_spammer
   end
 
   @doc """
@@ -131,5 +132,11 @@ defmodule Ello.Core.Network do
     redis_key = "user:#{user.id}:followed_users_id_cache"
     {:ok, [_, following_ids]} = Redis.command(["SSCAN", redis_key, 0, "COUNT", limit], name: :following_ids)
     following_ids
+  end
+
+  def flags_exist?(%{kind: kind, user: %{id: id}, verified: verified}) do
+    Flag
+    |> where(kind: ^kind, verified: ^verified, subject_user_id: ^id)
+    |> Repo.exists
   end
 end

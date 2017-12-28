@@ -1,7 +1,7 @@
 defmodule Ello.Core.Factory do
   alias Ello.Core.{Repo, Discovery, Network, Content, Contest}
   alias Discovery.{Category, Promotional, Editorial}
-  alias Network.{User, Relationship}
+  alias Network.{User, Relationship, Flag}
   alias Content.{Post, Love, Watch, Asset}
   alias Contest.{ArtistInvite, ArtistInviteSubmission}
   use ExMachina.Ecto, repo: Repo
@@ -20,6 +20,18 @@ defmodule Ello.Core.Factory do
 
   def settings_factory do
     %User.Settings{}
+  end
+
+  def flag_factory do
+    %Flag{
+      reporting_user: insert(:user, is_staff: true),
+      subject_user: insert(:user),
+      verified: true,
+      kind: "spam",
+      resolved_at: DateTime.utc_now,
+      created_at: DateTime.utc_now,
+      updated_at: DateTime.utc_now,
+    }
   end
 
   def post_factory do

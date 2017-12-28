@@ -109,8 +109,8 @@ defmodule Ello.Serve.Webapp.NoContentControllerTest do
   end
 
   @tag :meta
-  test "forgot - it renders - active version", %{conn: conn} do
-    resp = get(conn, "/forgot")
+  test "forgot-password - it renders - active version", %{conn: conn} do
+    resp = get(conn, "/forgot-password")
     html = html_response(resp, 200)
     assert html =~ "Forgot Password | Ello"
     assert has_meta(html, name: "description", content: "Welcome back .*")
