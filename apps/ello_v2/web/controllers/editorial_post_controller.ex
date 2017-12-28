@@ -6,7 +6,7 @@ defmodule Ello.V2.EditorialPostController do
   def index(conn, params) do
     posts = posts_by_tokens(conn, params)
     conn
-    |> track_post_view(posts, stream_kind: "editorial_curated_posts")
+    |> track_post_view(posts, stream_kind: "curated_posts_editorial")
     |> api_render_if_stale(PostView, :index, data: posts)
   end
 
