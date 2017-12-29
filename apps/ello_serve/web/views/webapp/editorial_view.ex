@@ -35,14 +35,14 @@ defmodule Ello.Serve.Webapp.EditorialView do
     })
     |> Search.post_search
     |> Map.get(:results)
-    |> track(posts, stream_kind: "trending_editorial")
+    |> track(conn, stream_kind: "trending_editorial")
   end
 
   def curated_posts(%{editorial: %{content: %{"post_tokens" => tokens}}, conn: conn}) do
     conn
     |> standard_params(%{tokens: tokens})
     |> Content.posts
-    |> track(posts, stream_kind: "curated_posts_editorial")
+    |> track(conn, stream_kind: "curated_posts_editorial")
   end
 
   def category_posts(%{editorial: %{content: %{"slug" => slug}}, conn: conn}) do
