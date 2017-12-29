@@ -77,7 +77,7 @@ defmodule Ello.Serve.Webapp.EditorialView do
       _ ->
         conn
         |> standard_params(%{status: "approved", images_only: true, per_page: 5, invite: invite})
-        |> Content.artist_invite_submissions
+        |> Contest.artist_invite_submissions
         |> Enum.map(&(&1.post))
         |> track(conn, stream_kind: "artist_invite_submissions_editorial", stream_id: invite.id)
     end
