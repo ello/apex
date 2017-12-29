@@ -5,7 +5,7 @@ defmodule Ello.Serve.Webapp.EditorialView do
   alias Ello.Search.Post.Search
   alias Ello.Serve.Webapp.PostView
   alias Ello.Core.{Content, Discovery, Contest}
-  import Ello.Events.TrackPostViews, only: [track_post_view: 3]
+  import Ello.Events.TrackPostViews, only: [track: 3]
 
   def render("editorial.html", %{editorial: %{kind: "post"}} = assigns),
     do: render("post_editorial.html", assigns)
@@ -35,14 +35,14 @@ defmodule Ello.Serve.Webapp.EditorialView do
     })
     |> Search.post_search
     |> Map.get(:results)
-    |> track_post_view(posts, stream_kind: "trending_editorial")
+    |> track(posts, stream_kind: "trending_editorial")
   end
 
   def curated_posts(%{editorial: %{content: %{"post_tokens" => tokens}}, conn: conn}) do
     conn
     |> standard_params(%{tokens: tokens})
     |> Content.posts
-    |> track_post_view(posts, stream_kind: "curated_posts_editorial")
+    |> track(posts, stream_kind: "curated_posts_editorial")
   end
 
   def category_posts(%{editorial: %{content: %{"slug" => slug}}, conn: conn}) do
@@ -64,7 +64,7 @@ defmodule Ello.Serve.Webapp.EditorialView do
         })
         |> Search.post_search
         |> Map.get(:results)
-        |> track_post_view(conn, stream_kind: "category_trending_editorial", stream_id: category.id)
+        |> track(conn, stream_kind: "category_trending_editorial", stream_id: category.id)
     end
   end
 
@@ -79,7 +79,7 @@ defmodule Ello.Serve.Webapp.EditorialView do
         |> standard_params(%{status: "approved", images_only: true, per_page: 5, invite: invite})
         |> Content.artist_invite_submissions
         |> Enum.map(&(&1.post))
-        |> track_post_view(conn, stream_kind: "artist_invite_submissions_editorial", stream_id: invite.id)
+        |> track(conn, stream_kind: "artist_invite_submissions_editorial", stream_id: invite.id)
     end
   end
 
