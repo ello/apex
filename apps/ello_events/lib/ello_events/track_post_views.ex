@@ -19,8 +19,10 @@ defmodule Ello.Events.TrackPostViews do
   """
 
   def track(conn, models, options \\ [])
-  def track(models, %Conn{} = conn, options),
-    do: track(conn, models, options)
+  def track(models, %Conn{} = conn, options) do
+    track(conn, models, options)
+    models
+  end
   def track(conn, [], _options),
     do: conn
   def track(conn, nil, _options),
