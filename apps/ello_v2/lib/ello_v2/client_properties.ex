@@ -64,8 +64,6 @@ defmodule Ello.V2.ClientProperties do
   defp nsfw(%{assigns: %{allow_nsfw: _preset}} = conn, _), do: conn
   defp nsfw(%{assigns: %{current_user: %{settings: %{views_adult_content: allow_nsfw}}}} = conn, _),
     do: assign(conn, :allow_nsfw, allow_nsfw)
-  defp nsfw(%{assigns: %{webapp: true}} = conn, _),
-    do: assign(conn, :allow_nsfw, true)
   defp nsfw(conn, _),
     do: assign(conn, :allow_nsfw, false)
 end
