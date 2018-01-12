@@ -14,7 +14,9 @@ config :ello_dispatch,
 env_name = System.get_env("ENVIRONMENT_NAME") || Mix.env
 
 config :honeybadger,
-  environment_name: env_name
+  environment_name: env_name,
+  exclude_envs: [:dev, :test]
+
 
 config :newrelic_phoenix,
   application_name: "Elixir API - #{env_name}",

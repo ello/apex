@@ -31,7 +31,7 @@ defmodule Ello.Auth.Mixfile do
       {:joken, "~> 1.3.0"},
       {:poison, "~> 3.1"},
       {:plug, "~> 1.3.0"},
-      {:httpoison, "~> 0.11.1"},
+      {:httpoison, "~> 1.0"},
     ]
   end
 end
