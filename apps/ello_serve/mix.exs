@@ -35,7 +35,7 @@ defmodule Ello.Serve.Mixfile do
       {:phoenix_html, "~> 2.10"},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
-      {:poison, "~> 3.1", override: true},
+      {:poison, "~> 3.1"},
       {:html_sanitize_ex, "~> 1.0.0"},
       {:timex, "~> 3.0"},
 

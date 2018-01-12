@@ -31,7 +31,7 @@ defmodule Ello.Search.Mixfile do
     [
       {:elastix, github: "ello/elastix", branch: "custom-header-support"},
       {:ex_aws, "~> 1.1"},
-      {:poison, "~> 3.1", override: true},
+      {:poison, "~> 3.1"},
       {:timex, "~> 3.0"},
       {:html_sanitize_ex, "~> 1.0.0"},
 
