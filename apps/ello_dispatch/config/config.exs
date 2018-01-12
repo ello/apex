@@ -11,7 +11,11 @@ config :ello_dispatch, Ello.Dispatch.Endpoint,
 config :ello_dispatch,
   ecto_repos: []
 
-env_name = System.get_env("ENVIRONMENT_NAME") || Mix.env
+env_name = case System.get_env("ENVIRONMENT_NAME") do
+  nil -> Mix.env
+  ""  -> Mix.env
+  str -> String.to_atom(str)
+end
 
 config :honeybadger,
   environment_name: env_name,
