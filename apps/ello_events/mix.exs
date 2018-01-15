@@ -22,7 +22,7 @@ defmodule Ello.Events.Mixfile do
   defp deps do
     [
       {:uuid,   "~> 1.0"},
-      {:poison, ">= 2.2.0"},
+      {:poison, "~> 3.1"},
 
       {:ello_core, in_umbrella: true},
     ]

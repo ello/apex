@@ -33,16 +33,16 @@ defmodule Ello.V2.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.2.1"},
+      {:phoenix, "~> 1.3.0"},
       {:phoenix_pubsub, "~> 1.0"},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:ex_json_schema, "~> 0.5.3", only: :test},
-      {:httpoison, "~> 0.11.0"},
+      {:httpoison, "~> 1.0"},
       {:html_sanitize_ex, "~> 1.0.0"},
       {:curtail, "~> 0.1"},
       {:phoenix_etag, "~> 0.1.0"},
-      {:poison, "~> 3.1", override: true},
+      {:poison, "~> 3.1"},
 
       {:ello_core,   in_umbrella: true},
       {:ello_auth,   in_umbrella: true},

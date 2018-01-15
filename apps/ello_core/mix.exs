@@ -39,10 +39,10 @@ defmodule Ello.Core.Mixfile do
       {:phoenix_ecto, "~> 3.0"},
       {:postgrex,     ">= 0.0.0"},
       {:redix,        "~> 0.4.0"},
-      {:poison,       ">= 2.2.0"},
+      {:poison,       "~> 3.1"},
       {:ex_machina,   "~> 1.0.2"},
       {:timex,        "~> 3.0"},
-      {:ecto,         "~> 2.1.4"},
+      {:ecto,         "~> 2.2.7"},
 
       {:newrelic_phoenix, github: "ello/newrelic_phoenix", branch: "master"},
     ]

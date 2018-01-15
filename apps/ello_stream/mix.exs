@@ -29,8 +29,8 @@ defmodule Ello.Stream.Mixfile do
 
   defp deps do
     [
-      {:httpoison, "~> 0.11.1"},
-      {:poison,    ">= 2.2.0"},
+      {:httpoison, "~> 1.0"},
+      {:poison, "~> 3.1"},
 
       {:ello_core, in_umbrella: true},
     ]

@@ -29,9 +29,9 @@ defmodule Ello.Auth.Mixfile do
 
       {:honeybadger, "~> 0.6"},
       {:joken, "~> 1.3.0"},
-      {:poison, ">= 3.0.0", override: true},
-      {:plug, "~> 1.3.0"},
-      {:httpoison, "~> 0.11.1"},
+      {:poison, "~> 3.1"},
+      {:plug, "~> 1.4.3"},
+      {:httpoison, "~> 1.0"},
     ]
   end
 end
