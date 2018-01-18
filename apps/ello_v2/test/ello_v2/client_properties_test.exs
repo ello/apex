@@ -49,7 +49,7 @@ defmodule Ello.V2.ClientPropertiesTest do
            |> ClientProperties.call([])
     assert conn.assigns[:webapp]
     assert conn.assigns[:allow_nudity]
-    assert conn.assigns[:allow_nsfw]
+    refute conn.assigns[:allow_nsfw]
   end
 
   test "allows nudity/nsfw - no user - android", %{conn: conn} do
