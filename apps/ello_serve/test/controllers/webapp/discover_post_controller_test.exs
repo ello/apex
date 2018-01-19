@@ -8,8 +8,8 @@ defmodule Ello.Serve.Webapp.DiscoverPostControllerTest do
     Stream.Client.Test.start
     Stream.Client.Test.reset
 
-    Factory.insert(:category, slug: "cat1", level: "primary")
-    Factory.insert(:category, slug: "cat2", level: "primary")
+    Factory.insert(:category, slug: "cat1", level: "primary", roshi_slug: "cat-1")
+    Factory.insert(:category, slug: "cat2", level: "primary", roshi_slug: "cat-2")
 
     p1 = Factory.insert(:post, token: "token-p1")
     p2 = Factory.insert(:post, token: "token-p2")
@@ -24,10 +24,10 @@ defmodule Ello.Serve.Webapp.DiscoverPostControllerTest do
     Index.add(p4, post: %{love_count: 1})
 
     roshi_items = [
-      %Stream.Item{id: "#{p1.id}", stream_id: "categories:v1:cat1", ts: DateTime.utc_now},
-      %Stream.Item{id: "#{p2.id}", stream_id: "categories:v1:cat1", ts: DateTime.utc_now},
-      %Stream.Item{id: "#{p3.id}", stream_id: "categories:v1:cat1", ts: DateTime.utc_now},
-      %Stream.Item{id: "#{p4.id}", stream_id: "categories:v1:cat1", ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p1.id}", stream_id: "categories:v1:cat-1", ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p2.id}", stream_id: "categories:v1:cat-1", ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p3.id}", stream_id: "categories:v1:cat-1", ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p4.id}", stream_id: "categories:v1:cat-1", ts: DateTime.utc_now},
 
       %Stream.Item{id: "#{p1.id}", stream_id: "all_post_firehose", ts: DateTime.utc_now},
       %Stream.Item{id: "#{p2.id}", stream_id: "all_post_firehose", ts: DateTime.utc_now},

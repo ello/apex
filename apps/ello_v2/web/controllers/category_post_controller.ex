@@ -59,7 +59,7 @@ defmodule Ello.V2.CategoryPostController do
     }))
   end
 
-  defp stream_key(%Category{slug: slug}), do: "categories:v1:#{slug}"
+  defp stream_key(%Category{roshi_slug: slug}), do: "categories:v1:#{slug}"
   defp stream_key(%ArtistInvite{id: id}), do: "artist_invite:v1:#{id}"
 
   defp fetch_trending(conn, category) do
