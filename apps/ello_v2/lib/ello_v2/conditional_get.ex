@@ -93,10 +93,18 @@ defimpl Ello.V2.ConditionalGet, for: Ello.Core.Content.Post do
       post.loves_count,
       post.comments_count,
       post.reposts_count,
+      categories(post),
       Ello.V2.ConditionalGet.etag(post.author),
     ]
     values
     |> :erlang.term_to_binary
+  end
+
+  defp categories(%{categories: []}), do: ""
+  defp categories(%{categories: categories}) do
+    categories
+    |> Enum.map(&(&1.updated_at))
+    |> Enum.join("")
   end
 end
 
