@@ -34,10 +34,10 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
   def category(conn, params) do
     case fetch_category(conn, params) do
       nil -> send_resp(conn, 404, "")
-      category ->
+      cat ->
         render_html(conn, %{
           categories: fn -> categories(conn) end,
-          posts:      fn -> category_posts(conn, category) end,
+          posts:      fn -> category_posts(conn, cat) end,
         })
     end
   end
