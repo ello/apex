@@ -31,11 +31,15 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
     })
   end
 
-  def category(conn, %{"category" => slug}) do
-    render_html(conn, %{
-      categories: fn -> categories(conn) end,
-      posts:      fn -> category_posts(conn, slug) end,
-    })
+  def category(conn, params) do
+    case fetch_category(conn, params) do
+      nil -> send_resp(conn, 404, "")
+      cat ->
+        render_html(conn, %{
+          categories: fn -> categories(conn) end,
+          posts:      fn -> category_posts(conn, cat) end,
+        })
+    end
   end
 
   defp trending_posts(conn) do
@@ -64,16 +68,16 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
     stream
   end
 
-  defp category_posts(conn, slug) do
+  defp category_posts(conn, category) do
     stream = Stream.fetch(standard_params(conn, %{
-      keys:         [category_stream_key(%{slug: slug})],
+      keys:         [category_stream_key(category)],
       allow_nsfw:   true, # No NSFW in categories, reduces slop.
     }))
     track(conn, stream.posts, stream_kind: "category")
     stream
   end
 
-  defp category_stream_key(%{slug: slug}), do: "categories:v1:#{slug}"
+  defp category_stream_key(%{roshi_slug: slug}), do: "categories:v1:#{slug}"
 
   @recent_stream "all_post_firehose"
   defp recent_posts(conn) do
@@ -90,6 +94,13 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
       meta:         false,
       promotionals: false,
       inactive:     false,
+    }))
+  end
+
+  def fetch_category(conn, params) do
+    Discovery.category(standard_params(conn, %{
+      id_or_slug: params["category"],
+      images:     false,
     }))
   end
 end

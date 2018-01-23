@@ -8,6 +8,7 @@ defmodule Ello.Core.Discovery.Category do
   schema "categories" do
     field :name, :string
     field :slug, :string
+    field :roshi_slug, :string
     field :level, :string
     field :order, :integer
     field :created_at, :utc_datetime

@@ -282,6 +282,7 @@ defmodule Ello.Core.Factory do
     %Category{
       name:        sequence(:category_name, &"category#{&1}"),
       slug:        sequence(:category_slug, &"category#{&1}"),
+      roshi_slug:  sequence(:category_roshi_slug, &"category#{&1}"),
       description: "Posts about this categories",
       is_sponsored: false,
       is_creator_type: false,

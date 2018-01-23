@@ -10,8 +10,8 @@ defmodule Ello.V2.CategoryPostControllerTest do
     Stream.Client.Test.start
     Stream.Client.Test.reset
 
-    cat1 = Factory.insert(:category, slug: "cat1", level: "primary")
-    cat2 = Factory.insert(:category, slug: "cat2", level: "primary")
+    cat1 = Factory.insert(:category, roshi_slug: "cat1", slug: "cat1", level: "primary")
+    cat2 = Factory.insert(:category, roshi_slug: "cat2", slug: "cat2", level: "primary")
     inv1 = Factory.insert(:artist_invite, status: "open")
     inv2 = Factory.insert(:artist_invite, status: "open")
     inv3 = Factory.insert(:artist_invite, status: "closed")

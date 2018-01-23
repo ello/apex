@@ -5,6 +5,7 @@ defmodule Ello.Repo.Migrations.CreateCategory do
     create_if_not_exists table(:categories) do
       add :name, :string
       add :slug, :string
+      add :roshi_slug, :string
       add :level, :string
       add :order, :integer
       add :created_at, :utc_datetime
