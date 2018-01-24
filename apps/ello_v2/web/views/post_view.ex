@@ -75,6 +75,9 @@ defmodule Ello.V2.PostView do
     :reposts_count,
     :views_count,
     :artist_invite_id,
+    :artist_invite_slug,
+    :artist_invite_title,
+    :artist_invite_submission_status,
   ]
 
   defp post_users(posts) when is_list(posts), do: Enum.flat_map(posts, &(post_users(&1, &1.reposted_source)))
@@ -107,6 +110,24 @@ defmodule Ello.V2.PostView do
   def artist_invite_id(%{reposted_source: %{artist_invite_submission: %{artist_invite_id: id}}}, _), do: "#{id}"
   def artist_invite_id(%{artist_invite_submission: %{artist_invite_id: id}} , _), do: "#{id}"
   def artist_invite_id(_, _), do: nil
+
+  def artist_invite_slug(%{reposted_source: %{artist_invite_submission: %{artist_invite: %{slug: slug}}}}, _), do: slug
+  def artist_invite_slug(%{artist_invite_submission: %{artist_invite: %{slug: slug}}}, _), do: slug
+  def artist_invite_slug(_, _), do: nil
+
+  def artist_invite_title(%{reposted_source: %{artist_invite_submission: %{artist_invite: %{title: title}}}}, _), do: title
+  def artist_invite_title(%{artist_invite_submission: %{artist_invite: %{title: title}}}, _), do: title
+  def artist_invite_title(_, _), do: nil
+
+  def artist_invite_submission_status(%{reposted_source: %{artist_invite_submission: submission}}, _),
+    do: do_submission_status(submission)
+  def artist_invite_submission_status(%{artist_invite_submission: submission}, _),
+    do: do_submission_status(submission)
+
+  defp do_submission_status(%{status: "approved"}), do: "approved"
+  defp do_submission_status(%{status: "selected", artist_invite: %{status: "closed"}}), do: "selected"
+  defp do_submission_status(%{status: "selected"}), do: "approved"
+  defp do_submission_status(_), do: nil
 
   def links(%{reposted_source: %Post{} = reposted} = post, conn) do
     post

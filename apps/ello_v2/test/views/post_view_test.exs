@@ -3,30 +3,26 @@ defmodule Ello.V2.PostViewTest do
   import Phoenix.View #For render/2
   alias Ello.V2.PostView
   alias Ello.Core.Content.{Post,Love,Watch,Asset}
-  alias Ello.Core.Contest.{ArtistInvite}
 
   setup %{conn: conn} do
     archer = Script.build(:archer)
     reposter = Factory.build(:user, id: 12)
     category = Factory.build(:category, id: 3)
     asset = Asset.build_attachment(Factory.build(:asset, id: 1))
-    a_inv = ArtistInvite.load_images(Factory.insert(:artist_invite, %{id: 1}))
-    post = :post
-           |> Factory.build(%{
-             id: 1,
-             author: archer,
-             assets: [asset],
-             reposted_source: nil,
-             repost_from_current_user: nil,
-             love_from_current_user: nil,
-             watch_from_current_user: nil,
-             rendered_summary: [
-               %{"data" => "<p>Post</p>", "kind" => "text", "link_url" => nil}
-             ],
-             categories: [category],
-             category_ids: [category.id],
-           })
-           |> load_artist_invite_submission(a_inv)
+    post = Factory.build(:post, %{
+      id: 1,
+      author: archer,
+      assets: [asset],
+      reposted_source: nil,
+      repost_from_current_user: nil,
+      love_from_current_user: nil,
+      watch_from_current_user: nil,
+      rendered_summary: [
+        %{"data" => "<p>Post</p>", "kind" => "text", "link_url" => nil}
+      ],
+      categories: [category],
+      category_ids: [category.id],
+    })
     repost = Factory.build(:post, %{
       id: 2,
       author: reposter,
@@ -48,11 +44,10 @@ defmodule Ello.V2.PostViewTest do
         post: post,
         repost: repost,
         reposter: reposter,
-        a_inv: a_inv,
     ]}
   end
 
-  test "post.json - it renders the post", %{category: category, post: post, archer: user, conn: conn, a_inv: a_inv} do
+  test "post.json - it renders the post", %{category: category, post: post, archer: user, conn: conn} do
     assert %{
       id: "#{post.id}",
       href: "/api/v2/posts/#{post.id}",
@@ -60,7 +55,10 @@ defmodule Ello.V2.PostViewTest do
       summary: [%{"data" => "<p>Post</p>", "kind" => "text", "link_url" => nil}],
       content: [%{"data" => "<p>Phrasing!</p>", "kind" => "text", "link_url" => nil}],
       author_id: "#{user.id}",
-      artist_invite_id: "#{a_inv.id}",
+      artist_invite_id: nil,
+      artist_invite_slug: nil,
+      artist_invite_title: nil,
+      artist_invite_submission_status: nil,
       is_adult_content: post.is_adult_content,
       body: [%{"data" => "Phrasing!", "kind" => "text"}],
       loves_count: 1,
@@ -89,17 +87,19 @@ defmodule Ello.V2.PostViewTest do
     )
   end
 
-  test "post.json - it renders a repost", %{post: post, repost: repost, conn: conn, a_inv: a_inv} do
+  test "post.json - it renders a repost", %{post: post, repost: repost, conn: conn} do
     reposted_id = "#{post.id}"
     reposted_author_id = "#{post.author.id}"
     repost_id = "#{repost.id}"
     repost_author_id = "#{repost.author.id}"
-    artist_invite_id = "#{a_inv.id}"
     assert %{
       id: ^repost_id,
       repost_id: ^reposted_id,
       author_id: ^repost_author_id,
-      artist_invite_id: ^artist_invite_id,
+      artist_invite_id: nil,
+      artist_invite_slug: nil,
+      artist_invite_title: nil,
+      artist_invite_submission_status: nil,
       repost_content: [%{"kind" => "text", "data" => "<p>Phrasing!</p>"}],
       summary: [%{"kind" => "text", "data" => "<p>Post</p>"}],
       loves_count: 1,
@@ -320,6 +320,156 @@ defmodule Ello.V2.PostViewTest do
     assert Enum.any?(assets, &(&1.id == asset_id3))
   end
 
-  def load_artist_invite_submission(post, a_inv),
-    do: Map.put(post, :artist_invite_submission, Factory.build(:artist_invite_submission, %{post: post, artist_invite: a_inv, artist_invite_id: a_inv.id}))
+  test "show.json - artist invite submission - unapproved", context do
+    submission = build_submission("unapproved", "open")
+    post = Map.put(context[:post], :artist_invite_submission, submission)
+    json = render(PostView, "show.json",
+      data: post,
+      conn: context[:conn],
+    )[:posts]
+
+    assert json[:artist_invite_id] == "0"
+    assert json[:artist_invite_slug] == "test-artist-invite"
+    assert json[:artist_invite_title] == "Test Artist Invite"
+    assert json[:artist_invite_submission_status] == nil
+  end
+
+  test "show.json - artist invite submission - approved", context do
+    submission = build_submission("approved", "open")
+    post = Map.put(context[:post], :artist_invite_submission, submission)
+    json = render(PostView, "show.json",
+      data: post,
+      conn: context[:conn],
+    )[:posts]
+
+    assert json[:artist_invite_id] == "0"
+    assert json[:artist_invite_slug] == "test-artist-invite"
+    assert json[:artist_invite_title] == "Test Artist Invite"
+    assert json[:artist_invite_submission_status] == "approved"
+  end
+
+  test "show.json - artist invite submission - declined", context do
+    submission = build_submission("declined", "open")
+    post = Map.put(context[:post], :artist_invite_submission, submission)
+    json = render(PostView, "show.json",
+      data: post,
+      conn: context[:conn],
+    )[:posts]
+
+    assert json[:artist_invite_id] == "0"
+    assert json[:artist_invite_slug] == "test-artist-invite"
+    assert json[:artist_invite_title] == "Test Artist Invite"
+    assert json[:artist_invite_submission_status] == nil
+  end
+
+  test "show.json - artist invite submission - selected - open", context do
+    submission = build_submission("selected", "open")
+    post = Map.put(context[:post], :artist_invite_submission, submission)
+    json = render(PostView, "show.json",
+      data: post,
+      conn: context[:conn],
+    )[:posts]
+
+    assert json[:artist_invite_id] == "0"
+    assert json[:artist_invite_slug] == "test-artist-invite"
+    assert json[:artist_invite_title] == "Test Artist Invite"
+    assert json[:artist_invite_submission_status] == "approved"
+  end
+
+  test "show.json - artist invite submission - selected - closed", context do
+    submission = build_submission("selected", "closed")
+    post = Map.put(context[:post], :artist_invite_submission, submission)
+    json = render(PostView, "show.json",
+      data: post,
+      conn: context[:conn],
+    )[:posts]
+
+    assert json[:artist_invite_id] == "0"
+    assert json[:artist_invite_slug] == "test-artist-invite"
+    assert json[:artist_invite_title] == "Test Artist Invite"
+    assert json[:artist_invite_submission_status] == "selected"
+  end
+
+  test "show.json - repost - artist invite submission - unapproved", context do
+    submission = build_submission("unapproved", "open")
+    repost = put_in(context[:repost].reposted_source.artist_invite_submission, submission)[:repost]
+    json = render(PostView, "show.json",
+      data: repost,
+      conn: context[:conn],
+    )[:posts]
+
+    assert json[:artist_invite_id] == "0"
+    assert json[:artist_invite_slug] == "test-artist-invite"
+    assert json[:artist_invite_title] == "Test Artist Invite"
+    assert json[:artist_invite_submission_status] == nil
+  end
+
+  test "show.json - repost - artist invite submission - approved", context do
+    submission = build_submission("approved", "open")
+    repost = put_in(context[:repost].reposted_source.artist_invite_submission, submission)[:repost]
+    json = render(PostView, "show.json",
+      data: repost,
+      conn: context[:conn],
+    )[:posts]
+
+    assert json[:artist_invite_id] == "0"
+    assert json[:artist_invite_slug] == "test-artist-invite"
+    assert json[:artist_invite_title] == "Test Artist Invite"
+    assert json[:artist_invite_submission_status] == "approved"
+  end
+
+  test "show.json - repost - artist invite submission - declined", context do
+    submission = build_submission("declined", "open")
+    repost = put_in(context[:repost].reposted_source.artist_invite_submission, submission)[:repost]
+    json = render(PostView, "show.json",
+      data: repost,
+      conn: context[:conn],
+    )[:posts]
+
+    assert json[:artist_invite_id] == "0"
+    assert json[:artist_invite_slug] == "test-artist-invite"
+    assert json[:artist_invite_title] == "Test Artist Invite"
+    assert json[:artist_invite_submission_status] == nil
+  end
+
+  test "show.json - repost - artist invite submission - selected - open", context do
+    submission = build_submission("selected", "open")
+    repost = put_in(context[:repost].reposted_source.artist_invite_submission, submission)[:repost]
+    json = render(PostView, "show.json",
+      data: repost,
+      conn: context[:conn],
+    )[:posts]
+
+    assert json[:artist_invite_id] == "0"
+    assert json[:artist_invite_slug] == "test-artist-invite"
+    assert json[:artist_invite_title] == "Test Artist Invite"
+    assert json[:artist_invite_submission_status] == "approved"
+  end
+
+  test "show.json - repost - artist invite submission - selected - closed", context do
+    submission = build_submission("selected", "closed")
+    repost = put_in(context[:repost].reposted_source.artist_invite_submission, submission)[:repost]
+    json = render(PostView, "show.json",
+      data: repost,
+      conn: context[:conn],
+    )[:posts]
+
+    assert json[:artist_invite_id] == "0"
+    assert json[:artist_invite_slug] == "test-artist-invite"
+    assert json[:artist_invite_title] == "Test Artist Invite"
+    assert json[:artist_invite_submission_status] == "selected"
+  end
+
+  defp build_submission(sub_status, inv_status) do
+    Factory.build(:artist_invite_submission, %{
+      status:           sub_status,
+      artist_invite_id: 0,
+      artist_invite:    Factory.build(:artist_invite, %{
+        id:     0,
+        slug:   "test-artist-invite",
+        title:  "Test Artist Invite",
+        status: inv_status,
+      })
+    })
+  end
 end
