@@ -2,6 +2,12 @@
 defmodule Ello.V3.Schema.ContentTypes do
   use Absinthe.Schema.Notation
 
+  enum :stream_type do
+    value :recent
+    value :featured
+    value :trending
+  end
+
   object :post_stream do
     field :next, :string
     field :per_page, :integer
@@ -81,6 +87,13 @@ defmodule Ello.V3.Resolvers.Stream do
         }}
       end
   end
+
+  def categories(_, %{stream_type: _type}, _resolution) do
+    {:ok, %{
+      next: nil,
+      posts: []
+    }}
+  end
 end
 
 defmodule Ello.V3.Schema do
@@ -95,14 +108,14 @@ defmodule Ello.V3.Schema do
     @desc "Get a post by username and token"
     field :post, :post do
       arg :token,    non_null(:string)
-      arg :username, non_null(:string)
+      arg :username, non_null(:string), description: "Username post belongs to"
       resolve &Resolvers.Content.find_post/3
     end
 
     @desc "Stream of all posts on network"
     field :firehose_post_stream, :post_stream do
       resolve &Resolvers.Stream.firehose/3
-      arg :before, :string
+      arg :before, :string, description: "Pagination cursor, returned by previous page"
       arg :per_page, :integer
     end
 
@@ -110,7 +123,16 @@ defmodule Ello.V3.Schema do
     field :user_post_stream, :post_stream do
       resolve &Resolvers.Stream.user/3
       arg :username, non_null(:string)
-      arg :before, :string
+      arg :before, :string, description: "Pagination cursor, returned by previous page"
+      arg :per_page, :integer
+    end
+
+    @desc "Stream of posts by category"
+    field :categories_post_stream, :post_stream do
+      resolve &Resolvers.Stream.categories/3
+      arg :categories, list_of(:id), description: "List of category ids to get posts stream for"
+      arg :stream_type, non_null(:stream_type), description: "Type of stream to return, one of RECENT, FEATURED, or TRENDING"
+      arg :before, :string, description: "Pagination cursor, returned by previous page"
       arg :per_page, :integer
     end
   end
