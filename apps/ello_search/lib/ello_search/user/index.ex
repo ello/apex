@@ -29,7 +29,7 @@ defmodule Ello.Search.User.Index do
 
   def delete, do: Client.delete_index(index_name())
 
-  def index_name, do: "users"
+  def index_name, do: Application.get_env(:ello_search, :users_active_index_name)
   def doc_type,   do: "user"
   def doc_types,  do: [doc_type()]
 
