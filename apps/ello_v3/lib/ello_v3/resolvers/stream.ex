@@ -12,7 +12,7 @@ defmodule Ello.V3.Resolvers.Stream do
     {:ok, %{next: stream.before, posts: stream.posts}}
   end
 
-  def user(_, %{username: username} = args, resolution) do
+  def user_stream(_, %{username: username} = args, _resolution) do
     case Ello.Core.Network.user(%{id_or_username: "~#{username}", preload: false}) do
       nil -> {:error, "User not found"}
       user ->

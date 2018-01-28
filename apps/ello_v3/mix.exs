@@ -10,10 +10,15 @@ defmodule Ello.V3.Mixfile do
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
       elixir: "~> 1.5",
+       elixirc_paths: elixirc_paths(Mix.env),
       start_permanent: Mix.env == :prod,
       deps: deps()
     ]
   end
+
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "web", "test/support"]
+  defp elixirc_paths(_),     do: ["lib", "web"]
 
   # Run "mix help compile.app" to learn about applications.
   def application do
@@ -31,6 +36,7 @@ defmodule Ello.V3.Mixfile do
       {:ello_core,   in_umbrella: true},
       {:ello_stream, in_umbrella: true},
       {:ello_search, in_umbrella: true},
+      {:ello_auth,   in_umbrella: true},
     ]
   end
 end
