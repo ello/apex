@@ -25,6 +25,7 @@ defmodule Ello.V3 do
 
   use Plug.Router
 
+  plug Ello.V3.Plug.NewRelic
   plug :match
   plug :dispatch
 

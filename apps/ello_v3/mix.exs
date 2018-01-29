@@ -33,6 +33,9 @@ defmodule Ello.V3.Mixfile do
     [
       {:absinthe_plug, "~> 1.4"},
       {:plug,          "~> 1.3"},
+
+      {:newrelic_phoenix, github: "ello/newrelic_phoenix", branch: "master"},
+
       {:ello_core,   in_umbrella: true},
       {:ello_stream, in_umbrella: true},
       {:ello_search, in_umbrella: true},
