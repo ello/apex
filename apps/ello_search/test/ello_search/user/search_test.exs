@@ -22,6 +22,9 @@ defmodule Ello.Search.User.SearchTest do
     lucian       = Factory.insert(:user, %{username: "lucian", name: "Lucian Föhr"})
     todd         = Factory.insert(:user, %{username: "todd", name: "Todd Berger"})
     toddreed     = Factory.insert(:user, %{username: "toddreed", name: "Todd Reed"})
+    colin        = Factory.insert(:user, %{username: "colin", name: "Colin Schlueter"})
+    colinta      = Factory.insert(:user, %{username: "colinta", name: "Colin T.A. Gray"})
+    colin_test   = Factory.insert(:user, %{username: "colin-test", name: ""})
 
     Index.delete
     Index.create
@@ -41,6 +44,9 @@ defmodule Ello.Search.User.SearchTest do
     Index.add(lucian)
     Index.add(todd)
     Index.add(toddreed)
+    Index.add(colin)
+    Index.add(colinta)
+    Index.add(colin_test)
 
     {:ok,
       user: user,
@@ -59,7 +65,10 @@ defmodule Ello.Search.User.SearchTest do
       dcdoran11888: dcdoran11888,
       lucian: lucian,
       todd: todd,
-      toddreed: toddreed
+      toddreed: toddreed,
+      colin: colin,
+      colinta: colinta,
+      colin_test: colin_test
     }
   end
 
@@ -136,11 +145,27 @@ defmodule Ello.Search.User.SearchTest do
     assert context.lanabandero.id in Enum.map(results, &(&1.id))
   end
 
+  test "username_search - hyphens supported", context do
+    results = Search.username_search(%{terms: "lana-", current_user: context.current_user}).results
+    assert context.lanabandero.id in Enum.map(results, &(&1.id))
+  end
+
+  test "username_search - colin (with hyphens) test", context do
+    Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.colinta.id])
+
+    results = Search.username_search(%{terms: "colin", current_user: context.current_user}).results
+    Redis.command(["DEL", "user:#{context.current_user.id}:followed_users_id_cache"])
+    assert context.colinta.id == hd(Enum.map(results, &(&1.id)))
+    assert context.colin.id in Enum.map(results, &(&1.id))
+    assert context.colin_test.id in Enum.map(results, &(&1.id))
+  end
+
   test "username_search - @todd test", context do
     Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.toddreed.id])
     Redis.command(["SADD", "user:#{context.current_user.id}:followed_users_id_cache", context.todd.id])
 
     results = Search.user_search(%{terms: "@todd", current_user: context.current_user, allow_nsfw: false, allow_nudity: false}).results
+    Redis.command(["DEL", "user:#{context.current_user.id}:followed_users_id_cache"])
     assert context.todd.id == hd(Enum.map(results, &(&1.id)))
     assert context.toddreed.id in Enum.map(results, &(&1.id))
   end

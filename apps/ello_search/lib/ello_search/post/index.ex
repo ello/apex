@@ -74,7 +74,7 @@ defmodule Ello.Search.Post.Index do
 
   def delete, do: Client.delete_index(index_name())
 
-  def index_name,      do: "posts"
+  def index_name,      do: Application.get_env(:ello_search, :posts_active_index_name)
   def author_doc_type, do: "author"
   def post_doc_type,   do: "post"
   def doc_types,       do: [post_doc_type(), author_doc_type()]
