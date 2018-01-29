@@ -6,7 +6,6 @@ defmodule Ello.V3.Schema do
   import_types __MODULE__.NetworkTypes
 
   query do
-
     @desc "Get a post by username and token"
     field :post, :post do
       arg :token,    non_null(:string)
@@ -38,5 +37,15 @@ defmodule Ello.V3.Schema do
       arg :per_page, :integer
     end
   end
+
+  @doc """
+  Add our newrelic middleware into all top level queries.
+
+  Allows us to track each different query as a seperate request for profiling in newrelic.
+  """
+  def middleware(middle, _field, %{identifier: :query}) do
+    [Ello.V3.Middleware.NewRelic | middle]
+  end
+  def middleware(middle, _field, _object), do: middle
 end
 
