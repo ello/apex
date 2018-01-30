@@ -22,7 +22,7 @@ defmodule Ello.V3.Schema do
 
     @desc "Stream of a user's posts"
     field :user_post_stream, :post_stream do
-      resolve &Resolvers.Stream.user_stream/3
+      resolve &Resolvers.UserPostStream.call/3
       arg :username, non_null(:string)
       arg :before, :string, description: "Pagination cursor, returned by previous page"
       arg :per_page, :integer

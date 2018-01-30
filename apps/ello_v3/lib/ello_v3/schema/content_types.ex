@@ -13,6 +13,9 @@ defmodule Ello.V3.Schema.ContentTypes do
     field :posts, list_of(:post)
   end
 
+  # Assets
+  # Content
+
   object :post do
     field :id, :id
     field :token, :string
