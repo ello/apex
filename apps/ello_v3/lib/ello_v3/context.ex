@@ -8,6 +8,8 @@ defmodule Ello.V3.Context do
   # TODO: nsfw etc (refactor/extract Ello.V2.ClientProperties to Ello.Auth?)
   def build_context(%Plug.Conn{assigns: assigns}),
     do: %{
-      current_user: assigns[:current_user]
+      current_user: assigns[:current_user],
+      allow_nudity: true,
+      allow_nsfw: false,
     }
 end
