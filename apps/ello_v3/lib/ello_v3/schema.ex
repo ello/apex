@@ -11,7 +11,7 @@ defmodule Ello.V3.Schema do
     field :post, :post do
       arg :token,    non_null(:string)
       arg :username, non_null(:string), description: "Username post belongs to"
-      resolve &Resolvers.Content.find_post/3
+      resolve &Resolvers.FindPost.call/3
     end
 
     @desc "Stream of all posts on network"
