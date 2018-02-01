@@ -38,27 +38,39 @@ defmodule Ello.V3.Resolvers.FindPostTest do
           id
           token
           summary {
-            link_url
+            linkUrl
             kind
             data
+            links {
+              assetId
+            }
           }
           content {
-            link_url
+            linkUrl
             kind
             data
+            links {
+              assetId
+            }
           }
-          reposted_source {
+          repostedSource {
             id
             token
             summary {
-              link_url
+              linkUrl
               kind
               data
+              links {
+                assetId
+              }
             }
             content {
-              link_url
+              linkUrl
               kind
               data
+              links {
+                assetId
+              }
             }
             author {
               id
@@ -74,9 +86,9 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     assert json["id"] == "#{repost.id}"
     assert hd(json["summary"])["kind"] == "text"
     assert hd(json["summary"])["data"] == "<p>Phrasing!</p>"
-    assert json["reposted_source"]["id"] == "#{post.id}"
-    assert json["reposted_source"]["author"]["id"] == "#{user.id}"
-    assert hd(json["reposted_source"]["summary"])["data"] == "<p>Phrasing!</p>"
-    assert hd(json["reposted_source"]["summary"])["kind"] == "text"
+    assert json["repostedSource"]["id"] == "#{post.id}"
+    assert json["repostedSource"]["author"]["id"] == "#{user.id}"
+    assert hd(json["repostedSource"]["summary"])["data"] == "<p>Phrasing!</p>"
+    assert hd(json["repostedSource"]["summary"])["kind"] == "text"
   end
 end

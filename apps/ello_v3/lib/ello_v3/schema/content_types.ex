@@ -32,9 +32,14 @@ defmodule Ello.V3.Schema.ContentTypes do
   end
 
   object :content_blocks do
-    field :link_url, :string, resolve: fn(_, %{source: %{"link_url" => url}}) -> {:ok, url} end
-    field :kind, :string, resolve: fn(_, %{source: %{"kind" => kind}}) -> {:ok, kind} end
-    field :data, :content_data, resolve: fn(_, %{source: %{"data" => data}}) -> {:ok, data} end
+    field :link_url, :string, resolve: &str_get/2
+    field :kind, :string, resolve: &str_get/2
+    field :data, :content_data, resolve: &str_get/2
+    field :links, :content_links, resolve: &str_get/2
+  end
+
+  object :content_links do
+    field :asset_id, :id, resolve: &str_get/2
   end
 
   scalar :content_data do
@@ -49,5 +54,11 @@ defmodule Ello.V3.Schema.ContentTypes do
 
   defp post_content(_, %{source: %{rendered_content: post_content}}),
     do: {:ok, post_content}
+
+
+  # Gets a json field propery with a string instead of atom name.
+  defp str_get(_, %{source: source, definition: %{schema_node: %{identifier: name}}}) do
+    {:ok, Map.get(source, "#{name}")}
+  end
 end
 
