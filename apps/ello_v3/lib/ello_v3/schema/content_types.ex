@@ -1,5 +1,6 @@
 defmodule Ello.V3.Schema.ContentTypes do
   use Absinthe.Schema.Notation
+  import Ello.V3.Schema.Helpers
   alias Ello.Core.Content.{
     Post,
     Love,
@@ -18,9 +19,6 @@ defmodule Ello.V3.Schema.ContentTypes do
     field :is_last_page, :boolean
     field :posts, list_of(:post)
   end
-
-  # Assets
-  # Content
 
   object :post do
     field :id, :id
@@ -85,11 +83,6 @@ defmodule Ello.V3.Schema.ContentTypes do
 
   defp post_watching(_, %{source: %{watch_from_current_user: %Watch{}}}), do: true
   defp post_watching(_, _), do: {:ok, false}
-
-  # Gets a json field propery with a string instead of atom name.
-  defp str_get(_, %{source: source, definition: %{schema_node: %{identifier: name}}}) do
-    {:ok, Map.get(source, "#{name}")}
-  end
 
   defp source_self(_, %{source: source}), do: {:ok, source}
 end
