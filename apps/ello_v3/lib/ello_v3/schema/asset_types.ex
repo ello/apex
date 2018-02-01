@@ -2,6 +2,28 @@ defmodule Ello.V3.Schema.AssetTypes do
   import Ello.V3.Schema.Helpers
   use Absinthe.Schema.Notation
 
+  object :asset do
+    field :id, :id
+    field :attachment, :responsive_image_versions
+  end
+
+  object :tshirt_image_versions do
+    field :small, :image, resolve: &resolve_image/2
+    field :regular, :image, resolve: &resolve_image/2
+    field :large, :image, resolve: &resolve_image/2
+    field :original, :image, resolve: &resolve_image/2
+  end
+
+  object :responsive_image_versions do
+    field :hdpi, :image, resolve: &resolve_image/2
+    field :ldpi, :image, resolve: &resolve_image/2
+    field :mdpi, :image, resolve: &resolve_image/2
+    field :xhdpi, :image, resolve: &resolve_image/2
+    field :original, :image, resolve: &resolve_image/2
+    field :optimized, :image, resolve: &resolve_image/2
+    field :video, :image, resolve: &resolve_image/2
+  end
+
   object :image do
     field :metadata, :metadata, resolve: fn(_args, %{source: %{version: version}}) ->
       {:ok, version}

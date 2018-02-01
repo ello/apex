@@ -42,6 +42,20 @@ defmodule Ello.V3.Resolvers.FindPostTest do
           id
           token
           createdAt
+          assets {
+            id
+            attachment {
+              hdpi {
+                metadata {
+                  width
+                  height
+                  size
+                  type
+                }
+                url
+              }
+            }
+          }
           author {
             id
             username

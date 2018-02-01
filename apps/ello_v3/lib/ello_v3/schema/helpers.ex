@@ -9,6 +9,8 @@ defmodule Ello.V3.Schema.Helpers do
     {:ok, %{version: get_image_version(image_struct, name), image: image_struct}}
   end
 
+  def source_self(_, %{source: source}), do: {:ok, source}
+
   defp get_image_version(image, :original) do
     %{url: image_url(image.path, image.filename), filename: image.filename}
   end

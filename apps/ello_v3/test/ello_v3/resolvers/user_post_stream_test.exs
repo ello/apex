@@ -85,13 +85,34 @@ defmodule Ello.V3.Resolvers.UserPostStreamTest do
             id
             username
             name
-            posts_adult_content
-            has_commenting_enabled
-            has_reposting_enabled
-            has_sharing_enabled
-            has_loves_enabled
-            is_collaborateable
-            is_hireable
+            location
+            formatted_short_bio
+            badges
+            current_user_state {
+              relationship_priority
+            }
+            external_links_list {
+              icon
+              type
+              url
+              text
+            }
+            stats {
+              loves_count
+              followers_count
+              following_count
+              posts_count
+              total_views_count
+            }
+            settings {
+              posts_adult_content
+              has_commenting_enabled
+              has_reposting_enabled
+              has_sharing_enabled
+              has_loves_enabled
+              is_collaborateable
+              is_hireable
+            }
             avatar {
               original {
                 url
@@ -127,18 +148,20 @@ defmodule Ello.V3.Resolvers.UserPostStreamTest do
     """
     resp = post_graphql(%{query: query})
     json = json_response(resp)
-    author_keys = Map.keys(hd(json["data"]["userPostStream"]["posts"])["author"])
+    author = hd(json["data"]["userPostStream"]["posts"])["author"]
+    author_keys = Map.keys(author)
+    settings_keys = Map.keys(author["settings"])
     assert "id" in author_keys
     assert "username" in author_keys
     assert "name" in author_keys
     assert "avatar" in author_keys
     assert "cover_image" in author_keys
-    assert "posts_adult_content" in author_keys
-    assert "has_commenting_enabled" in author_keys
-    assert "has_reposting_enabled" in author_keys
-    assert "has_sharing_enabled" in author_keys
-    assert "has_loves_enabled" in author_keys
-    assert "is_collaborateable" in author_keys
-    assert "is_hireable" in author_keys
+    assert "posts_adult_content" in settings_keys
+    assert "has_commenting_enabled" in settings_keys
+    assert "has_reposting_enabled" in settings_keys
+    assert "has_sharing_enabled" in settings_keys
+    assert "has_loves_enabled" in settings_keys
+    assert "is_collaborateable" in settings_keys
+    assert "is_hireable" in settings_keys
   end
 end

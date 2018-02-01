@@ -46,10 +46,6 @@ defmodule Ello.V3.Schema.ContentTypes do
     field :watching, :boolean, resolve: &post_watching/2
   end
 
-  object :asset do
-    field :id, :id
-  end
-
   object :content_blocks do
     field :link_url, :string, resolve: &str_get/2
     field :kind, :string, resolve: &str_get/2
@@ -83,7 +79,5 @@ defmodule Ello.V3.Schema.ContentTypes do
 
   defp post_watching(_, %{source: %{watch_from_current_user: %Watch{}}}), do: true
   defp post_watching(_, _), do: {:ok, false}
-
-  defp source_self(_, %{source: source}), do: {:ok, source}
 end
 
