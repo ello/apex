@@ -3,6 +3,7 @@ defmodule Ello.V3.Schema do
   alias Ello.V3.Resolvers
   alias Ello.V3.Middleware
 
+  import_types Absinthe.Type.Custom
   import_types __MODULE__.ContentTypes
   import_types __MODULE__.NetworkTypes
 

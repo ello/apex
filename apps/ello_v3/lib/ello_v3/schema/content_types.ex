@@ -1,5 +1,10 @@
 defmodule Ello.V3.Schema.ContentTypes do
   use Absinthe.Schema.Notation
+  alias Ello.Core.Content.{
+    Post,
+    Love,
+    Watch,
+  }
 
   enum :stream_type do
     value :recent
@@ -20,11 +25,27 @@ defmodule Ello.V3.Schema.ContentTypes do
   object :post do
     field :id, :id
     field :token, :string
+    field :created_at, :datetime
     field :reposted_source, :post
     field :assets, list_of(:asset)
     field :author, :user
     field :summary, list_of(:content_blocks), resolve: &post_summary/2
     field :content, list_of(:content_blocks), resolve: &post_content/2
+    field :post_stats, :post_stats, resolve: &source_self/2
+    field :current_user_state, :post_current_user_state, resolve: &source_self/2
+  end
+
+  object :post_stats do
+    field :loves_count, :integer
+    field :comments_count, :integer
+    field :reposts_count, :integer
+    field :views_count, :integer
+  end
+
+  object :post_current_user_state do
+    field :reposted, :boolean, resolve: &post_reposted/2
+    field :loved, :boolean, resolve: &post_loved/2
+    field :watching, :boolean, resolve: &post_watching/2
   end
 
   object :asset do
@@ -56,9 +77,20 @@ defmodule Ello.V3.Schema.ContentTypes do
     do: {:ok, post_content}
 
 
+  defp post_reposted(_, %{source: %{repost_from_current_user: %Post{}}}), do: {:ok, true}
+  defp post_reposted(_, _), do: {:ok, false}
+
+  defp post_loved(_, %{source: %{love_from_current_user: %Love{deleted: deleted}}}), do: {:ok, !deleted}
+  defp post_loved(_, _), do: {:ok, false}
+
+  defp post_watching(_, %{source: %{watch_from_current_user: %Watch{}}}), do: true
+  defp post_watching(_, _), do: {:ok, false}
+
   # Gets a json field propery with a string instead of atom name.
   defp str_get(_, %{source: source, definition: %{schema_node: %{identifier: name}}}) do
     {:ok, Map.get(source, "#{name}")}
   end
+
+  defp source_self(_, %{source: source}), do: {:ok, source}
 end
 
