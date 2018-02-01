@@ -73,4 +73,72 @@ defmodule Ello.V3.Resolvers.UserPostStreamTest do
     json = json_response(resp)
     assert json["data"]["userPostStream"] == %{"next" => nil, "posts" => []}
   end
+
+  test "Returns all required author data for iOS", context do
+    query = """
+    {
+      userPostStream(username: "#{context.user.username}") {
+        next
+        posts {
+          id
+          author {
+            id
+            username
+            name
+            posts_adult_content
+            has_commenting_enabled
+            has_reposting_enabled
+            has_sharing_enabled
+            has_loves_enabled
+            is_collaborateable
+            is_hireable
+            avatar {
+              original {
+                url
+              }
+              large {
+                metadata {
+                  width
+                  height
+                  size
+                  type
+                }
+                url
+              }
+            }
+            cover_image {
+              original {
+                url
+              }
+              hdpi {
+                metadata {
+                  width
+                  height
+                  size
+                  type
+                }
+                url
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    resp = post_graphql(%{query: query})
+    json = json_response(resp)
+    author_keys = Map.keys(hd(json["data"]["userPostStream"]["posts"])["author"])
+    assert "id" in author_keys
+    assert "username" in author_keys
+    assert "name" in author_keys
+    assert "avatar" in author_keys
+    assert "cover_image" in author_keys
+    assert "posts_adult_content" in author_keys
+    assert "has_commenting_enabled" in author_keys
+    assert "has_reposting_enabled" in author_keys
+    assert "has_sharing_enabled" in author_keys
+    assert "has_loves_enabled" in author_keys
+    assert "is_collaborateable" in author_keys
+    assert "is_hireable" in author_keys
+  end
 end
