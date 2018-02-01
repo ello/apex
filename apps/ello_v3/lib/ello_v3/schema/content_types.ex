@@ -29,6 +29,7 @@ defmodule Ello.V3.Schema.ContentTypes do
     field :author, :user
     field :summary, list_of(:content_blocks), resolve: &post_summary/2
     field :content, list_of(:content_blocks), resolve: &post_content/2
+    field :repost_content, list_of(:content_blocks), resolve: &repost_content/2
     field :post_stats, :post_stats, resolve: &source_self/2
     field :current_user_state, :post_current_user_state, resolve: &source_self/2
   end
@@ -79,5 +80,8 @@ defmodule Ello.V3.Schema.ContentTypes do
 
   defp post_watching(_, %{source: %{watch_from_current_user: %Watch{}}}), do: true
   defp post_watching(_, _), do: {:ok, false}
+
+  defp repost_content(_, %{source: %{reposted_source: %{rendered_content: c}}}), do: {:ok, c}
+  defp repost_content(_, _), do: {:ok, []}
 end
 

@@ -60,6 +60,14 @@ defmodule Ello.V3.Resolvers.FindPostTest do
             id
             username
           }
+          repostContent {
+            linkUrl
+            kind
+            data
+            links {
+              assetId
+            }
+          }
           summary {
             linkUrl
             kind
