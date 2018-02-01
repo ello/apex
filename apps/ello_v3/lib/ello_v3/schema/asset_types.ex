@@ -4,7 +4,9 @@ defmodule Ello.V3.Schema.AssetTypes do
 
   object :asset do
     field :id, :id
-    field :attachment, :responsive_image_versions
+    field :attachment, :responsive_image_versions, resolve: fn(_args, %{source: post}) ->
+      {:ok, post.attachment_struct}
+    end
   end
 
   object :tshirt_image_versions do
