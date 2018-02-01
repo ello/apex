@@ -30,9 +30,7 @@ defmodule Ello.V3.Schema.AssetTypes do
     field :metadata, :metadata, resolve: fn(_args, %{source: %{version: version}}) ->
       {:ok, version}
     end
-    field :url, :string, resolve: fn(_args, %{source: %{version: version, image: image}, context: context}) ->
-      {:ok, image_url(image.path, filename(version, image, context))}
-    end
+    field :url, :string, resolve: &url_from_version/2
   end
 
   object :metadata do
@@ -52,4 +50,9 @@ defmodule Ello.V3.Schema.AssetTypes do
                 %{assigns: %{allow_nudity: false}}), do: version.pixellated_filename
   # _ + _ = normal
   defp filename(version, _, _), do: version.filename
+
+  defp url_from_version(_, %{source: %{version: nil}}),
+    do: {:ok, nil}
+  defp url_from_version(_, %{source: %{version: version, image: image}, context: context}),
+    do: {:ok, image_url(image.path, filename(version, image, context))}
 end
