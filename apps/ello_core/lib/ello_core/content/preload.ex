@@ -52,7 +52,7 @@ defmodule Ello.Core.Content.Preload do
   defp prefetch_assets_and_author(post_or_posts, %{current_user: current_user}) do
     measure_segment {:db, "Ecto.PostAssetAndAuthorPreload"} do
       post_or_posts
-      |> Repo.preload([assets: [], artist_invite_submission: [], author: &Network.users(%{ids: &1, current_user: current_user})])
+      |> Repo.preload([assets: [], artist_invite_submission: [:artist_invite], author: &Network.users(%{ids: &1, current_user: current_user})])
       |> filter_assets
     end
   end
