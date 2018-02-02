@@ -4,10 +4,11 @@ defmodule Ello.V3.Resolvers.FindPostTest do
   setup do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
 
+    cat1 = Script.insert(:lacross_category)
     user = Factory.insert(:user)
     post = Factory.insert(:post, author: user)
     reposter = Factory.insert(:user)
-    repost = Factory.insert(:post, reposted_source: post, author: reposter)
+    repost = Factory.insert(:post, reposted_source: post, author: reposter, category_ids: [cat1.id])
     {:ok, %{user: user, post: post, repost: repost, reposter: reposter}}
   end
 
@@ -35,6 +36,29 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     assert json["summary"] == post.rendered_summary
   end
 
+  # promotionals {
+  #   post_token
+  #   user {
+  #     id
+  #     username
+  #     avatar {
+  #       small {
+  #         url
+  #       }
+  #     }
+  #   }
+  #   image {
+  #     hdpi {
+  #       url
+  #       metadata {
+  #         width
+  #         height
+  #         size
+  #         type
+  #       }
+  #     }
+  #   }
+  # }
   test "Full post representation with a repost", %{user: user, post: post, repost: repost, reposter: reposter} do
     query = """
       query($username: String!, $token: String!) {
@@ -42,6 +66,22 @@ defmodule Ello.V3.Resolvers.FindPostTest do
           id
           token
           createdAt
+          categories {
+            id
+            slug
+            roshi_slug
+            tile_image {
+              small {
+                url
+                metadata {
+                  width
+                  height
+                  size
+                  type
+                }
+              }
+            }
+          }
           assets {
             id
             attachment {
@@ -136,7 +176,7 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     """
 
     resp = post_graphql(%{query: query, variables: %{username: reposter.username, token: repost.token}})
-    assert %{"data" => %{"post" => json}} = json_response(resp)
+    assert %{"data" => %{"post" => json}} = json_response(resp) |> IO.inspect()
 
     assert json["id"] == "#{repost.id}"
     assert json["author"]["id"] == "#{reposter.id}"

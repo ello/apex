@@ -5,6 +5,7 @@ defmodule Ello.V3.Schema do
 
   import_types Absinthe.Type.Custom
   import_types __MODULE__.ContentTypes
+  import_types __MODULE__.DiscoveryTypes
   import_types __MODULE__.NetworkTypes
   import_types __MODULE__.AssetTypes
 

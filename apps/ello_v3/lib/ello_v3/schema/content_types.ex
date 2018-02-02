@@ -26,6 +26,7 @@ defmodule Ello.V3.Schema.ContentTypes do
     field :created_at, :datetime
     field :reposted_source, :post
     field :assets, list_of(:asset)
+    field :categories, list_of(:category)
     field :author, :user
     field :summary, list_of(:content_blocks), resolve: &post_summary/2
     field :content, list_of(:content_blocks), resolve: &post_content/2
