@@ -65,7 +65,7 @@ defmodule Ello.V3.Resolvers.FindPostTest do
             kind
             data
             links {
-              assetId
+              assets
             }
           }
           summary {
@@ -73,7 +73,7 @@ defmodule Ello.V3.Resolvers.FindPostTest do
             kind
             data
             links {
-              assetId
+              assets
             }
           }
           content {
@@ -81,7 +81,7 @@ defmodule Ello.V3.Resolvers.FindPostTest do
             kind
             data
             links {
-              assetId
+              assets
             }
           }
           postStats {
@@ -104,7 +104,7 @@ defmodule Ello.V3.Resolvers.FindPostTest do
               kind
               data
               links {
-                assetId
+                assets
               }
             }
             content {
@@ -112,7 +112,7 @@ defmodule Ello.V3.Resolvers.FindPostTest do
               kind
               data
               links {
-                assetId
+                assets
               }
             }
             author {

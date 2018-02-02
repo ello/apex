@@ -55,7 +55,7 @@ defmodule Ello.V3.Schema.ContentTypes do
   end
 
   object :content_links do
-    field :asset_id, :id, resolve: &str_get/2
+    field :assets, :id, resolve: &str_get/2
   end
 
   scalar :content_data do
