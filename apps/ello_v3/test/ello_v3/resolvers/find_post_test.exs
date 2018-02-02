@@ -7,8 +7,11 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     cat1 = Script.insert(:lacross_category)
     user = Factory.insert(:user)
     post = Factory.insert(:post, author: user)
+    a_inv = Factory.insert(:artist_invite, %{id: 1, status: "closed"})
+    Factory.insert(:artist_invite_submission, post: post, artist_invite: a_inv, status: "approved")
     reposter = Factory.insert(:user)
     repost = Factory.insert(:post, reposted_source: post, author: reposter, category_ids: [cat1.id])
+    Factory.insert(:artist_invite_submission, post: repost, artist_invite: a_inv, status: "approved")
     {:ok, %{user: user, post: post, repost: repost, reposter: reposter}}
   end
 
@@ -66,6 +69,12 @@ defmodule Ello.V3.Resolvers.FindPostTest do
           id
           token
           createdAt
+          artist_invite_id
+          artist_invite_submission {
+            slug
+            title
+            status
+          }
           categories {
             id
             slug

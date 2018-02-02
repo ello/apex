@@ -8,6 +8,7 @@ defmodule Ello.V3.Schema do
   import_types __MODULE__.DiscoveryTypes
   import_types __MODULE__.NetworkTypes
   import_types __MODULE__.AssetTypes
+  import_types __MODULE__.ContestTypes
 
   query do
     @desc "Get a post by username and token"
