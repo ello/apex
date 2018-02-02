@@ -78,7 +78,7 @@ defmodule Ello.V3.Schema.ContentTypes do
   defp post_loved(_, %{source: %{love_from_current_user: %Love{deleted: deleted}}}), do: {:ok, !deleted}
   defp post_loved(_, _), do: {:ok, false}
 
-  defp post_watching(_, %{source: %{watch_from_current_user: %Watch{}}}), do: true
+  defp post_watching(_, %{source: %{watch_from_current_user: %Watch{}}}), do: {:ok, true}
   defp post_watching(_, _), do: {:ok, false}
 
   defp repost_content(_, %{source: %{reposted_source: %{rendered_content: c}}}), do: {:ok, c}
