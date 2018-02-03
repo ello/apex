@@ -71,6 +71,7 @@ defmodule Ello.V3.Resolvers.FindPostTest do
           createdAt
           artist_invite_id
           artist_invite_submission {
+            id
             slug
             title
             status
@@ -185,7 +186,7 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     """
 
     resp = post_graphql(%{query: query, variables: %{username: reposter.username, token: repost.token}})
-    assert %{"data" => %{"post" => json}} = json_response(resp) |> IO.inspect()
+    assert %{"data" => %{"post" => json}} = json_response(resp)
 
     assert json["id"] == "#{repost.id}"
     assert json["author"]["id"] == "#{reposter.id}"
