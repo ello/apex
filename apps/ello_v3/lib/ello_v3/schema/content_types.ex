@@ -98,6 +98,7 @@ defmodule Ello.V3.Schema.ContentTypes do
     case get_submission(post) do
       nil        -> {:ok, %{slug: nil, title: nil, status: nil}}
       submission -> {:ok, %{
+        id: submission.id,
         slug: submission.artist_invite.slug,
         title: submission.artist_invite.title,
         status: submission_status(submission)
