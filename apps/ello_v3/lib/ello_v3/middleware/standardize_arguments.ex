@@ -38,8 +38,10 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
   defp per_page(%{per_page: per_page}), do: per_page
   defp per_page(_), do: @default_page_size
 
-  def preloads(%{path: [bp | _]}) do
-    find_preloads(bp, %{})
+  defp preloads(%{definition: field} = thing) do
+    IO.inspect(thing.definition.__struct__)
+    find_preloads(field, %{})
+    |> IO.inspect
   end
 
   # Root and query types are droped so we just get a list of the preloads
@@ -53,16 +55,24 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
     :tile_image, # Category
   ]
 
-  def find_preloads(%{selections: []}, preloads),
+  defp find_preloads(%{selections: []}, preloads),
     do: preloads
-  def find_preloads(selections, preloads) when is_list(selections),
+  defp find_preloads(selections, preloads) when is_list(selections),
     do: Enum.reduce(selections, preloads, &find_preloads/2)
-  def find_preloads(%{schema_node: %{type: t}, selections: s}, p) when t in @query_types,
+  defp find_preloads(%{schema_node: %{type: t}, selections: s}, p) when t in @query_types,
     do: find_preloads(s, p)
-  def find_preloads(%{schema_node: %{identifier: f}, selections: s}, p) when f in @root_fields,
+  defp find_preloads(%{schema_node: %{identifier: f}, selections: s}, p) when f in @root_fields,
     do: find_preloads(s, p)
-  def find_preloads(%{schema_node: %{identifier: f}}, p) when f in @ignore_fields,
+  defp find_preloads(%{schema_node: %{identifier: f}}, p) when f in @ignore_fields,
     do: p
-  def find_preloads(%{schema_node: %{identifier: field}, selections: selections}, preloads),
+  defp find_preloads(%{schema_node: %{identifier: field}, selections: selections}, preloads),
     do: Map.put(preloads, field, find_preloads(selections, %{}))
+  defp find_preloads(thing, preloads) do
+    IO.inspect("====START UNKNOWN====")
+    IO.inspect(preloads)
+    IO.inspect(thing.__struct__)
+    IO.inspect(Map.keys(thing))
+    IO.inspect("====END UNKNOWN====")
+    preloads
+  end
 end
