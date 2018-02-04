@@ -7,7 +7,7 @@ defmodule Ello.V3.Schema.NetworkTypes do
     field :username, :string
     field :name, :string
     field :settings, :user_settings
-    field :stats, :user_stats, resolve: &source_self/2
+    field :user_stats, :user_stats, resolve: &source_self/2
     field :location, :string
     field :formatted_short_bio, :string
     field :badges, list_of(:string)

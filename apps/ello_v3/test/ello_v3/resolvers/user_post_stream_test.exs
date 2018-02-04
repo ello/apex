@@ -97,7 +97,7 @@ defmodule Ello.V3.Resolvers.UserPostStreamTest do
               url
               text
             }
-            stats {
+            user_stats {
               loves_count
               followers_count
               following_count

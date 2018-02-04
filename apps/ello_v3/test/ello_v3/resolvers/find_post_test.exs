@@ -69,12 +69,14 @@ defmodule Ello.V3.Resolvers.FindPostTest do
           id
           token
           createdAt
-          artist_invite_id
-          artist_invite_submission {
+          artistInviteSubmission {
             id
-            slug
-            title
             status
+            artistInvite {
+              id
+              slug
+              title
+            }
           }
           categories {
             id
@@ -179,6 +181,15 @@ defmodule Ello.V3.Resolvers.FindPostTest do
               loved
               reposted
               watching
+            }
+            artistInviteSubmission {
+              id
+              status
+              artistInvite {
+                id
+                slug
+                title
+              }
             }
           }
         }
