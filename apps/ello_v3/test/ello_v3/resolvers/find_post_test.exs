@@ -69,12 +69,14 @@ defmodule Ello.V3.Resolvers.FindPostTest do
           id
           token
           createdAt
-          artist_invite_id
-          artist_invite_submission {
+          artistInviteSubmission {
             id
-            slug
-            title
             status
+            artistInvite {
+              id
+              slug
+              title
+            }
           }
           categories {
             id
@@ -180,6 +182,15 @@ defmodule Ello.V3.Resolvers.FindPostTest do
               reposted
               watching
             }
+            artistInviteSubmission {
+              id
+              status
+              artistInvite {
+                id
+                slug
+                title
+              }
+            }
           }
         }
       }
@@ -211,5 +222,70 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     assert json["repostedSource"]["currentUserState"]["reposted"] == false
     assert json["repostedSource"]["currentUserState"]["loved"] == false
     assert json["repostedSource"]["currentUserState"]["watching"] == false
+  end
+
+  test "Full post representation via fragments with a repost", %{user: user, post: post, repost: repost, reposter: reposter} do
+    fragment_query = """
+      fragment imageVersionProps on Image {
+        url
+        metadata { height width type size }
+      }
+
+      fragment avatarImageVersion on TshirtImageVersions {
+        small { ...imageVersionProps }
+        regular { ...imageVersionProps }
+        large { ...imageVersionProps }
+        original { ...imageVersionProps }
+      }
+
+      fragment authorSummary on User {
+        id
+        username
+        name
+        avatar {
+          ...avatarImageVersion
+        }
+      }
+
+      fragment contentProps on ContentBlocks {
+        linkUrl
+        kind
+        data
+        links { assets }
+      }
+
+      fragment postSummary on Post {
+        id
+        token
+        createdAt
+        summary { ...contentProps }
+        author { ...authorSummary }
+        assets {
+          id
+          attachment {
+            hdpi {
+              url
+            }
+          }
+        }
+        postStats { lovesCount commentsCount viewsCount repostsCount }
+        currentUserState { watching loved reposted }
+      }
+
+      query($username: String!, $token: String!) {
+        post(username: $username, token: $token) {
+          ...postSummary
+          repostedSource {
+            ...postSummary
+          }
+        }
+      }
+    """
+    resp = post_graphql(%{query: fragment_query, variables: %{username: reposter.username, token: repost.token}})
+    assert %{"data" => %{"post" => json}} = json_response(resp)
+    assert json["id"] == "#{repost.id}"
+    assert json["author"]["id"] == "#{reposter.id}"
+    assert json["repostedSource"]["id"] == "#{post.id}"
+    assert json["repostedSource"]["author"]["id"] == "#{user.id}"
   end
 end
