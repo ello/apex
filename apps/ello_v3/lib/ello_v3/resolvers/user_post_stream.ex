@@ -20,7 +20,6 @@ defmodule Ello.V3.Resolvers.UserPostStream do
     DateTime.to_iso8601(List.last(posts).created_at)
   end
 
-  # TODO: this probably needs to be shared logic
   @filter_slop 2 # Don't 204 if one blocked post gets filtered out
   defp is_last_page(args, structs, filer_slop \\ @filter_slop)
   defp is_last_page(_, [], _), do: true
