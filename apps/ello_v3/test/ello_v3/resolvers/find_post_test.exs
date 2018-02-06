@@ -39,29 +39,6 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     assert json["summary"] == post.rendered_summary
   end
 
-  # promotionals {
-  #   post_token
-  #   user {
-  #     id
-  #     username
-  #     avatar {
-  #       small {
-  #         url
-  #       }
-  #     }
-  #   }
-  #   image {
-  #     hdpi {
-  #       url
-  #       metadata {
-  #         width
-  #         height
-  #         size
-  #         type
-  #       }
-  #     }
-  #   }
-  # }
   test "Full post representation with a repost", %{user: user, post: post, repost: repost, reposter: reposter} do
     query = """
       query($username: String!, $token: String!) {
