@@ -18,28 +18,12 @@ defmodule Ello.V3.Schema do
       resolve &Resolvers.FindPost.call/3
     end
 
-    @desc "Stream of all posts on network"
-    field :firehose_post_stream, :post_stream do
-      resolve &Resolvers.Stream.firehose/3
-      arg :before, :string, description: "Pagination cursor, returned by previous page"
-      arg :per_page, :integer, default_value: 25
-    end
-
     @desc "Stream of a user's posts"
     field :user_post_stream, :post_stream do
       resolve &Resolvers.UserPostStream.call/3
       arg :username, non_null(:string)
       arg :before, :string, description: "Pagination cursor, returned by previous page"
       arg :per_page, :integer, default_value: 10
-    end
-
-    @desc "Stream of posts by category"
-    field :categories_post_stream, :post_stream do
-      resolve &Resolvers.Stream.categories/3
-      arg :categories, list_of(:id), description: "List of category ids to get posts stream for"
-      arg :stream_type, non_null(:stream_type), description: "Type of stream to return, one of RECENT, FEATURED, or TRENDING"
-      arg :before, :string, description: "Pagination cursor, returned by previous page"
-      arg :per_page, :integer, default_value: 25
     end
   end
 
