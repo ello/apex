@@ -13,6 +13,7 @@ defmodule Ello.V3 do
     """
     use Plug.Router
     plug Ello.Auth.RequireToken
+    plug Ello.Auth.ClientProperties
     plug Ello.V3.Context
     plug :match
     plug :dispatch

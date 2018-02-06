@@ -35,7 +35,7 @@ defmodule Ello.V2.Web do
     quote do
       unquote(public_controller())
       plug Ello.Auth.RequireToken
-      plug Ello.V2.ClientProperties
+      plug Ello.Auth.ClientProperties
       import Ello.Auth
       import Ello.V2.PostViewTracking
       import Ello.V2.Render

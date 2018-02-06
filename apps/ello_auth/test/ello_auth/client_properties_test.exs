@@ -1,7 +1,11 @@
-defmodule Ello.V2.ClientPropertiesTest do
-  use Ello.V2.ConnCase
-  alias Ello.V2.ClientProperties
+defmodule Ello.Auth.ClientPropertiesTest do
+  use Ello.Auth.Case
+  alias Ello.Auth.ClientProperties
   alias Ello.Core.Network.User
+
+  setup do
+    {:ok, conn: Plug.Test.conn(:get, "/doesnotmatter")}
+  end
 
   test "detects android", %{conn: conn} do
     conn = conn

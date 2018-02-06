@@ -9,7 +9,7 @@ defmodule Ello.V3.Context do
   def build_context(%Plug.Conn{assigns: assigns}),
     do: %{
       current_user: assigns[:current_user],
-      allow_nudity: true,
-      allow_nsfw: false,
+      allow_nudity: assigns[:allow_nudity],
+      allow_nsfw: assigns[:allow_nsfw],
     }
 end
