@@ -26,7 +26,7 @@ defmodule Ello.V3.Schema.Helpers do
   end
 
   defp asset_host(filename) do
-    asset_host = "https://" <> Application.get_env(:ello_v2, :asset_host)
+    asset_host = "https://" <> Application.get_env(:ello_v3, :asset_host)
 
     if String.contains?(asset_host, "%d") do
       String.replace(asset_host, "%d", asset_host_number(filename))
