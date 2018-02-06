@@ -152,7 +152,7 @@ defmodule Ello.V2.CategoryPostControllerTest do
   end
 
   @tag :json_schema
-  test "GET /v2/categoreis/:slug/posts/trending - json schema", %{conn: conn, posts: posts} do
+  test "GET /v2/categories/:slug/posts/trending - json schema", %{conn: conn, posts: posts} do
     Enum.each(posts, &Index.add/1)
     conn = get(conn, category_post_path(conn, :trending, "cat1"))
     assert :ok = validate_json("post", json_response(conn, 200))

@@ -1,4 +1,4 @@
-defmodule Ello.V2.ClientProperties do
+defmodule Ello.Auth.ClientProperties do
   use Plug.Builder
 
   plug :android

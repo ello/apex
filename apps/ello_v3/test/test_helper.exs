@@ -1,0 +1,5 @@
+{:ok, _} = Application.ensure_all_started(:ex_machina)
+{:ok, _} = Application.ensure_all_started(:ello_core)
+Absinthe.Test.prime(Ello.V3.Schema)
+ExUnit.start()
+Ecto.Adapters.SQL.Sandbox.mode(Ello.Core.Repo, :manual)

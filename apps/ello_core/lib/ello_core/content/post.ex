@@ -59,6 +59,7 @@ defmodule Ello.Core.Content.Post do
   In particular done include assets that have a nil attachment field or are not
   included in the content of the post.
   """
+  def filter_assets(%__MODULE__{assets: %{}} = post), do: post
   def filter_assets(%__MODULE__{assets: []} = post), do: post
   def filter_assets(%__MODULE__{assets: assets} = post) do
     linked_asset_ids = Enum.reduce post.body, [], fn
