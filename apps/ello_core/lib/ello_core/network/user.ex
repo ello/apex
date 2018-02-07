@@ -33,6 +33,7 @@ defmodule Ello.Core.Network.User do
     field :category_ids, {:array, :integer}, default: []
     field :categories, {:array, :map}, default: [], virtual: true
     field :badges, {:array, :string}, default: []
+    field :followed_category_ids, {:array, :integer}, default: []
 
     field :locked_at, :utc_datetime
     field :locked_reason, :string

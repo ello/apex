@@ -3,6 +3,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
 
   object :category do
     field :id, :id
+    field :name, :string
     field :slug, :string
     field :roshi_slug, :string
     field :level, :string

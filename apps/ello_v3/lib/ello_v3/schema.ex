@@ -25,6 +25,11 @@ defmodule Ello.V3.Schema do
       arg :before, :string, description: "Pagination cursor, returned by previous page"
       arg :per_page, :integer, default_value: 10
     end
+
+    @desc "Returns a list of categories for the navbar"
+    field :category_nav, list_of(:category) do
+      resolve &Resolvers.UserCategories.call/3
+    end
   end
 
   @doc """
@@ -37,4 +42,3 @@ defmodule Ello.V3.Schema do
   end
   def middleware(middle, _field, _object), do: middle
 end
-
