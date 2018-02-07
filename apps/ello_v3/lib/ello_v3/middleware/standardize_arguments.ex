@@ -46,7 +46,7 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
   end
 
   # Root and query types are droped so we just get a list of the preloads
-  @root_fields [:post, :posts]
+  @root_fields [:post, :posts, :page_headers]
   @query_types [:post_stream]
 
   # Ignores fields are typically nested json we just don't need to add to the preloads.
@@ -54,6 +54,7 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
     :cover_image, :avatar, :external_links_list, # User
     :attachment, :repost_content, :summary, :content, # Post/Assets
     :tile_image, # Category
+    :cta_link, :image, # Promotionals/PagePromotional
   ]
 
   defp find_preloads(%{selections: []}, _fragments, preloads),

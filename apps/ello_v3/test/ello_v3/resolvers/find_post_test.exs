@@ -58,7 +58,6 @@ defmodule Ello.V3.Resolvers.FindPostTest do
           categories {
             id
             slug
-            roshi_slug
             tile_image {
               small {
                 url
