@@ -1,17 +1,26 @@
 defmodule Ello.V2.UserPostControllerTest do
   use Ello.V2.ConnCase, async: false
-  alias Ello.Core.Repo
+  alias Ello.Core.{Repo, Network}
+  alias Network.User
 
   setup %{conn: conn} do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
 
     user = Factory.insert(:user)
     author = Factory.insert(:user)
+    nsfw_author = Factory.insert(:user, %{settings: %User.Settings{posts_adult_content: true}})
     now = DateTime.utc_now |> DateTime.to_unix
     posts = Enum.map 1..8, fn (i) ->
       Factory.insert(:post, %{
         author:     author,
         created_at: DateTime.from_unix!(now - (i * 1000))
+      })
+    end
+    nsfw_posts = Enum.map 1..8, fn (i) ->
+      Factory.insert(:post, %{
+        author:           nsfw_author,
+        is_adult_content: true,
+        created_at:       DateTime.from_unix!(now - (i * 1000))
       })
     end
     post = hd(posts)
@@ -21,6 +30,7 @@ defmodule Ello.V2.UserPostControllerTest do
       author_conn: auth_conn(conn, author),
       user: user,
       author: author,
+      nsfw_author: nsfw_author,
       posts: posts,
       post: post
     ]}
@@ -29,6 +39,11 @@ defmodule Ello.V2.UserPostControllerTest do
   test "GET /v2/users/:id/posts", %{conn: conn, author: author} do
     response = get(conn, user_post_path(conn, :index, author))
     assert response.status == 200
+  end
+
+  test "GET /v2/users/:id/posts - no posts when no current user and author is NSFW", %{public_conn: conn, nsfw_author: author} do
+    response = get(conn, user_post_path(conn, :index, author))
+    assert response.status == 204
   end
 
   test "GET /v2/users/:id/posts - no posts", %{conn: conn} do
