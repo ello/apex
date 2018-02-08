@@ -28,6 +28,7 @@ defmodule Ello.Repo.Migrations.CreateUser do
       add :has_experimental_features, :boolean, default: false
       add :bad_for_seo?, :boolean, default: true
       add :category_ids, {:array, :integer}
+      add :followed_category_ids, {:array, :integer}
 
       add :is_community, :boolean
       add :badges, {:array, :string}
@@ -59,7 +60,6 @@ defmodule Ello.Repo.Migrations.CreateUser do
       # t.datetime "last_bounced_from_sendgrid_at"
       # t.datetime "last_bounced_from_mailchimp_at"
       # t.string   "web_onboarding_version",         limit: 255
-      # t.integer  "followed_category_ids",                                   array: true
     end
   end
 end
