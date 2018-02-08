@@ -18,6 +18,12 @@ defmodule Ello.V3.Schema do
       resolve &Resolvers.FindPost.call/3
     end
 
+    field :page_headers, list_of(:page_header) do
+      arg :kind, non_null(:page_header_kind), description: "What type of page headers to get"
+      arg :slug, :string, description: "Optional slug to further specify which pageHeaders to get"
+      resolve &Resolvers.PageHeaders.call/3
+    end
+
     @desc "Stream of a user's posts"
     field :user_post_stream, :post_stream do
       resolve &Resolvers.UserPostStream.call/3

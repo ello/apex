@@ -1,7 +1,7 @@
 defmodule Ello.Core.Discovery do
   import Ecto.Query
   alias Ello.Core.{Repo, Network}
-  alias __MODULE__.{Category, Editorial, Preload}
+  alias __MODULE__.{Category, Editorial, Preload, Promotional, PagePromotional}
   alias Network.User
 
   @moduledoc """
@@ -88,7 +88,7 @@ defmodule Ello.Core.Discovery do
   end
 
   @doc """
-  Return Categories.
+  Return Editorials
 
   Fetch options:
 
@@ -147,6 +147,49 @@ defmodule Ello.Core.Discovery do
   end
 
   defp editorial_before(before), do: String.replace(before, ~r"\D", "")
+
+  @doc """
+  Return Category Promotionals
+
+  Fetch options:
+
+    * slug - the category from which to get the promotion
+    * per_page - how many to get - pagination not supported, just a limit
+  """
+  @spec promotionals(options) :: [Promotional.t]
+  def promotionals(%{slug: slug, per_page: per_page} = options) do
+    Promotional
+    |> join(:left, [promotional], category in assoc(promotional, :category))
+    |> where([promotional, category], category.slug == ^slug)
+    |> limit(^per_page)
+    |> Repo.all
+    |> Preload.promotionals(options)
+  end
+
+  @doc """
+  Return Page Promotionals
+
+  Fetch options:
+
+    * slug - the category from which to get the promotion
+    * per_page - how many to get - pagination not supported, just a limit
+  """
+  @spec page_promotionals(options) :: [PagePromotional.t]
+  def page_promotionals(%{per_page: per_page} = options) do
+    PagePromotional
+    |> page_promotional_by_kind(options[:kind])
+    |> page_promotional_by_login_status(options[:current_user])
+    |> limit(^per_page)
+    |> Repo.all
+    |> Preload.promotionals(options)
+  end
+
+  defp page_promotional_by_kind(q, :editorial), do: where(q, is_editorial: true)
+  defp page_promotional_by_kind(q, :artist_invite), do: where(q, is_artist_invite: true)
+  defp page_promotional_by_kind(q, _), do: where(q, is_artist_invite: false, is_editorial: false)
+
+  defp page_promotional_by_login_status(q, nil), do: where(q, is_logged_in: false)
+  defp page_promotional_by_login_status(q, _), do: where(q, is_logged_in: true)
 
   @type categorizable :: User.t | Post.t | [User.t | Post.t]
 

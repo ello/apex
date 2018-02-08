@@ -1,6 +1,6 @@
 defmodule Ello.Core.Factory do
   alias Ello.Core.{Repo, Discovery, Network, Content, Contest}
-  alias Discovery.{Category, Promotional, Editorial}
+  alias Discovery.{Category, Promotional, Editorial, PagePromotional}
   alias Network.{User, Relationship, Flag}
   alias Content.{Post, Love, Watch, Asset}
   alias Contest.{ArtistInvite, ArtistInviteSubmission}
@@ -304,6 +304,24 @@ defmodule Ello.Core.Factory do
       created_at: DateTime.utc_now,
       updated_at: DateTime.utc_now,
     } |> Promotional.load_images
+  end
+
+  def page_promotional_factory do
+    %PagePromotional{
+      header: "Header",
+      sub_header: "Sub Header",
+      cta_href: nil,
+      cta_caption: nil,
+      is_logged_in: false,
+      is_editorial: false,
+      is_artist_invite: false,
+      image: "ello-optimized-da955f87.jpg",
+      image_metadata: %{},
+      post_token: "abc-123",
+      user: build(:user),
+      created_at: DateTime.utc_now,
+      updated_at: DateTime.utc_now,
+    } |> PagePromotional.load_images
   end
 
   def relationship_factory do
