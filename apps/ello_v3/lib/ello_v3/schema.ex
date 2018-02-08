@@ -36,6 +36,11 @@ defmodule Ello.V3.Schema do
     field :category_nav, list_of(:category) do
       resolve &Resolvers.UserCategories.call/3
     end
+
+    @desc "Returns a list of all categories"
+    field :all_categories, list_of(:category) do
+      resolve &Resolvers.Categories.call/3
+    end
   end
 
   @doc """
