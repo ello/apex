@@ -7,6 +7,7 @@ defmodule Ello.V2.StandardParams do
       current_user: assigns[:current_user],
       allow_nsfw:   assigns[:allow_nsfw],
       allow_nudity: assigns[:allow_nudity],
+      preloads:     nil,
 
       before:       before(params),
       per_page:     per_page(params, overrides[:default][:per_page]),

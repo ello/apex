@@ -7,6 +7,7 @@ defmodule Ello.Serve.StandardParams do
       current_user: nil,
       allow_nsfw:   true,
       allow_nudity: true,
+      preloads:     nil,
 
       before:       before(params),
       per_page:     per_page(params, overrides[:default][:per_page]),
