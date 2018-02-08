@@ -42,6 +42,14 @@ defmodule Ello.V3.Schema do
     field :all_categories, list_of(:category) do
       resolve &Resolvers.Categories.call/3
     end
+
+    @desc "Stream of posts across the network"
+    field :global_post_stream, :post_stream do
+      arg :kind, non_null(:stream_kind), description: "Which variation of the stream to return"
+      arg :before, :string, description: "Pagination cursor, returned by previous page"
+      arg :per_page, :integer, default_value: 25
+      resolve &Resolvers.GlobalPostStream.call/3
+    end
   end
 
   @doc """

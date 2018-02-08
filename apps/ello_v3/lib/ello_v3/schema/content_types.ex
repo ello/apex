@@ -7,7 +7,7 @@ defmodule Ello.V3.Schema.ContentTypes do
     Watch,
   }
 
-  enum :stream_type do
+  enum :stream_kind do
     value :recent
     value :featured
     value :trending
