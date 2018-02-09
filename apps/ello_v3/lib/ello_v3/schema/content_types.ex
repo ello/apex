@@ -37,10 +37,10 @@ defmodule Ello.V3.Schema.ContentTypes do
   end
 
   object :post_stats do
-    field :loves_count, :integer
-    field :comments_count, :integer
-    field :reposts_count, :integer
-    field :views_count, :integer
+    field :loves_count, :integer, resolve: &loves_count/2
+    field :comments_count, :integer, resolve: &comments_count/2
+    field :reposts_count, :integer, resolve: &reposts_count/2
+    field :views_count, :integer, resolve: &views_count/2
   end
 
   object :post_current_user_state do
@@ -91,5 +91,18 @@ defmodule Ello.V3.Schema.ContentTypes do
   defp artist_invite_submission(_, %{source: %{artist_invite_submission: %{id: _} = s}}),
     do: {:ok, s}
   defp artist_invite_submission(_, _), do: {:ok, nil}
+
+
+  def loves_count(_, %{source: %{reposted_source: %{loves_count: count}}}), do: {:ok, count}
+  def loves_count(_, %{source: %{loves_count: count}}), do: {:ok, count}
+
+  def comments_count(_, %{source: %{reposted_source: %{comments_count: count}}}), do: {:ok, count}
+  def comments_count(_, %{source: %{comments_count: count}}), do: {:ok, count}
+
+  def reposts_count(_, %{source: %{reposted_source: %{reposts_count: count}}}), do: {:ok, count}
+  def reposts_count(_, %{source: %{reposts_count: count}}), do: {:ok, count}
+
+  def views_count(_, %{source: %{reposted_source: %{views_count: count}}}), do: {:ok, count}
+  def views_count(_, %{source: %{views_count: count}}), do: {:ok, count}
 end
 
