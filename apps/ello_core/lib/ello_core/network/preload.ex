@@ -20,7 +20,7 @@ defmodule Ello.Core.Network.Preload do
   def users(nil, _), do: nil
   def users([], _),  do: []
   def users(user_or_users, %{preload: false}), do: user_or_users
-  def users(user_or_users, %{preloads: _} = options) do
+  def users(user_or_users, %{preloads: %{}} = options) do
     user_or_users
     |> preload_current_user_relationship(options)
     |> prefetch_user_counts(options)

@@ -51,7 +51,7 @@ defmodule Ello.V3.Resolvers.UserCategoriesTest do
           id
           name
           slug
-          tile_image {
+          tileImage {
             small {
               url
               metadata {
@@ -68,6 +68,7 @@ defmodule Ello.V3.Resolvers.UserCategoriesTest do
 
     resp = post_graphql(%{query: query})
     assert %{"data" => %{"categoryNav" => json}} = json_response(resp)
+    assert [c1 | _] = json
     assert to_string(context.cat1.id) in Enum.map(json, &(&1["id"]))
     assert to_string(context.cat2.id) in Enum.map(json, &(&1["id"]))
     assert to_string(context.cat3.id) in Enum.map(json, &(&1["id"]))
@@ -80,6 +81,7 @@ defmodule Ello.V3.Resolvers.UserCategoriesTest do
     assert to_string(context.cat2.slug) in Enum.map(json, &(&1["slug"]))
     assert to_string(context.cat3.slug) in Enum.map(json, &(&1["slug"]))
 
-    assert length(Enum.map(json, &(&1["tile_image"]))) === 3
+    assert length(Enum.map(json, &(&1["tileImage"]))) === 3
+    assert c1["tileImage"]["small"]
   end
 end

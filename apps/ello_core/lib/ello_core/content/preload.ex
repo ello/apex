@@ -39,7 +39,7 @@ defmodule Ello.Core.Content.Preload do
   @doc "Accepts a list of posts and preloads all related resources."
   def post_list(nil, _), do: nil
   def post_list([], _), do: []
-  def post_list(post_or_posts, %{preloads: _} = options) do
+  def post_list(post_or_posts, %{preloads: %{}} = options) do
     post_or_posts
     |> post_and_repost_preloads(options)
     |> prefetch_reposted_source(options)
@@ -50,7 +50,7 @@ defmodule Ello.Core.Content.Preload do
 
   def comment_list(nil, _), do: nil
   def comment_list([], _), do: []
-  def comment_list(comments, %{preloads: _} = options) do
+  def comment_list(comments, %{preloads: %{}} = options) do
     comments
     |> prefetch_assets_and_author(options)
     |> build_image_structs

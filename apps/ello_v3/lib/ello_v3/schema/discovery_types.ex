@@ -11,7 +11,6 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
       {:ok, category.tile_image_struct}
     end
     field :allow_in_onboarding, :boolean
-    field :header, :string
     field :is_creator_type, :boolean
     field :created_at, :datetime
   end

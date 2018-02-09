@@ -1,4 +1,5 @@
 defmodule Ello.V3.Resolvers.UserPostStream do
+  import Ello.V3.Resolvers.PaginationHelpers
 
   def call(parent, %{username: "~" <> username} = args, resolution),
     do: call(parent, %{args | username: username}, resolution)
@@ -13,18 +14,6 @@ defmodule Ello.V3.Resolvers.UserPostStream do
           posts: posts
         }}
       end
-  end
-
-  defp next_page([]), do: nil
-  defp next_page(posts) do
-    DateTime.to_iso8601(List.last(posts).created_at)
-  end
-
-  @filter_slop 2 # Don't 204 if one blocked post gets filtered out
-  defp is_last_page(args, structs, filer_slop \\ @filter_slop)
-  defp is_last_page(_, [], _), do: true
-  defp is_last_page(%{per_page: requested}, structs, filter_slop) do
-    if requested - filter_slop > length(structs), do: true, else: false
   end
 end
 
