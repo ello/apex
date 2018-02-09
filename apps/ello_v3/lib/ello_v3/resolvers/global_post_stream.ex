@@ -4,6 +4,7 @@ defmodule Ello.V3.Resolvers.GlobalPostStream do
   alias Ello.Core.Discovery
   alias Ello.Core.Contest
   import Ello.V3.Resolvers.PaginationHelpers
+  import Ello.V3.Resolvers.PostViewHelpers
   @global_recent_key "all_post_firehose"
 
   def call(_, %{kind: :trending} = args, _) do
@@ -16,7 +17,7 @@ defmodule Ello.V3.Resolvers.GlobalPostStream do
     }))
 
     {:ok, %{
-      posts: search.results,
+      posts: track(search.results, args, kind: :global_trending),
       next: search.next_page,
       is_last_page: search.total_pages == search.page,
     }}
@@ -34,7 +35,7 @@ defmodule Ello.V3.Resolvers.GlobalPostStream do
     }))
 
     {:ok, %{
-      posts: stream.posts,
+      posts: track(stream.posts, args, kind: :global_featured),
       next: stream.before,
       is_last_page: is_last_page(args, stream.posts)
     }}
@@ -47,7 +48,7 @@ defmodule Ello.V3.Resolvers.GlobalPostStream do
     }))
 
     {:ok, %{
-      posts: stream.posts,
+      posts: track(stream.posts, args, kind: :global_recent),
       next: stream.before,
       is_last_page: is_last_page(args, stream.posts)
     }}
