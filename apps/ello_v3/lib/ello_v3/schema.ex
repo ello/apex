@@ -51,6 +51,14 @@ defmodule Ello.V3.Schema do
       resolve &Resolvers.GlobalPostStream.call/3
     end
 
+    @desc "Aggregate post streams from all subscribed categories"
+    field :subscribed_post_stream, :post_stream do
+      arg :kind, non_null(:stream_kind), description: "Which variation of the stream to return"
+      arg :before, :string, description: "Pagination cursor, returned by previous page"
+      arg :per_page, :integer, default_value: 25
+      resolve &Resolvers.SubscribedPostStream.call/3
+    end
+
     @desc "Stream of a category's posts"
     field :category_post_stream, :category_post_stream do
       resolve &Resolvers.CategoryPostStream.call/3
