@@ -13,7 +13,7 @@ defmodule Ello.V3.Resolvers.CategoryPostStream do
       category ->
         search = Search.post_search(Map.merge(args, %{
           page:         trending_page_from_before(args),
-          category:     category.id,
+          category_ids: [category.id],
           trending:     true,
           within_days:  14,
           allow_nsfw:   false,

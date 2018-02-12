@@ -14,7 +14,7 @@ defmodule Ello.Search.Post.Search do
     allow_nudity:   false,
     query:          %{},
     language:       "en",
-    category:       nil,
+    category_ids:   [],
     images_only:    false,
     following:      false,
     results:        [],
@@ -38,7 +38,7 @@ defmodule Ello.Search.Post.Search do
     |> build_hashtag_query
     |> Ello.Search.paginate
     |> filter_has_images
-    |> filter_category
+    |> filter_categories
     |> filter_following
     |> filter_days
     |> Trending.build_boosting_queries
@@ -121,9 +121,9 @@ defmodule Ello.Search.Post.Search do
     update_bool(search_struct, :must_not, &([%{terms: %{author_id: current_user.all_blocked_ids}} | &1]))
   end
 
-  defp filter_category(%{category: nil} = search_struct), do: search_struct
-  defp filter_category(%{category: id} = search_struct) do
-    update_bool(search_struct, :filter, &([%{terms: %{category_ids: [id]}} | &1]))
+  defp filter_categories(%{category_ids: []} = search_struct), do: search_struct
+  defp filter_categories(%{category_ids: ids} = search_struct) do
+    update_bool(search_struct, :filter, &([%{terms: %{category_ids: ids}} | &1]))
   end
 
   defp filter_following(%{following: true, current_user: %{} = current_user} = search_struct) do

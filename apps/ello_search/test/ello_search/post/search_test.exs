@@ -316,7 +316,7 @@ defmodule Ello.Search.Post.SearchTest do
       allow_nsfw:   true,
       allow_nudity: true,
       current_user: context.current_user,
-      category:     context.cat1.id
+      category_ids: [context.cat1.id]
     }).results
 
     ids = Enum.map(results, &(&1.id))
@@ -330,7 +330,7 @@ defmodule Ello.Search.Post.SearchTest do
       allow_nsfw:   true,
       allow_nudity: true,
       current_user: context.current_user,
-      category:     context.cat100.id
+      category_ids: [context.cat100.id]
     }).results
 
     ids = Enum.map(results, &(&1.id))
