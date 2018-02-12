@@ -40,6 +40,7 @@ defmodule Ello.V3.Mixfile do
       {:ello_stream, in_umbrella: true},
       {:ello_search, in_umbrella: true},
       {:ello_auth,   in_umbrella: true},
+      {:ello_events, in_umbrella: true},
     ]
   end
 end
