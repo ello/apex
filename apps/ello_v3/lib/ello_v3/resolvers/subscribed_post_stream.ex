@@ -5,7 +5,7 @@ defmodule Ello.V3.Resolvers.SubscribedPostStream do
   import Ello.V3.Resolvers.PaginationHelpers
   import Ello.V3.Resolvers.PostViewHelpers
 
-  def call(_parent, %{current_user: nil} = args, _resolver), do: {:error, "Must be logged in"}
+  def call(_parent, %{current_user: nil}, _resolver), do: {:error, "Must be logged in"}
   def call(_, %{kind: :recent}, _), do: {:error, "Recent has not been implemented"}
   def call(_, %{kind: :trending, current_user: current_user} = args, _) do
     search = Search.post_search(Map.merge(args, %{
