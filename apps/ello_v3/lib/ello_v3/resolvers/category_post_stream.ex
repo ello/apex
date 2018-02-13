@@ -25,7 +25,7 @@ defmodule Ello.V3.Resolvers.CategoryPostStream do
         {:ok, %{
           id:    category.id,
           slug:  category.slug,
-          posts: track(search.results, args, kind: "#{String.downcase(category.name)}_trending"),
+          posts: track(search.results, args, %{kind: "category_trending", id: category.id}),
           next:  search.next_page,
           is_last_page: search.total_pages == search.page,
         }}
@@ -43,7 +43,7 @@ defmodule Ello.V3.Resolvers.CategoryPostStream do
         {:ok, %{
           id:    category.id,
           slug:  category.slug,
-          posts: track(stream.posts, args, kind: "#{String.downcase(category.name)}_featured"),
+          posts: track(stream.posts, args, %{kind: "category_featured", id: category.id}),
           next:  stream.before,
           is_last_page: is_last_page(args, stream.posts)
         }}
