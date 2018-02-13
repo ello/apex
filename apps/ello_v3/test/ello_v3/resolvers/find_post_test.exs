@@ -87,6 +87,7 @@ defmodule Ello.V3.Resolvers.FindPostTest do
           author {
             id
             username
+            currentUserState { relationshipPriority }
           }
           repostContent {
             linkUrl
@@ -146,6 +147,7 @@ defmodule Ello.V3.Resolvers.FindPostTest do
             author {
               id
               username
+              currentUserState { relationshipPriority }
             }
             postStats {
               lovesCount
@@ -171,12 +173,13 @@ defmodule Ello.V3.Resolvers.FindPostTest do
         }
       }
     """
-
-    resp = post_graphql(%{query: query, variables: %{username: reposter.username, token: repost.token}})
+    Factory.insert(:relationship, owner: user, subject: reposter, priority: "friend")
+    resp = post_graphql(%{query: query, variables: %{username: reposter.username, token: repost.token}}, user)
     assert %{"data" => %{"post" => json}} = json_response(resp)
 
     assert json["id"] == "#{repost.id}"
     assert json["author"]["id"] == "#{reposter.id}"
+    assert json["author"]["currentUserState"]["relationshipPriority"] == "friend"
     assert hd(json["summary"])["kind"] == "text"
     assert hd(json["summary"])["data"] == "<p>Phrasing!</p>"
     assert json["postStats"]["lovesCount"] == 0
@@ -189,6 +192,7 @@ defmodule Ello.V3.Resolvers.FindPostTest do
 
     assert json["repostedSource"]["id"] == "#{post.id}"
     assert json["repostedSource"]["author"]["id"] == "#{user.id}"
+    assert json["repostedSource"]["author"]["currentUserState"]["relationshipPriority"] == "self"
     assert hd(json["repostedSource"]["summary"])["data"] == "<p>Phrasing!</p>"
     assert hd(json["repostedSource"]["summary"])["kind"] == "text"
     assert json["repostedSource"]["postStats"]["lovesCount"] == 0
@@ -218,6 +222,7 @@ defmodule Ello.V3.Resolvers.FindPostTest do
         id
         username
         name
+        currentUserState { relationshipPriority }
         avatar {
           ...avatarImageVersion
         }
@@ -257,11 +262,14 @@ defmodule Ello.V3.Resolvers.FindPostTest do
         }
       }
     """
-    resp = post_graphql(%{query: fragment_query, variables: %{username: reposter.username, token: repost.token}})
+    Factory.insert(:relationship, owner: reposter, subject: user, priority: "friend")
+    resp = post_graphql(%{query: fragment_query, variables: %{username: reposter.username, token: repost.token}}, reposter)
     assert %{"data" => %{"post" => json}} = json_response(resp)
     assert json["id"] == "#{repost.id}"
     assert json["author"]["id"] == "#{reposter.id}"
+    assert json["author"]["currentUserState"]["relationshipPriority"] == "self"
     assert json["repostedSource"]["id"] == "#{post.id}"
     assert json["repostedSource"]["author"]["id"] == "#{user.id}"
+    assert json["repostedSource"]["author"]["currentUserState"]["relationshipPriority"] == "friend"
   end
 end
