@@ -3,6 +3,7 @@ defmodule Ello.V3.Resolvers.SubscribedPostStream do
   alias Ello.Core.Discovery
   alias Ello.Stream
   import Ello.V3.Resolvers.PaginationHelpers
+  import Ello.V3.Resolvers.PostViewHelpers
 
   def call(_parent, %{current_user: nil} = args, _resolver), do: {:error, "Must be logged in"}
   def call(_, %{kind: :recent}, _), do: {:error, "Recent has not been implemented"}
@@ -17,7 +18,7 @@ defmodule Ello.V3.Resolvers.SubscribedPostStream do
     }))
 
     {:ok, %{
-      posts: search.results,
+      posts: track(search.results, args, kind: :subscribed_trending),
       next: search.next_page,
       is_last_page: search.total_pages == search.page,
     }}
@@ -30,7 +31,7 @@ defmodule Ello.V3.Resolvers.SubscribedPostStream do
     }))
 
     {:ok, %{
-      posts: stream.posts,
+      posts: track(stream.posts, args, kind: :subscribed_featured),
       next:  stream.before,
       is_last_page: is_last_page(args, stream.posts)
     }}
