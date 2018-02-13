@@ -7,8 +7,6 @@ defmodule Ello.V3.Resolvers.CategoryPostStreamTest do
   @query """
     query($kind: StreamKind!, $id: String, $slug: String, $perPage: String, $before: String) {
       categoryPostStream(kind: $kind, id: $id, slug: $slug, before: $before, perPage: $perPage) {
-        id
-        slug
         next
         isLastPage
         posts { id }

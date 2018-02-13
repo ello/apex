@@ -20,15 +20,6 @@ defmodule Ello.V3.Schema.ContentTypes do
     field :posts, list_of(:post)
   end
 
-  object :category_post_stream do
-    field :id, :integer
-    field :slug, :string
-    field :next, :string
-    field :per_page, :integer
-    field :is_last_page, :boolean
-    field :posts, list_of(:post)
-  end
-
   object :post do
     field :id, :id
     field :token, :string

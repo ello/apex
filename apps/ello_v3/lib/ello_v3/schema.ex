@@ -60,7 +60,7 @@ defmodule Ello.V3.Schema do
     end
 
     @desc "Stream of a category's posts"
-    field :category_post_stream, :category_post_stream do
+    field :category_post_stream, :post_stream do
       resolve &Resolvers.CategoryPostStream.call/3
       arg :kind, non_null(:stream_kind), description: "Which variation of the stream to return"
       arg :id, :integer
