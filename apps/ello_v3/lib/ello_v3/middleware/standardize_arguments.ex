@@ -41,9 +41,6 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
   defp per_page(%{per_page: per_page}), do: per_page
   defp per_page(_), do: @default_page_size
 
-  defp preloads(%{definition: field, fragments: fragments}) do
-    find_preloads(field, fragments, %{})
-  end
 
   # Root and query types are droped so we just get a list of the preloads
   @root_fields [:post, :posts, :page_headers, :category_nav, :category_post_stream]
@@ -56,6 +53,26 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
     :tile_image, # Category
     :cta_link, :image, # Promotionals/PagePromotional
   ]
+
+  @doc """
+  Takes an Absinthe.Resolution parses the query AST and returns a map of preloads.
+
+  The AST representation of the GraphQL query built by Absinth is split into 2 parts.
+  The definition is the root type, such as "post_stream", the fragments are a map fragments
+  included in the query keyed by name.
+
+  The definintion is a deeply nested structure of reflecting the query, but with additional
+  server side data built in.
+
+  Preloads recursively parses that nested data structure and adds any items with children as map keys.
+  When a "Fragment.Spread" is encountered the fragment is grabbed from the keys fragments hash and
+  its selections are added directly to the current level.
+
+  We ignore certain fields even with children when we know they are not needed for preloading.
+  """
+  def preloads(%{definition: field, fragments: fragments}) do
+    find_preloads(field, fragments, %{})
+  end
 
   defp find_preloads(%{selections: []}, _fragments, preloads),
     do: preloads
@@ -71,6 +88,6 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
     Map.put(preloads, field, find_preloads(selections, fragments, %{}))
   end
   defp find_preloads(%Fragment.Spread{} = spread, fragments, preloads) do
-    find_preloads(Map.get(fragments, spread.name), fragments, preloads)
+    find_preloads(Map.get(fragments, spread.name).selections, fragments, preloads)
   end
 end

@@ -52,8 +52,8 @@ defmodule Ello.V3.Schema.NetworkTypes do
     field :relationship_priority, :string, resolve: &relationship_priority/2
   end
 
-  def relationship_priority(_, %{source: %{id: id}, context: %{current_user: %{id: id}}}), do: {:ok, "self"}
-  def relationship_priority(_, %{source: %{relationship_to_current_user: nil}}), do: {:ok, nil}
-  def relationship_priority(_, %{source: %{relationship_to_current_user: %{priority: p}}}), do: {:ok, p}
-  def relationship_priority(_args, _resolution), do: {:ok, nil}
+  defp relationship_priority(_, %{source: %{id: id}, context: %{current_user: %{id: id}}}), do: {:ok, "self"}
+  defp relationship_priority(_, %{source: %{relationship_to_current_user: nil}}), do: {:ok, nil}
+  defp relationship_priority(_, %{source: %{relationship_to_current_user: %{priority: p}}}), do: {:ok, p}
+  defp relationship_priority(_args, _resolution), do: {:ok, nil}
 end

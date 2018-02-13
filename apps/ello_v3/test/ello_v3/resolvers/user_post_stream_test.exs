@@ -117,7 +117,9 @@ defmodule Ello.V3.Resolvers.UserPostStreamTest do
       }
     }
     """
-    resp = post_graphql(%{query: query})
+    current_user = Factory.insert(:user)
+    Factory.insert(:relationship, owner: current_user, subject: context.user, priority: "friend")
+    resp = post_graphql(%{query: query}, current_user)
     json = json_response(resp)
     author = hd(json["data"]["userPostStream"]["posts"])["author"]
     author_keys = Map.keys(author)
@@ -134,5 +136,6 @@ defmodule Ello.V3.Resolvers.UserPostStreamTest do
     assert "has_loves_enabled" in settings_keys
     assert "is_collaborateable" in settings_keys
     assert "is_hireable" in settings_keys
+    assert author["current_user_state"]["relationship_priority"] == "friend"
   end
 end
