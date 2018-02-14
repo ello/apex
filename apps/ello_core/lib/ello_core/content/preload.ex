@@ -28,6 +28,7 @@ defmodule Ello.Core.Content.Preload do
       categories: %{},
       artist_invite_submission: %{artist_invite: %{}},
       author: %{current_user_state: %{}, user_stats: %{}},
+      post_stats: %{},
     }
   }
 
