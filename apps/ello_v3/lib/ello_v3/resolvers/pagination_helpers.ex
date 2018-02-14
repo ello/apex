@@ -9,7 +9,7 @@ defmodule Ello.V3.Resolvers.PaginationHelpers do
   def is_last_page(args, structs, filer_slop \\ @filter_slop)
   def is_last_page(_, [], _), do: true
   def is_last_page(%{per_page: requested}, structs, filter_slop) do
-    if requested - filter_slop > length(structs), do: true, else: false
+    if requested - filter_slop >= length(structs), do: true, else: false
   end
 
   def trending_page_from_before(%{before: nil}), do: 1

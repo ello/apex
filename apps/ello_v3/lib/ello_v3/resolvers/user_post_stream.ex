@@ -14,7 +14,7 @@ defmodule Ello.V3.Resolvers.UserPostStream do
           is_last_page: is_last_page(args, posts),
           posts: track(posts, args, kind: :user, id: user.id)
         }}
-      end
+    end
   end
 end
 

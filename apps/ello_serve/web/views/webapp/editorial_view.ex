@@ -60,7 +60,7 @@ defmodule Ello.Serve.Webapp.EditorialView do
           allow_nsfw:   false,
           images_only:  true,
           per_page:     5,
-          category:     category.id,
+          category_ids: [category.id],
         })
         |> Search.post_search
         |> Map.get(:results)

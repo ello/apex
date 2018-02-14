@@ -64,7 +64,7 @@ defmodule Ello.V2.CategoryPostController do
 
   defp fetch_trending(conn, category) do
     Search.post_search(standard_params(conn, %{
-      category:     category.id,
+      category_ids: [category.id],
       trending:     true,
       within_days:  60,
       allow_nsfw:   false,
