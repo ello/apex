@@ -57,6 +57,15 @@ defmodule Ello.Core.Discovery do
     * primary -      only return primary categories
   """
   @spec categories(options) :: [Category.t]
+  def categories(%{ids: ids, promo: true} = options) do
+    Category
+    |> where([c], c.id in ^ids or c.level == "promo")
+    |> include_inactive_categories(options[:inactive])
+    |> include_meta_categories(options[:meta])
+    |> priority_order
+    |> Repo.all
+    |> Preload.categories(options)
+  end
   def categories(%{ids: ids} = options) do
     Category
     |> where([c], c.id in ^ids)
@@ -74,7 +83,7 @@ defmodule Ello.Core.Discovery do
   end
   def categories(%{primary: true} = options) do
     Category
-    |> where(level: "primary")
+    |> where([c], c.level == "primary" or c.level == "promo")
     |> Repo.all
     |> Preload.categories(options)
   end

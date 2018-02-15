@@ -8,6 +8,7 @@ defmodule Ello.Core.DiscoveryTest do
       active1:  Factory.insert(:category, level: "primary", order: 2),
       active2:  Factory.insert(:category, level: "primary", order: 1),
       meta:     Factory.insert(:category, level: "meta", order: 1, slug: "fu"),
+      promo:    Factory.insert(:category, level: "promo", order: 1),
       user:     Factory.insert(:user),
     }
   end
@@ -60,7 +61,7 @@ defmodule Ello.Core.DiscoveryTest do
     assert context.active2.id  in cat_ids
     refute context.inactive.id in cat_ids
     refute context.meta.id     in cat_ids
-    assert [context.active2.id, context.active1.id] == cat_ids
+    assert [context.active2.id, context.active1.id, context.promo.id] == cat_ids
     assert %Image{} = hd(cats).tile_image_struct
   end
 
@@ -130,5 +131,17 @@ defmodule Ello.Core.DiscoveryTest do
     assert context.active1.id == cat.id
     refute cat.tile_image_struct
     assert %Ecto.Association.NotLoaded{} = cat.promotionals
+  end
+
+  test "categories/1 - ids: [], promo: true", context do
+    categories = Discovery.categories(%{
+      ids: [context.active1.id, context.active2.id],
+      current_user: nil,
+      promo: true
+    })
+    cat_ids = Enum.map(categories, &(&1.id))
+    assert context.active1.id  in cat_ids
+    assert context.active2.id  in cat_ids
+    assert context.promo.id in cat_ids
   end
 end

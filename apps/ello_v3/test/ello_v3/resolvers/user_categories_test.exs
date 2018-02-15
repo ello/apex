@@ -5,6 +5,7 @@ defmodule Ello.V3.Resolvers.UserCategoriesTest do
     cat1 = Factory.insert(:category, level: "primary", id: 3)
     cat2 = Factory.insert(:category, level: "primary", id: 4)
     cat3 = Factory.insert(:category, level: "primary", id: 5)
+    cat4 = Factory.insert(:category, level: "promo", id: 6)
     user = Factory.insert(:user, followed_category_ids: [cat1.id, cat2.id])
 
     {:ok,
@@ -12,6 +13,7 @@ defmodule Ello.V3.Resolvers.UserCategoriesTest do
       cat1: cat1,
       cat2: cat2,
       cat3: cat3,
+      cat4: cat4,
     }
   end
 
@@ -41,6 +43,7 @@ defmodule Ello.V3.Resolvers.UserCategoriesTest do
     assert %{"data" => %{"categoryNav" => json}} = json_response(resp)
     assert to_string(context.cat1.id) in Enum.map(json, &(&1["id"]))
     assert to_string(context.cat2.id) in Enum.map(json, &(&1["id"]))
+    assert to_string(context.cat4.id) in Enum.map(json, &(&1["id"]))
     refute to_string(context.cat3.id) in Enum.map(json, &(&1["id"]))
   end
 
@@ -72,16 +75,19 @@ defmodule Ello.V3.Resolvers.UserCategoriesTest do
     assert to_string(context.cat1.id) in Enum.map(json, &(&1["id"]))
     assert to_string(context.cat2.id) in Enum.map(json, &(&1["id"]))
     assert to_string(context.cat3.id) in Enum.map(json, &(&1["id"]))
+    assert to_string(context.cat4.id) in Enum.map(json, &(&1["id"]))
 
     assert to_string(context.cat1.name) in Enum.map(json, &(&1["name"]))
     assert to_string(context.cat2.name) in Enum.map(json, &(&1["name"]))
     assert to_string(context.cat3.name) in Enum.map(json, &(&1["name"]))
+    assert to_string(context.cat4.name) in Enum.map(json, &(&1["name"]))
 
     assert to_string(context.cat1.slug) in Enum.map(json, &(&1["slug"]))
     assert to_string(context.cat2.slug) in Enum.map(json, &(&1["slug"]))
     assert to_string(context.cat3.slug) in Enum.map(json, &(&1["slug"]))
+    assert to_string(context.cat4.slug) in Enum.map(json, &(&1["slug"]))
 
-    assert length(Enum.map(json, &(&1["tileImage"]))) === 3
+    assert length(Enum.map(json, &(&1["tileImage"]))) === 4
     assert c1["tileImage"]["small"]
   end
 end
