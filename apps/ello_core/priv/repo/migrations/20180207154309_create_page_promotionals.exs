@@ -4,7 +4,7 @@ defmodule Ello.Core.Repo.Migrations.CreatePagePromotionals do
   def change do
     create_if_not_exists table(:page_promotionals) do
       add :header, :string
-      add :sub_header, :string
+      add :subheader, :string
       add :cta_href, :string
       add :cta_caption, :string
       add :is_logged_in, :boolean

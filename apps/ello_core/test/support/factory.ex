@@ -309,7 +309,7 @@ defmodule Ello.Core.Factory do
   def page_promotional_factory do
     %PagePromotional{
       header: "Header",
-      sub_header: "Sub Header",
+      subheader: "Sub Header",
       cta_href: nil,
       cta_caption: nil,
       is_logged_in: false,

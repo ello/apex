@@ -21,7 +21,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     field :post_token, :string
     field :kind, :page_header_kind, resolve: &page_header_kind/2
     field :header, :string, resolve: &page_header_header/2
-    field :sub_header, :string, resolve: &page_header_sub_header/2
+    field :subheader, :string, resolve: &page_header_sub_header/2
     field :cta_link, :page_header_cta_link, resolve: &page_header_cta_link/2
     field :image, :responsive_image_versions, resolve: &page_header_image/2
   end
@@ -48,7 +48,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
   defp page_header_header(_, %{source: %{header: copy}}), do: {:ok, copy}
 
   defp page_header_sub_header(_, %{source: %{category: %{description: copy}}}), do: {:ok, copy}
-  defp page_header_sub_header(_, %{source: %{sub_header: copy}}), do: {:ok, copy}
+  defp page_header_sub_header(_, %{source: %{subheader: copy}}), do: {:ok, copy}
 
   defp page_header_cta_link(_, %{source: %{category: %{cta_caption: text, cta_href: url}}}),
     do: {:ok, %{text: text, url: url}}
