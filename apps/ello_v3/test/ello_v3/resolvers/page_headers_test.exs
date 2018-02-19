@@ -102,6 +102,7 @@ defmodule Ello.V3.Resolvers.PageHeadersTest do
     assert json["ctaLink"]["text"] == "Click HERE!"
     assert json["ctaLink"]["url"] == "https://ello.co/"
     assert json["user"]["username"] == "ello"
+    assert %{} = json["user"]["avatar"]
     assert json["image"]
   end
 
