@@ -116,37 +116,25 @@ defmodule Ello.V3.Resolvers.PageHeadersTest do
     assert %{"data" => %{"pageHeaders" => [_p1, _p2, _p3]}} = json_response(resp)
   end
 
-  test "Get all headers for artist invites - logged in", %{user: user} do
+  test "Get all headers for artist invites", %{user: user} do
     Factory.insert_list(4, :page_promotional, is_artist_invite: true, is_logged_in: true)
     Factory.insert(:page_promotional, is_editorial: true, is_logged_in: true)
     Factory.insert(:page_promotional, is_artist_invite: true, is_logged_in: false)
     resp = post_graphql(%{query: @query, variables: %{kind: "ARTIST_INVITE"}}, user)
-    assert %{"data" => %{"pageHeaders" => [_p1, _p2, _p3, _p4]}} = json_response(resp)
+    assert %{"data" => %{"pageHeaders" => [_p1, _p2, _p3, _p4, _p5]}} = json_response(resp)
   end
 
-  test "Get all headers for editorials - logged in", %{user: user} do
+  test "Get all headers for editorials", %{user: user} do
     Factory.insert_list(4, :page_promotional, is_editorial: true, is_logged_in: true)
     Factory.insert(:page_promotional, is_editorial: true, is_logged_in: false)
     Factory.insert(:page_promotional, is_artist_invite: true, is_logged_in: true)
     resp = post_graphql(%{query: @query, variables: %{kind: "EDITORIAL"}}, user)
-    assert %{"data" => %{"pageHeaders" => [_p1, _p2, _p3, _p4]}} = json_response(resp)
+    assert %{"data" => %{"pageHeaders" => [_p1, _p2, _p3, _p4, _p5]}} = json_response(resp)
   end
 
   test "Get all headers for all/subscribed - logged in", %{user: user} do
     Factory.insert_list(4, :page_promotional, is_logged_in: true)
     resp = post_graphql(%{query: @query, variables: %{kind: "GENERIC"}}, user)
-    assert %{"data" => %{"pageHeaders" => [_p1, _p2, _p3, _p4]}} = json_response(resp)
-  end
-
-  test "Get all headers for artist invites - logged out", %{} do
-    Factory.insert_list(4, :page_promotional, is_artist_invite: true, is_logged_in: false)
-    resp = post_graphql(%{query: @query, variables: %{kind: "ARTIST_INVITE"}})
-    assert %{"data" => %{"pageHeaders" => [_p1, _p2, _p3, _p4]}} = json_response(resp)
-  end
-
-  test "Get all headers for editorials - logged out", %{} do
-    Factory.insert_list(4, :page_promotional, is_editorial: true, is_logged_in: false)
-    resp = post_graphql(%{query: @query, variables: %{kind: "EDITORIAL"}})
     assert %{"data" => %{"pageHeaders" => [_p1, _p2, _p3, _p4]}} = json_response(resp)
   end
 
