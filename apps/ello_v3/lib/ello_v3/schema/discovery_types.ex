@@ -19,6 +19,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     field :id, :id
     field :user, :user
     field :post_token, :string
+    field :slug, :string, resolve: &page_header_slug/2
     field :kind, :page_header_kind, resolve: &page_header_kind/2
     field :header, :string, resolve: &page_header_header/2
     field :subheader, :string, resolve: &page_header_sub_header/2
@@ -42,6 +43,9 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
   defp page_header_kind(_, %{source: %{is_editorial: true}}), do: {:ok, :editorial}
   defp page_header_kind(_, %{source: %{is_artist_invite: true}}), do: {:ok, :artist_invite}
   defp page_header_kind(_, %{source: _}), do: {:ok, :generic}
+
+  defp page_header_slug(_, %{source: %{category: %{slug: slug}}}), do: {:ok, slug}
+  defp page_header_slug(_, %{source: _}), do: {:ok, nil}
 
   defp page_header_header(_, %{source: %{category: %{header: nil, name: copy}}}), do: {:ok, copy}
   defp page_header_header(_, %{source: %{category: %{header: copy}}}), do: {:ok, copy}
