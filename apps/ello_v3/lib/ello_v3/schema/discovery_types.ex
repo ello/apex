@@ -19,9 +19,10 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     field :id, :id
     field :user, :user
     field :post_token, :string
+    field :slug, :string, resolve: &page_header_slug/2
     field :kind, :page_header_kind, resolve: &page_header_kind/2
     field :header, :string, resolve: &page_header_header/2
-    field :sub_header, :string, resolve: &page_header_sub_header/2
+    field :subheader, :string, resolve: &page_header_sub_header/2
     field :cta_link, :page_header_cta_link, resolve: &page_header_cta_link/2
     field :image, :responsive_image_versions, resolve: &page_header_image/2
   end
@@ -43,12 +44,15 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
   defp page_header_kind(_, %{source: %{is_artist_invite: true}}), do: {:ok, :artist_invite}
   defp page_header_kind(_, %{source: _}), do: {:ok, :generic}
 
+  defp page_header_slug(_, %{source: %{category: %{slug: slug}}}), do: {:ok, slug}
+  defp page_header_slug(_, %{source: _}), do: {:ok, nil}
+
   defp page_header_header(_, %{source: %{category: %{header: nil, name: copy}}}), do: {:ok, copy}
   defp page_header_header(_, %{source: %{category: %{header: copy}}}), do: {:ok, copy}
   defp page_header_header(_, %{source: %{header: copy}}), do: {:ok, copy}
 
   defp page_header_sub_header(_, %{source: %{category: %{description: copy}}}), do: {:ok, copy}
-  defp page_header_sub_header(_, %{source: %{sub_header: copy}}), do: {:ok, copy}
+  defp page_header_sub_header(_, %{source: %{subheader: copy}}), do: {:ok, copy}
 
   defp page_header_cta_link(_, %{source: %{category: %{cta_caption: text, cta_href: url}}}),
     do: {:ok, %{text: text, url: url}}

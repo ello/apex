@@ -7,7 +7,7 @@ defmodule Ello.Core.Discovery.PagePromotional do
 
   schema "page_promotionals" do
     field :header, :string
-    field :sub_header, :string
+    field :subheader, :string
     field :cta_href, :string
     field :cta_caption, :string
     field :is_logged_in, :boolean

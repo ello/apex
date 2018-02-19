@@ -32,8 +32,9 @@ defmodule Ello.V3.Resolvers.PageHeadersTest do
         id
         postToken
         kind
+        slug
         header
-        subHeader
+        subheader
         image { ...pageHeaderImageVersions }
         ctaLink { text url }
         user {
@@ -48,6 +49,10 @@ defmodule Ello.V3.Resolvers.PageHeadersTest do
     query($slug: String, $kind: PageHeaderKind!) {
       pageHeaders(slug: $slug, kind: $kind) {
         id
+        header
+        subheader
+        kind
+        slug
       }
     }
   """
@@ -69,7 +74,9 @@ defmodule Ello.V3.Resolvers.PageHeadersTest do
     assert json["id"] == "#{promo.id}"
     assert json["postToken"] == "foo"
     assert json["header"] == "Category 1"
-    assert json["subHeader"] == "a category"
+    assert json["kind"] == "CATEGORY"
+    assert json["slug"] == "cat1"
+    assert json["subheader"] == "a category"
     assert json["ctaLink"]["text"] == "Click HERE!"
     assert json["ctaLink"]["url"] == "https://ello.co/"
     assert json["user"]["username"] == "ello"
@@ -88,8 +95,10 @@ defmodule Ello.V3.Resolvers.PageHeadersTest do
     assert %{"data" => %{"pageHeaders" => [json | _]}} = json_response(resp)
     assert json["id"] == "#{promo.id}"
     assert json["postToken"] == "abc-123"
+    assert json["kind"] == "EDITORIAL"
+    refute json["slug"]
     assert json["header"] == "Header"
-    assert json["subHeader"] == "Sub Header"
+    assert json["subheader"] == "Sub Header"
     assert json["ctaLink"]["text"] == "Click HERE!"
     assert json["ctaLink"]["url"] == "https://ello.co/"
     assert json["user"]["username"] == "ello"
