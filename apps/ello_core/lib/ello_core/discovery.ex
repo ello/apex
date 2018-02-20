@@ -178,7 +178,7 @@ defmodule Ello.Core.Discovery do
   def page_promotionals(%{per_page: per_page} = options) do
     PagePromotional
     |> page_promotional_by_kind(options[:kind])
-    |> page_promotional_by_login_status(options[:current_user])
+    |> page_promotional_by_login_status(options[:kind], options[:current_user])
     |> limit(^per_page)
     |> Repo.all
     |> Preload.promotionals(options)
@@ -188,8 +188,9 @@ defmodule Ello.Core.Discovery do
   defp page_promotional_by_kind(q, :artist_invite), do: where(q, is_artist_invite: true)
   defp page_promotional_by_kind(q, _), do: where(q, is_artist_invite: false, is_editorial: false)
 
-  defp page_promotional_by_login_status(q, nil), do: where(q, is_logged_in: false)
-  defp page_promotional_by_login_status(q, _), do: where(q, is_logged_in: true)
+  defp page_promotional_by_login_status(q, :generic, nil), do: where(q, is_logged_in: false)
+  defp page_promotional_by_login_status(q, :generic, _), do: where(q, is_logged_in: true)
+  defp page_promotional_by_login_status(q, _, _), do: q
 
   @type categorizable :: User.t | Post.t | [User.t | Post.t]
 

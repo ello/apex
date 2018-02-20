@@ -32,8 +32,14 @@ defmodule Ello.Core.Discovery.Preload do
   end
   defp include_promotionals(categories, _), do: categories
 
-  defp promotional_includes(promotionals, %{preloads: preloads}), do:
-    Repo.preload(promotionals, Map.keys(preloads))
+  defp promotional_includes(promotionals, %{preloads: preloads} = options) do
+    preloads = Enum.map preloads, fn
+      ({:category, _}) -> :category
+      ({:user, user_preloads}) ->
+        {:user, &Network.users(%{ids: &1, current_user: options[:current_user], preloads: user_preloads})}
+    end
+    Repo.preload(promotionals, preloads)
+  end
 
   defp build_category_images(categories, %{images: false}), do: categories
   defp build_category_images(categories, _), do: build_category_images(categories)
