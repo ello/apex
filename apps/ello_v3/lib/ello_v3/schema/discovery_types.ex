@@ -31,6 +31,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     value :category
     value :artist_invite
     value :editorial
+    value :authentication
     value :generic
   end
 
@@ -42,6 +43,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
   defp page_header_kind(_, %{source: %{category_id: _}}), do: {:ok, :category}
   defp page_header_kind(_, %{source: %{is_editorial: true}}), do: {:ok, :editorial}
   defp page_header_kind(_, %{source: %{is_artist_invite: true}}), do: {:ok, :artist_invite}
+  defp page_header_kind(_, %{source: %{is_authentication: true}}), do: {:ok, :authentication}
   defp page_header_kind(_, %{source: _}), do: {:ok, :generic}
 
   defp page_header_slug(_, %{source: %{category: %{slug: slug}}}), do: {:ok, slug}

@@ -186,7 +186,9 @@ defmodule Ello.Core.Discovery do
 
   defp page_promotional_by_kind(q, :editorial), do: where(q, is_editorial: true)
   defp page_promotional_by_kind(q, :artist_invite), do: where(q, is_artist_invite: true)
-  defp page_promotional_by_kind(q, _), do: where(q, is_artist_invite: false, is_editorial: false)
+  defp page_promotional_by_kind(q, :authentication), do: where(q, is_authentication: true)
+  defp page_promotional_by_kind(q, _),
+    do: where(q, is_artist_invite: false, is_editorial: false, is_authentication: false)
 
   defp page_promotional_by_login_status(q, :generic, nil), do: where(q, is_logged_in: false)
   defp page_promotional_by_login_status(q, :generic, _), do: where(q, is_logged_in: true)
