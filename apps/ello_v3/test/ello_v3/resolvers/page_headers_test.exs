@@ -146,4 +146,12 @@ defmodule Ello.V3.Resolvers.PageHeadersTest do
     resp = post_graphql(%{query: @query, variables: %{kind: "GENERIC"}})
     assert %{"data" => %{"pageHeaders" => [_p1, _p2, _p3, _p4]}} = json_response(resp)
   end
+
+  test "Get all headers for authentication pages", %{user: user} do
+    Factory.insert_list(4, :page_promotional, is_authentication: true)
+    Factory.insert(:page_promotional, is_editorial: true)
+    Factory.insert(:page_promotional, is_artist_invite: true)
+    resp = post_graphql(%{query: @query, variables: %{kind: "AUTHENTICATION"}}, user)
+    assert %{"data" => %{"pageHeaders" => [_p1, _p2, _p3, _p4]}} = json_response(resp)
+  end
 end

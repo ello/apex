@@ -10,6 +10,7 @@ defmodule Ello.Core.Repo.Migrations.CreatePagePromotionals do
       add :is_logged_in, :boolean
       add :is_artist_invite, :boolean
       add :is_editorial, :boolean
+      add :is_authentication, :boolean
       add :image, :string
       add :image_metadata, :json
 

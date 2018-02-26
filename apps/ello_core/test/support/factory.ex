@@ -315,6 +315,7 @@ defmodule Ello.Core.Factory do
       is_logged_in: false,
       is_editorial: false,
       is_artist_invite: false,
+      is_authentication: false,
       image: "ello-optimized-da955f87.jpg",
       image_metadata: %{},
       post_token: "abc-123",
