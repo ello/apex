@@ -1,6 +1,6 @@
 defmodule Ello.V3.Resolvers.PageHeaders do
   alias Ello.Core.Discovery
-  @page_promotional_kinds [:artist_invite, :editorial, :generic]
+  @page_promotional_kinds [:artist_invite, :editorial, :generic, :authentication]
 
   def call(_, %{kind: :category} = args, _) do
     # We always need category to "proxy" header, title, etc

@@ -13,6 +13,7 @@ defmodule Ello.Core.Discovery.PagePromotional do
     field :is_logged_in, :boolean
     field :is_artist_invite, :boolean
     field :is_editorial, :boolean
+    field :is_authentication, :boolean
     field :image, :string
     field :image_metadata, :map
     field :image_struct, :map, virtual: true
