@@ -25,6 +25,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     field :subheader, :string, resolve: &page_header_sub_header/2
     field :cta_link, :page_header_cta_link, resolve: &page_header_cta_link/2
     field :image, :responsive_image_versions, resolve: &page_header_image/2
+    field :category, :category
   end
 
   enum :page_header_kind do

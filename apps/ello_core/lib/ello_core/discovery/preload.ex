@@ -27,6 +27,13 @@ defmodule Ello.Core.Discovery.Preload do
     |> build_promotional_images
   end
 
+  def page_promotionals([], _), do: []
+  def page_promotionals(promotions, options) do
+    promotions
+    |> page_promotional_includes(options)
+    |> build_promotional_images
+  end
+
   defp include_promotionals(categories, %{promotionals: true} = options) do
     Repo.preload(categories, promotionals: [user: &Network.users(%{ids: &1, current_user: options[:current_user]})])
   end
@@ -38,6 +45,16 @@ defmodule Ello.Core.Discovery.Preload do
       ({:user, user_preloads}) ->
         {:user, &Network.users(%{ids: &1, current_user: options[:current_user], preloads: user_preloads})}
     end
+    Repo.preload(promotionals, preloads)
+  end
+
+  defp page_promotional_includes(promotionals, %{preloads: preloads} = options) do
+    preloads = Enum.map preloads, fn
+      ({:user, user_preloads}) ->
+        {:user, &Network.users(%{ids: &1, current_user: options[:current_user], preloads: user_preloads})}
+      _ -> nil
+    end
+    preloads = Enum.filter(preloads, &(&1))
     Repo.preload(promotionals, preloads)
   end
 

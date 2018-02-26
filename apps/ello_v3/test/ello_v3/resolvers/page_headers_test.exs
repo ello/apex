@@ -37,6 +37,7 @@ defmodule Ello.V3.Resolvers.PageHeadersTest do
         subheader
         image { ...pageHeaderImageVersions }
         ctaLink { text url }
+        category { id }
         user {
           username
           avatar { ...avatarImageVersion }
@@ -80,6 +81,7 @@ defmodule Ello.V3.Resolvers.PageHeadersTest do
     assert json["ctaLink"]["text"] == "Click HERE!"
     assert json["ctaLink"]["url"] == "https://ello.co/"
     assert json["user"]["username"] == "ello"
+    assert json["category"]["id"] == "#{cat1.id}"
     assert json["image"]
   end
 
@@ -103,6 +105,7 @@ defmodule Ello.V3.Resolvers.PageHeadersTest do
     assert json["ctaLink"]["url"] == "https://ello.co/"
     assert json["user"]["username"] == "ello"
     assert %{} = json["user"]["avatar"]
+    assert json["category"] == nil
     assert json["image"]
   end
 

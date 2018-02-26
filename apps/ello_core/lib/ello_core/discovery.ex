@@ -181,7 +181,7 @@ defmodule Ello.Core.Discovery do
     |> page_promotional_by_login_status(options[:kind], options[:current_user])
     |> limit(^per_page)
     |> Repo.all
-    |> Preload.promotionals(options)
+    |> Preload.page_promotionals(options)
   end
 
   defp page_promotional_by_kind(q, :editorial), do: where(q, is_editorial: true)
