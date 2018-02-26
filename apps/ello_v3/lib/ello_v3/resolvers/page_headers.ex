@@ -4,7 +4,7 @@ defmodule Ello.V3.Resolvers.PageHeaders do
 
   def call(_, %{kind: :category} = args, _) do
     # We always need category to "proxy" header, title, etc
-    args = Map.put(args, :preloads, Map.merge(args[:preloads], %{category: %{}}))
+    args = Map.put(args, :preloads, Map.merge(%{category: %{}}, args[:preloads]))
     {:ok, Discovery.promotionals(args)}
   end
 
