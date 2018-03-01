@@ -43,37 +43,40 @@ defmodule Ello.Serve.Router do
   scope "/", Ello.Serve.Webapp do
     pipe_through :webapp
 
-    get "/",                      EditorialController, :index
-    get "/discover",              DiscoverPostController, :featured
-    get "/discover/trending",     DiscoverPostController, :trending
-    get "/discover/recent",       DiscoverPostController, :recent
-    get "/discover/all",          CategoryController, :index
-    get "/discover/:category",    DiscoverPostController, :category
-    get "/search",                SearchController, :index
-    get "/artist-invites",        ArtistInviteIndexController, :index
-    get "/artist-invites/:id",    ArtistInviteShowController, :show
+    get "/",                             EditorialController, :index
+    get "/discover",                     DiscoverPostController, :featured
+    get "/discover/trending",            DiscoverPostController, :trending
+    get "/discover/recent",              DiscoverPostController, :recent
+    get "/discover/all",                 CategoryController, :index
+    get "/discover/:category",           DiscoverPostController, :category
+    get "/discover/:category/trending",  DiscoverPostController, :category_trending
+    get "/search",                       SearchController, :index
+    get "/artist-invites",               ArtistInviteIndexController, :index
+    get "/artist-invites/:id",           ArtistInviteShowController, :show
 
     # Logged in only routes - no fallback content required
-    get "/following",             NoContentController, :show
-    get "/notifications",         NoContentController, :show
-    get "/invitations",           NoContentController, :show
-    get "/settings",              NoContentController, :show
-    get "/onboarding",            NoContentController, :show
-    get "/onboarding/*rest",      NoContentController, :show
+    get "/following",                    NoContentController, :show
+    get "/notifications",                NoContentController, :show
+    get "/invitations",                  NoContentController, :show
+    get "/settings",                     NoContentController, :show
+    get "/onboarding",                   NoContentController, :show
+    get "/onboarding/*rest",             NoContentController, :show
+    get "/discover/subscribed",          NoContentController, :show
+    get "/discover/subscribed/trending", NoContentController, :show
 
     # Join/Auth routes - no fallback content relevant
-    get "/enter",                 NoContentController, :enter
-    get "/join",                  NoContentController, :join
-    get "/forgot-password",       NoContentController, :forgot
+    get "/enter",                        NoContentController, :enter
+    get "/join",                         NoContentController, :join
+    get "/forgot-password",              NoContentController, :forgot
 
     # User routes
-    get "/:username/post/:token", PostController, :show
-    get "/:username/following",   RelationshipController, :following
-    get "/:username/followers",   RelationshipController, :followers
-    get "/:username/loves",       LoveController, :index
-    get "/:username",             UserController, :show
+    get "/:username/post/:token",        PostController, :show
+    get "/:username/following",          RelationshipController, :following
+    get "/:username/followers",          RelationshipController, :followers
+    get "/:username/loves",              LoveController, :index
+    get "/:username",                    UserController, :show
 
     # Fallback for any other route
-    get "/*rest",                 NoContentController, :show
+    get "/*rest",                        NoContentController, :show
   end
 end

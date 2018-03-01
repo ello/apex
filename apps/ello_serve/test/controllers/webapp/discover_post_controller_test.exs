@@ -8,13 +8,13 @@ defmodule Ello.Serve.Webapp.DiscoverPostControllerTest do
     Stream.Client.Test.start
     Stream.Client.Test.reset
 
-    Factory.insert(:category, slug: "cat1", level: "primary", roshi_slug: "cat-1")
-    Factory.insert(:category, slug: "cat2", level: "primary", roshi_slug: "cat-2")
+    c1 = Factory.insert(:category, slug: "cat1", level: "primary", roshi_slug: "cat-1")
+    c2 = Factory.insert(:category, slug: "cat2", level: "primary", roshi_slug: "cat-2")
 
-    p1 = Factory.insert(:post, token: "token-p1")
-    p2 = Factory.insert(:post, token: "token-p2")
-    p3 = Factory.insert(:post, token: "token-p3")
-    p4 = Factory.insert(:post, token: "token-p4")
+    p1 = Factory.insert(:post, token: "token-p1", category_ids: [c1.id])
+    p2 = Factory.insert(:post, token: "token-p2", category_ids: [c1.id])
+    p3 = Factory.insert(:post, token: "token-p3", category_ids: [c1.id])
+    p4 = Factory.insert(:post, token: "token-p4", category_ids: [c1.id])
 
     Index.delete
     Index.create
@@ -68,7 +68,7 @@ defmodule Ello.Serve.Webapp.DiscoverPostControllerTest do
     resp = get(conn, "/discover/trending", %{"per_page" => "2"})
     html = html_response(resp, 200)
     assert html =~ "<noscript>"
-    assert html =~ ~r(<a href="https://ello\.co/discover/trending\?page=2">Next Page</a>)
+    assert html =~ ~r(<a href="https://ello\.co/discover/trending\?before=2">Next Page</a>)
   end
 
   @tag :meta
@@ -102,5 +102,21 @@ defmodule Ello.Serve.Webapp.DiscoverPostControllerTest do
     assert html =~ "token-p3"
     assert html =~ "token-p4"
     assert html =~ ~r(<a href="https://ello\.co/discover/cat1\?before=.*">Next Page</a>)
+  end
+
+  @tag :meta
+  test "/discover/cat1/trending - meta", %{conn: conn} do
+    resp = get(conn, "/discover/cat1/trending")
+    html = html_response(resp, 200)
+    assert html =~ "Ello | The Creators Network"
+  end
+
+  test "/discover/cat1/trending - noscript", %{conn: conn} do
+    resp = get(conn, "/discover/cat1/trending", %{"per_page" => "2"})
+    html = html_response(resp, 200)
+    assert html =~ "<noscript>"
+    assert html =~ "token-p1"
+    assert html =~ "token-p2"
+    assert html =~ ~r(<a href="https://ello\.co/discover/cat1/trending\?before=2.*">Next Page</a>)
   end
 end

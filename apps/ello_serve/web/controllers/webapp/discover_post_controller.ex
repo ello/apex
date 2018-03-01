@@ -3,6 +3,7 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
   alias Ello.Stream
   alias Ello.Search.Post.Search
   alias Ello.Core.Discovery
+  alias Ello.Core.Contest
 
   def trending(conn, _) do
     render_html(conn, %{
@@ -42,6 +43,17 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
     end
   end
 
+  def category_trending(conn, params) do
+    case fetch_category(conn, params) do
+      nil -> send_resp(conn, 404, "")
+      cat ->
+        render_html(conn, %{
+          categories: fn -> categories(conn) end,
+          posts:      fn -> category_trending_posts(conn, cat) end,
+        })
+    end
+  end
+
   defp trending_posts(conn) do
     search = Search.post_search(standard_params(conn, %{
       trending:     true,
@@ -54,14 +66,12 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
   end
 
   defp featured_posts(conn) do
-    categories = Discovery.categories(standard_params(conn, %{
-      primary:      true,
-      images:       false,
-      promotionals: false,
-    }))
+    categories = Task.async(Discovery, :categories, [%{primary: true, images: false}])
+    invites = Task.async(Contest, :artist_invites, [%{for_discovery: true}])
+    sources = Task.await(categories) ++ Task.await(invites)
 
     stream = Stream.fetch(standard_params(conn, %{
-      keys:         Enum.map(categories, &category_stream_key/1),
+      keys:         Enum.map(sources, &stream_key/1),
       allow_nsfw:   true, # No NSFW in categories, reduces slop.
     }))
     track(conn, stream.posts, stream_kind: "featured")
@@ -70,14 +80,27 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
 
   defp category_posts(conn, category) do
     stream = Stream.fetch(standard_params(conn, %{
-      keys:         [category_stream_key(category)],
+      keys:         [stream_key(category)],
       allow_nsfw:   true, # No NSFW in categories, reduces slop.
     }))
     track(conn, stream.posts, stream_kind: "category")
     stream
   end
 
-  defp category_stream_key(%{roshi_slug: slug}), do: "categories:v1:#{slug}"
+  defp category_trending_posts(conn, category) do
+    search = Search.post_search(standard_params(conn, %{
+      category_ids: [category.id],
+      trending:     true,
+      within_days:  30,
+      allow_nsfw:   false,
+      images_only:  false,
+    }))
+    track(conn, search.results, stream_kind: "trending")
+    search
+  end
+
+  defp stream_key(%Discovery.Category{roshi_slug: slug}), do: "categories:v1:#{slug}"
+  defp stream_key(%Contest.ArtistInvite{id: id}), do: "artist_invite:v1:#{id}"
 
   @recent_stream "all_post_firehose"
   defp recent_posts(conn) do
@@ -91,6 +114,7 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
 
   defp categories(conn) do
     Discovery.categories(standard_params(conn, %{
+      primary:      true,
       meta:         false,
       promotionals: false,
       inactive:     false,

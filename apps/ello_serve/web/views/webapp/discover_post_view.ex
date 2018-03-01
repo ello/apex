@@ -15,6 +15,6 @@ defmodule Ello.Serve.Webapp.DiscoverPostView do
     webapp_url(path, %{before: before})
   end
   def next_page_url(path, %{next_page: next}) do
-    webapp_url(path, %{page: next})
+    webapp_url(path, %{before: next})
   end
 end
