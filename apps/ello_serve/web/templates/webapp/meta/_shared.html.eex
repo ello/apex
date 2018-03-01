@@ -1,10 +1,10 @@
 <title><%= title(assigns) %></title>
-<meta name="apple-itunes-app" content="app-id=<%= apple_app_id() %>" appArgument="<%= current_path(assigns) %>"/>
-<meta name="name" itemprop="name" content="<%= title(assigns) %>"/>
-<meta name="url" itemprop="url" content="<%= current_url(assigns) %>"/>
-<meta name="description" itemprop="description" content="<%= description(assigns) %>"/>
+<meta name="apple-itunes-app" content="app-id=<%= apple_app_id() %>, app-argument=<%= current_path(assigns) %>"/>
+<meta name="name" content="<%= title(assigns) %>"/>
+<meta name="url" content="<%= current_url(assigns) %>"/>
+<meta name="description"  content="<%= description(assigns) %>"/>
 <%= if assigns[:image] != false do %>
-  <meta name="image" itemprop="image" content="<%= image(assigns) %>"/>
+  <meta name="image"  content="<%= image(assigns) %>"/>
 <% end %>
 <meta property="og:url" content="<%= current_url(assigns) %>"/>
 <meta property="og:title" content="<%= title(assigns) %>"/>
