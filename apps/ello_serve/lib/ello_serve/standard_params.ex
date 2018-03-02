@@ -18,9 +18,10 @@ defmodule Ello.Serve.StandardParams do
   defp before(%{"before" => before}), do: before
   defp before(_), do: nil
 
-  defp page(%{"page" => ""}), do: 1
-  defp page(%{"page" => nil}), do: 1
-  defp page(%{"page" => page}), do: String.to_integer(page)
+  # Page parsed from page or before (matches webapp graphql behavior)
+  defp page(%{"page" => ""} = p), do: String.to_integer(before(p) || "1")
+  defp page(%{"page" => nil} = p), do: String.to_integer(before(p) || "1")
+  defp page(%{"page" => page} = p), do: String.to_integer(page)
   defp page(_), do: 1
 
   defp per_page(%{"per_page" => nil}, nil), do: 25

@@ -126,7 +126,7 @@ defmodule Ello.Serve.Webapp.NoContentControllerTest do
     default_image = "/static/images/support/ello-open-graph-image.png"
 
     assert html =~ "<title>Ello | The Creators Network</title>"
-    assert has_meta(html, name: "apple-itunes-app", content: "app-id=1234567")
+    assert has_meta(html, name: "apple-itunes-app", content: "app-id=1234567, app-argument=/following")
     assert has_meta(html, name: "name", content: default_title)
     assert has_meta(html, name: "url", content: "https://ello.co/following")
     assert has_meta(html, name: "description", content: default_desc)

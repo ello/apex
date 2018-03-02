@@ -9,7 +9,7 @@ defmodule Ello.Serve.Webapp.DiscoverPostControllerTest do
     Stream.Client.Test.reset
 
     c1 = Factory.insert(:category, slug: "cat1", level: "primary", roshi_slug: "cat-1")
-    c2 = Factory.insert(:category, slug: "cat2", level: "primary", roshi_slug: "cat-2")
+    Factory.insert(:category, slug: "cat2", level: "primary", roshi_slug: "cat-2")
 
     p1 = Factory.insert(:post, token: "token-p1", category_ids: [c1.id])
     p2 = Factory.insert(:post, token: "token-p2", category_ids: [c1.id])
@@ -68,7 +68,13 @@ defmodule Ello.Serve.Webapp.DiscoverPostControllerTest do
     resp = get(conn, "/discover/trending", %{"per_page" => "2"})
     html = html_response(resp, 200)
     assert html =~ "<noscript>"
+    assert html =~ "token"
     assert html =~ ~r(<a href="https://ello\.co/discover/trending\?before=2">Next Page</a>)
+
+    resp2 = get(conn, "/discover/trending", %{"per_page" => "2", "before" => "2"})
+    html2 = html_response(resp2, 200)
+    assert html2 =~ "<noscript>"
+    assert html2 =~ "token"
   end
 
   @tag :meta
@@ -115,8 +121,12 @@ defmodule Ello.Serve.Webapp.DiscoverPostControllerTest do
     resp = get(conn, "/discover/cat1/trending", %{"per_page" => "2"})
     html = html_response(resp, 200)
     assert html =~ "<noscript>"
-    assert html =~ "token-p1"
-    assert html =~ "token-p2"
+    assert html =~ "token"
     assert html =~ ~r(<a href="https://ello\.co/discover/cat1/trending\?before=2.*">Next Page</a>)
+
+    resp2 = get(conn, "/discover/cat1/trending", %{"per_page" => "2", "before" => "2"})
+    html2 = html_response(resp2, 200)
+    assert html2 =~ "<noscript>"
+    assert html2 =~ "token"
   end
 end
