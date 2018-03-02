@@ -3,6 +3,11 @@ defmodule Ello.Serve.StandardParams do
   @max_page_size 50
 
   def standard_params(%Conn{params: params}, overrides \\ %{}) do
+    page = if overrides[:before_as_page] do
+      String.to_integer(before(params) || "1")
+    else
+      page(params)
+    end
     Map.merge(%{
       current_user: nil,
       allow_nsfw:   true,
@@ -11,7 +16,7 @@ defmodule Ello.Serve.StandardParams do
 
       before:       before(params),
       per_page:     per_page(params, overrides[:default][:per_page]),
-      page:         page(params),
+      page:         page
     }, overrides)
   end
 
@@ -19,9 +24,9 @@ defmodule Ello.Serve.StandardParams do
   defp before(_), do: nil
 
   # Page parsed from page or before (matches webapp graphql behavior)
-  defp page(%{"page" => ""} = p), do: String.to_integer(before(p) || "1")
-  defp page(%{"page" => nil} = p), do: String.to_integer(before(p) || "1")
-  defp page(%{"page" => page} = p), do: String.to_integer(page)
+  defp page(%{"page" => ""}), do: 1
+  defp page(%{"page" => nil}), do: 1
+  defp page(%{"page" => page}), do: String.to_integer(page)
   defp page(_), do: 1
 
   defp per_page(%{"per_page" => nil}, nil), do: 25

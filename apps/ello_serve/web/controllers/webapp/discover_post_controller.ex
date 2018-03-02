@@ -56,10 +56,11 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
 
   defp trending_posts(conn) do
     search = Search.post_search(standard_params(conn, %{
-      trending:     true,
-      within_days:  14,
-      allow_nsfw:   false,
-      images_only:  false,
+      trending:       true,
+      within_days:    14,
+      allow_nsfw:     false,
+      images_only:    false,
+      before_as_page: true,
     }))
     track(conn, search.results, stream_kind: "trending")
     search
@@ -89,11 +90,12 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
 
   defp category_trending_posts(conn, category) do
     search = Search.post_search(standard_params(conn, %{
-      category_ids: [category.id],
-      trending:     true,
-      within_days:  30,
-      allow_nsfw:   false,
-      images_only:  false,
+      category_ids:   [category.id],
+      trending:       true,
+      within_days:    30,
+      allow_nsfw:     false,
+      images_only:    false,
+      before_as_page: true,
     }))
     track(conn, search.results, stream_kind: "trending")
     search
