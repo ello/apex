@@ -48,6 +48,8 @@ defmodule Ello.Serve.Router do
     get "/discover/trending",            DiscoverPostController, :trending
     get "/discover/recent",              DiscoverPostController, :recent
     get "/discover/all",                 CategoryController, :index
+    get "/discover/subscribed",          NoContentController, :show # Logged in only
+    get "/discover/subscribed/trending", NoContentController, :show # Logged in only
     get "/discover/:category",           DiscoverPostController, :category
     get "/discover/:category/trending",  DiscoverPostController, :category_trending
     get "/search",                       SearchController, :index
@@ -61,8 +63,6 @@ defmodule Ello.Serve.Router do
     get "/settings",                     NoContentController, :show
     get "/onboarding",                   NoContentController, :show
     get "/onboarding/*rest",             NoContentController, :show
-    get "/discover/subscribed",          NoContentController, :show
-    get "/discover/subscribed/trending", NoContentController, :show
 
     # Join/Auth routes - no fallback content relevant
     get "/enter",                        NoContentController, :enter
