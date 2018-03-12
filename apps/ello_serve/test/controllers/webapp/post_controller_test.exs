@@ -52,7 +52,7 @@ defmodule Ello.Serve.Webapp.PostControllerTest do
     resp = get(conn, "/archer/post/abc123")
     html = html_response(resp, 200)
     assert html =~ "<title>test post</title>"
-    assert has_meta(html, name: "apple-itunes-app", content: "app-id=1234567")
+    assert has_meta(html, name: "apple-itunes-app", content: "app-id=1234567, app-argument=/archer/post/abc123")
     assert has_meta(html, name: "name", content: "test post")
     assert has_meta(html, name: "url", content: "https://ello.co/archer/post/abc123")
     assert has_meta(html, name: "description", content: "Phrasing!")
@@ -76,7 +76,7 @@ defmodule Ello.Serve.Webapp.PostControllerTest do
     resp = get(conn, "/lana/post/def345")
     html = html_response(resp, 200)
     assert html =~ "<title>test post</title>"
-    assert has_meta(html, name: "apple-itunes-app", content: "app-id=1234567")
+    assert has_meta(html, name: "apple-itunes-app", content: "app-id=1234567, app-argument=/lana/post/def345")
     assert has_meta(html, name: "name", content: "test post")
     assert has_meta(html, name: "url", content: "https://ello.co/lana/post/def345")
     assert has_meta(html, name: "description", content: "Phrasing!")

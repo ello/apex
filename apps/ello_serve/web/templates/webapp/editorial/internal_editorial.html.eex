@@ -1,5 +1,5 @@
 <a href="<%= internal_url(@editorial) %>">
   <h2><%= title(@editorial) %></h2>
   <h3><%= subtitle(@editorial) %></h3>
-  <img src="<%= editorial_image_url(@editorial) %>" />
+  <img src="<%= editorial_image_url(@editorial) %>" alt="<%= title(@editorial) %>" />
 </a>

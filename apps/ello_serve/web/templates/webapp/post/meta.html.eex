@@ -4,7 +4,7 @@
 <% # Custom meta tags %>
 
 <%= for image_url <- image_urls(@post) do %>
-  <meta name="image" itemprop="image" content="<%= image_url %>"/>
+  <meta name="image" content="<%= image_url %>"/>
   <meta property="og:image" content="<%= image_url %>"/>
 <% end %>
 
