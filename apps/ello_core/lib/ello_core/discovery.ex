@@ -57,6 +57,7 @@ defmodule Ello.Core.Discovery do
     * primary -      only return primary categories
   """
   @spec categories(options) :: [Category.t]
+  def categories(%{ids: nil} = options), do: categories(Map.put(options, :ids, []))
   def categories(%{ids: ids, promo: true} = options) do
     Category
     |> where([c], c.id in ^ids or c.level == "promo")
