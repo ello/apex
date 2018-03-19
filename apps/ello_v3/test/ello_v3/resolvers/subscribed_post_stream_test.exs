@@ -48,6 +48,19 @@ defmodule Ello.V3.Resolvers.SubscribedPostStreamTest do
     assert List.duplicate(to_string(context.cat1.id), 3) == Enum.map(posts_resp2, &(hd(&1["categories"])["id"]))
   end
 
+  test "Trending stream - not subscribed to anything", context do
+    user = Factory.insert(:user, %{followed_category_ids: nil})
+    posts1 = Factory.insert_list(6, :post, %{category_ids: [context.cat1.id]})
+    posts2 = Factory.insert_list(6, :post, %{category_ids: [context.cat2.id]})
+    Index.delete
+    Index.create
+    Enum.each(posts1 ++ posts2, &Index.add/1)
+
+    resp = post_graphql(%{query: @query, variables: %{"kind" => "TRENDING", "perPage" => 3}}, user)
+    assert %{"data" => %{"subscribedPostStream" => json}} = json_response(resp)
+    assert %{"isLastPage" => true, "next" => nil, "posts" => []} = json
+  end
+
   test "Featured stream", context do
     Stream.Client.Test.start
     Stream.Client.Test.reset

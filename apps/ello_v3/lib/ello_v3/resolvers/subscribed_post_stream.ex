@@ -6,6 +6,10 @@ defmodule Ello.V3.Resolvers.SubscribedPostStream do
   import Ello.V3.Resolvers.PostViewHelpers
 
   def call(_parent, %{current_user: nil}, _resolver), do: {:error, "Must be logged in"}
+  def call(_, %{current_user: %{followed_category_ids: nil}}, _),
+    do: {:ok, %{posts: [], next: nil, is_last_page: true}}
+  def call(_, %{current_user: %{followed_category_ids: []}}, _),
+    do: {:ok, %{posts: [], next: nil, is_last_page: true}}
   def call(_, %{kind: :recent}, _), do: {:error, "Recent has not been implemented"}
   def call(_, %{kind: :trending, current_user: current_user} = args, _) do
     search = Search.post_search(Map.merge(args, %{
