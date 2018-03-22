@@ -5,9 +5,11 @@ defmodule Ello.Core.ContentTest do
   setup do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
     cat1 = Factory.insert(:category)
+    post = Factory.insert(:post)
+    Factory.insert(:category_post, post: post, category: cat1)
     {:ok,
       category: cat1,
-      post: Factory.insert(:post, category_ids: [cat1.id]),
+      post: post,
       user: Factory.insert(:user),
       nsfw_post: Factory.insert(:post, %{is_adult_content: true}),
       nudity_post: Factory.insert(:post, %{has_nudity: true}),

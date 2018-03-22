@@ -26,8 +26,10 @@ defmodule Ello.V3.Resolvers.SubscribedPostStreamTest do
   end
 
   test "Trending stream", context do
-    posts1 = Factory.insert_list(6, :post, %{category_ids: [context.cat1.id]})
-    posts2 = Factory.insert_list(6, :post, %{category_ids: [context.cat2.id]})
+    cposts1 = Factory.insert_list(6, :category_post, %{category: context.cat1})
+    cposts2 = Factory.insert_list(6, :category_post, %{category: context.cat2})
+    posts1 = Enum.map(cposts1, &(&1.post))
+    posts2 = Enum.map(cposts2, &(&1.post))
     Index.delete
     Index.create
     Enum.each(posts1 ++ posts2, &Index.add/1)
@@ -35,7 +37,10 @@ defmodule Ello.V3.Resolvers.SubscribedPostStreamTest do
     resp = post_graphql(%{query: @query, variables: %{"kind" => "TRENDING", "perPage" => 3}}, context.user)
     assert %{"data" => %{"subscribedPostStream" => json}} = json_response(resp)
     assert %{"isLastPage" => false, "next" => next, "posts" => posts_resp1} = json
-    assert List.duplicate(to_string(context.cat1.id), 3) == Enum.map(posts_resp1, &(hd(&1["categories"])["id"]))
+    assert length(posts_resp1) === 3
+    Enum.each posts_resp1, fn(post_json) ->
+      assert hd(post_json["categories"])["id"] === "#{context.cat1.id}"
+    end
 
     resp2 = post_graphql(%{query: @query, variables: %{
       "before" => next,
@@ -45,7 +50,10 @@ defmodule Ello.V3.Resolvers.SubscribedPostStreamTest do
 
     assert %{"data" => %{"subscribedPostStream" => json2}} = json_response(resp2)
     assert %{"isLastPage" => true, "next" => nil, "posts" => posts_resp2} = json2
-    assert List.duplicate(to_string(context.cat1.id), 3) == Enum.map(posts_resp2, &(hd(&1["categories"])["id"]))
+    assert length(posts_resp2) === 3
+    Enum.each posts_resp2, fn(post_json) ->
+      assert hd(post_json["categories"])["id"] === "#{context.cat1.id}"
+    end
   end
 
   test "Trending stream - not subscribed to anything", context do
@@ -65,12 +73,12 @@ defmodule Ello.V3.Resolvers.SubscribedPostStreamTest do
     Stream.Client.Test.start
     Stream.Client.Test.reset
 
-    post1 = Factory.insert(:post, %{category_ids: [context.cat1.id]})
-    post2 = Factory.insert(:post, %{category_ids: [context.cat1.id]})
-    post3 = Factory.insert(:post, %{category_ids: [context.cat1.id]})
-    post4 = Factory.insert(:post, %{category_ids: [context.cat1.id]})
-    post5 = Factory.insert(:post, %{category_ids: [context.cat2.id]})
-    post6 = Factory.insert(:post, %{category_ids: [context.cat2.id]})
+    post1 = Factory.insert(:featured_category_post, category: context.cat1).post
+    post2 = Factory.insert(:featured_category_post, category: context.cat1).post
+    post3 = Factory.insert(:featured_category_post, category: context.cat1).post
+    post4 = Factory.insert(:featured_category_post, category: context.cat1).post
+    post5 = Factory.insert(:featured_category_post, category: context.cat2).post
+    post6 = Factory.insert(:featured_category_post, category: context.cat2).post
     roshi_items = [
       %Item{id: "#{post1.id}", stream_id: "categories:v1:cat1", ts: DateTime.utc_now},
       %Item{id: "#{post2.id}", stream_id: "categories:v1:cat1", ts: DateTime.utc_now},
@@ -84,7 +92,10 @@ defmodule Ello.V3.Resolvers.SubscribedPostStreamTest do
     resp = post_graphql(%{query: @query, variables: %{"kind" => "FEATURED", "perPage" => 3}}, context.user)
     assert %{"data" => %{"subscribedPostStream" => json}} = json_response(resp)
     assert %{"isLastPage" => false, "next" => next, "posts" => posts_resp1} = json
-    assert List.duplicate(to_string(context.cat1.id), 3) == Enum.map(posts_resp1, &(hd(&1["categories"])["id"]))
+    assert length(posts_resp1) === 3
+    Enum.each posts_resp1, fn(post_json) ->
+      assert hd(post_json["categories"])["id"] === "#{context.cat1.id}"
+    end
 
     resp2 = post_graphql(%{query: @query, variables: %{
       "before" => next,
@@ -94,6 +105,9 @@ defmodule Ello.V3.Resolvers.SubscribedPostStreamTest do
 
     assert %{"data" => %{"subscribedPostStream" => json2}} = json_response(resp2)
     assert %{"isLastPage" => true, "next" => _, "posts" => posts_resp2} = json2
-    assert [to_string(context.cat1.id)] == Enum.map(posts_resp2, &(hd(&1["categories"])["id"]))
+    assert length(posts_resp2) === 1
+    Enum.each posts_resp2, fn(post_json) ->
+      assert hd(post_json["categories"])["id"] === "#{context.cat1.id}"
+    end
   end
 end

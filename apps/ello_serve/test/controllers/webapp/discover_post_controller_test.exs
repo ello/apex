@@ -11,10 +11,15 @@ defmodule Ello.Serve.Webapp.DiscoverPostControllerTest do
     c1 = Factory.insert(:category, slug: "cat1", level: "primary", roshi_slug: "cat-1")
     Factory.insert(:category, slug: "cat2", level: "primary", roshi_slug: "cat-2")
 
-    p1 = Factory.insert(:post, token: "token-p1", category_ids: [c1.id])
-    p2 = Factory.insert(:post, token: "token-p2", category_ids: [c1.id])
-    p3 = Factory.insert(:post, token: "token-p3", category_ids: [c1.id])
-    p4 = Factory.insert(:post, token: "token-p4", category_ids: [c1.id])
+    p1 = Factory.insert(:post, token: "token-p1")
+    p2 = Factory.insert(:post, token: "token-p2")
+    p3 = Factory.insert(:post, token: "token-p3")
+    p4 = Factory.insert(:post, token: "token-p4")
+
+    Factory.insert(:featured_category_post, post: p1, category: c1)
+    Factory.insert(:featured_category_post, post: p2, category: c1)
+    Factory.insert(:featured_category_post, post: p3, category: c1)
+    Factory.insert(:featured_category_post, post: p4, category: c1)
 
     Index.delete
     Index.create

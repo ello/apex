@@ -204,7 +204,7 @@ defmodule Ello.Core.Discovery do
   defp page_promotional_by_login_status(q, :generic, _), do: where(q, is_logged_in: true)
   defp page_promotional_by_login_status(q, _, _), do: q
 
-  @type categorizable :: User.t | Post.t | [User.t | Post.t]
+  @type categorizable :: User.t | [User.t]
 
   @doc """
   Fetches the categories for a user or post

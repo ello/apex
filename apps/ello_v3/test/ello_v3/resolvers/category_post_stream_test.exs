@@ -88,7 +88,7 @@ defmodule Ello.V3.Resolvers.CategoryPostStreamTest do
 
   test "Trending stream", _ do
     cat1  = Factory.insert(:category, roshi_slug: "cat1", slug: "cat1", level: "primary")
-    posts = Factory.insert_list(6, :post, %{category_ids: [cat1.id]})
+    posts = Enum.map(Factory.insert_list(6, :category_post, category: cat1), &(&1.post))
     Index.delete
     Index.create
     Enum.each(posts, &Index.add/1)

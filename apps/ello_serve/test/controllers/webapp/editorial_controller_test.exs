@@ -22,10 +22,14 @@ defmodule Ello.Serve.Webapp.EditorialControllerTest do
 
     cat1 = Factory.insert(:category, slug: "shop", level: "primary")
 
-    p1 = Factory.add_assets(Factory.insert(:post, token: "token-p1", category_ids: [cat1.id]))
-    p2 = Factory.add_assets(Factory.insert(:post, token: "token-p2", category_ids: [cat1.id]))
-    p3 = Factory.add_assets(Factory.insert(:post, token: "token-p3", category_ids: [cat1.id]))
-    p4 = Factory.add_assets(Factory.insert(:post, token: "token-p4", category_ids: [cat1.id]))
+    p1 = Factory.add_assets(Factory.insert(:post, token: "token-p1"))
+    p2 = Factory.add_assets(Factory.insert(:post, token: "token-p2"))
+    p3 = Factory.add_assets(Factory.insert(:post, token: "token-p3"))
+    p4 = Factory.add_assets(Factory.insert(:post, token: "token-p4"))
+    Factory.insert(:category_post, category: cat1, post: p1)
+    Factory.insert(:category_post, category: cat1, post: p2)
+    Factory.insert(:category_post, category: cat1, post: p3)
+    Factory.insert(:category_post, category: cat1, post: p4)
 
     Index.delete
     Index.create

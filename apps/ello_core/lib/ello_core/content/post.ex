@@ -3,6 +3,7 @@ defmodule Ello.Core.Content.Post do
   alias Ello.Core.Network.User
   alias Ello.Core.Contest.{ArtistInviteSubmission}
   alias Ello.Core.Content.{Love, Watch, Asset}
+  alias Ello.Core.Discovery.{CategoryPost}
 
   @type t :: %__MODULE__{}
 
@@ -17,7 +18,6 @@ defmodule Ello.Core.Content.Post do
 
     field :mentioned_usernames, {:array, :string}, default: []
     field :category_ids, {:array, :integer}, default: []
-    field :categories, {:array, :map}, default: [], virtual: true
 
     field :created_at, :utc_datetime
     field :updated_at, :utc_datetime
@@ -50,6 +50,9 @@ defmodule Ello.Core.Content.Post do
 
     has_one :artist_invite_submission, ArtistInviteSubmission
     has_one :artist_invite, through: [:artist_invite_submission, :artist_invite]
+
+    has_many :category_posts, CategoryPost
+    has_many :categories, through: [:category_posts, :category]
   end
 
 

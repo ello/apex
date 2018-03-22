@@ -53,7 +53,7 @@ defmodule Ello.Core.Content.Preload do
   def comment_list([], _), do: []
   def comment_list(comments, %{preloads: %{}} = options) do
     comments
-    |> prefetch_assets_and_author(options)
+    |> prefetch_ecto_preloads(options)
     |> build_image_structs
   end
   def comment_list(comments, options) do
@@ -70,19 +70,19 @@ defmodule Ello.Core.Content.Preload do
 
   defp post_and_repost_preloads(posts, options) do
     posts
-    |> prefetch_categories(options)
-    |> prefetch_assets_and_author(options)
+    |> prefetch_ecto_preloads(options)
     |> prefetch_current_user_relationships(options)
     |> prefetch_post_counts(options)
     |> build_image_structs
   end
 
-  defp prefetch_assets_and_author(post_or_posts, %{current_user: current_user, preloads: preloads}) do
+  defp prefetch_ecto_preloads(post_or_posts, %{current_user: current_user, preloads: preloads}) do
     measure_segment {:db, "Ecto.PostPreloads"} do
       ecto_preloads = []
                       |> add_assets_preload(preloads)
                       |> add_artist_invite_submission_preload(preloads)
                       |> add_author_preload(preloads, current_user)
+                      |> add_category_preload(preloads)
       post_or_posts
       |> Repo.preload(ecto_preloads)
       |> filter_assets
@@ -98,9 +98,18 @@ defmodule Ello.Core.Content.Preload do
     do: [{:artist_invite_submission, []} | preloads]
   defp add_artist_invite_submission_preload(preloads, _),
     do: preloads
+
   defp add_author_preload(preloads, %{author: author_preloads}, current_user),
     do: [{:author, &Network.users(%{ids: &1, current_user: current_user, preloads: author_preloads})} | preloads]
   defp add_author_preload(preloads, _, _), do: preloads
+
+  # NOTE: If/when we want to include category post info we would want to use a category_posts preload.
+  # We could also use :featured_category_posts vs :category_posts to get only featured categories
+  defp add_category_preload(preloads, %{categories: _}),
+    do: [{:categories, &Discovery.categories(%{ids: &1})} | preloads]
+  defp add_category_preload(preloads, _), do: preloads
+
+
   defp filter_assets(%Post{} = post), do: Post.filter_assets(post)
   defp filter_assets(posts) do
     Enum.map(posts, &filter_assets/1)
@@ -142,13 +151,6 @@ defmodule Ello.Core.Content.Preload do
   end
   defp prefetch_current_user_relationships(post_or_posts, _),
     do: post_or_posts
-
-  # Because categories are stored as an array on posts we can use preload.
-  # Instead we basically do what preload does ourselves manually.
-  defp prefetch_categories(post_or_posts, %{preloads: %{categories: _cat_preloads}}) do
-    Discovery.put_belongs_to_many_categories(post_or_posts)
-  end
-  defp prefetch_categories(post_or_posts, _), do: post_or_posts
 
   defp prefetch_post_counts(%Post{} = post, options),
     do: hd(prefetch_post_counts([post], options))
