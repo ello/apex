@@ -10,7 +10,8 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     a_inv = Factory.insert(:artist_invite, %{id: 1, status: "closed"})
     Factory.insert(:artist_invite_submission, post: post, artist_invite: a_inv, status: "approved")
     reposter = Factory.insert(:user)
-    repost = Factory.insert(:post, reposted_source: post, author: reposter, category_ids: [cat1.id])
+    repost = Factory.insert(:post, reposted_source: post, author: reposter)
+    Factory.insert(:category_post, post: repost, category: cat1)
     Factory.insert(:artist_invite_submission, post: repost, artist_invite: a_inv, status: "approved")
     {:ok, %{user: user, post: post, repost: repost, reposter: reposter}}
   end

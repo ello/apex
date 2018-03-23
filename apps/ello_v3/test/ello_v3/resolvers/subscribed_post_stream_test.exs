@@ -58,8 +58,10 @@ defmodule Ello.V3.Resolvers.SubscribedPostStreamTest do
 
   test "Trending stream - not subscribed to anything", context do
     user = Factory.insert(:user, %{followed_category_ids: nil})
-    posts1 = Factory.insert_list(6, :post, %{category_ids: [context.cat1.id]})
-    posts2 = Factory.insert_list(6, :post, %{category_ids: [context.cat2.id]})
+    cposts1 = Factory.insert_list(6, :category_post, %{category: context.cat1})
+    cposts2 = Factory.insert_list(6, :category_post, %{category: context.cat2})
+    posts1 = Enum.map(cposts1, &(&1.post))
+    posts2 = Enum.map(cposts2, &(&1.post))
     Index.delete
     Index.create
     Enum.each(posts1 ++ posts2, &Index.add/1)

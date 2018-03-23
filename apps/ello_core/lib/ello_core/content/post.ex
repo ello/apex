@@ -17,7 +17,6 @@ defmodule Ello.Core.Content.Post do
     field :is_saleable, :boolean
 
     field :mentioned_usernames, {:array, :string}, default: []
-    field :category_ids, {:array, :integer}, default: []
 
     field :created_at, :utc_datetime
     field :updated_at, :utc_datetime

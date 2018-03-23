@@ -27,9 +27,9 @@ defmodule Ello.V3.Resolvers.CategoryPostStreamTest do
     Stream.Client.Test.reset
 
     cat1  = Factory.insert(:category, roshi_slug: "cat1", slug: "cat1", level: "primary")
-    post1 = Factory.insert(:post, category_ids: [cat1.id])
-    post2 = Factory.insert(:post, category_ids: [cat1.id])
-    post3 = Factory.insert(:post, category_ids: [cat1.id])
+    post1 = Factory.insert(:post)
+    post2 = Factory.insert(:post)
+    post3 = Factory.insert(:post)
     roshi_items = [
       %Item{id: "#{post1.id}", stream_id: "categories:v1:cat1", ts: DateTime.utc_now},
       %Item{id: "#{post2.id}", stream_id: "categories:v1:cat1", ts: DateTime.utc_now},
@@ -59,9 +59,9 @@ defmodule Ello.V3.Resolvers.CategoryPostStreamTest do
     Stream.Client.Test.reset
 
     cat1  = Factory.insert(:category, roshi_slug: "cat1", slug: "cat1", level: "primary")
-    post1 = Factory.insert(:post, category_ids: [cat1.id])
-    post2 = Factory.insert(:post, category_ids: [cat1.id])
-    post3 = Factory.insert(:post, category_ids: [cat1.id])
+    post1 = Factory.insert(:post)
+    post2 = Factory.insert(:post)
+    post3 = Factory.insert(:post)
     roshi_items = [
       %Item{id: "#{post1.id}", stream_id: "categories:v1:cat1", ts: DateTime.utc_now},
       %Item{id: "#{post2.id}", stream_id: "categories:v1:cat1", ts: DateTime.utc_now},
