@@ -1,6 +1,6 @@
 defmodule Ello.Search.Post.Index do
   alias Ello.Search.Client
-  alias Ello.Core.Discovery
+  alias Ello.Core.{Discovery, Repo}
 
   def create do
     Client.create_index(index_name(), settings())
@@ -18,6 +18,7 @@ defmodule Ello.Search.Post.Index do
   end
 
   defp assemble_post_data(post, overrides) do
+    post = Repo.preload(post, :categories)
     %{
       id:                post.id,
       created_at:        post.created_at,
@@ -40,7 +41,7 @@ defmodule Ello.Search.Post.Index do
       view_count:        0,
       alt_text:          "",
       is_saleable:       post.is_saleable,
-      category_ids:      post.category_ids,
+      category_ids:      Enum.map(post.categories, &(&1.id)),
       has_images:        has_images(post),
     } |> Map.merge(overrides[:post] || %{})
   end

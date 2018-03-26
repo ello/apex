@@ -17,12 +17,14 @@ defmodule Ello.V2.CategoryPostControllerTest do
     inv3 = Factory.insert(:artist_invite, status: "closed")
 
     user = Factory.insert(:user)
-    post1 = Factory.insert(:post, category_ids: [cat1.id])
-    post2 = Factory.insert(:post, category_ids: [cat1.id])
-    post3 = Factory.insert(:post, has_nudity: true, category_ids: [cat1.id])
-    post4 = Factory.insert(:post, category_ids: [cat2.id])
-    post5 = Factory.insert(:post, category_ids: [cat2.id])
-    post6 = Factory.insert(:post, has_nudity: true, category_ids: [cat2.id])
+    post1 = Factory.insert(:featured_category_post, category: cat1).post
+    post2 = Factory.insert(:featured_category_post, category: cat1).post
+    post3 = Factory.insert(:post, has_nudity: true)
+    Factory.insert(:featured_category_post, post: post3, category: cat1)
+    post4 = Factory.insert(:featured_category_post, category: cat2).post
+    post5 = Factory.insert(:featured_category_post, category: cat2).post
+    post6 = Factory.insert(:post, has_nudity: true)
+    Factory.insert(:featured_category_post, post: post6, category: cat2)
     post7 = Factory.insert(:post)
     post8 = Factory.insert(:post, has_nudity: true)
     post9 = Factory.insert(:post)

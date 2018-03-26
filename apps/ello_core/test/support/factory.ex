@@ -1,6 +1,6 @@
 defmodule Ello.Core.Factory do
   alias Ello.Core.{Repo, Discovery, Network, Content, Contest}
-  alias Discovery.{Category, Promotional, Editorial, PagePromotional}
+  alias Discovery.{Category, Promotional, Editorial, PagePromotional, CategoryPost}
   alias Network.{User, Relationship, Flag}
   alias Content.{Post, Love, Watch, Asset}
   alias Contest.{ArtistInvite, ArtistInviteSubmission}
@@ -127,6 +127,23 @@ defmodule Ello.Core.Factory do
       created_at: DateTime.utc_now,
       updated_at: DateTime.utc_now,
     } |> Asset.build_attachment
+  end
+
+  def category_post_factory do
+    %CategoryPost{
+      category: build(:category),
+      post: build(:post),
+      submitted_at: DateTime.utc_now,
+    }
+  end
+
+  def featured_category_post_factory do
+    %CategoryPost{
+      category: build(:category),
+      post: build(:post),
+      submitted_at: DateTime.utc_now,
+      featured_at: DateTime.utc_now,
+    }
   end
 
   def editorial_factory do

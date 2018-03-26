@@ -21,7 +21,6 @@ defmodule Ello.V2.PostViewTest do
         %{"data" => "<p>Post</p>", "kind" => "text", "link_url" => nil}
       ],
       categories: [category],
-      category_ids: [category.id],
     })
     repost = Factory.build(:post, %{
       id: 2,
@@ -35,6 +34,7 @@ defmodule Ello.V2.PostViewTest do
       rendered_summary: [
         %{"data" => "<p>Repost</p>", "kind" => "text", "link_url" => nil}
       ],
+      categories: [],
     })
     current_user = Factory.build(:user)
     {:ok, [
@@ -166,6 +166,7 @@ defmodule Ello.V2.PostViewTest do
     current_user = Factory.build(:user, %{settings: settings})
     post = Factory.build(:post, %{
       assets: [],
+      categories: [],
       reposted_source: nil,
       body: [
         %{"kind" => "embed"}
@@ -249,8 +250,8 @@ defmodule Ello.V2.PostViewTest do
     id1 = "1"
     id2 = "2"
     posts = [
-      Factory.build(:post, %{id: id1, author: archer, assets: [], reposted_source: nil}),
-      Factory.build(:post, %{id: id2, author: archer, assets: [], reposted_source: nil}),
+      Factory.build(:post, %{id: id1, author: archer, assets: [], reposted_source: nil, categories: []}),
+      Factory.build(:post, %{id: id2, author: archer, assets: [], reposted_source: nil, categories: []}),
     ]
     assert %{
       posts: [
@@ -281,16 +282,19 @@ defmodule Ello.V2.PostViewTest do
       id: post_id1,
       author: archer,
       assets: [Asset.build_attachment(Factory.build(:asset, %{id: asset_id1}))],
+      categories: [],
       reposted_source: nil,
     })
     post2 = Factory.build(:post, %{
       id: post_id2,
       author: archer,
       assets: [Asset.build_attachment(Factory.build(:asset, %{id: asset_id2}))],
+      categories: [],
       reposted_source: Factory.build(:post, %{
         id: reposted_source_id,
         author: reposter,
         assets: [Asset.build_attachment(Factory.build(:asset, %{id: asset_id3}))],
+        categories: [],
         reposted_source: nil,
       }),
     })

@@ -3,7 +3,7 @@ defmodule Ello.V2.CommentViewTest do
   alias Ello.V2.CommentView
 
   setup %{conn: conn} do
-    post = Factory.insert(:post, assets: [])
+    post = Factory.insert(:post, assets: [], categories: [])
     author = Factory.insert(:user)
     comment = Factory.insert(:post, %{
       parent_post: post,

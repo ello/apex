@@ -101,11 +101,12 @@ defimpl Ello.V2.ConditionalGet, for: Ello.Core.Content.Post do
   end
 
   defp categories(%{categories: []}), do: ""
-  defp categories(%{categories: categories}) do
+  defp categories(%{categories: categories}) when is_list(categories) do
     categories
     |> Enum.map(&(&1.updated_at))
     |> Enum.join("")
   end
+  defp categories(%{categories: _}), do: ""
 end
 
 defimpl Ello.V2.ConditionalGet, for: Ello.Core.Discovery.Editorial do

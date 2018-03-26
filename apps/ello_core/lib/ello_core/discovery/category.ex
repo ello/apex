@@ -1,6 +1,9 @@
 defmodule Ello.Core.Discovery.Category do
   use Ecto.Schema
-  alias Ello.Core.Discovery.Promotional
+  alias Ello.Core.Discovery.{
+    CategoryPost,
+    Promotional,
+  }
   alias __MODULE__.TileImage
 
   @type t :: %__MODULE__{}
@@ -26,6 +29,7 @@ defmodule Ello.Core.Discovery.Category do
     field :is_creator_type, :boolean, default: false
 
     has_many :promotionals, Promotional
+    has_many :category_posts, CategoryPost
   end
 
   @doc """

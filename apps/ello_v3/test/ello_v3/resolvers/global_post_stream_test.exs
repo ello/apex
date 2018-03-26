@@ -91,18 +91,18 @@ defmodule Ello.V3.Resolvers.GlobalPostStreamTest do
     Stream.Client.Test.start
     Stream.Client.Test.reset
 
-    cat1 = Factory.insert(:category, roshi_slug: "cat1", slug: "cat1", level: "primary")
-    cat2 = Factory.insert(:category, roshi_slug: "cat2", slug: "cat2", level: "primary")
+    Factory.insert(:category, roshi_slug: "cat1", slug: "cat1", level: "primary")
+    Factory.insert(:category, roshi_slug: "cat2", slug: "cat2", level: "primary")
     inv1 = Factory.insert(:artist_invite, status: "open")
     inv2 = Factory.insert(:artist_invite, status: "open")
     inv3 = Factory.insert(:artist_invite, status: "closed")
 
-    post1 = Factory.insert(:post, category_ids: [cat1.id])
-    post2 = Factory.insert(:post, category_ids: [cat1.id])
-    post3 = Factory.insert(:post, has_nudity: true, category_ids: [cat1.id])
-    post4 = Factory.insert(:post, category_ids: [cat2.id])
-    post5 = Factory.insert(:post, category_ids: [cat2.id])
-    post6 = Factory.insert(:post, has_nudity: true, category_ids: [cat2.id])
+    post1 = Factory.insert(:post)
+    post2 = Factory.insert(:post)
+    post3 = Factory.insert(:post, has_nudity: true)
+    post4 = Factory.insert(:post)
+    post5 = Factory.insert(:post)
+    post6 = Factory.insert(:post, has_nudity: true)
     post7 = Factory.insert(:post)
     post8 = Factory.insert(:post, has_nudity: true)
     post9 = Factory.insert(:post)
