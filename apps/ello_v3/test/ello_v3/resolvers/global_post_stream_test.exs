@@ -31,13 +31,14 @@ defmodule Ello.V3.Resolvers.GlobalPostStreamTest do
     post5 = Factory.insert(:post)
     post6 = Factory.insert(:post, has_nudity: true)
     Factory.insert(:love, post: post1, user: user)
+    key = Stream.key(:global_recent)
     roshi_items = [
-      %Item{id: "#{post1.id}", stream_id: "all_post_firehose", ts: DateTime.utc_now},
-      %Item{id: "#{post2.id}", stream_id: "all_post_firehose", ts: DateTime.utc_now},
-      %Item{id: "#{post3.id}", stream_id: "all_post_firehose", ts: DateTime.utc_now},
-      %Item{id: "#{post4.id}", stream_id: "all_post_firehose", ts: DateTime.utc_now},
-      %Item{id: "#{post5.id}", stream_id: "all_post_firehose", ts: DateTime.utc_now},
-      %Item{id: "#{post6.id}", stream_id: "all_post_firehose", ts: DateTime.utc_now},
+      %Item{id: "#{post1.id}", stream_id: key, ts: DateTime.utc_now},
+      %Item{id: "#{post2.id}", stream_id: key, ts: DateTime.utc_now},
+      %Item{id: "#{post3.id}", stream_id: key, ts: DateTime.utc_now},
+      %Item{id: "#{post4.id}", stream_id: key, ts: DateTime.utc_now},
+      %Item{id: "#{post5.id}", stream_id: key, ts: DateTime.utc_now},
+      %Item{id: "#{post6.id}", stream_id: key, ts: DateTime.utc_now},
     ]
     Stream.Client.add_items(roshi_items)
 
@@ -77,14 +78,14 @@ defmodule Ello.V3.Resolvers.GlobalPostStreamTest do
     post5 = Factory.insert(:post, is_saleable: true)
     post6 = Factory.insert(:post, has_nudity: true, is_saleable: true)
     Factory.insert(:love, post: post1, user: user)
-
+    key = Stream.key(:global_shop)
     roshi_items = [
-      %Item{id: "#{post1.id}", stream_id: "global_shop_stream:v1", ts: DateTime.utc_now},
-      %Item{id: "#{post2.id}", stream_id: "global_shop_stream:v1", ts: DateTime.utc_now},
-      %Item{id: "#{post3.id}", stream_id: "global_shop_stream:v1", ts: DateTime.utc_now},
-      %Item{id: "#{post4.id}", stream_id: "global_shop_stream:v1", ts: DateTime.utc_now},
-      %Item{id: "#{post5.id}", stream_id: "global_shop_stream:v1", ts: DateTime.utc_now},
-      %Item{id: "#{post6.id}", stream_id: "global_shop_stream:v1", ts: DateTime.utc_now},
+      %Item{id: "#{post1.id}", stream_id: key, ts: DateTime.utc_now},
+      %Item{id: "#{post2.id}", stream_id: key, ts: DateTime.utc_now},
+      %Item{id: "#{post3.id}", stream_id: key, ts: DateTime.utc_now},
+      %Item{id: "#{post4.id}", stream_id: key, ts: DateTime.utc_now},
+      %Item{id: "#{post5.id}", stream_id: key, ts: DateTime.utc_now},
+      %Item{id: "#{post6.id}", stream_id: key, ts: DateTime.utc_now},
     ]
     Stream.Client.add_items(roshi_items)
 
@@ -139,8 +140,8 @@ defmodule Ello.V3.Resolvers.GlobalPostStreamTest do
     Stream.Client.Test.start
     Stream.Client.Test.reset
 
-    Factory.insert(:category, roshi_slug: "cat1", slug: "cat1", level: "primary")
-    Factory.insert(:category, roshi_slug: "cat2", slug: "cat2", level: "primary")
+    cat1 = Factory.insert(:category, roshi_slug: "cat1", slug: "cat1", level: "primary")
+    cat2 = Factory.insert(:category, roshi_slug: "cat2", slug: "cat2", level: "primary")
     inv1 = Factory.insert(:artist_invite, status: "open")
     inv2 = Factory.insert(:artist_invite, status: "open")
     inv3 = Factory.insert(:artist_invite, status: "closed")
@@ -158,15 +159,15 @@ defmodule Ello.V3.Resolvers.GlobalPostStreamTest do
     Factory.insert(:artist_invite_submission, post: post8, artist_invite: inv2)
     Factory.insert(:artist_invite_submission, post: post9, artist_invite: inv3)
     roshi_items = [
-      %Item{id: "#{post1.id}", stream_id: "categories:v1:cat1", ts: DateTime.utc_now},
-      %Item{id: "#{post2.id}", stream_id: "categories:v1:cat1", ts: DateTime.utc_now},
-      %Item{id: "#{post3.id}", stream_id: "categories:v1:cat1", ts: DateTime.utc_now},
-      %Item{id: "#{post4.id}", stream_id: "categories:v1:cat2", ts: DateTime.utc_now},
-      %Item{id: "#{post5.id}", stream_id: "categories:v1:cat2", ts: DateTime.utc_now},
-      %Item{id: "#{post6.id}", stream_id: "categories:v1:cat2", ts: DateTime.utc_now},
-      %Item{id: "#{post7.id}", stream_id: "artist_invite:v1:#{inv1.id}", ts: DateTime.utc_now},
-      %Item{id: "#{post8.id}", stream_id: "artist_invite:v1:#{inv2.id}", ts: DateTime.utc_now},
-      %Item{id: "#{post9.id}", stream_id: "artist_invite:v1:#{inv3.id}", ts: DateTime.utc_now},
+      %Item{id: "#{post1.id}", stream_id: Stream.key(cat1, :featured), ts: DateTime.utc_now},
+      %Item{id: "#{post2.id}", stream_id: Stream.key(cat1, :featured), ts: DateTime.utc_now},
+      %Item{id: "#{post3.id}", stream_id: Stream.key(cat1, :featured), ts: DateTime.utc_now},
+      %Item{id: "#{post4.id}", stream_id: Stream.key(cat2, :featured), ts: DateTime.utc_now},
+      %Item{id: "#{post5.id}", stream_id: Stream.key(cat2, :featured), ts: DateTime.utc_now},
+      %Item{id: "#{post6.id}", stream_id: Stream.key(cat2, :featured), ts: DateTime.utc_now},
+      %Item{id: "#{post7.id}", stream_id: Stream.key(inv1), ts: DateTime.utc_now},
+      %Item{id: "#{post8.id}", stream_id: Stream.key(inv2), ts: DateTime.utc_now},
+      %Item{id: "#{post9.id}", stream_id: Stream.key(inv3), ts: DateTime.utc_now},
     ]
     Stream.Client.add_items(roshi_items)
 
