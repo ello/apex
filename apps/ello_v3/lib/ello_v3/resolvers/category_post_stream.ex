@@ -31,26 +31,22 @@ defmodule Ello.V3.Resolvers.CategoryPostStream do
         }}
     end
   end
-  defp resolve_category(id_or_slug, %{kind: :featured} = args) do
+  defp resolve_category(id_or_slug, %{kind: kind} = args) when kind in [:featured, :recent, :shop] do
     case Discovery.category(%{id_or_slug: id_or_slug}) do
       nil -> {:error, "Category not found"}
       category ->
         stream = Stream.fetch(Map.merge(args, %{
-          keys:       [stream_key(category)],
+          keys:       [Stream.key(category, kind)],
           allow_nsfw: true,
         }))
 
         {:ok, %{
           id:    category.id,
           slug:  category.slug,
-          posts: track(stream.posts, args, %{kind: "category_featured", id: category.id}),
+          posts: track(stream.posts, args, %{kind: "category_#{kind}", id: category.id}),
           next:  stream.before,
           is_last_page: is_last_page(args, stream.posts)
         }}
     end
   end
-  defp resolve_category(_id_or_slug, %{kind: :recent}), do: {:error, "Recent has not been implemented"}
-
-  defp stream_key(%Discovery.Category{roshi_slug: slug}), do: "categories:v1:#{slug}"
 end
-
