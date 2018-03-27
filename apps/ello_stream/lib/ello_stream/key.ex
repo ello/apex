@@ -13,6 +13,4 @@ defmodule Ello.Stream.Key do
   def find(%Category{roshi_slug: slug}, :featured), do: "#{@category_key}:#{slug}"
   def find(%Category{roshi_slug: slug}, :recent), do: "#{@category_key}:recent:#{slug}"
   def find(%Category{roshi_slug: slug}, :shop), do: "#{@category_key}:shop:#{slug}"
-  def find(%Category{roshi_slug: slug}, :recent), do: "#{@category_key}:recent:#{slug}"
-  def find(%Category{roshi_slug: slug}, :shop), do: "#{@category_key}:shop:#{slug}"
 end
