@@ -68,6 +68,54 @@ defmodule Ello.V3.Resolvers.GlobalPostStreamTest do
     assert %{"isLastPage" => true, "posts" => []} = json3
   end
 
+  test "Shop stream", %{} do
+    user = Factory.insert(:user)
+    post1 = Factory.add_assets(Factory.insert(:post))
+    post2 = Factory.insert(:post, is_saleable: true)
+    post3 = Factory.insert(:post, has_nudity: true, is_saleable: true)
+    post4 = Factory.insert(:post, is_saleable: true)
+    post5 = Factory.insert(:post, is_saleable: true)
+    post6 = Factory.insert(:post, has_nudity: true, is_saleable: true)
+    Factory.insert(:love, post: post1, user: user)
+
+    roshi_items = [
+      %Item{id: "#{post1.id}", stream_id: "global_shop_stream:v1", ts: DateTime.utc_now},
+      %Item{id: "#{post2.id}", stream_id: "global_shop_stream:v1", ts: DateTime.utc_now},
+      %Item{id: "#{post3.id}", stream_id: "global_shop_stream:v1", ts: DateTime.utc_now},
+      %Item{id: "#{post4.id}", stream_id: "global_shop_stream:v1", ts: DateTime.utc_now},
+      %Item{id: "#{post5.id}", stream_id: "global_shop_stream:v1", ts: DateTime.utc_now},
+      %Item{id: "#{post6.id}", stream_id: "global_shop_stream:v1", ts: DateTime.utc_now},
+    ]
+    Stream.Client.add_items(roshi_items)
+
+    resp = post_graphql(%{query: @query, variables: %{"kind" => "SHOP", "perPage" => 3}})
+    assert %{"data" => %{"globalPostStream" => json}} = json_response(resp)
+    assert %{"isLastPage" => false, "next" => next, "posts" => posts} = json
+    assert to_string(post6.id) in Enum.map(posts, &(&1["id"]))
+    assert to_string(post5.id) in Enum.map(posts, &(&1["id"]))
+    assert to_string(post4.id) in Enum.map(posts, &(&1["id"]))
+
+    resp2 = post_graphql(%{query: @query, variables: %{
+      "before" => next,
+      "kind" => "SHOP",
+      "perPage" => 3,
+    }})
+    assert %{"data" => %{"globalPostStream" => json2}} = json_response(resp2)
+    assert %{"isLastPage" => false, "next" => next2, "posts" => posts2} = json2
+    assert to_string(post3.id) in Enum.map(posts2, &(&1["id"]))
+    assert to_string(post2.id) in Enum.map(posts2, &(&1["id"]))
+    assert to_string(post1.id) in Enum.map(posts2, &(&1["id"]))
+
+    resp3 = post_graphql(%{query: @query, variables: %{
+      "before" => next2,
+      "kind" => "SHOP",
+      "perPage" => 3,
+    }})
+    assert %{"data" => %{"globalPostStream" => json3}} = json_response(resp3)
+    assert %{"isLastPage" => true, "posts" => []} = json3
+  end
+
+
   test "Trending stream", _ do
     posts = Factory.insert_list(6, :post)
     Index.delete

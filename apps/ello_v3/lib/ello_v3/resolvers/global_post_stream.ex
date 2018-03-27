@@ -6,6 +6,7 @@ defmodule Ello.V3.Resolvers.GlobalPostStream do
   import Ello.V3.Resolvers.PaginationHelpers
   import Ello.V3.Resolvers.PostViewHelpers
   @global_recent_key "all_post_firehose"
+  @global_shop_key "global_shop_stream:v1"
 
   def call(_, %{kind: :trending} = args, _) do
     search = Search.post_search(Map.merge(args, %{
@@ -49,6 +50,19 @@ defmodule Ello.V3.Resolvers.GlobalPostStream do
 
     {:ok, %{
       posts: track(stream.posts, args, kind: :global_recent),
+      next: stream.before,
+      is_last_page: is_last_page(args, stream.posts)
+    }}
+  end
+
+  def call(_, %{kind: :shop} = args, _) do
+    stream = Stream.fetch(Map.merge(args, %{
+      keys:       [@global_shop_key],
+      allow_nsfw: true, # No NSFW in recent stream, reduces slop.
+    }))
+
+    {:ok, %{
+      posts: track(stream.posts, args, kind: :global_shop),
       next: stream.before,
       is_last_page: is_last_page(args, stream.posts)
     }}
