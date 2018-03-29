@@ -6,9 +6,11 @@ otp_release:
 services:
   - redis-server
 addons:
-  postgresql: '9.3'
+  postgresql: '10'
   apt:
     packages:
+      - postgresql-10
+      - postgresql-client-10
       - oracle-java8-set-default
 before_install:
   - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.deb
