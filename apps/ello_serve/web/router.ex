@@ -51,6 +51,8 @@ defmodule Ello.Serve.Router do
     get "/discover/all",                 CategoryController, :index
     get "/discover/subscribed",          NoContentController, :show # Logged in only
     get "/discover/subscribed/trending", NoContentController, :show # Logged in only
+    get "/discover/subscribed/recent",   NoContentController, :show # Logged in only
+    get "/discover/subscribed/shop",     NoContentController, :show # Logged in only
     get "/discover/:category",           DiscoverPostController, :category
     get "/discover/:category/trending",  DiscoverPostController, :category_trending
     get "/discover/:category/recent",    DiscoverPostController, :category_recent
