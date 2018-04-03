@@ -3,12 +3,11 @@ defmodule Ello.Grandstand.Impression do
 
   def from_json(%{
     "impressions" => impressions,
-    "date" => date,
     "stream_kind" => stream_kind,
     "artist_invite_id" => artist_invite_id,
-  }), do: %__MODULE__{
+  } = json), do: %__MODULE__{
     impressions: impressions,
-    date: date,
+    date: json["date"],
     stream_kind: stream_kind,
     artist_invite_id: artist_invite_id,
   }
