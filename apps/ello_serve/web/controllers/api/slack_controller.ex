@@ -5,7 +5,7 @@ defmodule Ello.Serve.API.SlackController do
   def slack_action(conn, params) do
     with encoded     <- params["payload"],
          decoded     <- URI.decode_www_form(encoded),
-         {:ok, resp} <- Poison.decode(decoded),
+         {:ok, resp} <- Jason.decode(decoded),
          true        <- valid_token(resp["token"]) do
       handle_action(conn, resp)
     else

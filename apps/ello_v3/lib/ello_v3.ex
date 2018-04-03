@@ -18,7 +18,7 @@ defmodule Ello.V3 do
     plug :match
     plug :dispatch
 
-    match "/api/v3/graphql", to: Absinthe.Plug, init_opts: [schema: Ello.V3.Schema]
+    match "/api/v3/graphql", to: Absinthe.Plug, init_opts: [schema: Ello.V3.Schema, json_codec: Jason]
     match _ do
       send_resp(conn, 404, "Not found")
     end
@@ -30,7 +30,7 @@ defmodule Ello.V3 do
   plug :match
   plug :dispatch
 
-  match "/api/v3/graphiql", to: Absinthe.Plug.GraphiQL, init_opts: [schema: Ello.V3.Schema]
+  match "/api/v3/graphiql", to: Absinthe.Plug.GraphiQL, init_opts: [schema: Ello.V3.Schema, json_codec: Jason]
   match "/api/v3/graphql",  to: Ello.V3.Authenticated
   match _ do
     send_resp(conn, 404, "Not found")

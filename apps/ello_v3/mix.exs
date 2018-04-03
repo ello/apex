@@ -33,6 +33,7 @@ defmodule Ello.V3.Mixfile do
     [
       {:absinthe_plug, "~> 1.4"},
       {:plug,          "~> 1.3"},
+      {:jason,         "~> 1.0"},
 
       {:newrelic_phoenix, github: "ello/newrelic_phoenix", branch: "master"},
 

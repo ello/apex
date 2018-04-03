@@ -8,7 +8,7 @@ defmodule Ello.Stream.Client.Roshi do
   """
   @spec add_items([Item.t]) :: :ok
   def add_items(items) do
-    body = Poison.encode!(Enum.map(items, &Item.format_stream_id/1))
+    body = Jason.encode!(Enum.map(items, &Item.format_stream_id/1))
     case put!("/streams", body, [], hackney: [pool: :roshi]) do
       %{status_code: 201} -> :ok
     end
@@ -19,7 +19,7 @@ defmodule Ello.Stream.Client.Roshi do
   """
   @spec delete_items([Item.t]) :: :ok
   def delete_items(items) do
-    body = Poison.encode!(Enum.map(items, &Item.format_stream_id/1))
+    body = Jason.encode!(Enum.map(items, &Item.format_stream_id/1))
     case request!(:delete, "/streams", body, [], hackney: [pool: :roshi]) do
       %{status_code: 200} -> :ok
     end
@@ -31,7 +31,7 @@ defmodule Ello.Stream.Client.Roshi do
   @spec get_coalesced_stream([String.t], String.t, integer) :: %{items: [Item.t], next_link: String.t}
   def get_coalesced_stream(keys, pagination_slug, limit) do
     params = [{"limit", limit}, {"from", pagination_slug}]
-    body = Poison.encode!(%{streams: Enum.map(keys, &Item.format_stream_id/1)})
+    body = Jason.encode!(%{streams: Enum.map(keys, &Item.format_stream_id/1)})
     case post!("/streams/coalesce", body, [], [params: params, hackney: [pool: :roshi, recv_timeout: timeout()]]) do
       %{status_code: 200, body: "[]"} -> %{items: [], next_link: pagination_slug}
       %{status_code: 200, body: resp, headers: headers} ->
