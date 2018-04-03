@@ -14,7 +14,7 @@ defmodule Ello.V2.JsonSchema do
     url
     |> HTTPoison.get!
     |> Map.get(:body)
-    |> Poison.decode!
+    |> Jason.decode!
   end
 
   def resolve(name) do

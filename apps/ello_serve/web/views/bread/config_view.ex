@@ -5,7 +5,7 @@ defmodule Ello.Serve.Bread.ConfigView do
     conn
     |> bread_env()
     |> set_debug(conn)
-    |> Poison.encode!
+    |> Jason.encode!
     |> URI.encode
   end
 

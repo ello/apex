@@ -15,7 +15,7 @@ defmodule Ello.Dispatch.Endpoint do
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
-    json_decoder: Poison
+    json_decoder: Jason
 
   plug CORSPlug, [
     headers: ["If-None-Match" | CORSPlug.defaults[:headers]],

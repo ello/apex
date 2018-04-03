@@ -6,7 +6,11 @@ use Mix.Config
 config :ello_core, Ello.Core.Repo,
   migration_source: "ecto_migrations",
   loggers: [{Ecto.LogEntry, :log, []}, NewRelicPhoenix.Ecto],
-  after_connect: {Ello.Core.Repo, :after_connect, []}
+  after_connect: {Ello.Core.Repo, :after_connect, []},
+  types: Ello.Core.PostgresTypes
+
+config :ecto, json_library: Jason
+
 
 config :ello_core,
   ecto_repos: [Ello.Core.Repo],
