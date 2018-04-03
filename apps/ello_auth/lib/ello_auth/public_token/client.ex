@@ -2,7 +2,7 @@ defmodule Ello.Auth.PublicToken.Client do
 
   def fetch_token(client_id, client_secret) do
     case make_request(client_id, client_secret) do
-      {:ok, %{status_code: 200, body: body}} -> Poison.decode(body)
+      {:ok, %{status_code: 200, body: body}} -> Jason.decode(body)
     end
   end
 
@@ -14,7 +14,7 @@ defmodule Ello.Auth.PublicToken.Client do
     }
     HTTPoison.post(
       token_url(),
-      Poison.encode!(body),
+      Jason.encode!(body),
       [{"Content-Type", "application/json"}]
     )
   end

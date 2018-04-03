@@ -32,7 +32,7 @@ defmodule Ello.Serve.Bread.NoContentControllerTest do
     resp = get(conn, "/manage")
     html = html_response(resp, 200)
     assert [_, content] = Regex.run(~r{<meta name="breadEnv" content="([^"]*)" />}s, html)
-    config = content |> URI.decode() |> Poison.decode!
+    config = content |> URI.decode() |> Jason.decode!
     assert config["OAUTH_CLIENT_ID"] == "client_id"
   end
 
@@ -41,7 +41,7 @@ defmodule Ello.Serve.Bread.NoContentControllerTest do
   #   html = html_response(resp, 200)
 
   #   assert [_, content] = Regex.run(~r{<meta name="webappEnv" content="([^"]*)" />}s, html)
-  #   config = content |> URI.decode() |> Poison.decode!
+  #   config = content |> URI.decode() |> Jason.decode!
   #   assert config["AUTH_CLIENT_ID"] == "client_id"
   #   assert config["AUTH_DOMAIN"] == "https://ello.co"
   #   assert config["PROMO_HOST"] == "https://d9ww8oh3n3brk.cloudfront.net"

@@ -35,7 +35,7 @@ defmodule Ello.Serve.Webapp.ConfigView do
   def encoded_env(conn) do
     conn
     |> webapp_env()
-    |> Poison.encode!
+    |> Jason.encode!
     |> URI.encode
   end
 

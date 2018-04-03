@@ -26,7 +26,7 @@ defmodule Ello.Events.Sidekiq do
     Task.async fn ->
       payload = module
                 |> build_job(struct)
-                |> Poison.encode!()
+                |> Jason.encode!()
 
       redis(["LPUSH", "sidekiq:queue:#{module.queue()}", payload])
     end

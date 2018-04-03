@@ -29,6 +29,6 @@ defmodule Ello.V3.Case do
   end
 
   def json_response(conn) do
-    Poison.decode!(conn.resp_body)
+    Jason.decode!(conn.resp_body)
   end
 end

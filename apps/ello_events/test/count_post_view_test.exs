@@ -24,7 +24,7 @@ defmodule Ello.Events.CountPostViewTest do
     })
 
     assert_receive ["LPUSH", "sidekiq:queue:count", json]
-    assert %{"args" => [%{"post_ids" => [1, 2, 3]}]} = Poison.decode!(json)
+    assert %{"args" => [%{"post_ids" => [1, 2, 3]}]} = Jason.decode!(json)
 
     Application.delete_env(:ello_events, :redis)
   end

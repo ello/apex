@@ -149,7 +149,7 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
     case webhook_url() do
       nil -> :ok
       url ->
-        HTTPoison.post!(url, Poison.encode!(body), [], [])
+        HTTPoison.post!(url, Jason.encode!(body), [], [])
     end
   end
 

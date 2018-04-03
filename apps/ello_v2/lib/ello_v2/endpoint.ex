@@ -15,7 +15,7 @@ defmodule Ello.V2.Endpoint do
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
-    json_decoder: Poison
+    json_decoder: Jason
 
   plug Ello.V2.Router
 end

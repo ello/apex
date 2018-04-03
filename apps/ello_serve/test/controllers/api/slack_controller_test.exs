@@ -16,7 +16,7 @@ defmodule Ello.Serve.API.SlackControllerTest do
       }]
     }
     body = %{
-      "payload" => URI.encode_www_form(Poison.encode!(payload))
+      "payload" => URI.encode_www_form(Jason.encode!(payload))
     }
     resp = post(conn, "/api/serve/v1/slack/action", body)
     assert resp.status == 401
@@ -33,7 +33,7 @@ defmodule Ello.Serve.API.SlackControllerTest do
       }]
     }
     body = %{
-      "payload" => URI.encode_www_form(Poison.encode!(payload))
+      "payload" => URI.encode_www_form(Jason.encode!(payload))
     }
     resp = post(conn, "/api/serve/v1/slack/action", body)
     assert resp.status == 200

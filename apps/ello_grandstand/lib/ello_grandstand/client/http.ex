@@ -24,8 +24,9 @@ defmodule Ello.Grandstand.Client.HTTP do
 
   defp handle_response(resp) do
     resp
-    |> Poison.decode!(as: %{"data" => [%Impression{}]})
+    |> Poison.decode!
     |> Map.get("data")
+    |> Enum.map(&Impression.from_json/1)
     |> case do
       nil -> []
       list -> list
