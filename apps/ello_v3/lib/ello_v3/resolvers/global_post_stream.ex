@@ -5,7 +5,6 @@ defmodule Ello.V3.Resolvers.GlobalPostStream do
   alias Ello.Core.Contest
   import Ello.V3.Resolvers.PaginationHelpers
   import Ello.V3.Resolvers.PostViewHelpers
-  @global_recent_key "all_post_firehose"
 
   def call(_, %{kind: :trending} = args, _) do
     search = Search.post_search(Map.merge(args, %{
@@ -30,7 +29,7 @@ defmodule Ello.V3.Resolvers.GlobalPostStream do
     sources = Task.await(categories) ++ Task.await(invites)
 
     stream = Stream.fetch(Map.merge(args, %{
-      keys:       Enum.map(sources, &stream_key/1),
+      keys:       Enum.map(sources, &Stream.key(&1, :featured)),
       allow_nsfw: true, # No NSFW in categories or artist invites, so reduce slop
     }))
 
@@ -43,7 +42,7 @@ defmodule Ello.V3.Resolvers.GlobalPostStream do
 
   def call(_, %{kind: :recent} = args, _) do
     stream = Stream.fetch(Map.merge(args, %{
-      keys:       [@global_recent_key],
+      keys:       [Stream.key(:global_recent)],
       allow_nsfw: true, # No NSFW in recent stream, reduces slop.
     }))
 
@@ -54,6 +53,16 @@ defmodule Ello.V3.Resolvers.GlobalPostStream do
     }}
   end
 
-  defp stream_key(%Discovery.Category{roshi_slug: slug}), do: "categories:v1:#{slug}"
-  defp stream_key(%Contest.ArtistInvite{id: id}), do: "artist_invite:v1:#{id}"
+  def call(_, %{kind: :shop} = args, _) do
+    stream = Stream.fetch(Map.merge(args, %{
+      keys:       [Stream.key(:global_shop)],
+      allow_nsfw: true, # No NSFW in recent stream, reduces slop.
+    }))
+
+    {:ok, %{
+      posts: track(stream.posts, args, kind: :global_shop),
+      next: stream.before,
+      is_last_page: is_last_page(args, stream.posts)
+    }}
+  end
 end

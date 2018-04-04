@@ -19,7 +19,16 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
       title: "Ello | The Creators Network",
       description: "Discover recent work from creators on Ello in Art, Fashion, Photography, Design, Architecture, Illustration, GIFs, Writing, Music, Textile, Skate and Cycling.",
       categories: fn -> categories(conn) end,
-      posts: fn -> recent_posts(conn) end,
+      posts: fn -> roshi_posts(conn, :global_recent) end,
+    })
+  end
+
+  def shop(conn, _) do
+    render_html(conn, %{
+      title: "Ello | The Creators Network",
+      description: "Discover recent purchasable work from creators on Ello in Art, Fashion, Photography, Design, Architecture, Illustration, GIFs, Writing, Music, Textile, Skate and Cycling.",
+      categories: fn -> categories(conn) end,
+      posts: fn -> roshi_posts(conn, :global_shop) end,
     })
   end
 
@@ -33,14 +42,15 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
   end
 
   def category(conn, params) do
-    case fetch_category(conn, params) do
-      nil -> send_resp(conn, 404, "")
-      cat ->
-        render_html(conn, %{
-          categories: fn -> categories(conn) end,
-          posts:      fn -> category_posts(conn, cat) end,
-        })
-    end
+    category_stream(conn, params, :featured)
+  end
+
+  def category_recent(conn, params) do
+    category_stream(conn, params, :recent)
+  end
+
+  def category_shop(conn, params) do
+    category_stream(conn, params, :shop)
   end
 
   def category_trending(conn, params) do
@@ -72,19 +82,31 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
     sources = Task.await(categories) ++ Task.await(invites)
 
     stream = Stream.fetch(standard_params(conn, %{
-      keys:         Enum.map(sources, &stream_key/1),
+      keys:         Enum.map(sources, &Stream.key(&1, :featured)),
       allow_nsfw:   true, # No NSFW in categories, reduces slop.
     }))
     track(conn, stream.posts, stream_kind: "featured")
     stream
   end
 
-  defp category_posts(conn, category) do
+
+  defp category_stream(conn, params, kind) do
+    case fetch_category(conn, params) do
+      nil -> send_resp(conn, 404, "")
+      cat ->
+        render_html(conn, %{
+          categories: fn -> categories(conn) end,
+          posts:      fn -> category_posts(conn, cat, kind) end,
+        })
+    end
+  end
+
+  defp category_posts(conn, category, kind) do
     stream = Stream.fetch(standard_params(conn, %{
-      keys:         [stream_key(category)],
+      keys:         [Stream.key(category, kind)],
       allow_nsfw:   true, # No NSFW in categories, reduces slop.
     }))
-    track(conn, stream.posts, stream_kind: "category")
+    track(conn, stream.posts, stream_kind: "category_#{kind}")
     stream
   end
 
@@ -101,16 +123,12 @@ defmodule Ello.Serve.Webapp.DiscoverPostController do
     search
   end
 
-  defp stream_key(%Discovery.Category{roshi_slug: slug}), do: "categories:v1:#{slug}"
-  defp stream_key(%Contest.ArtistInvite{id: id}), do: "artist_invite:v1:#{id}"
-
-  @recent_stream "all_post_firehose"
-  defp recent_posts(conn) do
+  defp roshi_posts(conn, kind) do
     stream = Stream.fetch(standard_params(conn, %{
-      keys:         [@recent_stream],
+      keys:         [Stream.key(kind)],
       allow_nsfw:   true, # No NSFW in categories, reduces slop.
     }))
-    track(conn, stream.posts, stream_kind: "recent")
+    track(conn, stream.posts, stream_kind: kind)
     stream
   end
 

@@ -3,9 +3,12 @@
     <li><%= link "Fetured", to: webapp_url("/discover") %></li>
     <li><%= link "Trending", to: webapp_url("/discover/trending") %></li>
     <li><%= link "Recent", to: webapp_url("/discover/recent") %></li>
+    <li><%= link "Shop", to: webapp_url("/discover/shop") %></li>
     <%= for cat <- @categories do %>
       <li><%= link cat.name <> " Featured", to: webapp_url("/discover/" <> cat.slug) %></li>
       <li><%= link cat.name <> " Trending", to: webapp_url("/discover/" <> cat.slug <> "/trending") %></li>
+      <li><%= link cat.name <> " Recent", to: webapp_url("/discover/" <> cat.slug <> "/recent") %></li>
+      <li><%= link cat.name <> " Shop", to: webapp_url("/discover/" <> cat.slug <> "/shop") %></li>
     <% end %>
   </ul>
 </nav>

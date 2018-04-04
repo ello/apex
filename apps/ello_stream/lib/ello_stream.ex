@@ -26,6 +26,9 @@ defmodule Ello.Stream do
     |> do_fetch
   end
 
+  def key(kind), do: Ello.Stream.Key.find(kind)
+  def key(arg, kind), do: Ello.Stream.Key.find(arg, kind)
+
   # Set in module attribute so we can pattern match.
   @max_batches_per_request Application.get_env(:ello_stream, :batches_per_request)
 

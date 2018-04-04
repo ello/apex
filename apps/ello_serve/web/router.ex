@@ -47,11 +47,16 @@ defmodule Ello.Serve.Router do
     get "/discover",                     DiscoverPostController, :featured
     get "/discover/trending",            DiscoverPostController, :trending
     get "/discover/recent",              DiscoverPostController, :recent
+    get "/discover/shop",                DiscoverPostController, :shop
     get "/discover/all",                 CategoryController, :index
     get "/discover/subscribed",          NoContentController, :show # Logged in only
     get "/discover/subscribed/trending", NoContentController, :show # Logged in only
+    get "/discover/subscribed/recent",   NoContentController, :show # Logged in only
+    get "/discover/subscribed/shop",     NoContentController, :show # Logged in only
     get "/discover/:category",           DiscoverPostController, :category
     get "/discover/:category/trending",  DiscoverPostController, :category_trending
+    get "/discover/:category/recent",    DiscoverPostController, :category_recent
+    get "/discover/:category/shop",      DiscoverPostController, :category_shop
     get "/search",                       SearchController, :index
     get "/artist-invites",               ArtistInviteIndexController, :index
     get "/artist-invites/:id",           ArtistInviteShowController, :show

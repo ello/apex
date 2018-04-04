@@ -29,15 +29,30 @@ defmodule Ello.Serve.Webapp.DiscoverPostControllerTest do
     Index.add(p4, post: %{love_count: 1})
 
     roshi_items = [
-      %Stream.Item{id: "#{p1.id}", stream_id: "categories:v1:cat-1", ts: DateTime.utc_now},
-      %Stream.Item{id: "#{p2.id}", stream_id: "categories:v1:cat-1", ts: DateTime.utc_now},
-      %Stream.Item{id: "#{p3.id}", stream_id: "categories:v1:cat-1", ts: DateTime.utc_now},
-      %Stream.Item{id: "#{p4.id}", stream_id: "categories:v1:cat-1", ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p1.id}", stream_id: Stream.key(c1, :featured), ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p2.id}", stream_id: Stream.key(c1, :featured), ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p3.id}", stream_id: Stream.key(c1, :featured), ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p4.id}", stream_id: Stream.key(c1, :featured), ts: DateTime.utc_now},
 
-      %Stream.Item{id: "#{p1.id}", stream_id: "all_post_firehose", ts: DateTime.utc_now},
-      %Stream.Item{id: "#{p2.id}", stream_id: "all_post_firehose", ts: DateTime.utc_now},
-      %Stream.Item{id: "#{p3.id}", stream_id: "all_post_firehose", ts: DateTime.utc_now},
-      %Stream.Item{id: "#{p4.id}", stream_id: "all_post_firehose", ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p1.id}", stream_id: Stream.key(c1, :recent), ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p2.id}", stream_id: Stream.key(c1, :recent), ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p3.id}", stream_id: Stream.key(c1, :recent), ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p4.id}", stream_id: Stream.key(c1, :recent), ts: DateTime.utc_now},
+
+      %Stream.Item{id: "#{p1.id}", stream_id: Stream.key(c1, :shop), ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p2.id}", stream_id: Stream.key(c1, :shop), ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p3.id}", stream_id: Stream.key(c1, :shop), ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p4.id}", stream_id: Stream.key(c1, :shop), ts: DateTime.utc_now},
+
+      %Stream.Item{id: "#{p1.id}", stream_id: Stream.key(:global_recent), ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p2.id}", stream_id: Stream.key(:global_recent), ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p3.id}", stream_id: Stream.key(:global_recent), ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p4.id}", stream_id: Stream.key(:global_recent), ts: DateTime.utc_now},
+
+      %Stream.Item{id: "#{p1.id}", stream_id: Stream.key(:global_shop), ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p2.id}", stream_id: Stream.key(:global_shop), ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p3.id}", stream_id: Stream.key(:global_shop), ts: DateTime.utc_now},
+      %Stream.Item{id: "#{p4.id}", stream_id: Stream.key(:global_shop), ts: DateTime.utc_now},
     ]
     Stream.Client.add_items(roshi_items)
 
@@ -100,6 +115,23 @@ defmodule Ello.Serve.Webapp.DiscoverPostControllerTest do
   end
 
   @tag :meta
+  test "/discover/shop - meta", %{conn: conn} do
+    resp = get(conn, "/discover/shop")
+    html = html_response(resp, 200)
+    assert html =~ "Ello | The Creators Network"
+    assert has_meta(html, name: "description", content: "Discover recent purchasable.*")
+  end
+
+  test "/discover/shop - noscript", %{conn: conn} do
+    resp = get(conn, "/discover/shop", %{"per_page" => "2"})
+    html = html_response(resp, 200)
+    assert html =~ "<noscript>"
+    assert html =~ "token-p3"
+    assert html =~ "token-p4"
+    assert html =~ ~r(<a href="https://ello\.co/discover/shop\?before=.*">Next Page</a>)
+  end
+
+  @tag :meta
   test "/discover/cat1 - meta", %{conn: conn} do
     resp = get(conn, "/discover/cat1")
     html = html_response(resp, 200)
@@ -113,6 +145,38 @@ defmodule Ello.Serve.Webapp.DiscoverPostControllerTest do
     assert html =~ "token-p3"
     assert html =~ "token-p4"
     assert html =~ ~r(<a href="https://ello\.co/discover/cat1\?before=.*">Next Page</a>)
+  end
+
+  @tag :meta
+  test "/discover/cat1/recent - meta", %{conn: conn} do
+    resp = get(conn, "/discover/cat1/recent")
+    html = html_response(resp, 200)
+    assert html =~ "Ello | The Creators Network"
+  end
+
+  test "/discover/cat1/recent - noscript", %{conn: conn} do
+    resp = get(conn, "/discover/cat1/recent", %{"per_page" => "2"})
+    html = html_response(resp, 200)
+    assert html =~ "<noscript>"
+    assert html =~ "token-p3"
+    assert html =~ "token-p4"
+    assert html =~ ~r(<a href="https://ello\.co/discover/cat1/recent\?before=.*">Next Page</a>)
+  end
+
+  @tag :meta
+  test "/discover/cat1/shop - meta", %{conn: conn} do
+    resp = get(conn, "/discover/cat1/shop")
+    html = html_response(resp, 200)
+    assert html =~ "Ello | The Creators Network"
+  end
+
+  test "/discover/cat1/shop - noscript", %{conn: conn} do
+    resp = get(conn, "/discover/cat1/shop", %{"per_page" => "2"})
+    html = html_response(resp, 200)
+    assert html =~ "<noscript>"
+    assert html =~ "token-p3"
+    assert html =~ "token-p4"
+    assert html =~ ~r(<a href="https://ello\.co/discover/cat1/shop\?before=.*">Next Page</a>)
   end
 
   @tag :meta

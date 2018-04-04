@@ -11,6 +11,7 @@ defmodule Ello.V3.Schema.ContentTypes do
     value :recent
     value :featured
     value :trending
+    value :shop
   end
 
   object :post_stream do

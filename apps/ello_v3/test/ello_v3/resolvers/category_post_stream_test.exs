@@ -106,4 +106,78 @@ defmodule Ello.V3.Resolvers.CategoryPostStreamTest do
     assert %{"data" => %{"categoryPostStream" => json2}} = json_response(resp2)
     assert %{"isLastPage" => true, "next" => nil, "posts" => [_p1, _p2, _p3]} = json2
   end
+
+  test "Recent stream", _ do
+    Stream.Client.Test.start
+    Stream.Client.Test.reset
+
+    cat1  = Factory.insert(:category, roshi_slug: "cat1", slug: "cat1", level: "primary")
+    post1 = Factory.insert(:post)
+    post2 = Factory.insert(:post)
+    post3 = Factory.insert(:post)
+    key = Ello.Stream.key(cat1, :recent)
+    roshi_items = [
+      %Item{id: "#{post1.id}", stream_id: key, ts: DateTime.utc_now},
+      %Item{id: "#{post2.id}", stream_id: key, ts: DateTime.utc_now},
+      %Item{id: "#{post3.id}", stream_id: key, ts: DateTime.utc_now},
+    ]
+    Stream.Client.add_items(roshi_items)
+
+    resp = post_graphql(%{query: @query, variables: %{
+      "id" => cat1.id,
+      "kind" => "RECENT",
+      "perPage" => 3
+    }})
+    assert %{"data" => %{"categoryPostStream" => json}} = json_response(resp)
+    assert %{"posts" => posts, "next" => next, "isLastPage" => false} = json
+    assert to_string(post1.id) in Enum.map(posts, &(&1["id"]))
+    assert to_string(post2.id) in Enum.map(posts, &(&1["id"]))
+    assert to_string(post3.id) in Enum.map(posts, &(&1["id"]))
+
+    resp2 = post_graphql(%{query: @query, variables: %{
+      "id" => cat1.id,
+      "kind" => "RECENT",
+      "before" => next,
+      "perPage" => 3,
+    }})
+    assert %{"data" => %{"categoryPostStream" => json2}} = json_response(resp2)
+    assert %{"isLastPage" => true, "next" => _, "posts" => []} = json2
+  end
+
+  test "Shop stream", _ do
+    Stream.Client.Test.start
+    Stream.Client.Test.reset
+
+    cat1  = Factory.insert(:category, roshi_slug: "cat1", slug: "cat1", level: "primary")
+    post1 = Factory.insert(:post, is_saleable: true)
+    post2 = Factory.insert(:post, is_saleable: true)
+    post3 = Factory.insert(:post, is_saleable: true)
+    key = Ello.Stream.key(cat1, :shop)
+    roshi_items = [
+      %Item{id: "#{post1.id}", stream_id: key, ts: DateTime.utc_now},
+      %Item{id: "#{post2.id}", stream_id: key, ts: DateTime.utc_now},
+      %Item{id: "#{post3.id}", stream_id: key, ts: DateTime.utc_now},
+    ]
+    Stream.Client.add_items(roshi_items)
+
+    resp = post_graphql(%{query: @query, variables: %{
+      "id" => cat1.id,
+      "kind" => "SHOP",
+      "perPage" => 3
+    }})
+    assert %{"data" => %{"categoryPostStream" => json}} = json_response(resp)
+    assert %{"posts" => posts, "next" => next, "isLastPage" => false} = json
+    assert to_string(post1.id) in Enum.map(posts, &(&1["id"]))
+    assert to_string(post2.id) in Enum.map(posts, &(&1["id"]))
+    assert to_string(post3.id) in Enum.map(posts, &(&1["id"]))
+
+    resp2 = post_graphql(%{query: @query, variables: %{
+      "id" => cat1.id,
+      "kind" => "SHOP",
+      "before" => next,
+      "perPage" => 3,
+    }})
+    assert %{"data" => %{"categoryPostStream" => json2}} = json_response(resp2)
+    assert %{"isLastPage" => true, "next" => _, "posts" => []} = json2
+  end
 end
