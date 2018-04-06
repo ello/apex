@@ -5,7 +5,7 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
 
     cat1 = Script.insert(:lacross_category)
-    user = Factory.insert(:user)
+    user = Factory.insert(:user, is_staff: true)
     post = Factory.insert(:post, author: user)
     a_inv = Factory.insert(:artist_invite, %{id: 1, status: "closed"})
     Factory.insert(:artist_invite_submission, post: post, artist_invite: a_inv, status: "approved")
@@ -54,6 +54,13 @@ defmodule Ello.V3.Resolvers.FindPostTest do
               id
               slug
               title
+            }
+            actions {
+              approve { href label method body { status } }
+              decline { href label method body { status } }
+              select  { href label method body { status } }
+              unapprove { href label method body { status } }
+              unselect { href label method body { status } }
             }
           }
           categories {
@@ -169,6 +176,13 @@ defmodule Ello.V3.Resolvers.FindPostTest do
                 slug
                 title
               }
+              actions {
+                approve { href label method body { status } }
+                decline { href label method body { status } }
+                select  { href label method body { status } }
+                unapprove { href label method body { status } }
+                unselect { href label method body { status } }
+              }
             }
           }
         }
@@ -190,6 +204,8 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     assert json["currentUserState"]["reposted"] == false
     assert json["currentUserState"]["loved"] == false
     assert json["currentUserState"]["watching"] == false
+    refute json["artist_invite_submission"]
+
 
     assert json["repostedSource"]["id"] == "#{post.id}"
     assert json["repostedSource"]["author"]["id"] == "#{user.id}"
@@ -203,6 +219,13 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     assert json["repostedSource"]["currentUserState"]["reposted"] == false
     assert json["repostedSource"]["currentUserState"]["loved"] == false
     assert json["repostedSource"]["currentUserState"]["watching"] == false
+
+    actions = json["repostedSource"]["artistInviteSubmission"]["actions"]
+    assert %{"body" => %{}, "href" => _, "method" => _, "label" => _} = actions["select"]
+    assert %{"body" => %{}, "href" => _, "method" => _, "label" => _} = actions["unapprove"]
+    refute actions["decline"]
+    refute actions["unselect"]
+    refute actions["approve"]
   end
 
   test "Full post representation via fragments with a repost", %{user: user, post: post, repost: repost, reposter: reposter} do
