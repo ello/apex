@@ -7,9 +7,9 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     cat1 = Script.insert(:lacross_category)
     user = Factory.insert(:user, is_staff: true)
     post = Factory.insert(:post, author: user)
-    a_inv = Factory.insert(:artist_invite, %{id: 1, status: "closed"})
-    Factory.insert(:artist_invite_submission, post: post, artist_invite: a_inv, status: "approved")
     reposter = Factory.insert(:user)
+    a_inv = Factory.insert(:artist_invite, %{id: 1, status: "closed", brand_account: reposter})
+    Factory.insert(:artist_invite_submission, post: post, artist_invite: a_inv, status: "approved")
     repost = Factory.insert(:post, reposted_source: post, author: reposter)
     Factory.insert(:category_post, post: repost, category: cat1)
     Factory.insert(:artist_invite_submission, post: repost, artist_invite: a_inv, status: "approved")
@@ -259,6 +259,23 @@ defmodule Ello.V3.Resolvers.FindPostTest do
         links { assets }
       }
 
+      fragment artistInviteSubmissionAction on ArtistInviteSubmissionAction {
+        href label method body { status }
+      }
+
+      fragment artistInviteSubmissionDetails on ArtistInviteSubmission {
+        id
+        status
+        artistInvite { id slug title }
+        actions {
+          approve { ...artistInviteSubmissionAction }
+          decline { ...artistInviteSubmissionAction }
+          select { ...artistInviteSubmissionAction }
+          unapprove { ...artistInviteSubmissionAction }
+          unselect { ...artistInviteSubmissionAction }
+        }
+      }
+
       fragment postSummary on Post {
         id
         token
@@ -275,6 +292,7 @@ defmodule Ello.V3.Resolvers.FindPostTest do
         }
         postStats { lovesCount commentsCount viewsCount repostsCount }
         currentUserState { watching loved reposted }
+        artistInviteSubmission { ...artistInviteSubmissionDetails }
       }
 
       query($username: String!, $token: String!) {
@@ -292,8 +310,22 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     assert json["id"] == "#{repost.id}"
     assert json["author"]["id"] == "#{reposter.id}"
     assert json["author"]["currentUserState"]["relationshipPriority"] == "self"
+    actions = json["artistInviteSubmission"]["actions"]
+    assert %{"body" => %{}, "href" => _, "method" => _, "label" => _} = actions["select"]
+    assert %{"body" => %{}, "href" => _, "method" => _, "label" => _} = actions["unapprove"]
+    refute actions["decline"]
+    refute actions["unselect"]
+    refute actions["approve"]
+
     assert json["repostedSource"]["id"] == "#{post.id}"
     assert json["repostedSource"]["author"]["id"] == "#{user.id}"
     assert json["repostedSource"]["author"]["currentUserState"]["relationshipPriority"] == "friend"
+
+    actions = json["repostedSource"]["artistInviteSubmission"]["actions"]
+    assert %{"body" => %{}, "href" => _, "method" => _, "label" => _} = actions["select"]
+    assert %{"body" => %{}, "href" => _, "method" => _, "label" => _} = actions["unapprove"]
+    refute actions["decline"]
+    refute actions["unselect"]
+    refute actions["approve"]
   end
 end
