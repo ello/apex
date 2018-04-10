@@ -56,6 +56,7 @@ defmodule Ello.V2.PostViewTest do
       content: [%{"data" => "<p>Phrasing!</p>", "kind" => "text", "link_url" => nil}],
       author_id: "#{user.id}",
       artist_invite_id: nil,
+      artist_invite_submission_id: nil,
       artist_invite_submission: %{
         slug: nil,
         title: nil,
@@ -99,6 +100,7 @@ defmodule Ello.V2.PostViewTest do
       repost_id: ^reposted_id,
       author_id: ^repost_author_id,
       artist_invite_id: nil,
+      artist_invite_submission_id: nil,
       artist_invite_submission: %{
         slug: nil,
         title: nil,
@@ -337,6 +339,7 @@ defmodule Ello.V2.PostViewTest do
     )[:posts]
 
     assert json[:artist_invite_id] == "0"
+    assert json[:artist_invite_submission_id] == "0"
     assert json[:artist_invite_submission][:slug] == "test-artist-invite"
     assert json[:artist_invite_submission][:title] == "Test Artist Invite"
     assert json[:artist_invite_submission][:status] == nil
@@ -351,6 +354,7 @@ defmodule Ello.V2.PostViewTest do
     )[:posts]
 
     assert json[:artist_invite_id] == "0"
+    assert json[:artist_invite_submission_id] == "0"
     assert json[:artist_invite_submission][:slug] == "test-artist-invite"
     assert json[:artist_invite_submission][:title] == "Test Artist Invite"
     assert json[:artist_invite_submission][:status] == "approved"
@@ -365,6 +369,7 @@ defmodule Ello.V2.PostViewTest do
     )[:posts]
 
     assert json[:artist_invite_id] == "0"
+    assert json[:artist_invite_submission_id] == "0"
     assert json[:artist_invite_submission][:slug] == "test-artist-invite"
     assert json[:artist_invite_submission][:title] == "Test Artist Invite"
     assert json[:artist_invite_submission][:status] == nil
@@ -379,6 +384,7 @@ defmodule Ello.V2.PostViewTest do
     )[:posts]
 
     assert json[:artist_invite_id] == "0"
+    assert json[:artist_invite_submission_id] == "0"
     assert json[:artist_invite_submission][:slug] == "test-artist-invite"
     assert json[:artist_invite_submission][:title] == "Test Artist Invite"
     assert json[:artist_invite_submission][:status] == "approved"
@@ -393,6 +399,7 @@ defmodule Ello.V2.PostViewTest do
     )[:posts]
 
     assert json[:artist_invite_id] == "0"
+    assert json[:artist_invite_submission_id] == "0"
     assert json[:artist_invite_submission][:slug] == "test-artist-invite"
     assert json[:artist_invite_submission][:title] == "Test Artist Invite"
     assert json[:artist_invite_submission][:status] == "selected"
@@ -407,6 +414,7 @@ defmodule Ello.V2.PostViewTest do
     )[:posts]
 
     assert json[:artist_invite_id] == nil
+    assert json[:artist_invite_submission_id] == nil
     assert json[:artist_invite_submission][:slug] == nil
     assert json[:artist_invite_submission][:title] == nil
     assert json[:artist_invite_submission][:status] == nil
@@ -421,6 +429,7 @@ defmodule Ello.V2.PostViewTest do
     )[:posts]
 
     assert json[:artist_invite_id] == nil
+    assert json[:artist_invite_submission_id] == nil
     assert json[:artist_invite_submission][:slug] == nil
     assert json[:artist_invite_submission][:title] == nil
     assert json[:artist_invite_submission][:status] == nil
@@ -435,6 +444,7 @@ defmodule Ello.V2.PostViewTest do
     )[:posts]
 
     assert json[:artist_invite_id] == nil
+    assert json[:artist_invite_submission_id] == nil
     assert json[:artist_invite_submission][:slug] == nil
     assert json[:artist_invite_submission][:title] == nil
     assert json[:artist_invite_submission][:status] == nil
@@ -449,6 +459,7 @@ defmodule Ello.V2.PostViewTest do
     )[:posts]
 
     assert json[:artist_invite_id] == nil
+    assert json[:artist_invite_submission_id] == nil
     assert json[:artist_invite_submission][:slug] == nil
     assert json[:artist_invite_submission][:title] == nil
     assert json[:artist_invite_submission][:status] == nil
@@ -463,6 +474,7 @@ defmodule Ello.V2.PostViewTest do
     )[:posts]
 
     assert json[:artist_invite_id] == nil
+    assert json[:artist_invite_submission_id] == nil
     assert json[:artist_invite_submission][:slug] == nil
     assert json[:artist_invite_submission][:title] == nil
     assert json[:artist_invite_submission][:status] == nil
@@ -470,6 +482,7 @@ defmodule Ello.V2.PostViewTest do
 
   defp build_submission(sub_status, inv_status) do
     Factory.build(:artist_invite_submission, %{
+      id:               0,
       status:           sub_status,
       artist_invite_id: 0,
       artist_invite:    Factory.build(:artist_invite, %{
