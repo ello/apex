@@ -406,9 +406,9 @@ defmodule Ello.V2.PostViewTest do
       conn: context[:conn],
     )[:posts]
 
-    assert json[:artist_invite_id] == "0"
-    assert json[:artist_invite_submission][:slug] == "test-artist-invite"
-    assert json[:artist_invite_submission][:title] == "Test Artist Invite"
+    assert json[:artist_invite_id] == nil
+    assert json[:artist_invite_submission][:slug] == nil
+    assert json[:artist_invite_submission][:title] == nil
     assert json[:artist_invite_submission][:status] == nil
   end
 
@@ -420,10 +420,10 @@ defmodule Ello.V2.PostViewTest do
       conn: context[:conn],
     )[:posts]
 
-    assert json[:artist_invite_id] == "0"
-    assert json[:artist_invite_submission][:slug] == "test-artist-invite"
-    assert json[:artist_invite_submission][:title] == "Test Artist Invite"
-    assert json[:artist_invite_submission][:status] == "approved"
+    assert json[:artist_invite_id] == nil
+    assert json[:artist_invite_submission][:slug] == nil
+    assert json[:artist_invite_submission][:title] == nil
+    assert json[:artist_invite_submission][:status] == nil
   end
 
   test "show.json - repost - artist invite submission - declined", context do
@@ -434,9 +434,9 @@ defmodule Ello.V2.PostViewTest do
       conn: context[:conn],
     )[:posts]
 
-    assert json[:artist_invite_id] == "0"
-    assert json[:artist_invite_submission][:slug] == "test-artist-invite"
-    assert json[:artist_invite_submission][:title] == "Test Artist Invite"
+    assert json[:artist_invite_id] == nil
+    assert json[:artist_invite_submission][:slug] == nil
+    assert json[:artist_invite_submission][:title] == nil
     assert json[:artist_invite_submission][:status] == nil
   end
 
@@ -448,10 +448,10 @@ defmodule Ello.V2.PostViewTest do
       conn: context[:conn],
     )[:posts]
 
-    assert json[:artist_invite_id] == "0"
-    assert json[:artist_invite_submission][:slug] == "test-artist-invite"
-    assert json[:artist_invite_submission][:title] == "Test Artist Invite"
-    assert json[:artist_invite_submission][:status] == "approved"
+    assert json[:artist_invite_id] == nil
+    assert json[:artist_invite_submission][:slug] == nil
+    assert json[:artist_invite_submission][:title] == nil
+    assert json[:artist_invite_submission][:status] == nil
   end
 
   test "show.json - repost - artist invite submission - selected - closed", context do
@@ -462,10 +462,10 @@ defmodule Ello.V2.PostViewTest do
       conn: context[:conn],
     )[:posts]
 
-    assert json[:artist_invite_id] == "0"
-    assert json[:artist_invite_submission][:slug] == "test-artist-invite"
-    assert json[:artist_invite_submission][:title] == "Test Artist Invite"
-    assert json[:artist_invite_submission][:status] == "selected"
+    assert json[:artist_invite_id] == nil
+    assert json[:artist_invite_submission][:slug] == nil
+    assert json[:artist_invite_submission][:title] == nil
+    assert json[:artist_invite_submission][:status] == nil
   end
 
   defp build_submission(sub_status, inv_status) do

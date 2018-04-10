@@ -87,8 +87,6 @@ defmodule Ello.V3.Schema.ContentTypes do
   defp repost_content(_, %{source: %{reposted_source: %{rendered_content: c}}}), do: {:ok, c}
   defp repost_content(_, _), do: {:ok, []}
 
-  defp artist_invite_submission(_, %{source: %{reposted_source: %{artist_invite_submission: %{id: _} = s}}}),
-    do: {:ok, s}
   defp artist_invite_submission(_, %{source: %{artist_invite_submission: %{id: _} = s}}),
     do: {:ok, s}
   defp artist_invite_submission(_, _), do: {:ok, nil}

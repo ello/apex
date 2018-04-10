@@ -57,6 +57,7 @@ defmodule Ello.V2.PostView do
     :is_adult_content,
     :body,
     :created_at,
+    :artist_invite_submission_id,
   ]
 
   def computed_attributes, do: [
@@ -123,7 +124,6 @@ defmodule Ello.V2.PostView do
     end
   end
 
-  defp get_submission(%{reposted_source: %{artist_invite_submission: %{id: _} = s}}), do: s
   defp get_submission(%{artist_invite_submission: %{id: _} = s}), do: s
   defp get_submission(_), do: nil
 

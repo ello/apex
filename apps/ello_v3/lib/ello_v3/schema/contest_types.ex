@@ -49,7 +49,7 @@ defmodule Ello.V3.Schema.ContestTypes do
     source: %{artist_invite: %{brand_account_id: user_id}} = submission,
     context: %{current_user: %{id: user_id}},
   }), do: {:ok, actions_map(submission)}
-  defp actions(_, args),
+  defp actions(_, _),
     do: {:ok, nil}
 
   defp actions_map(%{status: "declined", id: id}) do
