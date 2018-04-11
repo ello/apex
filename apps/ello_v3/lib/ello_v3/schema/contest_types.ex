@@ -33,13 +33,22 @@ defmodule Ello.V3.Schema.ContestTypes do
     field :status, :string
   end
 
+  # Owners and Staff get the real status, everyone else gets limited status.
+  defp submission_status(_, %{
+    source:  submission,
+    context: %{current_user: %{is_staff: true}}
+  }), do: {:ok, submission.status}
+  defp submission_status(_, %{
+    source:  %{artist_invite: %{brand_account_id: user_id}} = submission,
+    context: %{current_user: %{id: user_id}},
+  }), do: {:ok, submission.status}
   defp submission_status(_, %{source: %{status: "approved"}}),
     do: {:ok, "approved"}
   defp submission_status(_, %{source: %{status: "selected", artist_invite: %{status: "closed"}}}),
     do: {:ok, "selected"}
-  defp submission_status(_, %{source: %{status: "selected"}}), do: {:ok, "approved"}
+  defp submission_status(_, %{source: %{status: "selected"}}),
+    do: {:ok, "approved"}
   defp submission_status(_, _), do: {:ok, nil}
-
 
   defp actions(_, %{
     source: submission,
