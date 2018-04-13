@@ -76,6 +76,7 @@ defmodule Ello.V2.PostView do
     :views_count,
     :artist_invite_id,
     :artist_invite_submission,
+    :artist_invite_submission_id,
   ]
 
   defp post_users(posts) when is_list(posts), do: Enum.flat_map(posts, &(post_users(&1, &1.reposted_source)))
@@ -116,6 +117,13 @@ defmodule Ello.V2.PostView do
     end
   end
 
+  def artist_invite_submission_id(post, _) do
+    case get_submission(post) do
+      nil        -> nil
+      submission -> "#{submission.id}"
+    end
+  end
+
   def artist_invite_id(post, _) do
     case get_submission(post) do
       nil -> nil
@@ -123,7 +131,6 @@ defmodule Ello.V2.PostView do
     end
   end
 
-  defp get_submission(%{reposted_source: %{artist_invite_submission: %{id: _} = s}}), do: s
   defp get_submission(%{artist_invite_submission: %{id: _} = s}), do: s
   defp get_submission(_), do: nil
 
