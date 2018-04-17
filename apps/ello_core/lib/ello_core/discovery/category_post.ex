@@ -8,8 +8,10 @@ defmodule Ello.Core.Discovery.CategoryPost do
 
   schema "category_posts" do
     field :submitted_at, :utc_datetime
-    field :featured_at,  :utc_datetime
-    field :removed_at,  :utc_datetime
+    field :featured_at, :utc_datetime
+    field :unfeatured_at, :utc_datetime
+    field :removed_at, :utc_datetime
+
     field :created_at, :utc_datetime
     field :updated_at, :utc_datetime
 
@@ -17,5 +19,7 @@ defmodule Ello.Core.Discovery.CategoryPost do
     belongs_to :category, Category
     belongs_to :submitted_by, User
     belongs_to :featured_by, User
+    belongs_to :removed_by, User
+    belongs_to :unfeatured_by, User
   end
 end

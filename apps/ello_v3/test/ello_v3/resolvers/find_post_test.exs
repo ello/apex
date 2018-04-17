@@ -7,11 +7,17 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     cat1 = Script.insert(:lacross_category)
     user = Factory.insert(:user, is_staff: true)
     post = Factory.insert(:post, author: user)
+    Factory.insert(:category_post, %{
+      post: post,
+      category: cat1,
+      featured_at: DateTime.utc_now,
+      featured_by: Factory.insert(:user, username: "Curator McCurator"),
+    })
     reposter = Factory.insert(:user)
     a_inv = Factory.insert(:artist_invite, %{id: 1, status: "closed", brand_account: reposter})
     Factory.insert(:artist_invite_submission, post: post, artist_invite: a_inv, status: "approved")
     repost = Factory.insert(:post, reposted_source: post, author: reposter)
-    Factory.insert(:category_post, post: repost, category: cat1)
+    Factory.insert(:category_post, post: repost, category: cat1, submitted_at: DateTime.utc_now)
     Factory.insert(:artist_invite_submission, post: repost, artist_invite: a_inv, status: "approved")
     {:ok, %{user: user, post: post, repost: repost, reposter: reposter}}
   end
@@ -276,6 +282,18 @@ defmodule Ello.V3.Resolvers.FindPostTest do
         }
       }
 
+      fragment categoryPostDetails on CategoryPost {
+        id
+        status
+        category { id slug name }
+        submitted_at
+        submitted_by { username }
+        featured_at
+        featured_by { username }
+        unfeatured_at
+        removed_at
+      }
+
       fragment postSummary on Post {
         id
         token
@@ -293,6 +311,7 @@ defmodule Ello.V3.Resolvers.FindPostTest do
         postStats { lovesCount commentsCount viewsCount repostsCount }
         currentUserState { watching loved reposted }
         artistInviteSubmission { ...artistInviteSubmissionDetails }
+        categoryPosts { ...categoryPostDetails }
       }
 
       query($username: String!, $token: String!) {
@@ -317,6 +336,11 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     refute actions["unselect"]
     refute actions["approve"]
 
+    assert [category_post] = json["categoryPosts"]
+    assert category_post["id"]
+    assert category_post["status"] == "submitted"
+    assert category_post["submitted_at"]
+
     assert json["repostedSource"]["id"] == "#{post.id}"
     assert json["repostedSource"]["author"]["id"] == "#{user.id}"
     assert json["repostedSource"]["author"]["currentUserState"]["relationshipPriority"] == "friend"
@@ -327,5 +351,12 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     refute actions["decline"]
     refute actions["unselect"]
     refute actions["approve"]
+
+    assert [category_post] = json["repostedSource"]["categoryPosts"]
+    assert category_post["id"]
+    assert category_post["submitted_at"]
+    assert category_post["featured_at"]
+    assert category_post["featured_by"]["username"] == "Curator McCurator"
+    assert category_post["status"] == "featured"
   end
 end

@@ -9,7 +9,10 @@ defmodule Ello.Core.Repo.Migrations.CreateCategoryPosts do
       add :submitted_by_id, :integer
       add :featured_at, :utc_datetime
       add :featured_by_id, :integer
+      add :unfeatured_at, :utc_datetime
+      add :unfeatured_by_id, :integer
       add :removed_at, :utc_datetime
+      add :removed_by_id, :integer
       add :created_at, :utc_datetime
       add :updated_at, :utc_datetime
     end
