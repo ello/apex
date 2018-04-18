@@ -25,6 +25,18 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     field :unfeatured_at, :datetime
     field :removed_at, :datetime
     field :category, :category
+    field :actions, :category_post_actions, resolve: &actions/2
+  end
+
+  object :category_post_actions do
+    field :feature, :category_post_action
+    field :unfeature, :category_post_action
+  end
+
+  object :category_post_action do
+    field :href, :string
+    field :label, :string
+    field :method, :string
   end
 
   object :page_header do
@@ -76,18 +88,41 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
 
   defp page_header_image(_, %{source: %{image_struct: image}}), do: {:ok, image}
 
-  def category_post_status(_, %{source: %{removed_at: nil, featured_at: nil}}),
+  defp category_post_status(_, %{source: %{removed_at: nil, featured_at: nil}}),
     do: {:ok, "submitted"}
-  def category_post_status(_, %{source: %{removed_at: nil, unfeatured_at: nil}}),
+  defp category_post_status(_, %{source: %{removed_at: nil, unfeatured_at: nil}}),
     do: {:ok, "featured"}
-  def category_post_status(_, %{source: %{submitted_at: submitted, removed_at: removed}})
+  defp category_post_status(_, %{source: %{submitted_at: submitted, removed_at: removed}})
     when submitted > removed,
     do: {:ok, "submitted"}
-  def category_post_status(_, %{source: %{featured_at: featured, unfeatured_at: unfeatured}})
+  defp category_post_status(_, %{source: %{featured_at: featured, unfeatured_at: unfeatured}})
     when featured > unfeatured,
     do: {:ok, "featured"}
-  def category_post_status(_, %{source: %{removed_at: %{}}}),
+  defp category_post_status(_, %{source: %{removed_at: %{}}}),
     do: {:ok, "removed"}
-  def category_post_status(_, _),
+  defp category_post_status(_, _),
     do: {:ok, "submitted"}
+
+  defp actions(a, %{
+    source: category_post,
+    context: %{current_user: %{is_staff: true}},
+  } = args) do
+    {:ok, status} = category_post_status(a, args)
+    {:ok, %{
+      feature:   feature_action(category_post, status),
+      unfeature: unfeature_action(category_post, status),
+    }}
+  end
+  defp actions(_, _), do: {:ok, nil}
+
+  defp feature_action(%{id: id}, "submitted"), do: %{
+    href: "/api/v2/category_posts/#{id}/feature",
+    method: "put",
+  }
+  defp feature_action(_, _), do: nil
+  defp unfeature_action(%{id: id}, "featured"), do: %{
+    href: "/api/v2/category_posts/#{id}/unfeature",
+    method: "put",
+  }
+  defp unfeature_action(_, _), do: nil
 end
