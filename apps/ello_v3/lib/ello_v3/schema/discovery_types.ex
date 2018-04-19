@@ -92,12 +92,16 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     do: {:ok, "submitted"}
   defp category_post_status(_, %{source: %{removed_at: nil, unfeatured_at: nil}}),
     do: {:ok, "featured"}
+    defp category_post_status(_, %{source: %{
+      featured_at: featured,
+      unfeatured_at: unfeatured,
+      removed_at: removed,
+    }})
+    when featured > unfeatured and featured > removed,
+    do: {:ok, "featured"}
   defp category_post_status(_, %{source: %{submitted_at: submitted, removed_at: removed}})
     when submitted > removed,
     do: {:ok, "submitted"}
-  defp category_post_status(_, %{source: %{featured_at: featured, unfeatured_at: unfeatured}})
-    when featured > unfeatured,
-    do: {:ok, "featured"}
   defp category_post_status(_, %{source: %{removed_at: %{}}}),
     do: {:ok, "removed"}
   defp category_post_status(_, _),
