@@ -17,7 +17,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
 
   object :category_post do
     field :id, :id
-    field :status, :string, resolve: &category_post_status/2
+    field :status, :string
     field :submitted_at, :datetime
     field :submitted_by, :user
     field :featured_at, :datetime
@@ -88,45 +88,25 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
 
   defp page_header_image(_, %{source: %{image_struct: image}}), do: {:ok, image}
 
-  defp category_post_status(_, %{source: %{removed_at: nil, featured_at: nil}}),
-    do: {:ok, "submitted"}
-  defp category_post_status(_, %{source: %{removed_at: nil, unfeatured_at: nil}}),
-    do: {:ok, "featured"}
-    defp category_post_status(_, %{source: %{
-      featured_at: featured,
-      unfeatured_at: unfeatured,
-      removed_at: removed,
-    }})
-    when featured > unfeatured and featured > removed,
-    do: {:ok, "featured"}
-  defp category_post_status(_, %{source: %{submitted_at: submitted, removed_at: removed}})
-    when submitted > removed,
-    do: {:ok, "submitted"}
-  defp category_post_status(_, %{source: %{removed_at: %{}}}),
-    do: {:ok, "removed"}
-  defp category_post_status(_, _),
-    do: {:ok, "submitted"}
-
-  defp actions(a, %{
+  defp actions(_, %{
     source: category_post,
     context: %{current_user: %{is_staff: true}},
-  } = args) do
-    {:ok, status} = category_post_status(a, args)
+  }) do
     {:ok, %{
-      feature:   feature_action(category_post, status),
-      unfeature: unfeature_action(category_post, status),
+      feature:   feature_action(category_post),
+      unfeature: unfeature_action(category_post),
     }}
   end
   defp actions(_, _), do: {:ok, nil}
 
-  defp feature_action(%{id: id}, "submitted"), do: %{
+  defp feature_action(%{id: id, status: "submitted"}), do: %{
     href: "/api/v2/category_posts/#{id}/feature",
     method: "put",
   }
-  defp feature_action(_, _), do: nil
-  defp unfeature_action(%{id: id}, "featured"), do: %{
+  defp feature_action(_), do: nil
+  defp unfeature_action(%{id: id, status: "featured"}), do: %{
     href: "/api/v2/category_posts/#{id}/unfeature",
     method: "put",
   }
-  defp unfeature_action(_, _), do: nil
+  defp unfeature_action(_), do: nil
 end

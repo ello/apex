@@ -8,7 +8,7 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     staff = Factory.insert(:user, is_staff: true)
     user = Factory.insert(:user)
     post = Factory.insert(:post, author: user)
-    Factory.insert(:category_post, %{
+    Factory.insert(:featured_category_post, %{
       post: post,
       category: cat1,
       featured_at: DateTime.utc_now,

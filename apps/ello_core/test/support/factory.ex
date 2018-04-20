@@ -131,6 +131,7 @@ defmodule Ello.Core.Factory do
 
   def category_post_factory do
     %CategoryPost{
+      status: "submitted",
       category: build(:category),
       post: build(:post),
       submitted_at: DateTime.utc_now,
@@ -139,6 +140,7 @@ defmodule Ello.Core.Factory do
 
   def featured_category_post_factory do
     %CategoryPost{
+      status: "featured",
       category: build(:category),
       post: build(:post),
       submitted_at: DateTime.utc_now,

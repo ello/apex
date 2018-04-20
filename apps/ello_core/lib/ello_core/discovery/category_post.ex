@@ -7,6 +7,7 @@ defmodule Ello.Core.Discovery.CategoryPost do
   @type t :: %__MODULE__{}
 
   schema "category_posts" do
+    field :status, :string
     field :submitted_at, :utc_datetime
     field :featured_at, :utc_datetime
     field :unfeatured_at, :utc_datetime

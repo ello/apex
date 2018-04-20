@@ -3,6 +3,7 @@ defmodule Ello.Core.Repo.Migrations.CreateCategoryPosts do
 
   def change do
     create_if_not_exists table(:category_posts) do
+      add :status, :string
       add :category_id, :integer
       add :post_id, :integer
       add :submitted_at, :utc_datetime
