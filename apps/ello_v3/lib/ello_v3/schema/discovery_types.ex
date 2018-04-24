@@ -15,6 +15,30 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     field :created_at, :datetime
   end
 
+  object :category_post do
+    field :id, :id
+    field :status, :string
+    field :submitted_at, :datetime
+    field :submitted_by, :user
+    field :featured_at, :datetime
+    field :featured_by, :user
+    field :unfeatured_at, :datetime
+    field :removed_at, :datetime
+    field :category, :category
+    field :actions, :category_post_actions, resolve: &actions/2
+  end
+
+  object :category_post_actions do
+    field :feature, :category_post_action
+    field :unfeature, :category_post_action
+  end
+
+  object :category_post_action do
+    field :href, :string
+    field :label, :string
+    field :method, :string
+  end
+
   object :page_header do
     field :id, :id
     field :user, :user
@@ -63,4 +87,26 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     do: {:ok, %{text: text, url: url}}
 
   defp page_header_image(_, %{source: %{image_struct: image}}), do: {:ok, image}
+
+  defp actions(_, %{
+    source: category_post,
+    context: %{current_user: %{is_staff: true}},
+  }) do
+    {:ok, %{
+      feature:   feature_action(category_post),
+      unfeature: unfeature_action(category_post),
+    }}
+  end
+  defp actions(_, _), do: {:ok, nil}
+
+  defp feature_action(%{id: id, status: "submitted"}), do: %{
+    href: "/api/v2/category_posts/#{id}/feature",
+    method: "put",
+  }
+  defp feature_action(_), do: nil
+  defp unfeature_action(%{id: id, status: "featured"}), do: %{
+    href: "/api/v2/category_posts/#{id}/unfeature",
+    method: "put",
+  }
+  defp unfeature_action(_), do: nil
 end

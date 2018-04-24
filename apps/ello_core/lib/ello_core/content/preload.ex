@@ -103,8 +103,8 @@ defmodule Ello.Core.Content.Preload do
     do: [{:author, &Network.users(%{ids: &1, current_user: current_user, preloads: author_preloads})} | preloads]
   defp add_author_preload(preloads, _, _), do: preloads
 
-  # NOTE: If/when we want to include category post info we would want to use a category_posts preload.
-  # We could also use :featured_category_posts vs :category_posts to get only featured categories
+  defp add_category_preload(preloads, %{category_posts: cp_preloads}),
+    do: [{:category_posts, &Discovery.category_posts(%{ids: &1, preloads: cp_preloads})} | preloads]
   defp add_category_preload(preloads, %{categories: _}),
     do: [{:categories, &Discovery.categories(%{ids: &1})} | preloads]
   defp add_category_preload(preloads, _), do: preloads

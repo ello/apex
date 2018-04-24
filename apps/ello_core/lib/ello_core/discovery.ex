@@ -1,7 +1,7 @@
 defmodule Ello.Core.Discovery do
   import Ecto.Query
   alias Ello.Core.{Repo, Network}
-  alias __MODULE__.{Category, Editorial, Preload, Promotional, PagePromotional}
+  alias __MODULE__.{Category, Editorial, Preload, Promotional, PagePromotional, CategoryPost}
   alias Network.User
 
   @moduledoc """
@@ -95,6 +95,15 @@ defmodule Ello.Core.Discovery do
     |> priority_order
     |> Repo.all
     |> Preload.categories(options)
+  end
+
+  def category_posts(%{ids: ids} = options) do
+    CategoryPost
+    |> join(:left, [cp], category in assoc(cp, :category))
+    |> where([cp, c], not is_nil(c.level))
+    |> where([cp, c], cp.post_id in ^ids)
+    |> Repo.all
+    |> Preload.category_posts(options)
   end
 
   @doc """

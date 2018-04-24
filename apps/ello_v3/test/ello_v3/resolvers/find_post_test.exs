@@ -5,16 +5,116 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
 
     cat1 = Script.insert(:lacross_category)
-    user = Factory.insert(:user, is_staff: true)
+    staff = Factory.insert(:user, is_staff: true)
+    user = Factory.insert(:user)
     post = Factory.insert(:post, author: user)
+    Factory.insert(:featured_category_post, %{
+      post: post,
+      category: cat1,
+      featured_at: DateTime.utc_now,
+      featured_by: Factory.insert(:user, username: "Curator McCurator"),
+    })
     reposter = Factory.insert(:user)
     a_inv = Factory.insert(:artist_invite, %{id: 1, status: "closed", brand_account: reposter})
     Factory.insert(:artist_invite_submission, post: post, artist_invite: a_inv, status: "approved")
     repost = Factory.insert(:post, reposted_source: post, author: reposter)
-    Factory.insert(:category_post, post: repost, category: cat1)
+    Factory.insert(:category_post, post: repost, category: cat1, submitted_at: DateTime.utc_now)
     Factory.insert(:artist_invite_submission, post: repost, artist_invite: a_inv, status: "approved")
-    {:ok, %{user: user, post: post, repost: repost, reposter: reposter}}
+    {:ok, %{user: user, staff: staff, post: post, repost: repost, reposter: reposter}}
   end
+
+  @fragment_query """
+    fragment imageVersionProps on Image {
+      url
+      metadata { height width type size }
+    }
+
+    fragment avatarImageVersion on TshirtImageVersions {
+      small { ...imageVersionProps }
+      regular { ...imageVersionProps }
+      large { ...imageVersionProps }
+      original { ...imageVersionProps }
+    }
+
+    fragment authorSummary on User {
+      id
+      username
+      name
+      currentUserState { relationshipPriority }
+      avatar {
+        ...avatarImageVersion
+      }
+    }
+
+    fragment contentProps on ContentBlocks {
+      linkUrl
+      kind
+      data
+      links { assets }
+    }
+
+    fragment artistInviteSubmissionAction on ArtistInviteSubmissionAction {
+      href label method body { status }
+    }
+
+    fragment artistInviteSubmissionDetails on ArtistInviteSubmission {
+      id
+      status
+      artistInvite { id slug title }
+      actions {
+        approve { ...artistInviteSubmissionAction }
+        decline { ...artistInviteSubmissionAction }
+        select { ...artistInviteSubmissionAction }
+        unapprove { ...artistInviteSubmissionAction }
+        unselect { ...artistInviteSubmissionAction }
+      }
+    }
+
+    fragment categoryPostDetails on CategoryPost {
+      id
+      status
+      category { id slug name }
+      submitted_at
+      submitted_by { username }
+      featured_at
+      featured_by { username }
+      unfeatured_at
+      removed_at
+      actions {
+        feature { href method }
+        unfeature { href method }
+      }
+    }
+
+    fragment postSummary on Post {
+      id
+      token
+      createdAt
+      summary { ...contentProps }
+      author { ...authorSummary }
+      assets {
+        id
+        attachment {
+          hdpi {
+            url
+          }
+        }
+      }
+      postStats { lovesCount commentsCount viewsCount repostsCount }
+      currentUserState { watching loved reposted }
+      artistInviteSubmission { ...artistInviteSubmissionDetails }
+      categoryPosts { ...categoryPostDetails }
+    }
+
+    query($username: String!, $token: String!) {
+      post(username: $username, token: $token) {
+        ...postSummary
+        repostedSource {
+          ...postSummary
+        }
+      }
+    }
+  """
 
   test "Abbreviated post representation", %{user: user, post: post} do
     query = """
@@ -220,102 +320,36 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     assert json["repostedSource"]["currentUserState"]["loved"] == false
     assert json["repostedSource"]["currentUserState"]["watching"] == false
 
-    actions = json["repostedSource"]["artistInviteSubmission"]["actions"]
-    assert %{"body" => %{}, "href" => _, "method" => _, "label" => _} = actions["select"]
-    assert %{"body" => %{}, "href" => _, "method" => _, "label" => _} = actions["unapprove"]
-    refute actions["decline"]
-    refute actions["unselect"]
-    refute actions["approve"]
+    refute json["repostedSource"]["artistInviteSubmission"]["actions"]
   end
 
-  test "Full post representation via fragments with a repost", %{user: user, post: post, repost: repost, reposter: reposter} do
-    fragment_query = """
-      fragment imageVersionProps on Image {
-        url
-        metadata { height width type size }
-      }
-
-      fragment avatarImageVersion on TshirtImageVersions {
-        small { ...imageVersionProps }
-        regular { ...imageVersionProps }
-        large { ...imageVersionProps }
-        original { ...imageVersionProps }
-      }
-
-      fragment authorSummary on User {
-        id
-        username
-        name
-        currentUserState { relationshipPriority }
-        avatar {
-          ...avatarImageVersion
-        }
-      }
-
-      fragment contentProps on ContentBlocks {
-        linkUrl
-        kind
-        data
-        links { assets }
-      }
-
-      fragment artistInviteSubmissionAction on ArtistInviteSubmissionAction {
-        href label method body { status }
-      }
-
-      fragment artistInviteSubmissionDetails on ArtistInviteSubmission {
-        id
-        status
-        artistInvite { id slug title }
-        actions {
-          approve { ...artistInviteSubmissionAction }
-          decline { ...artistInviteSubmissionAction }
-          select { ...artistInviteSubmissionAction }
-          unapprove { ...artistInviteSubmissionAction }
-          unselect { ...artistInviteSubmissionAction }
-        }
-      }
-
-      fragment postSummary on Post {
-        id
-        token
-        createdAt
-        summary { ...contentProps }
-        author { ...authorSummary }
-        assets {
-          id
-          attachment {
-            hdpi {
-              url
-            }
-          }
-        }
-        postStats { lovesCount commentsCount viewsCount repostsCount }
-        currentUserState { watching loved reposted }
-        artistInviteSubmission { ...artistInviteSubmissionDetails }
-      }
-
-      query($username: String!, $token: String!) {
-        post(username: $username, token: $token) {
-          ...postSummary
-          repostedSource {
-            ...postSummary
-          }
-        }
-      }
-    """
-    Factory.insert(:relationship, owner: reposter, subject: user, priority: "friend")
-    resp = post_graphql(%{query: fragment_query, variables: %{username: reposter.username, token: repost.token}}, reposter)
+  test "Full post representation via fragments with a repost as staff", %{
+    staff: staff,
+    user: user,
+    post: post,
+    repost: repost,
+    reposter: reposter
+  } do
+    Factory.insert(:relationship, owner: staff, subject: user, priority: "friend")
+    resp = post_graphql(%{query: @fragment_query, variables: %{
+      username: reposter.username,
+      token: repost.token
+    }}, staff)
     assert %{"data" => %{"post" => json}} = json_response(resp)
     assert json["id"] == "#{repost.id}"
     assert json["author"]["id"] == "#{reposter.id}"
-    assert json["author"]["currentUserState"]["relationshipPriority"] == "self"
+    refute json["author"]["currentUserState"]["relationshipPriority"]
     actions = json["artistInviteSubmission"]["actions"]
     assert %{"body" => %{}, "href" => _, "method" => _, "label" => _} = actions["select"]
     assert %{"body" => %{}, "href" => _, "method" => _, "label" => _} = actions["unapprove"]
     refute actions["decline"]
     refute actions["unselect"]
     refute actions["approve"]
+
+    assert [category_post] = json["categoryPosts"]
+    assert category_post["id"]
+    assert category_post["status"] == "submitted"
+    assert category_post["submitted_at"]
 
     assert json["repostedSource"]["id"] == "#{post.id}"
     assert json["repostedSource"]["author"]["id"] == "#{user.id}"
@@ -327,5 +361,52 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     refute actions["decline"]
     refute actions["unselect"]
     refute actions["approve"]
+
+    assert [category_post] = json["repostedSource"]["categoryPosts"]
+    assert category_post["id"]
+    assert category_post["submitted_at"]
+    assert category_post["featured_at"]
+    assert category_post["featured_by"]["username"] == "Curator McCurator"
+    assert category_post["status"] == "featured"
+  end
+
+  test "Full post representation via fragments with a repost as artist invite brand account", %{
+    user: user,
+    post: post,
+    repost: repost,
+    reposter: reposter,
+  } do
+    Factory.insert(:relationship, owner: reposter, subject: user, priority: "friend")
+    resp = post_graphql(%{query: @fragment_query, variables: %{
+      username: reposter.username,
+      token: repost.token,
+    }}, reposter)
+    assert %{"data" => %{"post" => json}} = json_response(resp)
+    assert json["id"] == "#{repost.id}"
+    assert json["author"]["id"] == "#{reposter.id}"
+    actions = json["artistInviteSubmission"]["actions"]
+    assert %{"body" => %{}, "href" => _, "method" => _, "label" => _} = actions["select"]
+    assert %{"body" => %{}, "href" => _, "method" => _, "label" => _} = actions["unapprove"]
+    refute actions["decline"]
+    refute actions["unselect"]
+    refute actions["approve"]
+
+    assert [category_post] = json["categoryPosts"]
+    assert category_post["id"]
+    assert category_post["status"] == "submitted"
+    assert category_post["submitted_at"]
+    refute category_post["actions"]
+
+    assert json["repostedSource"]["id"] == "#{post.id}"
+    actions = json["repostedSource"]["artistInviteSubmission"]["actions"]
+    assert %{"body" => %{}, "href" => _, "method" => _, "label" => _} = actions["select"]
+    assert %{"body" => %{}, "href" => _, "method" => _, "label" => _} = actions["unapprove"]
+    refute actions["decline"]
+    refute actions["unselect"]
+    refute actions["approve"]
+
+    assert [category_post] = json["repostedSource"]["categoryPosts"]
+    assert category_post["status"] == "featured"
+    refute category_post["actions"]
   end
 end
