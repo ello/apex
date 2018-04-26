@@ -14,7 +14,7 @@ defmodule Ello.V3.Schema do
     @desc "Get a post by username and token"
     field :post, :post do
       arg :token,    non_null(:string)
-      arg :username, non_null(:string), description: "Username post belongs to"
+      arg :username, :string, description: "Username post belongs to"
       resolve &Resolvers.FindPost.call/3
     end
 
