@@ -23,8 +23,8 @@ defmodule Ello.Core.Network.Preload do
   def users(user_or_users, %{preloads: %{}} = options) do
     user_or_users
     |> preload_current_user_relationship(options)
+    |> preload_categories(options)
     |> prefetch_user_counts(options)
-    |> prefetch_categories(options)
     |> build_image_structs
   end
   def users(user_or_users, options) do
@@ -40,6 +40,11 @@ defmodule Ello.Core.Network.Preload do
     Repo.preload(users, [relationship_to_current_user: current_user_query])
   end
   defp preload_current_user_relationship(users, _), do: users
+
+  defp preload_categories(users, %{preloads: %{categories: _}}) do
+    Repo.preload(users, :categories)
+  end
+  defp preload_categories(users, _), do: users
 
   defp prefetch_user_counts(%User{} = user, options),
     do: hd(prefetch_user_counts([user], options))
@@ -87,11 +92,6 @@ defmodule Ello.Core.Network.Preload do
       ]
     end
   end
-
-  defp prefetch_categories(user_or_users, %{preloads: %{categories: _}}) do
-    Discovery.put_belongs_to_many_categories(user_or_users)
-  end
-  defp prefetch_categories(user_or_users, _), do: user_or_users
 
   defp build_image_structs(%User{} = user), do: User.load_images(user)
   defp build_image_structs(users) do
