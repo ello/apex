@@ -215,36 +215,6 @@ defmodule Ello.Core.Discovery do
 
   @type categorizable :: User.t | [User.t]
 
-  @doc """
-  Fetches the categories for a user or post
-
-  Given a user or post struct (or list of users or posts), this function will
-  fetch all the categories and include them in the struct (or list of structs).
-  """
-  @spec put_belongs_to_many_categories(categorizables :: categorizable | nil) :: categorizable | nil
-  def put_belongs_to_many_categories(nil), do: nil
-  def put_belongs_to_many_categories([]), do: []
-  def put_belongs_to_many_categories(%{} = categorizable),
-    do: hd(put_belongs_to_many_categories([categorizable]))
-  def put_belongs_to_many_categories(categorizables) do
-    category_ids = categorizables
-                   |> Enum.flat_map(&(&1.category_ids || []))
-                   |> Enum.uniq
-    categories = %{ids: category_ids}
-                 |> categories
-                 |> Enum.group_by(&(&1.id))
-    Enum.map categorizables, fn
-      %{category_ids: nil} = categorizable -> categorizable
-      %{category_ids: []} = categorizable -> categorizable
-      categorizable ->
-        categorizable_categories = categories
-                                   |> Map.take(categorizable.category_ids)
-                                   |> Map.values
-                                   |> List.flatten
-        Map.put(categorizable, :categories, categorizable_categories)
-    end
-  end
-
   # Category Scopes
   defp priority_order(q),
     do: order_by(q, [:level, :order])
