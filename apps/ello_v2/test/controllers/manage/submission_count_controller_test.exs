@@ -13,7 +13,11 @@ defmodule Ello.V2.Manage.SubmissionCountControllerTest do
                 |> DateTime.from_unix!()
     Factory.insert_list(2, :artist_invite_submission, %{artist_invite: a_inv1})
     Factory.insert_list(2, :artist_invite_submission, %{artist_invite: a_inv2})
-    featured_user = Factory.insert(:user, %{category_ids: [1, 2]})
+    cat1 = Factory.insert(:category, id: 1)
+    cat2 = Factory.insert(:category, id: 2)
+    featured_user = Factory.insert(:user)
+    Factory.insert(:category_user, user: featured_user, category: cat1)
+    Factory.insert(:category_user, user: featured_user, category: cat2)
     Factory.insert_list(2, :artist_invite_submission, %{
       artist_invite: a_inv2,
       post: Factory.insert(:post, %{

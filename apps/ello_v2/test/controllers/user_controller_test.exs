@@ -6,7 +6,8 @@ defmodule Ello.V2.UserControllerTest do
   setup %{conn: conn} do
     user = Factory.insert(:user)
     spying = Script.insert(:espionage_category)
-    archer = Script.insert(:archer, category_ids: [spying.id])
+    archer = Script.insert(:archer)
+    Factory.insert(:category_user, user: archer, category: spying)
     {:ok, conn: auth_conn(conn, user), unauth_conn: conn, archer: archer, user: user}
   end
 
