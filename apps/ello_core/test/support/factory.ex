@@ -15,7 +15,9 @@ defmodule Ello.Core.Factory do
 
       created_at: DateTime.utc_now,
       updated_at: DateTime.utc_now,
-    } |> User.load_images
+    }
+    |> Repo.preload(:categories)
+    |> User.load_images
   end
 
   def settings_factory do
@@ -523,7 +525,9 @@ defmodule Ello.Core.Factory do
         settings: %User.Settings{
           views_adult_content: true,
         }
-      } |> User.load_images
+      }
+      |> Repo.preload(:categories)
+      |> User.load_images
     end
 
 

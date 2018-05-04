@@ -1,6 +1,6 @@
 defmodule Ello.Core.Network.Preload do
   import Ecto.Query
-  alias Ello.Core.{Repo,Redis,Network,Discovery}
+  alias Ello.Core.{Repo,Redis,Network, Discovery}
   alias Network.{User,Relationship}
 
   @user_default_preloads %{
@@ -22,8 +22,7 @@ defmodule Ello.Core.Network.Preload do
   def users(user_or_users, %{preload: false}), do: user_or_users
   def users(user_or_users, %{preloads: %{}} = options) do
     user_or_users
-    |> preload_current_user_relationship(options)
-    |> preload_categories(options)
+    |> user_preloads(options)
     |> prefetch_user_counts(options)
     |> build_image_structs
   end
@@ -35,16 +34,24 @@ defmodule Ello.Core.Network.Preload do
     Map.put(user, :is_spammer, Network.flags_exist?(%{user: user, kind: "spam", verified: true}))
   end
 
-  defp preload_current_user_relationship(users, %{current_user: %{id: id}, preloads: %{current_user_state: _}}) do
+  defp add_current_user_relationship_preload(preloads, %{current_user: %{id: id}, preloads: %{current_user_state: _}}) do
     current_user_query = where(Relationship, owner_id: ^id)
-    Repo.preload(users, [relationship_to_current_user: current_user_query])
+    [{:relationship_to_current_user, current_user_query} | preloads]
   end
-  defp preload_current_user_relationship(users, _), do: users
+  defp add_current_user_relationship_preload(preloads, _), do: preloads
 
-  defp preload_categories(users, %{preloads: %{categories: _}}) do
-    Repo.preload(users, :categories)
+  defp add_category_preload(preloads, %{preloads: %{categories: _}}),
+    do: [{:categories, &Discovery.categories(%{ids: &1})} | preloads]
+  defp add_category_preload(preloads, _),
+    do: preloads
+
+  defp user_preloads(user_or_users, options) do
+    ecto_preloads = []
+                    |> add_current_user_relationship_preload(options)
+                    |> add_category_preload(options)
+    user_or_users
+    |> Repo.preload(ecto_preloads)
   end
-  defp preload_categories(users, _), do: users
 
   defp prefetch_user_counts(%User{} = user, options),
     do: hd(prefetch_user_counts([user], options))

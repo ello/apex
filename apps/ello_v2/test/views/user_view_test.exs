@@ -2,10 +2,12 @@ defmodule Ello.V2.UserViewTest do
   use Ello.V2.ConnCase, async: true
   import Phoenix.View #For render/2
   alias Ello.V2.UserView
+  alias Ello.Core.{Repo}
+  alias Ello.Core.Network.User
 
   setup %{conn: conn} do
     spying = Script.insert(:espionage_category)
-    archer = Script.build(:archer, categories: [spying], total_views_count: 2500)
+    archer = Script.build(:archer, total_views_count: 2500, categories: [spying])
     user = Factory.build(:user, %{
       id: 1234,
       relationship_to_current_user: Factory.build(:relationship,
@@ -187,7 +189,7 @@ defmodule Ello.V2.UserViewTest do
   end
 
   test "user.json - renders nil for total_post_views attribute for users with 0 views", %{conn: conn} do
-    user = Factory.build(:user, is_system_user: true, total_views_count: 0)
+    user = Factory.build(:user, is_system_user: true, total_views_count: 0) |> Repo.preload(:categories)
     assert render(UserView, "user.json", user: user, conn: conn).total_views_count == nil
   end
 

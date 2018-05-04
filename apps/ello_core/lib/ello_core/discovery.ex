@@ -213,8 +213,6 @@ defmodule Ello.Core.Discovery do
   defp page_promotional_by_login_status(q, :generic, _), do: where(q, is_logged_in: true)
   defp page_promotional_by_login_status(q, _, _), do: q
 
-  @type categorizable :: User.t | [User.t]
-
   # Category Scopes
   defp priority_order(q),
     do: order_by(q, [:level, :order])
