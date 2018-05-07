@@ -68,6 +68,14 @@ defmodule Ello.V3.Schema do
       arg :before, :string, description: "Pagination cursor, returned by previous page"
       arg :per_page, :integer, default_value: 10
     end
+
+    @desc "Stream of editorials"
+    field :editorial_stream, :editorial_stream do
+      resolve &Resolvers.EditorialStream.call/3
+      arg :before, :string, description: "Pagination cursor, returned by previous page"
+      arg :per_page, :integer, default_value: 25
+      arg :preview, :boolean, default_value: false, description: "Preview unpublished editorials - only works on staff accounts"
+    end
   end
 
   @doc """

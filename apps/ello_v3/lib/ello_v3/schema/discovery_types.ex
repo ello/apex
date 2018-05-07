@@ -65,6 +65,30 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     field :url, :string
   end
 
+  object :editorial_stream do
+    field :next, :string
+    field :per_page, :integer
+    field :is_last_page, :boolean
+    field :editorials, list_of(:editorial)
+  end
+
+  object :editorial do
+    field :id, :id
+    field :kind, :editorial_kind, resolve: &editorial_kind/2
+    field :title, :string, resolve: &editorial_content/2
+    field :subtitle, :string, resolve: &editorial_content(&1, &2, "rendered_subtitle")
+    field :path, :string, resolve: &editorial_content(&1, &2)
+    field :url, :string, resolve: &editorial_content(&1, &2)
+    field :posts, list_of(:post), resolve: &editorial_posts/2
+  end
+
+  enum :editorial_kind do
+    value :post
+    value :curated_posts
+    value :internal
+    value :external
+  end
+
   defp page_header_kind(_, %{source: %{category_id: _}}), do: {:ok, :category}
   defp page_header_kind(_, %{source: %{is_editorial: true}}), do: {:ok, :editorial}
   defp page_header_kind(_, %{source: %{is_artist_invite: true}}), do: {:ok, :artist_invite}
@@ -122,4 +146,21 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     method: "put",
   }
   defp unfeature_action(_), do: nil
+
+  @editorial_kinds %{
+    "post" => :post,
+    "curated_posts" => :curated_posts,
+    "internal" => :internal,
+    "external" => :external,
+  }
+  defp editorial_kind(_, %{source: %{kind: kind}}), do: {:ok, @editorial_kinds[kind]}
+
+  defp editorial_content(a, b = %{definition: %{schema_node: %{identifier: name}}}),
+    do: editorial_content(a, b, "#{name}")
+  defp editorial_content(_, %{source: editorial}, key),
+    do: {:ok, Map.get(editorial.content, key)}
+
+  defp editorial_posts(_, %{source: %{kind: "post", post: post}}), do: {:ok, [post]}
+  defp editorial_posts(_, %{source: %{kind: "curated_posts", curated_posts: pts}}), do: {:ok, pts}
+  defp editorial_posts(_, _), do: {:ok, nil}
 end
