@@ -28,14 +28,14 @@ defmodule Ello.Core.Discovery.Preload do
       current_user_state: %{},
       categories: %{},
       artist_invite_submission: %{artist_invite: %{}},
-      author: %{current_user_state: %{}, user_stats: %{}},
+      author: %{current_user_state: %{}, user_stats: %{}, categories: %{}},
       post_stats: %{},
       reposted_source: %{
         assets: %{},
         current_user_state: %{},
         categories: %{},
         artist_invite_submission: %{artist_invite: %{}},
-        author: %{current_user_state: %{}, user_stats: %{}},
+        author: %{current_user_state: %{}, user_stats: %{}, categories: %{}},
         post_stats: %{},
       }
     }
