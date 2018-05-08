@@ -114,6 +114,7 @@ defmodule Ello.Core.Discovery do
     * preview -  return staff preview or publicly published list of editorials?
     * before -   pagination cursor
     * per_page - how many per page.
+    * kinds    - filter by kinds
   """
   @spec editorials(options) :: [Editorial.t]
   def editorials(%{preview: false} = options) do
@@ -130,6 +131,7 @@ defmodule Ello.Core.Discovery do
   def editorials(%{preview: true} = options) do
     Editorial
     |> where([e], not is_nil(e.preview_position))
+    |> filter_kinds(options[:kinds])
     |> order_by(desc: :preview_position)
     |> editorial_cursor(options)
     |> limit(^options[:per_page])

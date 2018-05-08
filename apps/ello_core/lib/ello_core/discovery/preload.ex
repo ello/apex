@@ -22,14 +22,67 @@ defmodule Ello.Core.Discovery.Preload do
     |> Repo.preload(ecto_preloads)
   end
 
-  @doc "TODO"
+  @editorial_default_preloads %{
+    post: %{
+      assets: %{},
+      current_user_state: %{},
+      categories: %{},
+      artist_invite_submission: %{artist_invite: %{}},
+      author: %{current_user_state: %{}, user_stats: %{}},
+      post_stats: %{},
+      reposted_source: %{
+        assets: %{},
+        current_user_state: %{},
+        categories: %{},
+        artist_invite_submission: %{artist_invite: %{}},
+        author: %{current_user_state: %{}, user_stats: %{}},
+        post_stats: %{},
+      }
+    }
+  }
+
   def editorials(nil, _), do: nil
   def editorials([], _),  do: []
-  def editorials(editorials, options) do
+  def editorials(editorials, %{preloads: %{}} = options) do
     editorials
-    |> Repo.preload(post: &(Content.posts(Map.put(options, :ids, &1))))
+    |> preload_post(options)
+    |> preload_curated_posts(options)
     |> build_editorial_images
   end
+  def editorials(editorials, options),
+    do: editorials(editorials, Map.put(options, :preloads, @editorial_default_preloads))
+
+  # For "post" type support both posts and post as preload name
+  defp preload_post(editorials, %{preloads: %{post: post_preloads}} = options) do
+    preload_post(editorials, %{options | preloads: %{posts: post_preloads}})
+  end
+  defp preload_post(editorials, %{preloads: %{posts: post_preloads}} = options) do
+    Repo.preload(editorials, [
+      {:post, &(Content.posts(Map.merge(options, %{ids: &1, preloads: post_preloads})))}
+    ])
+  end
+  defp preload_post(editorials, _), do: editorials
+
+  defp preload_curated_posts(editorials, %{preloads: %{posts: post_preloads}} = options) do
+    tokens = editorials
+             |> Enum.flat_map(&(&1.content["post_tokens"] || []))
+             |> Enum.uniq
+    posts = options
+            |> Map.merge(%{tokens: tokens, preloads: post_preloads})
+            |> Content.posts
+            |> Enum.reduce(%{}, &Map.put(&2, &1.token, &1))
+    Enum.map editorials, fn
+      %{content: %{"post_tokens" => []}} = e -> e
+      %{content: %{"post_tokens" => nil}} = e -> e
+      %{content: %{"post_tokens" => tokens}} = e ->
+        curated_posts = posts
+                        |> Map.take(e.content["post_tokens"])
+                        |> Map.values
+        Map.put(e, :curated_posts, curated_posts)
+      e -> e
+    end
+  end
+  defp preload_curated_posts(editorials, _), do: editorials
 
   def promotionals([], _), do: []
   def promotionals(promotions, options) do
