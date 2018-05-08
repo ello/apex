@@ -1,7 +1,5 @@
 defmodule Ello.V2.Manage.SubmissionCountControllerTest do
   use Ello.V2.ConnCase
-  alias Ello.Core.Repo
-  alias Ello.Core.Network.User
 
   setup %{conn: conn} do
     archer = Script.insert(:archer)
@@ -20,7 +18,6 @@ defmodule Ello.V2.Manage.SubmissionCountControllerTest do
     featured_user = Factory.insert(:user, %{categories: [cat1, cat2]})
     Factory.insert(:category_user, user: featured_user, category: cat1)
     Factory.insert(:category_user, user: featured_user, category: cat2)
-    featured_user = Repo.get(User, featured_user.id) |> Repo.preload(:categories) |> User.load_images
     Factory.insert_list(2, :artist_invite_submission, %{
       artist_invite: a_inv2,
       post: Factory.insert(:post, %{
