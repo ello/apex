@@ -1,7 +1,7 @@
 defmodule Ello.Core.Factory do
   alias Ello.Core.{Repo, Discovery, Network, Content, Contest}
   alias Discovery.{Category, Promotional, Editorial, PagePromotional, CategoryPost}
-  alias Network.{User, Relationship, Flag}
+  alias Network.{User, Relationship, Flag, CategoryUser}
   alias Content.{Post, Love, Watch, Asset}
   alias Contest.{ArtistInvite, ArtistInviteSubmission}
   use ExMachina.Ecto, repo: Repo
@@ -15,7 +15,9 @@ defmodule Ello.Core.Factory do
 
       created_at: DateTime.utc_now,
       updated_at: DateTime.utc_now,
-    } |> User.load_images
+    }
+    |> Repo.preload(:categories)
+    |> User.load_images
   end
 
   def settings_factory do
@@ -135,6 +137,14 @@ defmodule Ello.Core.Factory do
       category: build(:category),
       post: build(:post),
       submitted_at: DateTime.utc_now,
+    }
+  end
+
+  def category_user_factory do
+    %CategoryUser{
+      role: "featured",
+      user: build(:user),
+      category: build(:category),
     }
   end
 
@@ -515,7 +525,9 @@ defmodule Ello.Core.Factory do
         settings: %User.Settings{
           views_adult_content: true,
         }
-      } |> User.load_images
+      }
+      |> Repo.preload(:categories)
+      |> User.load_images
     end
 
 

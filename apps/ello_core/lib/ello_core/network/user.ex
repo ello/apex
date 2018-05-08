@@ -1,7 +1,7 @@
 defmodule Ello.Core.Network.User do
   use Ecto.Schema
   alias Ello.Core.Redis
-  alias Ello.Core.Network.{Relationship, User, Flag}
+  alias Ello.Core.Network.{Relationship, User, Flag, CategoryUser}
   alias User.{Avatar, CoverImage, Settings}
 
   @type t :: %__MODULE__{}
@@ -30,8 +30,6 @@ defmodule Ello.Core.Network.User do
     field :is_public, :boolean, default: true
     field :is_community, :boolean, default: false
     field :bad_for_seo?, :boolean, default: true
-    field :category_ids, {:array, :integer}, default: []
-    field :categories, {:array, :map}, default: [], virtual: true
     field :badges, {:array, :string}, default: []
     field :followed_category_ids, {:array, :integer}, default: []
 
@@ -67,6 +65,9 @@ defmodule Ello.Core.Network.User do
 
     # Used to hold spam status retreived from DB
     field :is_spammer, :boolean, default: false, virtual: true
+
+    has_many :category_users, CategoryUser
+    has_many :categories, through: [:category_users, :category]
   end
 
   @doc """

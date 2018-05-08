@@ -7,6 +7,8 @@ defmodule Ello.Core.NetworkTest do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
     current = Factory.insert(:user)
     category = Factory.insert(:category)
+    norelation = Factory.insert(:user)
+    Factory.insert(:category_user, user: norelation, category: category)
     {:ok,
       current:    current,
       category:   category,
@@ -15,7 +17,7 @@ defmodule Ello.Core.NetworkTest do
       noise1:     Factory.insert(:relationship,
                                  owner: current,
                                  priority: "noise").subject,
-      norelation: Factory.insert(:user, category_ids: [category.id]),
+      norelation: norelation,
     }
   end
 

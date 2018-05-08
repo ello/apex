@@ -1,6 +1,6 @@
 defmodule Ello.Search.Post.Index do
   alias Ello.Search.Client
-  alias Ello.Core.{Discovery, Repo}
+  alias Ello.Core.{Repo}
 
   def create do
     Client.create_index(index_name(), settings())
@@ -47,6 +47,7 @@ defmodule Ello.Search.Post.Index do
   end
 
   defp assemble_author_data(author, overrides) do
+    author = Repo.preload(author, :categories)
     %{
       id:                 author.id,
       created_at:         author.created_at,
@@ -61,11 +62,11 @@ defmodule Ello.Search.Post.Index do
       follower_count:     0,
       is_spammer:         false,
       is_system_user:     author.is_system_user,
-      is_featured_user:   Enum.any?(author.category_ids),
+      is_featured_user:   Enum.any?(author.categories),
       has_avatar:         !!author.avatar,
       is_public:          author.is_public,
-      category_ids:       author.category_ids,
-      category_names:     category_names(author.category_ids),
+      category_ids:       Enum.map(author.categories, &(&1.id)),
+      category_names:     Enum.map(author.categories, &(&1.name)),
       is_hireable:        author.settings.is_hireable,
       is_collaborateable: author.settings.is_collaborateable,
       location:           author.location,
@@ -160,13 +161,6 @@ defmodule Ello.Search.Post.Index do
         has_images:        %{type: "boolean"},
       }
     }
-  end
-
-  defp category_names(category_ids) when length(category_ids) == 0, do: []
-  defp category_names(category_ids) do
-    %{ids: category_ids, images: false}
-    |> Discovery.categories
-    |> Enum.map(&(&1.name))
   end
 
   defp text_content(%{reposted_source: reposted_source} = post) when reposted_source != nil do
