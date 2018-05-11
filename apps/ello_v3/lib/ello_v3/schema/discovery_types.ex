@@ -79,7 +79,8 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     field :subtitle, :string, resolve: &editorial_content(&1, &2, "rendered_subtitle")
     field :path, :string, resolve: &editorial_content(&1, &2)
     field :url, :string, resolve: &editorial_content(&1, &2)
-    field :posts, list_of(:post), resolve: &editorial_posts/2
+    field :post, :post
+    field :stream, :editorial_post_stream, resolve: &editorial_stream/2
   end
 
   enum :editorial_kind do
@@ -87,6 +88,11 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     value :curated_posts
     value :internal
     value :external
+  end
+
+  object :editorial_post_stream do
+    field :query, :string
+    field :tokens, list_of(:string)
   end
 
   defp page_header_kind(_, %{source: %{category_id: _}}), do: {:ok, :category}
@@ -160,7 +166,12 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
   defp editorial_content(_, %{source: editorial}, key),
     do: {:ok, Map.get(editorial.content, key)}
 
-  defp editorial_posts(_, %{source: %{kind: "post", post: post}}), do: {:ok, [post]}
-  defp editorial_posts(_, %{source: %{kind: "curated_posts", curated_posts: pts}}), do: {:ok, pts}
-  defp editorial_posts(_, _), do: {:ok, nil}
+  defp editorial_stream(_, %{source: %{kind: "curated_posts"} = editorial}) do
+    {:ok, %{
+      query: "findPosts",
+      tokens: editorial.content["post_tokens"],
+    }}
+  end
+  defp editorial_stream(_, _), do: {:ok, nil}
+
 end

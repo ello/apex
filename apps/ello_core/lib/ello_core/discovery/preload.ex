@@ -46,7 +46,6 @@ defmodule Ello.Core.Discovery.Preload do
   def editorials(editorials, %{preloads: %{}} = options) do
     editorials
     |> preload_post(options)
-    |> preload_curated_posts(options)
     |> build_editorial_images
   end
   def editorials(editorials, options),
@@ -62,27 +61,6 @@ defmodule Ello.Core.Discovery.Preload do
     ])
   end
   defp preload_post(editorials, _), do: editorials
-
-  defp preload_curated_posts(editorials, %{preloads: %{posts: post_preloads}} = options) do
-    tokens = editorials
-             |> Enum.flat_map(&(&1.content["post_tokens"] || []))
-             |> Enum.uniq
-    posts = options
-            |> Map.merge(%{tokens: tokens, preloads: post_preloads})
-            |> Content.posts
-            |> Enum.reduce(%{}, &Map.put(&2, &1.token, &1))
-    Enum.map editorials, fn
-      %{content: %{"post_tokens" => []}} = e -> e
-      %{content: %{"post_tokens" => nil}} = e -> e
-      %{content: %{"post_tokens" => tokens}} = e ->
-        curated_posts = posts
-                        |> Map.take(e.content["post_tokens"])
-                        |> Map.values
-        Map.put(e, :curated_posts, curated_posts)
-      e -> e
-    end
-  end
-  defp preload_curated_posts(editorials, _), do: editorials
 
   def promotionals([], _), do: []
   def promotionals(promotions, options) do

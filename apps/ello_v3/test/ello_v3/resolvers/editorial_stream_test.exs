@@ -31,7 +31,8 @@ defmodule Ello.V3.Resolvers.EditorialStreamTest do
       subtitle
       url
       path
-      posts {
+      stream { query tokens }
+      post {
         id
         author { id }
         assets { id }
@@ -144,11 +145,8 @@ defmodule Ello.V3.Resolvers.EditorialStreamTest do
     refute je7["subtitle"]
     refute je7["url"]
     refute je7["path"]
-    assert [post1, post2] = je7["posts"]
-    assert post1["id"]
-    assert post1["author"]["id"]
-    assert post2["id"]
-    assert post2["author"]["id"]
+    assert je7["stream"]["query"] == "findPosts"
+    assert [_, _] = je7["stream"]["tokens"]
 
     assert je6["id"] == "#{e6.id}"
     assert je6["kind"] == "EXTERNAL"
@@ -172,7 +170,7 @@ defmodule Ello.V3.Resolvers.EditorialStreamTest do
     assert je2["subtitle"] == "<p>check <em>it</em> out</p>"
     refute je2["url"]
     refute je2["path"]
-    assert [post] = je2["posts"]
+    assert post = je2["post"]
     assert post["id"]
     assert post["author"]["id"]
   end
