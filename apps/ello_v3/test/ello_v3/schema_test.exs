@@ -20,6 +20,12 @@ defmodule Ello.V3.SchemaTest do
     assert "post" in Enum.map(json, &(&1["name"]))
   end
 
+  test "has a findPosts query" do
+    resp = post_graphql(%{query: @query_list_query})
+    json = json_response(resp)["data"]["__schema"]["queryType"]["fields"]
+    assert "findPosts" in Enum.map(json, &(&1["name"]))
+  end
+
   test "has a userPostStream query" do
     resp = post_graphql(%{query: @query_list_query})
     json = json_response(resp)["data"]["__schema"]["queryType"]["fields"]
@@ -54,5 +60,11 @@ defmodule Ello.V3.SchemaTest do
     resp = post_graphql(%{query: @query_list_query})
     json = json_response(resp)["data"]["__schema"]["queryType"]["fields"]
     assert "categoryPostStream" in Enum.map(json, &(&1["name"]))
+  end
+
+  test "has an editorialStream query" do
+    resp = post_graphql(%{query: @query_list_query})
+    json = json_response(resp)["data"]["__schema"]["queryType"]["fields"]
+    assert "editorialStream" in Enum.map(json, &(&1["name"]))
   end
 end

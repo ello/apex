@@ -2,6 +2,7 @@ defmodule Ello.V3.Resolvers.PostViewHelpers do
   alias Ello.Events
   alias Ello.Events.CountPostView
   alias Ello.Core.Content.Post
+  alias Ello.Core.Discovery.Editorial
 
   @doc """
   Track post views.
@@ -29,6 +30,11 @@ defmodule Ello.V3.Resolvers.PostViewHelpers do
   defp post_ids(nil), do: []
   defp post_ids(%Post{id: id}), do: [id]
   defp post_ids([%Post{} | _] = posts), do: Enum.map(posts, &(&1.id))
+  defp post_ids([%Editorial{} | _] = editorials) do
+    editorials
+    |> Enum.map(&(&1.post_id))
+    |> Enum.reject(&is_nil/1)
+  end
 
   defp user_id(%{current_user: %{id: id}}), do: id
   defp user_id(_), do: nil

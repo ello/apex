@@ -1,9 +1,11 @@
 defmodule Ello.V3.Resolvers.EditorialStream do
   alias Ello.Core.Discovery
   import Ello.V3.Resolvers.PaginationHelpers
+  import Ello.V3.Resolvers.PostViewHelpers
 
   def call(_, args, _) do
     editorials = Discovery.editorials(Map.merge(args, %{preview: preview?(args)}))
+    track(editorials, args, kind: "editorials")
     {:ok, %{
       editorials: editorials,
       next: next(args, editorials),
