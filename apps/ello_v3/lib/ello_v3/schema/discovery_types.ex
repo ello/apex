@@ -81,6 +81,10 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     field :url, :string, resolve: &editorial_content(&1, &2)
     field :post, :post
     field :stream, :editorial_post_stream, resolve: &editorial_stream/2
+    field :one_by_one_image, :responsive_image_versions, resolve: &editorial_image/2
+    field :one_by_two_image, :responsive_image_versions, resolve: &editorial_image/2
+    field :two_by_one_image, :responsive_image_versions, resolve: &editorial_image/2
+    field :two_by_two_image, :responsive_image_versions, resolve: &editorial_image/2
   end
 
   enum :editorial_kind do
@@ -174,4 +178,35 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
   end
   defp editorial_stream(_, _), do: {:ok, nil}
 
+  defp editorial_image(_, %{
+    definition: %{schema_node: %{identifier: :one_by_one_image}},
+    source: editorial,
+  }), do: one_by_one_image(editorial)
+  defp editorial_image(_, %{
+    definition: %{schema_node: %{identifier: :one_by_two_image}},
+    source: %{one_by_two_image_struct: nil} = editorial,
+  }), do: one_by_one_image(editorial)
+  defp editorial_image(_, %{
+    definition: %{schema_node: %{identifier: :one_by_two_image}},
+    source: %{one_by_two_image_struct: image},
+  }), do: {:ok, image}
+  defp editorial_image(_, %{
+    definition: %{schema_node: %{identifier: :two_by_one_image}},
+    source: %{two_by_one_image_struct: nil} = editorial,
+  }), do: one_by_one_image(editorial)
+  defp editorial_image(_, %{
+    definition: %{schema_node: %{identifier: :two_by_one_image}},
+    source: %{two_by_one_image_struct: image},
+  }), do: {:ok, image}
+  defp editorial_image(_, %{
+    definition: %{schema_node: %{identifier: :two_by_two_image}},
+    source: %{two_by_two_image_struct: nil} = editorial,
+  }), do: one_by_one_image(editorial)
+  defp editorial_image(_, %{
+    definition: %{schema_node: %{identifier: :two_by_two_image}},
+    source: %{two_by_two_image_struct: image},
+  }), do: {:ok, image}
+
+  defp one_by_one_image(%{one_by_one_image_struct: nil}), do: {:ok, %{}}
+  defp one_by_one_image(%{one_by_one_image_struct: image}), do: {:ok, image}
 end
