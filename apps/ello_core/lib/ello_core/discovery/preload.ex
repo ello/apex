@@ -22,24 +22,7 @@ defmodule Ello.Core.Discovery.Preload do
     |> Repo.preload(ecto_preloads)
   end
 
-  @editorial_default_preloads %{
-    post: %{
-      assets: %{},
-      current_user_state: %{},
-      categories: %{},
-      artist_invite_submission: %{artist_invite: %{}},
-      author: %{current_user_state: %{}, user_stats: %{}, categories: %{}},
-      post_stats: %{},
-      reposted_source: %{
-        assets: %{},
-        current_user_state: %{},
-        categories: %{},
-        artist_invite_submission: %{artist_invite: %{}},
-        author: %{current_user_state: %{}, user_stats: %{}, categories: %{}},
-        post_stats: %{},
-      }
-    }
-  }
+  @editorial_default_preloads %{post: Content.Preload.post_default_preloads}
 
   def editorials(nil, _), do: nil
   def editorials([], _),  do: []
