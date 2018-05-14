@@ -73,7 +73,6 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
     |> strip_query
     |> strip_root(fragments)
     |> find_preloads(fragments, %{})
-    |> IO.inspect
   end
 
   # Ignore top level query types - they are not part of the pre-load tree we need
@@ -90,7 +89,7 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
   defp strip_root(%Fragment.Spread{} = spread, fragments) do
     strip_root(Map.get(fragments, spread.name).selections, fragments)
   end
-  defp strip_root(field, _), do: IO.inspect(field)
+  defp strip_root(field, _), do: field
 
   defp find_preloads(%{selections: []}, _fragments, preloads),
     do: preloads
