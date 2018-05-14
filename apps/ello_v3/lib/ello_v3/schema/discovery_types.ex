@@ -89,7 +89,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
 
   enum :editorial_kind do
     value :post
-    value :curated_posts
+    value :post_stream
     value :internal
     value :external
   end
@@ -159,7 +159,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
 
   @editorial_kinds %{
     "post" => :post,
-    "curated_posts" => :curated_posts,
+    "curated_posts" => :post_stream,
     "internal" => :internal,
     "external" => :external,
   }

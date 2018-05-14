@@ -152,7 +152,7 @@ defmodule Ello.V3.Resolvers.EditorialStreamTest do
     assert [je7, je6, _je5, je4, je2, _je3, _je1] = editorials
 
     assert je7["id"] == "#{e7.id}"
-    assert je7["kind"] == "CURATED_POSTS"
+    assert je7["kind"] == "POST_STREAM"
     assert je7["title"] == "Curated Posts Editorial"
     refute je7["subtitle"]
     refute je7["url"]
