@@ -90,6 +90,9 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
 
   defp page_header_image(_, %{source: %{image_struct: image}}), do: {:ok, image}
 
+  defp actions(args, %{source: category_post, context: %{current_user: nil}} = resolution) do
+    actions(args, resolution, nil)
+  end
   defp actions(args, %{source: category_post, context: %{current_user: current_user}} = resolution) do
     cat_user = CategoryUser
                |> Repo.get_by(category_id: category_post.category.id, user_id: current_user.id)
