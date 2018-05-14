@@ -73,6 +73,7 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
     |> strip_query
     |> strip_root
     |> find_preloads(fragments, %{})
+    |> IO.inspect
   end
 
   # Ignore top level query types - they are not part of the pre-load tree we need
