@@ -71,7 +71,7 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
   def preloads(%{definition: field, fragments: fragments}) do
     field
     |> strip_query
-    |> strip_root
+    |> strip_root(fragments)
     |> find_preloads(fragments, %{})
     |> IO.inspect
   end
@@ -83,11 +83,14 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
 
   # Ignore top level data types - this is a convienience so we don't have to grab a specific key
   # in the top level.
-  defp strip_root(fields) when is_list(fields),
-    do: Enum.reduce(fields, [], &([strip_root(&1) | &2]))
-  defp strip_root(%{schema_node: %{identifier: f}, selections: children}) when f in @root_fields,
+  defp strip_root(fields, fragments) when is_list(fields),
+    do: Enum.reduce(fields, [], &([strip_root(&1, fragments) | &2]))
+  defp strip_root(%{schema_node: %{identifier: f}, selections: children}, _) when f in @root_fields,
     do: children
-  defp strip_root(field), do: IO.inspect(field)
+  defp strip_root(%Fragment.Spread{} = spread, fragments) do
+    strip_root(Map.get(fragments, spread.name).selections, fragments)
+  end
+  defp strip_root(field, _), do: IO.inspect(field)
 
   defp find_preloads(%{selections: []}, _fragments, preloads),
     do: preloads
