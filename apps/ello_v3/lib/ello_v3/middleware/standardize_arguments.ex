@@ -87,7 +87,7 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
     do: Enum.reduce(fields, [], &([strip_root(&1) | &2]))
   defp strip_root(%{schema_node: %{identifier: f}, selections: children}) when f in @root_fields,
     do: children
-  defp strip_root(field), do: field
+  defp strip_root(field), do: IO.inspect(field)
 
   defp find_preloads(%{selections: []}, _fragments, preloads),
     do: preloads
