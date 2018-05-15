@@ -88,16 +88,29 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
 
   defp page_header_image(_, %{source: %{image_struct: image}}), do: {:ok, image}
 
+  defp actions(args, %{context: %{current_user: nil}} = resolution) do
+    actions(args, resolution, nil)
+  end
+  defp actions(args, %{source: category_post, context: %{current_user: current_user}} = resolution) do
+    cat_user = Enum.find(current_user.category_users, &(&1.category_id == category_post.category.id))
+    actions(args, resolution, cat_user)
+  end
   defp actions(_, %{
     source: category_post,
     context: %{current_user: %{is_staff: true}},
-  }) do
+  }, _) do
     {:ok, %{
       feature:   feature_action(category_post),
       unfeature: unfeature_action(category_post),
     }}
   end
-  defp actions(_, _), do: {:ok, nil}
+  defp actions(_, %{source: category_post}, %{role: "curator"}) do
+    {:ok, %{
+      feature:   feature_action(category_post),
+      unfeature: unfeature_action(category_post),
+    }}
+  end
+  defp actions(_, _, _), do: {:ok, nil}
 
   defp feature_action(%{id: id, status: "submitted"}), do: %{
     href: "/api/v2/category_posts/#{id}/feature",

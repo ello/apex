@@ -61,6 +61,7 @@ defmodule Ello.Core.Network do
   def load_current_user(id) do
     User
     |> Repo.get(id)
+    |> Repo.preload(:category_users)
     |> User.preload_blocked_ids
     |> Preload.is_spammer
   end
