@@ -94,8 +94,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     actions(args, resolution, nil)
   end
   defp actions(args, %{source: category_post, context: %{current_user: current_user}} = resolution) do
-    cat_user = CategoryUser
-               |> Repo.get_by(category_id: category_post.category.id, user_id: current_user.id)
+    cat_user = Enum.find(current_user.category_users, &(&1.category_id == category_post.category.id))
     actions(args, resolution, cat_user)
   end
   defp actions(_, %{
