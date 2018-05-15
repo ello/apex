@@ -44,7 +44,7 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
 
   # Root and query types are droped so we just get a list of the preloads
   @root_fields [:post, :posts, :page_headers, :editorials]
-  @query_types [:post_stream, :category_post_stream, :editorial_stream, :category_nav]
+  @query_types [:post_stream, :category_post_stream, :editorial_stream, :category_nav, :find_posts]
 
   # Ignores fields are typically nested json we just don't need to add to the preloads.
   @ignore_fields [
@@ -77,6 +77,8 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
 
   # Ignore top level query types - they are not part of the pre-load tree we need
   defp strip_query(%{schema_node: %{type: t}, selections: s}) when t in @query_types,
+    do: s
+  defp strip_query(%{schema_node: %{identifier: i}, selections: s}) when i in @query_types,
     do: s
   defp strip_query(field), do: field
 
