@@ -39,10 +39,10 @@ defmodule Ello.V3.Resolvers.EditorialStreamTest do
       subtitle
       url
       path
-      one_by_one_image { ...editorialImageVersions }
-      one_by_two_image { ...editorialImageVersions }
-      two_by_one_image { ...editorialImageVersions }
-      two_by_two_image { ...editorialImageVersions }
+      oneByOneImage { ...editorialImageVersions }
+      oneByTwoImage { ...editorialImageVersions }
+      twoByOneImage { ...editorialImageVersions }
+      twoByTwoImage { ...editorialImageVersions }
       stream { query tokens }
       post {
         id
@@ -159,10 +159,10 @@ defmodule Ello.V3.Resolvers.EditorialStreamTest do
     refute je7["path"]
     assert je7["stream"]["query"] == "findPosts"
     assert [_, _] = je7["stream"]["tokens"]
-    assert je7["one_by_one_image"]["hdpi"]["url"]
-    assert je7["one_by_two_image"]["hdpi"]["url"]
-    assert je7["two_by_one_image"]["hdpi"]["url"]
-    assert je7["two_by_two_image"]["hdpi"]["url"]
+    assert je7["oneByOneImage"]["hdpi"]["url"]
+    assert je7["oneByTwoImage"]["hdpi"]["url"]
+    assert je7["twoByOneImage"]["hdpi"]["url"]
+    assert je7["twoByTwoImage"]["hdpi"]["url"]
 
     assert je6["id"] == "#{e6.id}"
     assert je6["kind"] == "EXTERNAL"
@@ -171,10 +171,10 @@ defmodule Ello.V3.Resolvers.EditorialStreamTest do
     assert je6["url"] == "https://ello.co/wtf"
     refute je6["path"]
     refute je6["posts"]
-    assert je6["one_by_one_image"]["hdpi"]["url"]
-    assert je6["one_by_two_image"]["hdpi"]["url"]
-    assert je6["two_by_one_image"]["hdpi"]["url"]
-    assert je6["two_by_two_image"]["hdpi"]["url"]
+    assert je6["oneByOneImage"]["hdpi"]["url"]
+    assert je6["oneByTwoImage"]["hdpi"]["url"]
+    assert je6["twoByOneImage"]["hdpi"]["url"]
+    assert je6["twoByTwoImage"]["hdpi"]["url"]
 
     assert je4["id"] == "#{e4.id}"
     assert je4["kind"] == "INTERNAL"
@@ -183,10 +183,10 @@ defmodule Ello.V3.Resolvers.EditorialStreamTest do
     assert je4["path"] == "/discover/recent"
     refute je4["url"]
     refute je4["posts"]
-    assert je4["one_by_one_image"]["hdpi"]["url"]
-    assert je4["one_by_two_image"]["hdpi"]["url"]
-    assert je4["two_by_one_image"]["hdpi"]["url"]
-    assert je4["two_by_two_image"]["hdpi"]["url"]
+    assert je4["oneByOneImage"]["hdpi"]["url"]
+    assert je4["oneByTwoImage"]["hdpi"]["url"]
+    assert je4["twoByOneImage"]["hdpi"]["url"]
+    assert je4["twoByTwoImage"]["hdpi"]["url"]
 
     assert je2["id"] == "#{e2.id}"
     assert je2["kind"] == "POST"
@@ -197,9 +197,9 @@ defmodule Ello.V3.Resolvers.EditorialStreamTest do
     assert post = je2["post"]
     assert post["id"]
     assert post["author"]["id"]
-    assert je2["one_by_one_image"]["hdpi"]["url"]
-    assert je2["one_by_two_image"]["hdpi"]["url"]
-    assert je2["two_by_one_image"]["hdpi"]["url"]
-    assert je2["two_by_two_image"]["hdpi"]["url"]
+    assert je2["oneByOneImage"]["hdpi"]["url"]
+    assert je2["oneByTwoImage"]["hdpi"]["url"]
+    assert je2["twoByOneImage"]["hdpi"]["url"]
+    assert je2["twoByTwoImage"]["hdpi"]["url"]
   end
 end
