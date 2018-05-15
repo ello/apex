@@ -1,6 +1,4 @@
 defmodule Ello.V3.Schema.DiscoveryTypes do
-  alias Ello.Core.Repo
-  alias Ello.Core.Network.{CategoryUser}
   use Absinthe.Schema.Notation
 
   object :category do
@@ -90,7 +88,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
 
   defp page_header_image(_, %{source: %{image_struct: image}}), do: {:ok, image}
 
-  defp actions(args, %{source: category_post, context: %{current_user: nil}} = resolution) do
+  defp actions(args, %{context: %{current_user: nil}} = resolution) do
     actions(args, resolution, nil)
   end
   defp actions(args, %{source: category_post, context: %{current_user: current_user}} = resolution) do
