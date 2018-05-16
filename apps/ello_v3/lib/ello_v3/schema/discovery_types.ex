@@ -207,6 +207,6 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     source: %{two_by_two_image_struct: image},
   }), do: {:ok, image}
 
-  defp one_by_one_image(%{one_by_one_image_struct: nil}), do: {:ok, %{}}
+  defp one_by_one_image(%{one_by_one_image_struct: nil}), do: {:ok, nil}
   defp one_by_one_image(%{one_by_one_image_struct: image}), do: {:ok, image}
 end
