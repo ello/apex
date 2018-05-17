@@ -65,6 +65,40 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     field :url, :string
   end
 
+  object :editorial_stream do
+    field :next, :string
+    field :per_page, :integer
+    field :is_last_page, :boolean
+    field :editorials, list_of(:editorial)
+  end
+
+  object :editorial do
+    field :id, :id
+    field :kind, :editorial_kind, resolve: &editorial_kind/2
+    field :title, :string, resolve: &editorial_content/2
+    field :subtitle, :string, resolve: &editorial_content(&1, &2, "rendered_subtitle")
+    field :path, :string, resolve: &editorial_content(&1, &2)
+    field :url, :string, resolve: &editorial_content(&1, &2)
+    field :post, :post
+    field :stream, :editorial_post_stream, resolve: &editorial_stream/2
+    field :one_by_one_image, :responsive_image_versions, resolve: &editorial_image/2
+    field :one_by_two_image, :responsive_image_versions, resolve: &editorial_image/2
+    field :two_by_one_image, :responsive_image_versions, resolve: &editorial_image/2
+    field :two_by_two_image, :responsive_image_versions, resolve: &editorial_image/2
+  end
+
+  enum :editorial_kind do
+    value :post
+    value :post_stream
+    value :internal
+    value :external
+  end
+
+  object :editorial_post_stream do
+    field :query, :string
+    field :tokens, list_of(:string)
+  end
+
   defp page_header_kind(_, %{source: %{category_id: _}}), do: {:ok, :category}
   defp page_header_kind(_, %{source: %{is_editorial: true}}), do: {:ok, :editorial}
   defp page_header_kind(_, %{source: %{is_artist_invite: true}}), do: {:ok, :artist_invite}
@@ -122,4 +156,57 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     method: "put",
   }
   defp unfeature_action(_), do: nil
+
+  @editorial_kinds %{
+    "post" => :post,
+    "curated_posts" => :post_stream,
+    "internal" => :internal,
+    "external" => :external,
+  }
+  defp editorial_kind(_, %{source: %{kind: kind}}), do: {:ok, @editorial_kinds[kind]}
+
+  defp editorial_content(a, b = %{definition: %{schema_node: %{identifier: name}}}),
+    do: editorial_content(a, b, "#{name}")
+  defp editorial_content(_, %{source: editorial}, key),
+    do: {:ok, Map.get(editorial.content, key)}
+
+  defp editorial_stream(_, %{source: %{kind: "curated_posts"} = editorial}) do
+    {:ok, %{
+      query: "findPosts",
+      tokens: editorial.content["post_tokens"],
+    }}
+  end
+  defp editorial_stream(_, _), do: {:ok, nil}
+
+  defp editorial_image(_, %{
+    definition: %{schema_node: %{identifier: :one_by_one_image}},
+    source: editorial,
+  }), do: one_by_one_image(editorial)
+  defp editorial_image(_, %{
+    definition: %{schema_node: %{identifier: :one_by_two_image}},
+    source: %{one_by_two_image_struct: nil} = editorial,
+  }), do: one_by_one_image(editorial)
+  defp editorial_image(_, %{
+    definition: %{schema_node: %{identifier: :one_by_two_image}},
+    source: %{one_by_two_image_struct: image},
+  }), do: {:ok, image}
+  defp editorial_image(_, %{
+    definition: %{schema_node: %{identifier: :two_by_one_image}},
+    source: %{two_by_one_image_struct: nil} = editorial,
+  }), do: one_by_one_image(editorial)
+  defp editorial_image(_, %{
+    definition: %{schema_node: %{identifier: :two_by_one_image}},
+    source: %{two_by_one_image_struct: image},
+  }), do: {:ok, image}
+  defp editorial_image(_, %{
+    definition: %{schema_node: %{identifier: :two_by_two_image}},
+    source: %{two_by_two_image_struct: nil} = editorial,
+  }), do: one_by_one_image(editorial)
+  defp editorial_image(_, %{
+    definition: %{schema_node: %{identifier: :two_by_two_image}},
+    source: %{two_by_two_image_struct: image},
+  }), do: {:ok, image}
+
+  defp one_by_one_image(%{one_by_one_image_struct: nil}), do: {:ok, nil}
+  defp one_by_one_image(%{one_by_one_image_struct: image}), do: {:ok, image}
 end

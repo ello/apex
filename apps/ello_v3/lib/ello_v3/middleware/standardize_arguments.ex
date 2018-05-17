@@ -43,8 +43,8 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
 
 
   # Root and query types are droped so we just get a list of the preloads
-  @root_fields [:post, :posts, :page_headers, :category_nav, :category_post_stream]
-  @query_types [:post_stream]
+  @root_fields [:post, :posts, :page_headers, :editorials]
+  @query_types [:post_stream, :category_post_stream, :editorial_stream, :category_nav, :find_posts]
 
   # Ignores fields are typically nested json we just don't need to add to the preloads.
   @ignore_fields [
@@ -67,21 +67,36 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
   Preloads recursively parses that nested data structure and adds any items with children as map keys.
   When a "Fragment.Spread" is encountered the fragment is grabbed from the keys fragments hash and
   its selections are added directly to the current level.
-
-  We ignore certain fields even with children when we know they are not needed for preloading.
   """
   def preloads(%{definition: field, fragments: fragments}) do
-    find_preloads(field, fragments, %{})
+    field
+    |> strip_query
+    |> strip_root(fragments)
+    |> find_preloads(fragments, %{})
   end
+
+  # Ignore top level query types - they are not part of the pre-load tree we need
+  defp strip_query(%{schema_node: %{type: t}, selections: s}) when t in @query_types,
+    do: s
+  defp strip_query(%{schema_node: %{identifier: i}, selections: s}) when i in @query_types,
+    do: s
+  defp strip_query(field), do: field
+
+  # Ignore top level data types - this is a convienience so we don't have to grab a specific key
+  # in the top level.
+  defp strip_root(fields, fragments) when is_list(fields),
+    do: Enum.reduce(fields, [], &([strip_root(&1, fragments) | &2]))
+  defp strip_root(%{schema_node: %{identifier: f}, selections: children}, _) when f in @root_fields,
+    do: children
+  defp strip_root(%Fragment.Spread{} = spread, fragments) do
+    strip_root(Map.get(fragments, spread.name).selections, fragments)
+  end
+  defp strip_root(field, _), do: field
 
   defp find_preloads(%{selections: []}, _fragments, preloads),
     do: preloads
   defp find_preloads(selections, fragments, preloads) when is_list(selections),
     do: Enum.reduce(selections, preloads, &find_preloads(&1, fragments, &2))
-  defp find_preloads(%{schema_node: %{type: t}, selections: s}, r, p) when t in @query_types,
-    do: find_preloads(s, r, p)
-  defp find_preloads(%{schema_node: %{identifier: f}, selections: s}, r, p) when f in @root_fields,
-    do: find_preloads(s, r, p)
   defp find_preloads(%{schema_node: %{identifier: f}}, _r, p) when f in @ignore_fields,
     do: p
   defp find_preloads(%{schema_node: %{identifier: field}, selections: selections}, fragments, preloads) do

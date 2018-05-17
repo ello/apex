@@ -22,14 +22,28 @@ defmodule Ello.Core.Discovery.Preload do
     |> Repo.preload(ecto_preloads)
   end
 
-  @doc "TODO"
+  @editorial_default_preloads %{post: Content.Preload.post_default_preloads}
+
   def editorials(nil, _), do: nil
   def editorials([], _),  do: []
-  def editorials(editorials, options) do
+  def editorials(editorials, %{preloads: %{}} = options) do
     editorials
-    |> Repo.preload(post: &(Content.posts(Map.put(options, :ids, &1))))
+    |> preload_post(options)
     |> build_editorial_images
   end
+  def editorials(editorials, options),
+    do: editorials(editorials, Map.put(options, :preloads, @editorial_default_preloads))
+
+  # For "post" type support both posts and post as preload name
+  defp preload_post(editorials, %{preloads: %{post: post_preloads}} = options) do
+    preload_post(editorials, %{options | preloads: %{posts: post_preloads}})
+  end
+  defp preload_post(editorials, %{preloads: %{posts: post_preloads}} = options) do
+    Repo.preload(editorials, [
+      {:post, &(Content.posts(Map.merge(options, %{ids: &1, preloads: post_preloads})))}
+    ])
+  end
+  defp preload_post(editorials, _), do: editorials
 
   def promotionals([], _), do: []
   def promotionals(promotions, options) do

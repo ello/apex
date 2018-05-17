@@ -29,6 +29,9 @@ defmodule Ello.Core.Discovery.Editorial do
     field :created_at, :utc_datetime
     field :updated_at, :utc_datetime
 
+    # Holds curated posts preloads
+    field :curated_posts, {:array, :map}, default: [], virtual: true
+
     belongs_to :post, Post
   end
 

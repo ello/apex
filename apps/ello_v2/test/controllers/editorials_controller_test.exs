@@ -40,7 +40,7 @@ defmodule Ello.V2.EditorialControllerTest do
     ] = get_resp_header(conn, "link")
   end
 
-  test "GET /v2/categories - published - page2", %{conn: conn, editorials: editorials} do
+  test "GET /v2/editorials - published - page2", %{conn: conn, editorials: editorials} do
     [e1, _e2, _e3, _e4, _e5, _e6, _e7] = editorials
     conn = get(conn, editorial_path(conn, :index), %{before: "2", per_page: "4"})
     assert %{"editorials" => response} = json_response(conn, 200)
@@ -48,7 +48,7 @@ defmodule Ello.V2.EditorialControllerTest do
       [e1.id]
   end
 
-  test "GET /v2/categories - logged out", %{public_conn: conn, editorials: editorials} do
+  test "GET /v2/editorials - logged out", %{public_conn: conn, editorials: editorials} do
     [_e1, _e2, e3, e4, e5, _e6, e7] = editorials
     conn = get(conn, editorial_path(conn, :index), %{per_page: "4"})
     assert %{
@@ -67,7 +67,7 @@ defmodule Ello.V2.EditorialControllerTest do
     ] = get_resp_header(conn, "link")
   end
 
-  test "GET /v2/categories - preview - not staff", %{conn: conn, editorials: editorials} do
+  test "GET /v2/editorials - preview - not staff", %{conn: conn, editorials: editorials} do
     [_e1, _e2, e3, e4, e5, _e6, e7] = editorials
     conn = get(conn, editorial_path(conn, :index), %{preview: "true", per_page: "4"})
     assert %{"editorials" => response} = json_response(conn, 200)
@@ -79,7 +79,7 @@ defmodule Ello.V2.EditorialControllerTest do
     ] = get_resp_header(conn, "link")
   end
 
-  test "GET /v2/categories - preview - as staff", %{staff_conn: conn, editorials: editorials} do
+  test "GET /v2/editorials - preview - as staff", %{staff_conn: conn, editorials: editorials} do
     [_e1, _e2, _e3, e4, e5, e6, e7] = editorials
     conn = get(conn, editorial_path(conn, :index), %{preview: "true", per_page: "4"})
     assert %{"editorials" => response} = json_response(conn, 200)
@@ -91,18 +91,18 @@ defmodule Ello.V2.EditorialControllerTest do
     ] = get_resp_header(conn, "link")
   end
 
-  test "GET /v2/categories - first page", %{public_conn: conn} do
+  test "GET /v2/editorials - first page", %{public_conn: conn} do
     conn = get(conn, editorial_path(conn, :index), %{per_page: "4"})
     assert ["1"] = get_resp_header(conn, "x-total-pages-remaining")
   end
 
-  test "GET /v2/categories - last page", %{public_conn: conn, editorials: editorials} do
+  test "GET /v2/editorials - last page", %{public_conn: conn, editorials: editorials} do
     [_e1, _e2, _e3, _e4, e5, _e6, _e7] = editorials
     conn = get(conn, editorial_path(conn, :index), %{per_page: "4", before: "#{e5.published_position}/"})
     assert ["0"] = get_resp_header(conn, "x-total-pages-remaining")
   end
 
-  test "GET /v2/categories - too many pages", %{public_conn: conn, editorials: editorials} do
+  test "GET /v2/editorials - too many pages", %{public_conn: conn, editorials: editorials} do
     [e1, _e2, _e3, _e4, _e5, _e6, _e7] = editorials
     conn = get(conn, editorial_path(conn, :index), %{per_page: "4", before: "#{e1.published_position}"})
     assert response(conn, 204)

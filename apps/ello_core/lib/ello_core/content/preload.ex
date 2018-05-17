@@ -31,6 +31,7 @@ defmodule Ello.Core.Content.Preload do
       post_stats: %{},
     }
   }
+  def post_default_preloads, do: @post_default_preloads
 
   @comment_default_preloads %{
     assets: %{},

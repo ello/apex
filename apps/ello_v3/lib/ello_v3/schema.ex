@@ -18,6 +18,12 @@ defmodule Ello.V3.Schema do
       resolve &Resolvers.FindPost.call/3
     end
 
+    @desc "Get posts by token"
+    field :find_posts, list_of(:post) do
+      arg :tokens, list_of(:string)
+      resolve &Resolvers.FindPosts.call/3
+    end
+
     @desc "List of PageHeaders for the given page"
     field :page_headers, list_of(:page_header) do
       arg :kind, non_null(:page_header_kind), description: "What type of page headers to get"
@@ -67,6 +73,14 @@ defmodule Ello.V3.Schema do
       arg :slug, :string
       arg :before, :string, description: "Pagination cursor, returned by previous page"
       arg :per_page, :integer, default_value: 10
+    end
+
+    @desc "Stream of editorials"
+    field :editorial_stream, :editorial_stream do
+      resolve &Resolvers.EditorialStream.call/3
+      arg :before, :string, description: "Pagination cursor, returned by previous page"
+      arg :per_page, :integer, default_value: 25
+      arg :preview, :boolean, default_value: false, description: "Preview unpublished editorials - only works on staff accounts"
     end
   end
 
