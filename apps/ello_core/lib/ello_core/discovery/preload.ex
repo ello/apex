@@ -8,6 +8,7 @@ defmodule Ello.Core.Discovery.Preload do
   def categories(categories, options) do
     categories
     |> include_promotionals(options)
+    |> include_category_users(options)
     |> build_category_images(options)
   end
 
@@ -18,8 +19,16 @@ defmodule Ello.Core.Discovery.Preload do
                     |> add_category_preload(preloads)
                     |> add_submitted_by_preload(preloads)
                     |> add_featured_by_preload(preloads)
-    category_posts
-    |> Repo.preload(ecto_preloads)
+    Repo.preload(category_posts, ecto_preloads)
+  end
+
+  def category_users(nil, _), do: nil
+  def category_users([], _),  do: []
+  def category_users(category_users, %{preloads: preloads}) do
+    ecto_preloads = []
+                    |> add_category_preload(preloads)
+                    |> add_user_preload(preloads)
+    Repo.preload(category_users, ecto_preloads)
   end
 
   @editorial_default_preloads %{post: Content.Preload.post_default_preloads}
@@ -64,6 +73,19 @@ defmodule Ello.Core.Discovery.Preload do
   end
   defp include_promotionals(categories, _), do: categories
 
+  defp include_category_users(categories, %{preloads: %{category_users: cuser_preloads}} = opts) do
+    {args, preloads} = Map.pop(cuser_preloads, :args, %{})
+    opts = opts
+           |> Map.merge(args)
+           |> Map.put(:preloads, preloads)
+           |> Map.put(:category_ids, nil)
+
+    Repo.preload(categories, [
+      category_users: &Discovery.category_users(%{opts | category_ids: &1})
+    ])
+  end
+  defp include_category_users(categories, _), do: categories
+
   defp promotional_includes(promotionals, %{preloads: preloads} = options) do
     preloads = Enum.map preloads, fn
       ({:category, _}) -> :category
@@ -107,6 +129,11 @@ defmodule Ello.Core.Discovery.Preload do
   defp add_category_preload(preloads, %{category: category_preloads}),
     do: [{:category, &Discovery.categories(%{ids: &1, preloads: category_preloads})} | preloads]
   defp add_category_preload(preloads, _), do: preloads
+
+  defp add_user_preload(preloads, %{user: user_preloads}) do
+    [{:user, &Network.users(%{ids: &1, preloads: user_preloads})} | preloads]
+  end
+  defp add_user_preload(preloads, _), do: preloads
 
   defp add_submitted_by_preload(preloads, %{submitted_by: user_preloads}),
     do: [{:submitted_by, &Network.users(%{ids: &1, preloads: user_preloads})} | preloads]

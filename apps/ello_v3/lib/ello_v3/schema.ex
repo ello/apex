@@ -49,6 +49,12 @@ defmodule Ello.V3.Schema do
       resolve &Resolvers.Categories.call/3
     end
 
+    @desc "Returns a signle (active) category"
+    field :category, :category do
+      arg :slug, non_null(:string)
+      resolve &Resolvers.Category.call/3
+    end
+
     @desc "Stream of posts across the network"
     field :global_post_stream, :post_stream do
       arg :kind, non_null(:stream_kind), description: "Which variation of the stream to return"

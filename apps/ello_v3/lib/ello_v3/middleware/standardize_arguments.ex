@@ -43,7 +43,7 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
 
 
   # Root and query types are droped so we just get a list of the preloads
-  @root_fields [:post, :posts, :page_headers, :editorials]
+  @root_fields [:post, :posts, :page_headers, :editorials, :category, :categories]
   @query_types [:post_stream, :category_post_stream, :editorial_stream, :category_nav, :find_posts]
 
   # Ignores fields are typically nested json we just don't need to add to the preloads.
@@ -93,15 +93,17 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
   end
   defp strip_root(field, _), do: field
 
-  defp find_preloads(%{selections: []}, _fragments, preloads),
-    do: preloads
+  defp find_preloads(%{selections: []}, _fragments, preloads) do
+    preloads
+  end
   defp find_preloads(selections, fragments, preloads) when is_list(selections),
     do: Enum.reduce(selections, preloads, &find_preloads(&1, fragments, &2))
-  defp find_preloads(%{schema_node: %{identifier: f}}, _r, p) when f in @ignore_fields,
+  defp find_preloads(%{schema_node: %{identifier: i}}, _r, p) when i in @ignore_fields,
     do: p
-  defp find_preloads(%{schema_node: %{identifier: field}, selections: selections}, fragments, preloads) do
-    Map.put(preloads, field, find_preloads(selections, fragments, %{}))
-  end
+  defp find_preloads(%{schema_node: %{identifier: i}, selections: s, argument_data: a}, f, p)
+    when map_size(a) == 0, do: Map.put(p, i, find_preloads(s, f, %{}))
+  defp find_preloads(%{schema_node: %{identifier: i}, selections: s, argument_data: a}, f, p),
+    do: Map.put(p, i, find_preloads(s, f, %{args: a}))
   defp find_preloads(%Fragment.Spread{} = spread, fragments, preloads) do
     find_preloads(Map.get(fragments, spread.name).selections, fragments, preloads)
   end
