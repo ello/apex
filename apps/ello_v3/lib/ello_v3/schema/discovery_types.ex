@@ -8,6 +8,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     field :slug, :string
     field :level, :string
     field :order, :integer
+    field :description, :string
     field :tile_image, :tshirt_image_versions, resolve: fn(_args, %{source: category}) ->
       {:ok, category.tile_image_struct}
     end
