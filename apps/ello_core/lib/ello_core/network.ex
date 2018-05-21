@@ -67,6 +67,16 @@ defmodule Ello.Core.Network do
   end
 
   @doc """
+  Load a user with no preloads for the sake of post view tracking.
+
+  Requires id or email.
+  """
+  def load_view_tracking_user(%{email: email}), do:
+    Repo.get_by(User, email: String.downcase(email))
+  def load_view_tracking_user(%{id: id}), do:
+    Repo.get(User, id)
+
+  @doc """
   Get multiple users.
 
   * ids - ids of users to retreive
