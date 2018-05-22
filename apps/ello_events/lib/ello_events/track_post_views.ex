@@ -32,7 +32,7 @@ defmodule Ello.Events.TrackPostViews do
       []       -> conn
       ids -> Events.publish(%CountPostView{
         post_ids:    ids,
-        user_id:     user_id(conn),
+        user_id:     user_id(conn, options),
         stream_kind: stream_kind(conn, options),
         stream_id:   stream_id(options),
       })
@@ -40,8 +40,9 @@ defmodule Ello.Events.TrackPostViews do
     end
   end
 
-  defp user_id(%{assigns: %{current_user: %{id: id}}}), do: id
-  defp user_id(_), do: nil
+  defp user_id(%{assigns: %{current_user: %{id: id}}}, _), do: id
+  defp user_id(_, %{user: %{id: id}}), do: id
+  defp user_id(_, _), do: nil
 
   defp stream_kind(conn, opts) do
     case {opts[:stream_kind], conn.params["stream_source"]} do
