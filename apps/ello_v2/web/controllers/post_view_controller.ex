@@ -36,9 +36,9 @@ defmodule Ello.V2.PostViewController do
   }
 
   defp find_posts(%{"post_tokens" => tokens}),
-    do: Content.posts(%{tokens: tokens, preloads: @preloads, current_user: nil})
+    do: Content.posts(%{tokens: List.wrap(tokens), preloads: @preloads, current_user: nil})
   defp find_posts(%{"post_ids" => ids}),
-    do: Content.posts(%{ids: ids, preloads: @preloads, current_user: nil})
+    do: Content.posts(%{ids: List.wrap(ids), preloads: @preloads, current_user: nil})
   defp find_posts(_), do: nil
 
   defp safe_string(str) when is_binary(str), 
