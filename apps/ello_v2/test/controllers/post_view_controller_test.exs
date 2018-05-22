@@ -106,4 +106,42 @@ defmodule Ello.V2.PostViewControllerTest do
     }]} = Jason.decode!(json)
     assert ids == Enum.map(posts, &(&1.id))
   end
+
+  test "count post views correctly - via bearer token with string array of ids", %{
+    user: %{id: user_id},
+    user_conn: conn,
+    posts: posts,
+  } do
+    ids = Enum.map(posts, &(&1.id))
+    assert %{status: 204} = get(conn, "/api/v2/post_views", %{
+      post_ids: Enum.join(ids, ","),
+    })
+    assert_receive ["LPUSH", "sidekiq:queue:count", json]
+    assert %{"args" => [%{
+      "post_ids" => jids,
+      "user_id" => ^user_id,
+      "stream_kind" => "unknown_via_post_view_api",
+      "stream_id" => "",
+    }]} = Jason.decode!(json)
+    assert jids == Enum.map(posts, &(&1.id))
+  end
+
+  test "count post views correctly - via bearer token with string array of tokens", %{
+    user: %{id: user_id},
+    user_conn: conn,
+    posts: posts,
+  } do
+    tokens = Enum.map(posts, &(&1.token))
+    assert %{status: 204} = get(conn, "/api/v2/post_views", %{
+      posts: "[#{Enum.join(tokens, ",")}]",
+    })
+    assert_receive ["LPUSH", "sidekiq:queue:count", json]
+    assert %{"args" => [%{
+      "post_ids" => ids,
+      "user_id" => ^user_id,
+      "stream_kind" => "unknown_via_post_view_api",
+      "stream_id" => "",
+    }]} = Jason.decode!(json)
+    assert ids == Enum.map(posts, &(&1.id))
+  end
 end
