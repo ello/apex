@@ -101,7 +101,7 @@ defmodule Ello.V2.PostViewControllerTest do
     assert %{"args" => [%{
       "post_ids" => ids,
       "user_id" => ^user_id,
-      "stream_kind" => "unknown_via_post_view_api",
+      "stream_kind" => "email",
       "stream_id" => "",
     }]} = Jason.decode!(json)
     assert ids == Enum.map(posts, &(&1.id))
@@ -120,7 +120,7 @@ defmodule Ello.V2.PostViewControllerTest do
     assert %{"args" => [%{
       "post_ids" => jids,
       "user_id" => ^user_id,
-      "stream_kind" => "unknown_via_post_view_api",
+      "stream_kind" => "email",
       "stream_id" => "",
     }]} = Jason.decode!(json)
     assert jids == Enum.map(posts, &(&1.id))
@@ -139,7 +139,7 @@ defmodule Ello.V2.PostViewControllerTest do
     assert %{"args" => [%{
       "post_ids" => ids,
       "user_id" => ^user_id,
-      "stream_kind" => "unknown_via_post_view_api",
+      "stream_kind" => "email",
       "stream_id" => "",
     }]} = Jason.decode!(json)
     assert ids == Enum.map(posts, &(&1.id))
