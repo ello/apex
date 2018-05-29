@@ -20,7 +20,7 @@ defmodule Ello.V2.PostViewController do
 
   defp tracking_options(params) do
     %{
-      stream_kind: safe_string(params["kind"]) || "unknown_via_post_view_api",
+      stream_kind: safe_string(params["kind"]) || "email",
       stream_id: safe_string(params["id"]),
       user: find_user(params),
     }
