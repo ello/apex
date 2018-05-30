@@ -4,6 +4,9 @@ defmodule Ello.Core.Discovery.Category do
     CategoryPost,
     Promotional,
   }
+  alias Ello.Core.Network.{
+    CategoryUser,
+  }
   alias __MODULE__.TileImage
 
   @type t :: %__MODULE__{}
@@ -30,6 +33,7 @@ defmodule Ello.Core.Discovery.Category do
 
     has_many :promotionals, Promotional
     has_many :category_posts, CategoryPost
+    has_many :category_users, CategoryUser
   end
 
   @doc """

@@ -56,6 +56,12 @@ defmodule Ello.V3.SchemaTest do
     assert "allCategories" in Enum.map(json, &(&1["name"]))
   end
 
+  test "has a category query" do
+    resp = post_graphql(%{query: @query_list_query})
+    json = json_response(resp)["data"]["__schema"]["queryType"]["fields"]
+    assert "category" in Enum.map(json, &(&1["name"]))
+  end
+
   test "has a categoryPostStream query" do
     resp = post_graphql(%{query: @query_list_query})
     json = json_response(resp)["data"]["__schema"]["queryType"]["fields"]

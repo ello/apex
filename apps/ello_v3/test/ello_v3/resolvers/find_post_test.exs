@@ -140,6 +140,30 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     assert json["summary"] == post.rendered_summary
   end
 
+  test "Abbreviated post representation - by id", %{post: post} do
+    query = """
+      query($id: ID!) {
+        post(id: $id) {
+          id
+          token
+          createdAt
+          summary {
+            link_url
+            kind
+            data
+          }
+        }
+      }
+    """
+
+    resp = post_graphql(%{query: query, variables: %{id: post.id}})
+    assert %{"data" => %{"post" => json}} = json_response(resp)
+    assert json["id"] == "#{post.id}"
+    assert json["token"] == "#{post.token}"
+    assert json["createdAt"] == DateTime.to_iso8601(post.created_at)
+    assert json["summary"] == post.rendered_summary
+  end
+
   test "Abbreviated post representation - wrong username", %{post: post} do
     query = """
       query($username: String!, $token: String!) {

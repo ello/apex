@@ -13,7 +13,8 @@ defmodule Ello.V3.Schema do
   query do
     @desc "Get a post by username and token"
     field :post, :post do
-      arg :token,    non_null(:string)
+      arg :id, :id
+      arg :token, :string
       arg :username, :string, description: "Username post belongs to"
       resolve &Resolvers.FindPost.call/3
     end
@@ -47,6 +48,12 @@ defmodule Ello.V3.Schema do
     @desc "Returns a list of all active categories"
     field :all_categories, list_of(:category) do
       resolve &Resolvers.Categories.call/3
+    end
+
+    @desc "Returns a signle (active) category"
+    field :category, :category do
+      arg :slug, non_null(:string)
+      resolve &Resolvers.Category.call/3
     end
 
     @desc "Stream of posts across the network"

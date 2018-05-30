@@ -1,5 +1,6 @@
 defmodule Ello.V3.Schema.DiscoveryTypes do
   use Absinthe.Schema.Notation
+  alias Ello.V3.Resolvers
 
   object :category do
     field :id, :id
@@ -7,12 +8,17 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     field :slug, :string
     field :level, :string
     field :order, :integer
+    field :description, :string
     field :tile_image, :tshirt_image_versions, resolve: fn(_args, %{source: category}) ->
       {:ok, category.tile_image_struct}
     end
     field :allow_in_onboarding, :boolean
     field :is_creator_type, :boolean
     field :created_at, :datetime
+    field :category_users, list_of(:category_user) do
+      arg :roles, list_of(:category_user_role)
+      resolve &Resolvers.CategoryUsers.call/3
+    end
   end
 
   object :category_post do
@@ -37,6 +43,21 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     field :href, :string
     field :label, :string
     field :method, :string
+  end
+
+  object :category_user do
+    field :id, :id
+    field :role, :category_user_role
+    field :created_at, :datetime
+    field :updated_at, :datetime
+    field :category, :category
+    field :user, :user
+  end
+
+  enum :category_user_role do
+    value :moderator, as: "moderator"
+    value :curator, as: "curator"
+    value :featured, as: "featured"
   end
 
   object :page_header do

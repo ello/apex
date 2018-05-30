@@ -2,7 +2,7 @@ defmodule Ello.Core.Discovery do
   import Ecto.Query
   alias Ello.Core.{Repo, Network}
   alias __MODULE__.{Category, Editorial, Preload, Promotional, PagePromotional, CategoryPost}
-  alias Network.User
+  alias Network.{User, CategoryUser}
 
   @moduledoc """
   Responsible for retreiving and loading categories and related data.
@@ -37,11 +37,13 @@ defmodule Ello.Core.Discovery do
   @spec category(options) :: Category.t
   def category(%{id_or_slug: slug} = options) when is_binary(slug) do
     Category
+    |> include_inactive_categories(options[:inactive])
     |> Repo.get_by(slug: slug)
     |> Preload.categories(options)
   end
   def category(%{id_or_slug: id} = options) when is_number(id) do
     Category
+    |> include_inactive_categories(options[:inactive])
     |> Repo.get(id)
     |> Preload.categories(options)
   end
@@ -104,6 +106,21 @@ defmodule Ello.Core.Discovery do
     |> where([cp, c], cp.post_id in ^ids)
     |> Repo.all
     |> Preload.category_posts(options)
+  end
+
+  def category_users(%{category_ids: ids, roles: roles} = options) do
+    roles = Enum.map(roles, &to_string/1)
+    CategoryUser
+    |> where([cu], cu.category_id in ^ids)
+    |> where([cu], cu.role in ^roles)
+    |> Repo.all
+    |> Preload.category_users(options)
+  end
+  def category_users(%{category_ids: ids} = options) do
+    CategoryUser
+    |> where([cu], cu.category_id in ^ids)
+    |> Repo.all
+    |> Preload.category_users(options)
   end
 
   @doc """
