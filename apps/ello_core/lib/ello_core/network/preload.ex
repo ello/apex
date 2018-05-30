@@ -30,6 +30,7 @@ defmodule Ello.Core.Network.Preload do
     users(user_or_users, Map.put(options, :preloads, @user_default_preloads))
   end
 
+  def is_spammer(nil), do: nil
   def is_spammer(user) do
     Map.put(user, :is_spammer, Network.flags_exist?(%{user: user, kind: "spam", verified: true}))
   end

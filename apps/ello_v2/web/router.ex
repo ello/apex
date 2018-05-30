@@ -12,6 +12,8 @@ defmodule Ello.V2.Router do
 
     get "/ping", StatusController, :ping
 
+    get "/post_views", PostViewController, :track
+
     # Promotionals
     resources "/categories", CategoryController, only: @read
 
