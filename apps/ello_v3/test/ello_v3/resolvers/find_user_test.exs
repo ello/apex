@@ -42,6 +42,7 @@ defmodule Ello.V3.Resolvers.FindUserTest do
             isHireable
             isCollaborateable
           }
+          metaAttributes { title robots image description }
           categoryUsers {
             id
             role
@@ -58,6 +59,7 @@ defmodule Ello.V3.Resolvers.FindUserTest do
     assert json["username"] == user.username
     assert json["userStats"]["postsCount"]
     assert json["settings"]["hasCommentingEnabled"]
+    assert json["metaAttributes"]["title"]
 
     assert [j1, j2, j3] = json["categoryUsers"]
     assert j1["role"] == "FEATURED"

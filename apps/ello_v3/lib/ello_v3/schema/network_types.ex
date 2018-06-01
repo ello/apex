@@ -2,6 +2,7 @@ defmodule Ello.V3.Schema.NetworkTypes do
   import Ello.V3.Schema.Helpers
   use Absinthe.Schema.Notation
   alias Ello.V3.Resolvers
+  alias Ello.Core.Network.User
 
   object :user do
     field :id, :id
@@ -28,6 +29,7 @@ defmodule Ello.V3.Schema.NetworkTypes do
       arg :roles, list_of(:category_user_role)
       resolve &Resolvers.CategoryUsers.call/3
     end
+    field :meta_attributes, :user_meta_attributes, resolve: &user_meta/2
   end
 
   object :external_link do
@@ -55,6 +57,13 @@ defmodule Ello.V3.Schema.NetworkTypes do
     field :total_views_count, :integer
   end
 
+  object :user_meta_attributes do
+    field :title, :string
+    field :robots, :string
+    field :image, :string
+    field :description, :string
+  end
+
   object :user_current_user_state do
     field :relationship_priority, :string, resolve: &relationship_priority/2
   end
@@ -67,4 +76,19 @@ defmodule Ello.V3.Schema.NetworkTypes do
   defp experimental_features(_, %{source: %{is_staff: true}}), do: {:ok, true}
   defp experimental_features(_, %{source: %{has_experimental_features: true}}), do: {:ok, true}
   defp experimental_features(_, _), do: {:ok, false}
+
+
+  def user_meta(_, %{source: user}) do
+    {:ok, %{
+      title: User.title(user),
+      robots: User.robots(user),
+      image: image(user),
+      description: User.seo_description(user),
+    }}
+  end
+
+  defp image(user) do
+    version = Enum.find(user.cover_image_struct.versions, &(&1.name == "optimized"))
+    image_url(user.cover_image_struct.path, version.filename)
+  end
 end
