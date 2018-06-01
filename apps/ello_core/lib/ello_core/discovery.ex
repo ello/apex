@@ -122,6 +122,20 @@ defmodule Ello.Core.Discovery do
     |> Repo.all
     |> Preload.category_users(options)
   end
+  def category_users(%{user_ids: ids, roles: roles} = options) do
+    roles = Enum.map(roles, &to_string/1)
+    CategoryUser
+    |> where([cu], cu.user_id in ^ids)
+    |> where([cu], cu.role in ^roles)
+    |> Repo.all
+    |> Preload.category_users(options)
+  end
+  def category_users(%{user_ids: ids} = options) do
+    CategoryUser
+    |> where([cu], cu.user_id in ^ids)
+    |> Repo.all
+    |> Preload.category_users(options)
+  end
 
   @doc """
   Return Editorials

@@ -1,6 +1,7 @@
 defmodule Ello.V3.Schema.NetworkTypes do
   import Ello.V3.Schema.Helpers
   use Absinthe.Schema.Notation
+  alias Ello.V3.Resolvers
 
   object :user do
     field :id, :id
@@ -11,6 +12,8 @@ defmodule Ello.V3.Schema.NetworkTypes do
     field :location, :string
     field :formatted_short_bio, :string
     field :badges, list_of(:string)
+    field :experimental_features, :boolean, resolve: &experimental_features/2
+    field :is_community, :boolean
     field :external_links_list, list_of(:external_link), resolve: fn(_args, %{source: user}) ->
       {:ok, user.rendered_links}
     end
@@ -21,6 +24,10 @@ defmodule Ello.V3.Schema.NetworkTypes do
       {:ok, user.cover_image_struct}
     end
     field :current_user_state, :user_current_user_state, resolve: &source_self/2
+    field :category_users, list_of(:category_user) do
+      arg :roles, list_of(:category_user_role)
+      resolve &Resolvers.CategoryUsers.call/3
+    end
   end
 
   object :external_link do
@@ -56,4 +63,8 @@ defmodule Ello.V3.Schema.NetworkTypes do
   defp relationship_priority(_, %{source: %{relationship_to_current_user: nil}}), do: {:ok, nil}
   defp relationship_priority(_, %{source: %{relationship_to_current_user: %{priority: p}}}), do: {:ok, p}
   defp relationship_priority(_args, _resolution), do: {:ok, nil}
+
+  defp experimental_features(_, %{source: %{is_staff: true}}), do: {:ok, true}
+  defp experimental_features(_, %{source: %{has_experimental_features: true}}), do: {:ok, true}
+  defp experimental_features(_, _), do: {:ok, false}
 end
