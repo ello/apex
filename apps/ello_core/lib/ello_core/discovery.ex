@@ -125,14 +125,18 @@ defmodule Ello.Core.Discovery do
   def category_users(%{user_ids: ids, roles: roles} = options) do
     roles = Enum.map(roles, &to_string/1)
     CategoryUser
-    |> where([cu], cu.user_id in ^ids)
-    |> where([cu], cu.role in ^roles)
+    |> join(:left, [cu], category in assoc(cu, :category))
+    |> where([cu, c], cu.user_id in ^ids)
+    |> where([cu, c], cu.role in ^roles)
+    |> where([cu, c], not is_nil(c.level))
     |> Repo.all
     |> Preload.category_users(options)
   end
   def category_users(%{user_ids: ids} = options) do
     CategoryUser
+    |> join(:left, [cu], category in assoc(cu, :category))
     |> where([cu], cu.user_id in ^ids)
+    |> where([cu, c], not is_nil(c.level))
     |> Repo.all
     |> Preload.category_users(options)
   end
