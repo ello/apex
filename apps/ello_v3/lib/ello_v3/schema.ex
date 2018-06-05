@@ -50,7 +50,7 @@ defmodule Ello.V3.Schema do
       resolve &Resolvers.Categories.call/3
     end
 
-    @desc "Returns a signle (active) category"
+    @desc "Returns a single (active) category"
     field :category, :category do
       arg :slug, non_null(:string)
       resolve &Resolvers.Category.call/3
@@ -95,6 +95,15 @@ defmodule Ello.V3.Schema do
       resolve &Resolvers.FindUser.call/3
       arg :username, :string, description: "Find user by username"
       arg :id, :id, description: "Find user by id"
+    end
+
+    @desc "Returns a list of comments"
+    field :comment_stream, :comment_stream do
+      arg :id, :id
+      arg :token, :string
+      arg :before, :string, description: "Pagination cursor, returned by previous page"
+      arg :per_page, :integer, default_value: 25
+      resolve &Resolvers.CommentStream.call/3
     end
   end
 
