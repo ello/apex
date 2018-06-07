@@ -188,6 +188,6 @@ defmodule Ello.Core.Content do
     |> Filter.loves_query(options)
     |> Network.paginate(options)
     |> Repo.all
-    |> Preload.loves(options)
+    |> Preload.love_list(options)
   end
 end
