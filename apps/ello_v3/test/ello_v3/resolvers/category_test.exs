@@ -3,15 +3,22 @@ defmodule Ello.V3.Resolvers.CategoryTest do
 
   setup do
     cat1 = Factory.insert(:category, level: "secondary", id: 3)
+    current_user = Factory.insert(:user)
+    user1 = Factory.insert(:user)
+
+    Factory.insert(:relationship, owner: current_user, subject: user1)
+
     cu1 = Factory.insert(:category_user, category: cat1, role: "featured")
-    cu2 = Factory.insert(:category_user, category: cat1, role: "curator")
+    cu2 = Factory.insert(:category_user, category: cat1, role: "curator", user: user1)
     cu3 = Factory.insert(:category_user, category: cat1, role: "moderator")
+
 
     {:ok,
       cat1: cat1,
       cu1: cu1,
       cu2: cu2,
       cu3: cu3,
+      current_user: current_user,
     }
   end
 
@@ -44,7 +51,7 @@ defmodule Ello.V3.Resolvers.CategoryTest do
     assert json["id"] == "#{cat1.id}"
   end
 
-  test "Returns the category with users", %{cat1: cat1, cu2: cu2, cu2: cu3} do
+  test "Returns the category with users", %{cat1: cat1, cu2: cu2, cu2: cu3, current_user: current_user} do
     query = """
       query($slug: String, $roles: [CategoryUserRole]) {
         category(slug: $slug) {
@@ -56,6 +63,7 @@ defmodule Ello.V3.Resolvers.CategoryTest do
             user {
               id
               username
+              currentUserState { relationshipPriority }
             }
           }
         }
@@ -65,7 +73,7 @@ defmodule Ello.V3.Resolvers.CategoryTest do
     resp = post_graphql(%{
       query: query,
       variables: %{slug: cat1.slug, roles: ["CURATOR", "MODERATOR"]},
-    })
+    }, current_user)
     assert %{"data" => %{"category" => json}} = json_response(resp)
     assert json["id"] == "#{cat1.id}"
     assert [_jcu2, _jcu3] = users = json["categoryUsers"]
@@ -76,5 +84,6 @@ defmodule Ello.V3.Resolvers.CategoryTest do
     assert "MODERATOR" in Enum.map(users, &(&1["role"]))
     assert cu2.user.username in Enum.map(users, &(&1["user"]["username"]))
     assert cu3.user.username in Enum.map(users, &(&1["user"]["username"]))
+    assert "friend" in Enum.map(users, &(&1["user"]["currentUserState"]["relationshipPriority"]))
   end
 end
