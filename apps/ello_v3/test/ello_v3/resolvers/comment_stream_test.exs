@@ -4,7 +4,7 @@ defmodule Ello.V3.Resolvers.CommentStreamTest do
   @query """
     query($id: String, $token: String, $perPage: String, $before: String) {
       commentStream(id: $id, token: $token, before: $before, perPage: $perPage) {
-        comments { id }
+        comments { id, author { id } }
         next
         isLastPage
       }
@@ -28,6 +28,9 @@ defmodule Ello.V3.Resolvers.CommentStreamTest do
     assert to_string(comment3.id) in Enum.map(comments, &(&1["id"]))
     assert to_string(comment2.id) in Enum.map(comments, &(&1["id"]))
     assert to_string(comment1.id) in Enum.map(comments, &(&1["id"]))
+    assert to_string(comment3.author.id) in Enum.map(comments, &(&1["author"]["id"]))
+    assert to_string(comment2.author.id) in Enum.map(comments, &(&1["author"]["id"]))
+    assert to_string(comment1.author.id) in Enum.map(comments, &(&1["author"]["id"]))
 
     resp2 = post_graphql(%{query: @query, variables: %{"id" => post.id, "before" => next, "perPage" => 3}})
     assert %{"data" => %{"commentStream" => json2}} = json_response(resp2)
@@ -46,6 +49,9 @@ defmodule Ello.V3.Resolvers.CommentStreamTest do
     assert to_string(comment3.id) in Enum.map(comments, &(&1["id"]))
     assert to_string(comment2.id) in Enum.map(comments, &(&1["id"]))
     assert to_string(comment1.id) in Enum.map(comments, &(&1["id"]))
+    assert to_string(comment3.author.id) in Enum.map(comments, &(&1["author"]["id"]))
+    assert to_string(comment2.author.id) in Enum.map(comments, &(&1["author"]["id"]))
+    assert to_string(comment1.author.id) in Enum.map(comments, &(&1["author"]["id"]))
 
     resp2 = post_graphql(%{query: @query, variables: %{"token" => "~#{post.token}", "before" => next, "perPage" => 3}})
     assert %{"data" => %{"commentStream" => json2}} = json_response(resp2)
