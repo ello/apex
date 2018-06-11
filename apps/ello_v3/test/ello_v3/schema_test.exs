@@ -73,4 +73,10 @@ defmodule Ello.V3.SchemaTest do
     json = json_response(resp)["data"]["__schema"]["queryType"]["fields"]
     assert "editorialStream" in Enum.map(json, &(&1["name"]))
   end
+
+  test "has a findUser query" do
+    resp = post_graphql(%{query: @query_list_query})
+    json = json_response(resp)["data"]["__schema"]["queryType"]["fields"]
+    assert "findUser" in Enum.map(json, &(&1["name"]))
+  end
 end

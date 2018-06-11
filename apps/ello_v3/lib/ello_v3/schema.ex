@@ -89,6 +89,13 @@ defmodule Ello.V3.Schema do
       arg :per_page, :integer, default_value: 25
       arg :preview, :boolean, default_value: false, description: "Preview unpublished editorials - only works on staff accounts"
     end
+
+    @desc "Find a single user by id or username"
+    field :find_user, :user do
+      resolve &Resolvers.FindUser.call/3
+      arg :username, :string, description: "Find user by username"
+      arg :id, :id, description: "Find user by id"
+    end
   end
 
   @doc """

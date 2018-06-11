@@ -46,10 +46,22 @@ defmodule Ello.Core.Network.Preload do
   defp add_category_preload(preloads, _),
     do: preloads
 
+  defp add_category_users_preload(preloads, %{preloads: %{category_users: cuser_preloads}} = opts) do
+    {args, cuser_preloads_wo_query_opts} = Map.pop(cuser_preloads, :args, %{})
+    opts = opts
+           |> Map.merge(args)
+           |> Map.put(:preloads, cuser_preloads_wo_query_opts)
+           |> Map.put(:user_ids, nil)
+
+    [{:category_users, &Discovery.category_users(%{opts | user_ids: &1})} | preloads]
+  end
+  defp add_category_users_preload(preloads, _), do: preloads
+
   defp user_preloads(user_or_users, options) do
     ecto_preloads = []
                     |> add_current_user_relationship_preload(options)
                     |> add_category_preload(options)
+                    |> add_category_users_preload(options)
     user_or_users
     |> Repo.preload(ecto_preloads)
   end

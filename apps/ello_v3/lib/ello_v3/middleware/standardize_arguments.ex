@@ -44,7 +44,9 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
 
   # Root and query types are droped so we just get a list of the preloads
   @root_fields [:post, :posts, :page_headers, :editorials, :category, :categories]
-  @query_types [:post_stream, :category_post_stream, :editorial_stream, :category_nav, :find_posts]
+  @query_types [
+    :post_stream, :category_post_stream, :editorial_stream, :category_nav, :find_posts, :find_user,
+  ]
 
   # Ignores fields are typically nested json we just don't need to add to the preloads.
   @ignore_fields [
