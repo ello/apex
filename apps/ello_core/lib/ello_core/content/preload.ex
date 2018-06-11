@@ -35,6 +35,7 @@ defmodule Ello.Core.Content.Preload do
 
   @comment_default_preloads %{
     assets: %{},
+    parent_post: %{},
     author: %{current_user_state: %{}, user_stats: %{}, categories: %{}},
   }
 
@@ -55,6 +56,7 @@ defmodule Ello.Core.Content.Preload do
   def comment_list(comments, %{preloads: %{}} = options) do
     comments
     |> prefetch_ecto_preloads(options)
+    |> prefetch_parent_post(options)
     |> build_image_structs
   end
   def comment_list(comments, options) do
@@ -84,6 +86,7 @@ defmodule Ello.Core.Content.Preload do
                       |> add_artist_invite_submission_preload(preloads)
                       |> add_author_preload(preloads, current_user)
                       |> add_category_preload(preloads)
+
       post_or_posts
       |> Repo.preload(ecto_preloads)
       |> filter_assets
@@ -110,7 +113,6 @@ defmodule Ello.Core.Content.Preload do
     do: [{:categories, &Discovery.categories(%{ids: &1})} | preloads]
   defp add_category_preload(preloads, _), do: preloads
 
-
   defp filter_assets(%Post{} = post), do: Post.filter_assets(post)
   defp filter_assets(posts) do
     Enum.map(posts, &filter_assets/1)
@@ -126,6 +128,15 @@ defmodule Ello.Core.Content.Preload do
     end
   end
   defp prefetch_reposted_source(post_or_posts, _), do: post_or_posts
+
+  defp prefetch_parent_post(comment_or_comments, %{preloads: %{parent_post: _preloads}}) do
+    Repo.preload comment_or_comments, parent_post: fn(ids) ->
+      Post
+      |> where([p], p.id in ^ids)
+      |> Repo.all
+    end
+  end
+  defp prefetch_parent_post(comment_or_comments, _), do: comment_or_comments
 
   defp repost_preloads(reposts, options) do
     reposts
