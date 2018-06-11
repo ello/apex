@@ -21,8 +21,9 @@ defmodule Ello.Events.Mixfile do
 
   defp deps do
     [
-      {:uuid,   "~> 1.0"},
-      {:jason,  "~> 1.0"},
+      {:uuid,    "~> 1.0"},
+      {:jason,   "~> 1.0"},
+      {:phoenix, "~> 1.3.0"},
 
       {:ello_core, in_umbrella: true},
     ]

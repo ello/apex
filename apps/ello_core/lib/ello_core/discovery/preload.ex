@@ -24,10 +24,10 @@ defmodule Ello.Core.Discovery.Preload do
 
   def category_users(nil, _), do: nil
   def category_users([], _),  do: []
-  def category_users(category_users, %{preloads: preloads}) do
+  def category_users(category_users, %{preloads: preloads} = options) do
     ecto_preloads = []
                     |> add_category_preload(preloads)
-                    |> add_user_preload(preloads)
+                    |> add_user_preload(preloads, options[:current_user])
     Repo.preload(category_users, ecto_preloads)
   end
 
@@ -130,10 +130,10 @@ defmodule Ello.Core.Discovery.Preload do
     do: [{:category, &Discovery.categories(%{ids: &1, preloads: category_preloads})} | preloads]
   defp add_category_preload(preloads, _), do: preloads
 
-  defp add_user_preload(preloads, %{user: user_preloads}) do
-    [{:user, &Network.users(%{ids: &1, preloads: user_preloads})} | preloads]
+  defp add_user_preload(preloads, %{user: user_preloads}, current_user) do
+    [{:user, &Network.users(%{ids: &1, preloads: user_preloads, current_user: current_user})} | preloads]
   end
-  defp add_user_preload(preloads, _), do: preloads
+  defp add_user_preload(preloads, _, _current_user), do: preloads
 
   defp add_submitted_by_preload(preloads, %{submitted_by: user_preloads}),
     do: [{:submitted_by, &Network.users(%{ids: &1, preloads: user_preloads})} | preloads]
