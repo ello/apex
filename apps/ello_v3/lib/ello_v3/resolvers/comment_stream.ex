@@ -1,0 +1,21 @@
+defmodule Ello.V3.Resolvers.CommentStream do
+  import Ello.V3.Resolvers.PaginationHelpers
+
+  alias Ello.Core.Content
+
+  def call(_parent, %{id: id} = args, _resolution), do: resolve_comments(id, args)
+  def call(_parent, %{token: token} = args, _resolution), do: resolve_comments(token, args)
+
+  defp resolve_comments(id_or_token, args) do
+    case Content.post(Map.merge(args, %{id_or_token: id_or_token})) do
+      nil -> {:error, "Post not found"}
+      post -> comments = Content.comments(Map.merge(args, %{post: post}))
+
+        {:ok, %{
+          comments: comments,
+          next:  next_page(comments),
+          is_last_page: is_last_page(args, comments),
+        }}
+    end
+  end
+end
