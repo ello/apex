@@ -7,7 +7,7 @@ defmodule Ello.V3.Resolvers.CommentStream do
   def call(_parent, %{token: token} = args, _resolution), do: resolve_comments(token, args)
 
   defp resolve_comments(id_or_token, args) do
-    case Content.post(Map.merge(args, %{id_or_token: id_or_token})) do
+    case Content.post(%{id_or_token: id_or_token, current_user: args.current_user}) do
       nil -> {:error, "Post not found"}
       post -> comments = Content.comments(Map.merge(args, %{post: post}))
 
