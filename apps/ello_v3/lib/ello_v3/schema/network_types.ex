@@ -12,7 +12,7 @@ defmodule Ello.V3.Schema.NetworkTypes do
     field :user_stats, :user_stats, resolve: &source_self/2
     field :location, :string
     field :formatted_short_bio, :string
-    field :badges, list_of(:string)
+    field :badges, list_of(:string), resolve: &user_badges/2
     field :experimental_features, :boolean, resolve: &experimental_features/2
     field :is_community, :boolean
     field :external_links_list, list_of(:external_link), resolve: fn(_args, %{source: user}) ->
@@ -91,4 +91,16 @@ defmodule Ello.V3.Schema.NetworkTypes do
     version = Enum.find(user.cover_image_struct.versions, &(&1.name == "optimized"))
     image_url(user.cover_image_struct.path, version.filename)
   end
+
+  @sensitive_badges [
+    "nsfw",
+    "spam",
+  ]
+
+  defp user_badges(_, %{source: %{badges: nil}}), do: {:ok, []}
+  defp user_badges(_, %{source: %{badges: []}}), do: {:ok, []}
+  defp user_badges(_, %{source: %{badges: badges}, context: %{current_user: %{is_staff: true}}}),
+    do: {:ok, badges}
+  defp user_badges(_, %{source: %{badges: badges}}),
+    do: {:ok, Enum.reject(badges, &(Enum.member?(@sensitive_badges, &1)))}
 end
