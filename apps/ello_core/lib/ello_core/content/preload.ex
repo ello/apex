@@ -40,7 +40,7 @@ defmodule Ello.Core.Content.Preload do
   }
 
   @love_default_preloads %{
-    post: %{},
+    post: %{assets: %{}, author: %{}, reposted_source: %{assets: %{}, author: %{}}},
     user: %{},
   }
 
