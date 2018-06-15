@@ -35,6 +35,6 @@ defmodule Ello.Core.Content.Love do
       %{id: id}          -> not id in linked_asset_ids
     end
 
-    %{love | assets: filtered_assets}
+    Map.put(love, :post, %{love.post | assets: filtered_assets})
   end
 end
