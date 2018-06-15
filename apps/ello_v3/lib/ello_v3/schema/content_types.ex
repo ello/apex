@@ -14,6 +14,23 @@ defmodule Ello.V3.Schema.ContentTypes do
     value :shop
   end
 
+  object :comment_stream do
+    field :next, :string
+    field :per_page, :integer
+    field :is_last_page, :boolean
+    field :comments, list_of(:comment)
+  end
+
+  object :comment do
+    field :id, :id
+    field :author, :user
+    field :parent_post, :post
+    field :assets, list_of(:asset)
+    field :summary, list_of(:content_blocks), resolve: &post_summary/2
+    field :content, list_of(:content_blocks), resolve: &post_content/2
+    field :created_at, :datetime
+  end
+
   object :post_stream do
     field :next, :string
     field :per_page, :integer
