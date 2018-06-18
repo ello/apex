@@ -65,13 +65,16 @@ defmodule Ello.V3.Resolvers.CommentStreamTest do
     comment1 = Factory.insert(:comment, %{parent_post: original_post, created_at:  DateTime.from_unix!(100_000_000)})
     comment2 = Factory.insert(:comment, %{parent_post: original_post, created_at:  DateTime.from_unix!(100_000_100)})
     comment3 = Factory.insert(:comment, %{parent_post: original_post, created_at:  DateTime.from_unix!(100_000_200)})
+    comment4 = Factory.insert(:comment, %{parent_post: repost, created_at:  DateTime.from_unix!(100_000_300)})
 
-    resp = post_graphql(%{query: @query, variables: %{"id" => repost.id, "perPage" => 3}})
+    resp = post_graphql(%{query: @query, variables: %{"id" => repost.id, "perPage" => 4}})
     assert %{"data" => %{"commentStream" => json}} = json_response(resp)
     assert %{"comments" => comments, "next" => next, "isLastPage" => false} = json
+    assert to_string(comment4.id) in Enum.map(comments, &(&1["id"]))
     assert to_string(comment3.id) in Enum.map(comments, &(&1["id"]))
     assert to_string(comment2.id) in Enum.map(comments, &(&1["id"]))
     assert to_string(comment1.id) in Enum.map(comments, &(&1["id"]))
+    assert to_string(comment4.author.id) in Enum.map(comments, &(&1["author"]["id"]))
     assert to_string(comment3.author.id) in Enum.map(comments, &(&1["author"]["id"]))
     assert to_string(comment2.author.id) in Enum.map(comments, &(&1["author"]["id"]))
     assert to_string(comment1.author.id) in Enum.map(comments, &(&1["author"]["id"]))

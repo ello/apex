@@ -98,7 +98,7 @@ defmodule Ello.Core.Content.Preload do
       |> filter_assets
     end
   end
-  defp prefetch_love_ecto_preloads(love_or_loves, %{current_user: current_user, preloads: preloads} = options) do
+  defp prefetch_loves_ecto_preloads(love_or_loves, %{current_user: current_user, preloads: preloads} = options) do
     measure_segment {:db, "Ecto.LovePreloads"} do
       ecto_preloads = []
                       |> add_post_preload(options)
