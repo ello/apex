@@ -71,8 +71,7 @@ defmodule Ello.Core.Content.Preload do
   def love_list(nil, _), do: nil
   def love_list([], _), do: []
   def love_list(loves, %{preloads: %{}} = options) do
-    loves
-    |> prefetch_ecto_preloads(options, for_loves: true)
+    prefetch_loves_ecto_preloads(loves, options)
   end
   def love_list(loves, options) do
     love_list(loves, Map.put(options, :preloads, @love_default_preloads))
@@ -99,7 +98,7 @@ defmodule Ello.Core.Content.Preload do
       |> filter_assets
     end
   end
-  defp prefetch_ecto_preloads(love_or_loves, %{current_user: current_user, preloads: preloads} = options, for_loves: true) do
+  defp prefetch_love_ecto_preloads(love_or_loves, %{current_user: current_user, preloads: preloads} = options) do
     measure_segment {:db, "Ecto.LovePreloads"} do
       ecto_preloads = []
                       |> add_post_preload(options)
