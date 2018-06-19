@@ -39,6 +39,11 @@ defmodule Ello.Core.Content.Preload do
     author: %{current_user_state: %{}, user_stats: %{}, categories: %{}},
   }
 
+  @love_default_preloads %{
+    post: %{assets: %{}, author: %{}, reposted_source: %{assets: %{}, author: %{}}},
+    user: %{},
+  }
+
   @doc "Accepts a list of posts and preloads all related resources."
   def post_list(nil, _), do: nil
   def post_list([], _), do: []
@@ -63,12 +68,13 @@ defmodule Ello.Core.Content.Preload do
     comment_list(comments, Map.put(options, :preloads, @comment_default_preloads))
   end
 
-  def loves([], _), do: []
-  def loves(loves, options) do
-    Repo.preload(loves, [
-      user: &Network.users(Map.put(options, :ids, &1)),
-      post: &Content.posts(Map.put(options, :ids, &1)),
-    ])
+  def love_list(nil, _), do: nil
+  def love_list([], _), do: []
+  def love_list(loves, %{preloads: %{}} = options) do
+    prefetch_loves_ecto_preloads(loves, options)
+  end
+  def love_list(loves, options) do
+    love_list(loves, Map.put(options, :preloads, @love_default_preloads))
   end
 
   defp post_and_repost_preloads(posts, options) do
@@ -92,6 +98,16 @@ defmodule Ello.Core.Content.Preload do
       |> filter_assets
     end
   end
+  defp prefetch_loves_ecto_preloads(love_or_loves, %{current_user: current_user, preloads: preloads} = options) do
+    measure_segment {:db, "Ecto.LovePreloads"} do
+      ecto_preloads = []
+                      |> add_post_preload(options)
+                      |> add_user_preload(preloads, current_user)
+      love_or_loves
+      |> Repo.preload(ecto_preloads)
+      |> filter_assets
+    end
+  end
 
   defp add_assets_preload(preloads, %{assets: _}), do: [{:assets, []} | preloads]
   defp add_assets_preload(preloads, _), do: preloads
@@ -107,6 +123,14 @@ defmodule Ello.Core.Content.Preload do
     do: [{:author, &Network.users(%{ids: &1, current_user: current_user, preloads: author_preloads})} | preloads]
   defp add_author_preload(preloads, _, _), do: preloads
 
+  defp add_user_preload(preloads, %{user: user_preloads}, current_user),
+    do: [{:user, &Network.users(%{ids: &1, current_user: current_user, preloads: user_preloads})} | preloads]
+  defp add_user_preload(preloads, _, _), do: preloads
+
+  defp add_post_preload(preloads, %{preloads: %{post: post_preloads}} = options),
+    do: [{:post, &Content.posts(Map.merge(options, %{ids: &1, preloads: post_preloads}))} | preloads]
+  defp add_post_preload(preloads, _), do: preloads
+
   defp add_category_preload(preloads, %{category_posts: cp_preloads}),
     do: [{:category_posts, &Discovery.category_posts(%{ids: &1, preloads: cp_preloads})} | preloads]
   defp add_category_preload(preloads, %{categories: _}),
@@ -114,8 +138,9 @@ defmodule Ello.Core.Content.Preload do
   defp add_category_preload(preloads, _), do: preloads
 
   defp filter_assets(%Post{} = post), do: Post.filter_assets(post)
-  defp filter_assets(posts) do
-    Enum.map(posts, &filter_assets/1)
+  defp filter_assets(%Love{} = love), do: Love.filter_assets(love)
+  defp filter_assets(posts_or_loves) do
+    Enum.map(posts_or_loves, &filter_assets/1)
   end
 
   defp prefetch_reposted_source(post_or_posts, %{preloads: %{reposted_source: repost_preloads}} = options) do

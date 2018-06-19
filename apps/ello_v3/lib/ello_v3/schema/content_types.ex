@@ -28,6 +28,19 @@ defmodule Ello.V3.Schema.ContentTypes do
     field :assets, list_of(:asset)
     field :summary, list_of(:content_blocks), resolve: &post_summary/2
     field :content, list_of(:content_blocks), resolve: &post_content/2
+  end
+
+  object :love_stream do
+    field :next, :string
+    field :per_page, :integer
+    field :is_last_page, :boolean
+    field :loves, list_of(:love)
+  end
+
+  object :love do
+    field :id, :id
+    field :user, :user
+    field :post, :post
     field :created_at, :datetime
   end
 

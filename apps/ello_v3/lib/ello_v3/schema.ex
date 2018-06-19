@@ -105,6 +105,14 @@ defmodule Ello.V3.Schema do
       arg :per_page, :integer, default_value: 25
       resolve &Resolvers.CommentStream.call/3
     end
+
+    @desc "Stream of a user's loves"
+    field :user_love_stream, :love_stream do
+      resolve &Resolvers.UserLoveStream.call/3
+      arg :username, non_null(:string)
+      arg :before, :string, description: "Pagination cursor, returned by previous page"
+      arg :per_page, :integer, default_value: 10
+    end
   end
 
   @doc """
