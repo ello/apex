@@ -20,13 +20,15 @@ defmodule Ello.V3.Resolvers.UserLoveStreamTest do
 
   test "It returns a user's loves", _ do
     user = Factory.insert(:user)
+    love0 = Factory.insert(:love, %{user: user, deleted: true})
     love1 = Factory.insert(:love, %{user: user})
     love2 = Factory.insert(:love, %{user: user})
     love3 = Factory.insert(:love, %{user: user})
 
-    resp = post_graphql(%{query: @query, variables: %{"username" => user.username, "perPage" => 3}})
+    resp = post_graphql(%{query: @query, variables: %{"username" => user.username, "perPage" => 4}})
     assert %{"data" => %{"userLoveStream" => json}} = json_response(resp)
     assert %{"loves" => loves, "next" => next, "isLastPage" => false} = json
+    refute to_string(love0.id) in Enum.map(loves, &(&1["id"]))
     assert to_string(love3.id) in Enum.map(loves, &(&1["id"]))
     assert to_string(love2.id) in Enum.map(loves, &(&1["id"]))
     assert to_string(love1.id) in Enum.map(loves, &(&1["id"]))
