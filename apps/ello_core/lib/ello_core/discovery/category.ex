@@ -34,6 +34,9 @@ defmodule Ello.Core.Discovery.Category do
     has_many :promotionals, Promotional
     has_many :category_posts, CategoryPost
     has_many :category_users, CategoryUser
+
+    # Used to eager load current users role in the category.
+    has_one :current_user_state, CategoryUser
   end
 
   @doc """

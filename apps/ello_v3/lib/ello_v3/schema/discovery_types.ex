@@ -19,6 +19,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
       arg :roles, list_of(:category_user_role)
       resolve &Resolvers.CategoryUsers.call/3
     end
+    field :current_user_state, :category_user
   end
 
   object :category_post do
