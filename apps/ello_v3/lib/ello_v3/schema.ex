@@ -50,6 +50,14 @@ defmodule Ello.V3.Schema do
       resolve &Resolvers.Categories.call/3
     end
 
+    @desc "Returns a list of filtered active categories"
+    field :search_categories, :category_search_result do
+      resolve &Resolvers.SearchCategories.call/3
+      arg :query, :string, description: "Search categories by name"
+      arg :administered, :boolean, description: "Restrict categories to categories the current user moderates or curates."
+      arg :per_page, :integer, default_value: 20
+    end
+
     @desc "Returns a single (active) category"
     field :category, :category do
       arg :slug, non_null(:string)

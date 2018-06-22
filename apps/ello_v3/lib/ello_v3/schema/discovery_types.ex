@@ -22,6 +22,10 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     field :current_user_state, :category_user
   end
 
+  object :category_search_result do
+    field :categories, list_of(:category)
+  end
+
   object :category_post do
     field :id, :id
     field :status, :string
