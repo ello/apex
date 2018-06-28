@@ -1,6 +1,8 @@
 defmodule Ello.Core.Discovery.Preload do
-  alias Ello.Core.{Repo, Network, Discovery, Content}
+  import Ecto.Query
+  alias Ello.Core.{Repo, Network, Discovery, Content, Network}
   alias Discovery.{Category, Promotional, Editorial}
+  alias Network.CategoryUser
 
   @doc "TODO"
   def categories(nil, _), do: nil
@@ -9,6 +11,7 @@ defmodule Ello.Core.Discovery.Preload do
     categories
     |> include_promotionals(options)
     |> include_category_users(options)
+    |> include_current_user_state(options)
     |> build_category_images(options)
   end
 
@@ -85,6 +88,13 @@ defmodule Ello.Core.Discovery.Preload do
     ])
   end
   defp include_category_users(categories, _), do: categories
+
+
+  defp include_current_user_state(categories, %{current_user: %{id: id}, preloads: %{current_user_state: _}}) do
+    Repo.preload(categories, [{:current_user_state, where(CategoryUser, user_id: ^id)}])
+  end
+  defp include_current_user_state(categories, _), do: categories
+
 
   defp promotional_includes(promotionals, %{preloads: preloads} = options) do
     preloads = Enum.map preloads, fn

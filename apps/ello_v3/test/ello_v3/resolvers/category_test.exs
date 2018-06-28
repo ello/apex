@@ -10,7 +10,7 @@ defmodule Ello.V3.Resolvers.CategoryTest do
 
     cu1 = Factory.insert(:category_user, category: cat1, role: "featured")
     cu2 = Factory.insert(:category_user, category: cat1, role: "curator", user: user1)
-    cu3 = Factory.insert(:category_user, category: cat1, role: "moderator")
+    cu3 = Factory.insert(:category_user, category: cat1, role: "moderator", user: current_user)
 
 
     {:ok,
@@ -85,5 +85,23 @@ defmodule Ello.V3.Resolvers.CategoryTest do
     assert cu2.user.username in Enum.map(users, &(&1["user"]["username"]))
     assert cu3.user.username in Enum.map(users, &(&1["user"]["username"]))
     assert "friend" in Enum.map(users, &(&1["user"]["currentUserState"]["relationshipPriority"]))
+  end
+
+  test "Returns the current users category user", %{cat1: cat1, current_user: current_user} do
+    query = """
+    {
+      category(slug: "#{cat1.slug}") {
+          id
+          name
+          slug
+          currentUserState { id role }
+        }
+    }
+    """
+
+    resp = post_graphql(%{query: query}, current_user)
+    assert %{"data" => %{"category" => json}} = json_response(resp)
+    assert json["id"] == "#{cat1.id}"
+    assert json["currentUserState"]["role"] == "MODERATOR"
   end
 end

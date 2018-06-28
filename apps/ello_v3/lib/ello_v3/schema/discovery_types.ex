@@ -19,6 +19,12 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
       arg :roles, list_of(:category_user_role)
       resolve &Resolvers.CategoryUsers.call/3
     end
+    field :current_user_state, :category_user
+  end
+
+  object :category_search_result do
+    field :categories, list_of(:category)
+    field :is_last_page, :boolean, resolve: fn(_, _) -> {:ok, true} end
   end
 
   object :category_post do

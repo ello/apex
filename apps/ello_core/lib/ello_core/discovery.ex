@@ -57,6 +57,8 @@ defmodule Ello.Core.Discovery do
     * inactive -     include inactive category
     * meta -         include meta categories
     * primary -      only return primary categories
+    * query -        search by category name
+    * administered - only return categories adiminstered by the current user
   """
   @spec categories(options) :: [Category.t]
   def categories(%{ids: nil} = options), do: categories(Map.put(options, :ids, []))
@@ -94,6 +96,8 @@ defmodule Ello.Core.Discovery do
     Category
     |> include_inactive_categories(options[:inactive])
     |> include_meta_categories(options[:meta])
+    |> search_by_name(options[:query])
+    |> administered_only(options[:administered], options[:current_user])
     |> priority_order
     |> Repo.all
     |> Preload.categories(options)
@@ -261,4 +265,21 @@ defmodule Ello.Core.Discovery do
   defp include_meta_categories(q, true), do: q
   defp include_meta_categories(q, _),
     do: where(q, [c], c.level != "meta" or is_nil(c.level))
+
+  defp search_by_name(q, nil), do: q
+  defp search_by_name(q, term) do
+    term = "%#{term}%"
+    where(q, [c], ilike(c.name, ^term))
+  end
+
+  @admin_roles ["curator", "moderator"]
+  defp administered_only(q, nil, _user), do: q
+  defp administered_only(q, false, _user), do: q
+  defp administered_only(q, _, %{is_staff: true}), do: q
+  defp administered_only(query, true, %{id: user_id}) do
+    query
+    |> join(:left, [c], category_user in assoc(c, :category_users))
+    |> where([c, cu], cu.user_id == ^user_id)
+    |> where([c, cu], cu.role in @admin_roles)
+  end
 end
