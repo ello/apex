@@ -24,6 +24,7 @@ defmodule Ello.V3.Resolvers.SearchCategoriesTest do
   @query """
     query($query: String, $administered: Boolean) {
       searchCategories(query: $query, administered: $administered) {
+        isLastPage
         categories {
           id
           name
@@ -41,7 +42,10 @@ defmodule Ello.V3.Resolvers.SearchCategoriesTest do
     cat5: cat5,
   } do
     resp = post_graphql(%{query: @query, variables: %{}})
-    assert %{"data" => %{"searchCategories" => %{"categories" => json}}} = json_response(resp)
+    assert %{"data" => %{"searchCategories" => %{
+      "categories" => json,
+      "isLastPage" => true,
+    }}} = json_response(resp)
     assert [c1, c2, c4, c5] = json
     assert c1["id"] == Integer.to_string(cat1.id)
     assert c2["id"] == Integer.to_string(cat2.id)
