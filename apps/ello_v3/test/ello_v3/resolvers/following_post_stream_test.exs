@@ -58,6 +58,7 @@ defmodule Ello.V3.Resolvers.FollowingPostStreamTest do
     {:ok, %{
       current_user: current_user,
       users: [user1, user2],
+      posts: [post0, post1, post2, post3, post4],
     }}
   end
 
@@ -66,7 +67,7 @@ defmodule Ello.V3.Resolvers.FollowingPostStreamTest do
       "kind" => "RECENT",
       "perPage" => 3,
     }})
-    assert %{"errors" => [%{"message" => "unauthenticated"} | _ ]} = json_response(resp)
+    assert %{"errors" => [%{"message" => "unauthenticated"} | _]} = json_response(resp)
   end
 
   test "Recent - Returns an empty post stream with no posts" do
@@ -133,5 +134,49 @@ defmodule Ello.V3.Resolvers.FollowingPostStreamTest do
     }}, current_user)
     assert %{"data" => %{"newFollowingPostStreamContent" => json}} = json_response(resp)
     assert %{"newContent" => true} = json
+  end
+
+  test "Trending - Returns an error when requesting the stream when not logged in" do
+    resp = post_graphql(%{query: @query, variables: %{
+      "kind" => "TRENDING",
+      "perPage" => 3,
+    }})
+    assert %{"errors" => [%{"message" => "unauthenticated"} | _]} = json_response(resp)
+  end
+
+  test "Trending - Returns an empty post stream with no posts" do
+    current_user = Factory.insert(:user)
+    resp = post_graphql(%{query: @query, variables: %{
+      "kind" => "TRENDING",
+      "perPage" => 3,
+    }}, current_user)
+    assert %{"data" => %{"followingPostStream" => json}} = json_response(resp)
+    assert %{"isLastPage" => true, "next" => _, "posts" => []} = json
+  end
+
+  test "Trending - Returns a recent post stream when posts exist", %{
+    current_user: current_user,
+    users: users,
+    posts: posts,
+  } do
+    [u1, u2] = users
+    Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", u1.id])
+    Redis.command(["SADD", "user:#{current_user.id}:followed_users_id_cache", u2.id])
+    Enum.each(posts, &Index.add/1)
+
+    resp = post_graphql(%{query: @query, variables: %{
+      "kind" => "TRENDING",
+      "perPage" => 3,
+    }}, current_user)
+    assert %{"data" => %{"followingPostStream" => json}} = json_response(resp)
+    assert %{"isLastPage" => false, "next" => next, "posts" => [_p1, _p2, _p3]} = json
+
+    resp2 = post_graphql(%{query: @query, variables: %{
+      "kind" => "TRENDING",
+      "before" => next,
+      "perPage" => 5,
+    }}, current_user)
+    assert %{"data" => %{"followingPostStream" => json2}} = json_response(resp2)
+    assert %{"isLastPage" => true, "posts" => _} = json2
   end
 end

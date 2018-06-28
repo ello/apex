@@ -5,8 +5,18 @@ defmodule Ello.V3.Resolvers.FollowingPostStream do
   import Ello.V3.Resolvers.PaginationHelpers
   import Ello.V3.Resolvers.PostViewHelpers
 
-  def call(_parent, %{kind: :trending} = args, _resolution) do
+  def call(_parent, %{kind: :trending, current_user: current_user} = args, _resolution) do
+    search = Search.post_search(Map.merge(args, %{
+      trending:    true,
+      following:   true,
+      within_days: 60,
+    }))
 
+    {:ok, %{
+      posts: track(search.results, args, %{kind: "following_trending", id: current_user.id}),
+      next:  search.next_page,
+      is_last_page: search.total_pages == 0 || search.total_pages == search.page,
+    }}
   end
   def call(_parent, %{kind: :recent, current_user: current_user} = args, _resolution) do
     stream = Stream.fetch(Map.merge(args, %{
