@@ -184,7 +184,7 @@ defmodule Ello.Core.Content do
 
   def loves(%{user: %{id: user_id}} = options) do
     Love
-    |> where([l], l.user_id == ^user_id)
+    |> where([l], l.user_id == ^user_id and l.deleted == false)
     |> Filter.loves_query(options)
     |> Network.paginate(options)
     |> Repo.all
