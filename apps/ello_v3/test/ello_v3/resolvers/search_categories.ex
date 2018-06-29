@@ -83,6 +83,9 @@ defmodule Ello.V3.Resolvers.SearchCategoriesTest do
     assert c2["id"] == Integer.to_string(cat2.id)
     assert c4["id"] == Integer.to_string(cat4.id)
     assert c5["id"] == Integer.to_string(cat5.id)
+    assert c2["currentUserState"]["role"] === "CURATOR"
+    assert c4["currentUserState"]["role"] === "CURATOR"
+    assert c4["currentUserState"]["role"] === "MODERATOR"
   end
 
   test "filters by role and query when present", %{
@@ -101,6 +104,8 @@ defmodule Ello.V3.Resolvers.SearchCategoriesTest do
     assert [c2, c4] = json
     assert c2["id"] == Integer.to_string(cat2.id)
     assert c4["id"] == Integer.to_string(cat4.id)
+    assert c2["currentUserState"]["role"] === "CURATOR"
+    assert c4["currentUserState"]["role"] === "CURATOR"
   end
 
   test "filters by administered when present - no effect for staff", %{
