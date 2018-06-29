@@ -22,6 +22,18 @@ defmodule Ello.V3.Resolvers.SearchCategoriesTest do
   end
 
   @query """
+    fragment imageVersionProps on Image {
+      url
+      metadata { height width type size }
+    }
+
+    fragment tshirtImageVersions on TshirtImageVersions {
+      small { ...imageVersionProps }
+      regular { ...imageVersionProps }
+      large { ...imageVersionProps }
+      original { ...imageVersionProps }
+    }
+
     query($query: String, $administered: Boolean) {
       searchCategories(query: $query, administered: $administered) {
         isLastPage
@@ -29,6 +41,9 @@ defmodule Ello.V3.Resolvers.SearchCategoriesTest do
           id
           name
           slug
+          level
+          order
+          tileImage { ...tshirtImageVersions }
           currentUserState { role }
         }
       }
@@ -85,7 +100,7 @@ defmodule Ello.V3.Resolvers.SearchCategoriesTest do
     assert c5["id"] == Integer.to_string(cat5.id)
     assert c2["currentUserState"]["role"] === "CURATOR"
     assert c4["currentUserState"]["role"] === "CURATOR"
-    assert c4["currentUserState"]["role"] === "MODERATOR"
+    assert c5["currentUserState"]["role"] === "MODERATOR"
   end
 
   test "filters by role and query when present", %{
