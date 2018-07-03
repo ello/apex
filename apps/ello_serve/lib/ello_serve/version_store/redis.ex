@@ -24,7 +24,6 @@ defmodule Ello.Serve.VersionStore.Redis do
     end
   end
 
-  #TODO: move redis commands to multi/transaction
   def activate_version(app, version, env) when is_binary(version) do
     with {:ok, html} <- fetch_version(app, version, env),
          {:ok, _}    <- Client.command(["LPUSH", versions_key(app, env), version]),

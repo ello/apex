@@ -240,7 +240,7 @@ defmodule Ello.Search.User.SearchTest do
     assert length(Enum.map(results, &(&1.id))) == 2
 
     results = Search.user_search(%{terms: "username", allow_nsfw: true, allow_nudity: true, current_user: context.current_user, page: 3, per_page: 2}).results
-    assert length(Enum.map(results, &(&1.id))) == 0
+    assert Enum.empty?(results)
   end
 
   test "user_search - filters private users if no current user", context do

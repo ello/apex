@@ -16,7 +16,7 @@ defmodule Ello.StreamTest do
       keys: ["test"],
     )
 
-    assert Enum.count(stream.posts) == 0
+    assert Enum.empty?(stream.posts)
     assert stream.__batches == 1
   end
 

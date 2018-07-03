@@ -192,7 +192,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
   }
   defp editorial_kind(_, %{source: %{kind: kind}}), do: {:ok, @editorial_kinds[kind]}
 
-  defp editorial_content(a, b = %{definition: %{schema_node: %{identifier: name}}}),
+  defp editorial_content(a, %{definition: %{schema_node: %{identifier: name}}} = b),
     do: editorial_content(a, b, "#{name}")
   defp editorial_content(_, %{source: editorial}, key),
     do: {:ok, Map.get(editorial.content, key)}
