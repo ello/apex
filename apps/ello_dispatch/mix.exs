@@ -23,9 +23,9 @@ defmodule Ello.Dispatch.Mixfile do
   # Type "mix help deps" for examples and options
   defp deps do
     [
-      {:cowboy, "~> 1.0.0"},
+      {:cowboy, "~> 1.1"},
       {:plug,   "~> 1.3"},
-      {:phoenix, "~> 1.3"},
+      {:phoenix, "~> 1.3.3"},
       {:honeybadger, "~> 0.7"},
       {:cors_plug, "~> 1.1"},
 

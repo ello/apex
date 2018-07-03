@@ -3,7 +3,6 @@ defmodule Ello.V2.UserViewTest do
   import Phoenix.View #For render/2
   alias Ello.V2.UserView
   alias Ello.Core.{Repo}
-  alias Ello.Core.Network.User
 
   setup %{conn: conn} do
     spying = Script.insert(:espionage_category)
