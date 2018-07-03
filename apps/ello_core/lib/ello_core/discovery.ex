@@ -273,8 +273,6 @@ defmodule Ello.Core.Discovery do
   end
 
   @admin_roles ["curator", "moderator"]
-  defp administered_only(q, nil, _user), do: q
-  defp administered_only(q, false, _user), do: q
   defp administered_only(q, _, %{is_staff: true}), do: q
   defp administered_only(query, true, %{id: user_id}) do
     query
@@ -282,4 +280,5 @@ defmodule Ello.Core.Discovery do
     |> where([c, cu], cu.user_id == ^user_id)
     |> where([c, cu], cu.role in @admin_roles)
   end
+  defp administered_only(q, _, _user), do: q
 end
