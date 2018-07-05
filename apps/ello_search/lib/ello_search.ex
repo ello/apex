@@ -9,7 +9,7 @@ defmodule Ello.Search do
   @doc """
   Paginate an elastic search query based on the page and per page params.
   """
-  def paginate(search = %{page: page, per_page: per_page}) do
+  def paginate(%{page: page, per_page: per_page} = search) do
     page = page - 1 # elasticsearch first page is 0, we use 1 as first
     search
     |> update_in([Access.key!(:query), :from], &(&1 = page * per_page))

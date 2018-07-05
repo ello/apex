@@ -29,7 +29,7 @@ defmodule Ello.SlopTest do
       block_slop_multiplier: 2,
       max_block_slop_factor: 100,
     }
-    assert Slop.slop_factor(%{current_user: %{all_blocked_ids: [1,2,3]}}, factors) == 6
+    assert Slop.slop_factor(%{current_user: %{all_blocked_ids: [1, 2, 3]}}, factors) == 6
   end
 
 end

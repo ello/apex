@@ -1,7 +1,7 @@
 defmodule Ello.V2.CategoryView do
   use Ello.V2.Web, :view
   use Ello.V2.JSONAPI
-  alias Ello.V2.{ImageView,PromotionalView,UserView}
+  alias Ello.V2.{ImageView, PromotionalView, UserView}
 
   def stale_checks(_, %{data: categories}) do
     [etag: etag(categories)]

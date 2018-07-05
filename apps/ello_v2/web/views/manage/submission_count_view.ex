@@ -5,7 +5,7 @@ defmodule Ello.V2.Manage.SubmissionCountView do
     id = "#{artist_invite.id}"
     %{
       daily_submissions: Enum.map(data, fn(day) ->
-        {{y,m,d}, _} = day.date
+        {{y, m, d}, _} = day.date
         date = %Date{year: y, month: m, day: d}
         %{
           id: "daily_submissions:#{id}:all:#{date}",

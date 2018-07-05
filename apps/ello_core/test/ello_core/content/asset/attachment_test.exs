@@ -1,6 +1,6 @@
 defmodule Ello.Core.AttachmentTest do
   use Ello.Core.Case
-  alias Ello.Core.{Content.Asset.Attachment,Image}
+  alias Ello.Core.{Content.Asset.Attachment, Image}
 
   test "Attachment.from_asset/1 - builds an Image" do
     asset = Factory.build(:asset)

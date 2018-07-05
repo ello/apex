@@ -8,7 +8,7 @@ defmodule Ello.V2.PostView do
     PostMetaAttributesView,
   }
   alias Ello.Core.Network.{User}
-  alias Ello.Core.Content.{Post,Love,Watch}
+  alias Ello.Core.Content.{Post, Love, Watch}
 
   def stale_checks(_, %{data: posts}) do
     [etag: etag(posts)]

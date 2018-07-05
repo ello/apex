@@ -151,7 +151,7 @@ defmodule Ello.Search.Post.SearchTest do
     assert length(Enum.map(results, &(&1.id))) == 1
 
     results = Search.post_search(%{terms: "Phrasing", allow_nsfw: true, allow_nudity: true, current_user: nil, page: 3, per_page: 2}).results
-    assert length(Enum.map(results, &(&1.id))) == 0
+    assert Enum.empty?(results)
   end
 
   test "post_search - returns hashtag posts and non-hashtag posts", context do

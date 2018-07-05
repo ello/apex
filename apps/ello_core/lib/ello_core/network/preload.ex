@@ -1,7 +1,7 @@
 defmodule Ello.Core.Network.Preload do
   import Ecto.Query
-  alias Ello.Core.{Repo,Redis,Network, Discovery}
-  alias Network.{User,Relationship}
+  alias Ello.Core.{Repo, Redis, Network, Discovery}
+  alias Network.{User, Relationship}
 
   @user_default_preloads %{
     current_user_state: %{},
