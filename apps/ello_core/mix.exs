@@ -10,6 +10,7 @@ defmodule Ello.Core.Mixfile do
      lockfile: "../../mix.lock",
      elixir: "~> 1.4",
      elixirc_paths: elixirc_paths(Mix.env),
+     elixirc_options: [warnings_as_errors: Mix.env == :test],
      aliases: aliases(),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,

@@ -7,6 +7,8 @@ otp_release:
 services:
   - redis-server
   - postgresql
+env:
+  - MIX_ENV=test
 addons:
   postgresql: '9.6' # Overwritten in before_script.
   apt:
@@ -19,7 +21,6 @@ before_install:
 before_script:
   - bash script/install-postgres-10.sh
 script:
-  - mix compile --warnings-as-errors
   - mix credo -a
   - mix test --exclude skip_on_travis
 notifications:
