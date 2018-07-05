@@ -13,7 +13,7 @@ defmodule Ello.Mixfile do
 
   defp deps do
     [
-      {:credo, "~> 0.9.3", only: :dev},
+      {:credo, "~> 0.9.3", only: [:dev, :test]},
       {:poison, "~> 3.1.0", override: true},
     ]
   end

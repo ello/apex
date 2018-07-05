@@ -7,6 +7,8 @@ otp_release:
 services:
   - redis-server
   - postgresql
+env:
+  - MIX_ENV=test
 addons:
   postgresql: '9.6' # Overwritten in before_script.
   apt:
