@@ -52,6 +52,10 @@ defmodule Ello.V3.Schema.ContentTypes do
     field :posts, list_of(:post)
   end
 
+  object :new_content do
+    field :new_content, :boolean
+  end
+
   object :post do
     field :id, :id
     field :token, :string

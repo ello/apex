@@ -13,23 +13,23 @@ defmodule Ello.V3.Schema do
   query do
     @desc "Get a post by username and token"
     field :post, :post do
+      resolve &Resolvers.FindPost.call/3
       arg :id, :id
       arg :token, :string
       arg :username, :string, description: "Username post belongs to"
-      resolve &Resolvers.FindPost.call/3
     end
 
     @desc "Get posts by token"
     field :find_posts, list_of(:post) do
-      arg :tokens, list_of(:string)
       resolve &Resolvers.FindPosts.call/3
+      arg :tokens, list_of(:string)
     end
 
     @desc "List of PageHeaders for the given page"
     field :page_headers, list_of(:page_header) do
+      resolve &Resolvers.PageHeaders.call/3
       arg :kind, non_null(:page_header_kind), description: "What type of page headers to get"
       arg :slug, :string, description: "Optional slug to further specify which pageHeaders to get"
-      resolve &Resolvers.PageHeaders.call/3
     end
 
     @desc "Stream of a user's posts"
@@ -60,24 +60,41 @@ defmodule Ello.V3.Schema do
 
     @desc "Returns a single (active) category"
     field :category, :category do
-      arg :slug, non_null(:string)
       resolve &Resolvers.Category.call/3
+      arg :slug, non_null(:string)
     end
 
     @desc "Stream of posts across the network"
     field :global_post_stream, :post_stream do
+      resolve &Resolvers.GlobalPostStream.call/3
       arg :kind, non_null(:stream_kind), description: "Which variation of the stream to return"
       arg :before, :string, description: "Pagination cursor, returned by previous page"
       arg :per_page, :integer, default_value: 25
-      resolve &Resolvers.GlobalPostStream.call/3
     end
 
     @desc "Aggregate post streams from all subscribed categories"
     field :subscribed_post_stream, :post_stream do
+      resolve &Resolvers.SubscribedPostStream.call/3
       arg :kind, non_null(:stream_kind), description: "Which variation of the stream to return"
       arg :before, :string, description: "Pagination cursor, returned by previous page"
       arg :per_page, :integer, default_value: 25
-      resolve &Resolvers.SubscribedPostStream.call/3
+    end
+
+    @desc "Aggregate post streams from all followed users"
+    field :following_post_stream, :post_stream do
+      middleware Middleware.RequireCurrentUser
+      resolve &Resolvers.FollowingPostStream.call/3
+      arg :kind, non_null(:stream_kind), description: "Which variation of the stream to return"
+      arg :before, :string, description: "Pagination cursor, returned by previous page"
+      arg :per_page, :integer, default_value: 25
+    end
+
+    @desc "Is there any new content since the provided datetime."
+    field :new_following_post_stream_content, :new_content do
+      middleware Middleware.RequireCurrentUser
+      resolve &Resolvers.FollowingPostStream.new_content/3
+      arg :kind, :stream_kind, default_value: :recent
+      arg :since, :datetime
     end
 
     @desc "Stream of a category's posts"
@@ -107,11 +124,11 @@ defmodule Ello.V3.Schema do
 
     @desc "Returns a list of comments"
     field :comment_stream, :comment_stream do
+      resolve &Resolvers.CommentStream.call/3
       arg :id, :id
       arg :token, :string
       arg :before, :string, description: "Pagination cursor, returned by previous page"
       arg :per_page, :integer, default_value: 25
-      resolve &Resolvers.CommentStream.call/3
     end
 
     @desc "Stream of a user's loves"
