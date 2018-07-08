@@ -2,6 +2,7 @@ defmodule Ello.Notifications.Stream do
   alias __MODULE__.{
     Item,
     Client,
+    Loader,
   }
   @moduledoc """
   Public API for interacting with the Ello Notifications Streams (in app notifications) via elixir.
@@ -14,8 +15,8 @@ defmodule Ello.Notifications.Stream do
     per_page: 25,
     before: nil,
     next: nil,
+    models: [],
     __response: nil,
-    __models: nil,
   ]
 
   @doc """
@@ -39,13 +40,13 @@ defmodule Ello.Notifications.Stream do
     |> Client.create
   end
 
-  @doc """
-  Delete a single in app notification.
-  """
-  def delete(opts) do
-    Item
-    |> struct(opts)
-    |> Item.validate
-    |> Client.delete
-  end
+  # @doc """
+  # Delete a single in app notification.
+  # """
+  # def delete(opts) do
+  #   Item
+  #   |> struct(opts)
+  #   |> Item.validate
+  #   |> Client.delete
+  # end
 end

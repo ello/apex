@@ -3,7 +3,7 @@ defmodule Ello.Notifications.Stream.Item do
     Post User Love InvitedUser Watch ArtistInviteSubmission CategoryPost CategoryUser
   )
 
-  @valid_notification_kinds ~w(
+  @valid_kinds ~w(
     invitation_accepted_post
     new_followed_user_post
     new_follower_post
@@ -38,6 +38,40 @@ defmodule Ello.Notifications.Stream.Item do
     :kind,
     :created_at,
     :originating_user,
-    :originating_user_id
+    :originating_user_id,
+    errors: [],
   ]
+
+  def as_json(%__MODULE__{} = item) do
+    item
+    |> Map.take([:user_id, :subject_id, :subject_type, :kind, :created_at, :originating_user_id])
+    |> Jason.encode!
+  end
+
+  def validate(%__MODULE__{} = item) do
+    item
+    |> validate_present(:user_id)
+    |> validate_present(:subject_id)
+    |> validate_present(:subject_type)
+    |> validate_present(:kind)
+    |> validate_present(:originating_user_id)
+    |> validate_inclusion(:subject_type, @valid_subjects)
+    |> validate_inclusion(:kind, @valid_kinds)
+  end
+
+  defp validate_present(item, field) do
+    case Map.get(item, field) do
+      nil -> Map.put(item, :errors, ["#{field} must be present" | item.errors])
+      _ -> item
+    end
+  end
+
+  defp validate_inclusion(item, field, list) do
+    with val <- Map.get(item, field),
+         true <- val in list do
+      item
+    else
+      _ -> Map.put(item, :errors, ["#{field} is an invalid value" | item.errors])
+    end
+  end
 end
