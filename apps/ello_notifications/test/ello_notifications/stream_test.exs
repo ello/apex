@@ -3,14 +3,14 @@ defmodule Ello.Notifications.StreamTest do
   alias Ello.Notifications.Stream
   alias Stream.Item
 
-  test "empty results" do
+  test "empty results - http client" do
     user = Factory.insert(:user)
     assert stream = %Stream{} = Stream.fetch(%{current_user: user})
 
     assert stream.models == []
   end
 
-  test "with notifications" do
+  test "create, fetch, delete - http client" do
     user = Factory.insert(:user)
     author = Factory.insert(:user)
     post = Factory.insert(:post, author: author)
@@ -23,6 +23,9 @@ defmodule Ello.Notifications.StreamTest do
       originating_user_id: author.id,
     })
     assert stream = %Stream{} = Stream.fetch(%{current_user: user})
-    assert [%Item{}] = stream.models
+    assert [%Item{} = item] = stream.models
+    assert item.user_id == user.id
+    assert item.subject_id == post.id
+    assert item.subject_type == "Post"
   end
 end

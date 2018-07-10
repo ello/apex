@@ -25,10 +25,15 @@ defmodule Ello.Notifications.Stream.Client.HTTP do
     end
   end
 
-  # @impl Client
-  # def delete_notifications(item) do
-  #   # TODO
-  # end
+  @impl Client
+  def delete_notifications(%{user_id: user_id}) do
+    # TODO
+    :ok
+  end
+  def delete_notifications(%{subject_id: subject_id, subject_type: subject_type}) do
+    # TODO
+    :ok
+  end
 
   @impl HTTPoison.Base
   def process_url(path), do: Application.get_env(:ello_notifications, :stream_service_url) <> path
