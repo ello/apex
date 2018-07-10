@@ -40,13 +40,15 @@ defmodule Ello.Notifications.Stream do
     |> Client.create
   end
 
-  # @doc """
-  # Delete a single in app notification.
-  # """
-  # def delete(opts) do
-  #   Item
-  #   |> struct(opts)
-  #   |> Item.validate
-  #   |> Client.delete
-  # end
+  @doc """
+  Delete a collection of notifications.
+
+  Either:
+    * delete all notifications for a user by passing user_id
+    * delete all notifications for a subject by passing subject_id and subject_type
+
+  """
+  def delete_many(%{} = opts) do
+    Client.delete_many(opts)
+  end
 end

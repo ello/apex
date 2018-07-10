@@ -11,6 +11,7 @@ defmodule Ello.Notifications.Mixfile do
       lockfile: "../../mix.lock",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env),
+      elixirc_options: [warnings_as_errors: Mix.env == :test],
       start_permanent: Mix.env == :prod,
       deps: deps()
     ]

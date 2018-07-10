@@ -43,8 +43,12 @@ defmodule Ello.Notifications.Stream.Item do
   ]
 
   def as_json(%__MODULE__{} = item) do
+    Map.take(item, [:user_id, :subject_id, :subject_type, :kind, :created_at, :originating_user_id])
+  end
+
+  def to_json(%__MODULE__{} = item) do
     item
-    |> Map.take([:user_id, :subject_id, :subject_type, :kind, :created_at, :originating_user_id])
+    |> as_json
     |> Jason.encode!
   end
 

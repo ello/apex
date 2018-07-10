@@ -8,7 +8,6 @@ defmodule Ello.Notifications.Stream.Client.HTTP do
   @ct {"content-type", "application/json"}
   @hackney_opts [pool: :notification_streams]
 
-
   @impl Client
   def fetch_notifications(%{current_user: %{id: user_id}} = stream) do
     params = to_params(stream)
@@ -19,7 +18,7 @@ defmodule Ello.Notifications.Stream.Client.HTTP do
 
   @impl Client
   def create_notification(item) do
-    body = Item.as_json(item)
+    body = Item.to_json(item)
     case post!(user_path(item.user_id), body, [@ct], hackney: @hackney_opts) do
       %{status_code: 201} -> :ok
     end
@@ -27,12 +26,15 @@ defmodule Ello.Notifications.Stream.Client.HTTP do
 
   @impl Client
   def delete_notifications(%{user_id: user_id}) do
-    # TODO
-    :ok
+    case delete!(user_path(user_id), [@ct], hackney: @hackney_opts) do
+      %{status_code: 202} -> :ok
+    end
   end
   def delete_notifications(%{subject_id: subject_id, subject_type: subject_type}) do
-    # TODO
-    :ok
+    subject_params = %{subject_id: subject_id, subject_type: subject_type}
+    case delete!("/api/v2/notifications", [@ct], params: subject_params, hackney: @hackney_opts) do
+      %{status_code: 202} -> :ok
+    end
   end
 
   @impl HTTPoison.Base
