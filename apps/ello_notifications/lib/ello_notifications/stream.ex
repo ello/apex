@@ -16,6 +16,7 @@ defmodule Ello.Notifications.Stream do
     before: nil,
     next: nil,
     models: [],
+    category: :all,
     __response: nil,
   ]
 

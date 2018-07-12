@@ -47,6 +47,7 @@ defmodule Ello.Notifications.Stream.Client.HTTP do
       user_id: stream.current_user.id,
       limit: stream.per_page,
       before: stream.before,
+      category: stream.category,
     }
   end
 
