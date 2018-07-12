@@ -56,25 +56,25 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
       originating_user_id: repost_love.user_id,
     })
 
-    # category_post = Factory.insert(:category_post, post: user_post, featured_by: author)
-    # assert :ok = Stream.create(%{
-    #   user_id: user.id,
-    #   subject_id: category_post.id,
-    #   subject_type: "CategoryPost",
-    #   kind: "category_post_featured",
-    #   created_at: DateTime.from_unix!(5000),
-    #   originating_user_id: category_post.featured_by_id,
-    # })
+    category_post = Factory.insert(:category_post, post: user_post, featured_by: author)
+    assert :ok = Stream.create(%{
+      user_id: user.id,
+      subject_id: category_post.id,
+      subject_type: "CategoryPost",
+      kind: "category_post_featured",
+      created_at: DateTime.from_unix!(5000),
+      originating_user_id: category_post.featured_by_id,
+    })
 
-    # artist_invite_submission = Factory.insert(:artist_invite_submission, post: user_post)
-    # assert :ok = Stream.create(%{
-    #   user_id: user.id,
-    #   subject_id: artist_invite_submission.id,
-    #   subject_type: "ArtistInviteSubmission",
-    #   kind: "approved_artist_invite_submission",
-    #   created_at: DateTime.from_unix!(6000),
-    #   originating_user_id: user.id,
-    # })
+    artist_invite_submission = Factory.insert(:artist_invite_submission, post: user_post)
+    assert :ok = Stream.create(%{
+      user_id: user.id,
+      subject_id: artist_invite_submission.id,
+      subject_type: "ArtistInviteSubmission",
+      kind: "approved_artist_invite_submission",
+      created_at: DateTime.from_unix!(6000),
+      originating_user_id: user.id,
+    })
 
     comment = Factory.insert(:comment, parent_post: user_post)
     assert :ok = Stream.create(%{
@@ -105,15 +105,15 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
       originating_user_id: author.id,
     })
 
-    # category_user = Factory.insert(:category_user, user: user, featured_by: Factory.insert(:user))
-    # assert :ok = Stream.create(%{
-    #   user_id: user.id,
-    #   subject_id: category_user.id,
-    #   subject_type: "CategoryUser",
-    #   kind: "user_added_as_featured_notification",
-    #   created_at: DateTime.from_unix!(10000),
-    #   originating_user_id: category_user.featured_by_id,
-    # })
+    category_user = Factory.insert(:category_user, user: user, featured_by: Factory.insert(:user))
+    assert :ok = Stream.create(%{
+      user_id: user.id,
+      subject_id: category_user.id,
+      subject_type: "CategoryUser",
+      kind: "user_added_as_featured_notification",
+      created_at: DateTime.from_unix!(10000),
+      originating_user_id: category_user.featured_by_id,
+    })
     #
     # watch = Factory.insert(:watch, post: post)
     # assert :ok = Stream.create(%{
@@ -156,7 +156,7 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     }}, user)
     assert %{"data" => %{"notificationStream" => json2}} = json_response(resp2)
     assert %{"notifications" => notifications2, "isLastPage" => true, "next" => _} = json2
-    assert length(notifications2) == 5
+    assert length(notifications2) == 8
   end
 
   test "getting notifications with subjects" do

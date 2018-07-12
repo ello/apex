@@ -10,13 +10,15 @@ defmodule Ello.Core.Network.CategoryUser do
     field :created_at, :utc_datetime
     field :updated_at, :utc_datetime
 
-    # TODO: add category user roles
-    # t.datetime "featured_at"
-    # t.integer  "featured_by_id"
-    # t.datetime "curator_at"
-    # t.integer  "curator_by_id"
-    # t.datetime "moderator_at"
-    # t.integer  "moderator_by_id"
+    field :featured_at, :utc_datetime
+    belongs_to :featured_by, User
+
+    field :curator_at, :utc_datetime
+    belongs_to :curator_by, User
+
+    field :moderator_at, :utc_datetime
+    belongs_to :moderator_by, User
+
 
     belongs_to :user, User
     belongs_to :category, Category

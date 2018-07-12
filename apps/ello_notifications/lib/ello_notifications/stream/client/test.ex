@@ -52,5 +52,4 @@ defmodule Ello.Notifications.Stream.Client.Test do
       Enum.reject(state, &(&1["subject_id"] == subject_id && &1["subject_type"] == subject_type))
     end
   end
-
 end
