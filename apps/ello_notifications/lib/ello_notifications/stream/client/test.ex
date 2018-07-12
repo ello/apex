@@ -14,25 +14,30 @@ defmodule Ello.Notifications.Stream.Client.Test do
   end
 
   @impl Client
-  def fetch_notifications(%{current_user: %{id: user_id}, per_page: limit} = stream) do
+  def fetch_notifications(%{current_user: %{id: user_id}, per_page: limit, before: b4} = stream) do
     Agent.get __MODULE__, fn(state) ->
       results = state
                 |> Enum.filter(&(&1["user_id"] == user_id))
-                |> Enum.sort_by(&(&1["created_at"]), &>=/2)
-                # TODO - pagination
-                |> Enum.take(limit)
+                |> Enum.sort_by(&(&1["created_at"]), &(DateTime.from_iso8601(&1) >= DateTime.from_iso8601(&2)))
+                |> paginate(b4, limit)
       Map.merge(stream, %{
         __response: results,
-        #todo - pagination
       })
     end
+  end
+
+  defp paginate(items, nil, limit), do: Enum.take(items, limit)
+  defp paginate(items, before, limit) do
+    items
+    |> Enum.reject(&(DateTime.from_iso8601(&1["created_at"]) >= DateTime.from_iso8601(before)))
+    |> Enum.take(limit)
   end
 
   @impl Client
   def create_notification(item) do
     body = item
-           |> Item.as_json
-           |> Enum.reduce(%{}, fn({k, v}, a) -> Map.put(a, Atom.to_string(k), v) end)
+           |> Item.to_json
+           |> Jason.decode! # force to the same format as http by encoding and decoding
     Agent.update(__MODULE__, &([body | &1]))
   end
 

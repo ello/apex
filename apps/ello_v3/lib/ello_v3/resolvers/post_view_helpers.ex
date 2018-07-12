@@ -3,6 +3,7 @@ defmodule Ello.V3.Resolvers.PostViewHelpers do
   alias Ello.Events.CountPostView
   alias Ello.Core.Content.Post
   alias Ello.Core.Discovery.Editorial
+  alias Ello.Notifications
 
   @doc """
   Track post views.
@@ -35,6 +36,8 @@ defmodule Ello.V3.Resolvers.PostViewHelpers do
     |> Enum.map(&(&1.post_id))
     |> Enum.reject(&is_nil/1)
   end
+  # TODO - handle notification post views
+  defp post_ids([%Notifications.Stream.Item{} | _]), do: []
 
   defp user_id(%{current_user: %{id: id}}), do: id
   defp user_id(_), do: nil

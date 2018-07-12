@@ -1,6 +1,6 @@
 defmodule Ello.Notifications.Stream.Item do
   @valid_subjects ~w(
-    Post User Love InvitedUser Watch ArtistInviteSubmission CategoryPost CategoryUser
+    Post User Love Watch ArtistInviteSubmission CategoryPost CategoryUser
   )
 
   @valid_kinds ~w(

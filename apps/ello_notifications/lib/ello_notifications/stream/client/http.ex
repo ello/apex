@@ -45,11 +45,12 @@ defmodule Ello.Notifications.Stream.Client.HTTP do
   defp to_params(stream) do
     %{
       user_id: stream.current_user.id,
+      limit: stream.per_page,
+      before: stream.before,
     }
   end
 
   defp parse_response(%{body: body}, stream) do
     Map.put(stream, :__response, Jason.decode!(body))
   end
-
 end

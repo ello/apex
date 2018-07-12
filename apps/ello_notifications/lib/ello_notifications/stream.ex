@@ -28,6 +28,7 @@ defmodule Ello.Notifications.Stream do
     |> struct(opts)
     |> Client.fetch
     |> Loader.load
+    |> set_next
   end
 
   @doc """
@@ -50,5 +51,10 @@ defmodule Ello.Notifications.Stream do
   """
   def delete_many(%{} = opts) do
     Client.delete_many(opts)
+  end
+
+  defp set_next(%{models: []} = stream), do: stream
+  defp set_next(%{models: models} = stream) do
+    %{stream | next: List.last(models).created_at}
   end
 end
