@@ -190,4 +190,11 @@ defmodule Ello.Core.Content do
     |> Repo.all
     |> Preload.love_list(options)
   end
+  def loves(%{ids: ids} = options) do
+    Love
+    |> where([l], l.id in ^ids)
+    |> Filter.loves_query(options)
+    |> Repo.all
+    |> Preload.love_list(options)
+  end
 end

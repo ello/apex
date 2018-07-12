@@ -6,7 +6,7 @@ defmodule Ello.V3.Schema.NotificationTypes do
     Contest,
     Discovery,
   }
-  alias Content.Post
+  alias Content.{Post, Love}
   alias Contest.ArtistInviteSubmission
   alias Discovery.CategoryPost
   alias Network.{CategoryUser, User}
@@ -32,15 +32,16 @@ defmodule Ello.V3.Schema.NotificationTypes do
     field :kind, :string
     field :subject_id, :id
     field :subject_type, :string
-    field :subject, :notification_subject
+    field :subject, :notification_subject #, resolve: fn(item,_,_) -> {:ok, item.subject} end
     field :created_at, :string
   end
 
   union :notification_subject do
-    types [:user, :post, :artist_invite_submission, :category_post, :category_user]
+    types [:user, :love, :post, :artist_invite_submission, :category_post, :category_user]
     resolve_type fn
       %User{}, _ -> :user
       %Post{}, _ -> :post
+      %Love{}, _ -> :love
       %CategoryUser{}, _ -> :category_user
       %CategoryPost{}, _ -> :category_post
       %ArtistInviteSubmission{}, _ -> :artist_invite_submission

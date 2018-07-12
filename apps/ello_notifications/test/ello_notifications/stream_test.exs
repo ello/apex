@@ -1,9 +1,11 @@
 defmodule Ello.Notifications.StreamTest do
   use Ello.Notifications.Case, async: false
   alias Ello.Notifications.Stream
+  alias Ello.Core.Content.Post
   alias Stream.Item
 
   setup do
+    Ecto.Adapters.SQL.Sandbox.mode(Ello.Core.Repo, {:shared, self()})
     Stream.Client.Test.start()
     Stream.Client.Test.reset()
 
@@ -106,6 +108,7 @@ defmodule Ello.Notifications.StreamTest do
     assert item.user_id == user.id
     assert item.subject_id == post.id
     assert item.subject_type == "Post"
+    assert %Post{} = item.subject
 
     assert :ok = Stream.delete_many(%{user_id: user.id})
 

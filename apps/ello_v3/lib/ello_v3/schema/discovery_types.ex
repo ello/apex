@@ -37,6 +37,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     field :unfeatured_at, :datetime
     field :removed_at, :datetime
     field :category, :category
+    field :post, :post
     field :actions, :category_post_actions, resolve: &actions/2
   end
 

@@ -12,10 +12,12 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
     Stream.Client.Test.start()
     Stream.Client.Test.reset()
+
     user = Factory.insert(:user)
     user_post = Factory.insert(:post, author: user)
     author = Factory.insert(:user)
     post = Factory.insert(:post, author: author)
+    category = Factory.insert(:category, level: "primary", order: "5")
 
     assert :ok = Stream.create(%{
       user_id: user.id,
@@ -56,7 +58,11 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
       originating_user_id: repost_love.user_id,
     })
 
-    category_post = Factory.insert(:category_post, post: user_post, featured_by: author)
+    category_post = Factory.insert(:category_post, %{
+      post: user_post,
+      featured_by: author,
+      category: category,
+    })
     assert :ok = Stream.create(%{
       user_id: user.id,
       subject_id: category_post.id,
@@ -86,12 +92,12 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
       originating_user_id: comment.author_id,
     })
 
-    comment = Factory.insert(:comment, parent_post: user_post)
+    comment = Factory.insert(:comment, parent_post: repost)
     assert :ok = Stream.create(%{
       user_id: user.id,
       subject_id: comment.id,
       subject_type: "Post",
-      kind: "comment_notification",
+      kind: "comment_on_repost_notification",
       created_at: DateTime.from_unix!(8000),
       originating_user_id: comment.author_id,
     })
@@ -114,7 +120,8 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
       created_at: DateTime.from_unix!(10000),
       originating_user_id: category_user.featured_by_id,
     })
-    #
+
+
     # watch = Factory.insert(:watch, post: post)
     # assert :ok = Stream.create(%{
     #   user_id: user.id,
@@ -139,7 +146,110 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
       }
     }
   """
-  test "getting base notifications", %{
+
+  @full_query """
+    fragment imageVersionProps on Image {
+      url
+      metadata { height width type size }
+    }
+
+    fragment avatarImageVersion on TshirtImageVersions {
+      small { ...imageVersionProps }
+      regular { ...imageVersionProps }
+      large { ...imageVersionProps }
+      original { ...imageVersionProps }
+    }
+
+    fragment authorSummary on User {
+      id
+      username
+      name
+      currentUserState { relationshipPriority }
+      avatar {
+        ...avatarImageVersion
+      }
+    }
+
+    fragment contentProps on ContentBlocks {
+      linkUrl
+      kind
+      data
+      links { assets }
+    }
+
+    fragment postSummary on Post {
+      id
+      token
+      createdAt
+      summary { ...contentProps }
+      author { ...authorSummary }
+      assets {
+        id
+        attachment {
+          hdpi {
+            url
+          }
+        }
+      }
+      postStats { lovesCount commentsCount viewsCount repostsCount }
+      currentUserState { watching loved reposted }
+    }
+
+
+    fragment categorySummary on Category {
+      id slug name
+    }
+
+    fragment categoryPostSummary on CategoryPost {
+      id
+      status
+      category { ...categorySummary }
+      post { ...postSummary repostedSource { ...postSummary } }
+    }
+
+    fragment categoryUserSummary on CategoryUser {
+      id
+      role
+      category { ...categorySummary }
+      user { ...authorSummary }
+    }
+
+    fragment artistInviteSubmissionSummary on ArtistInviteSubmission {
+      id
+      status
+      post { ...postSummary repostedSource { ...postSummary } }
+      artistInvite { id title slug }
+    }
+
+    fragment loveSummary on Love {
+      id
+      post { ...postSummary repostedSource { ...postSummary } }
+      user { ...authorSummary }
+    }
+
+    query($perPage: Int, $before: String, $category: NotificationCategory) {
+      notificationStream(perPage: $perPage, before: $before, category: $category) {
+        isLastPage
+        next
+        notifications {
+          kind
+          subjectType
+          createdAt
+          subject {
+            __typename
+            ... on Post { ...postSummary repostedSource { ...postSummary } }
+            ... on User { ...authorSummary }
+            ... on CategoryUser { ...categoryUserSummary }
+            ... on CategoryPost { ...categoryPostSummary }
+            ... on Love { ...loveSummary }
+            ... on ArtistInviteSubmission { ...artistInviteSubmissionSummary }
+          }
+        }
+      }
+    }
+  """
+
+  test "getting paginated notifications - no subjects", %{
     user: user,
   } do
     resp = post_graphql(%{query: @basic_query, variables: %{perPage: 2}}, user)
@@ -159,8 +269,44 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     assert length(notifications2) == 8
   end
 
-  test "getting notifications with subjects" do
+  test "getting notifications with subjects", %{
+    user: user,
+  } do
+    resp = post_graphql(%{query: @full_query, variables: %{}}, user)
+    assert %{"data" => %{"notificationStream" => json}} = json_response(resp)
+    assert %{"notifications" => notifications, "isLastPage" => false, "next" => _next} = json
+    assert [n1, n2, n3, n4, n5, n6, n7, n8, n9, n10] = notifications
 
+    assert n1["subjectType"] == "CategoryUser"
+    assert n1["subject"]["id"]
+    assert n1["subject"]["category"]["name"]
+
+    assert n2["subjectType"] == "User"
+    assert n2["subject"]["id"]
+
+    assert n3["subjectType"] == "Post"
+    assert n3["subject"]["id"]
+
+    assert n4["subjectType"] == "Post"
+    assert n4["subject"]["id"]
+
+    assert n5["subjectType"] == "ArtistInviteSubmission"
+    assert n5["subject"]["id"]
+
+    assert n6["subjectType"] == "CategoryPost"
+    assert n6["subject"]["id"]
+
+    assert n7["subjectType"] == "Love"
+    assert n7["subject"]["id"]
+
+    assert n8["subjectType"] == "Post"
+    assert n8["subject"]["id"]
+
+    assert n9["subjectType"] == "Love"
+    assert n9["subject"]["id"]
+
+    assert n10["subjectType"] == "Post"
+    assert n10["subject"]["id"]
   end
 
   test "getting notifications with subjects by category" do

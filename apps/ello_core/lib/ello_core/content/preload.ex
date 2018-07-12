@@ -132,7 +132,7 @@ defmodule Ello.Core.Content.Preload do
   defp add_post_preload(preloads, _), do: preloads
 
   defp add_category_preload(preloads, %{category_posts: cp_preloads}),
-    do: [{:category_posts, &Discovery.category_posts(%{ids: &1, preloads: cp_preloads})} | preloads]
+    do: [{:category_posts, &Discovery.category_posts(%{post_ids: &1, preloads: cp_preloads})} | preloads]
   defp add_category_preload(preloads, %{categories: _}),
     do: [{:categories, &Discovery.categories(%{ids: &1})} | preloads]
   defp add_category_preload(preloads, _), do: preloads

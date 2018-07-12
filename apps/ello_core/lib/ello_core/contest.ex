@@ -153,6 +153,13 @@ defmodule Ello.Core.Contest do
     current_user: %{id: user_id}
   } = options),
     do: get_submissions_by_status(options, "selected")
+  def artist_invite_submissions(%{ids: ids} = options) do
+    ArtistInviteSubmission
+    |> where([s], s.id in ^ids)
+    |> Repo.all
+    |> Preload.artist_invite_submissions(options)
+    |> filter_postless
+  end
   def artist_invite_submissions(_),
     do: []
 

@@ -108,4 +108,7 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
   defp find_preloads(%Fragment.Spread{} = spread, fragments, preloads) do
     find_preloads(Map.get(fragments, spread.name).selections, fragments, preloads)
   end
+  defp find_preloads(%Fragment.Inline{} = inline, fragments, preloads) do
+    Enum.reduce(inline.selections, preloads, &find_preloads(&1, fragments, &2))
+  end
 end

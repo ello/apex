@@ -103,11 +103,18 @@ defmodule Ello.Core.Discovery do
     |> Preload.categories(options)
   end
 
-  def category_posts(%{ids: ids} = options) do
+  def category_posts(%{post_ids: ids} = options) do
     CategoryPost
     |> join(:left, [cp], category in assoc(cp, :category))
     |> where([cp, c], not is_nil(c.level))
     |> where([cp, c], cp.post_id in ^ids)
+    |> Repo.all
+    |> Preload.category_posts(options)
+  end
+  def category_posts(%{ids: ids} = options) do
+    CategoryPost
+    |> join(:left, [cp], category in assoc(cp, :category))
+    |> where([cp, c], cp.id in ^ids)
     |> Repo.all
     |> Preload.category_posts(options)
   end
@@ -140,6 +147,14 @@ defmodule Ello.Core.Discovery do
     CategoryUser
     |> join(:left, [cu], category in assoc(cu, :category))
     |> where([cu], cu.user_id in ^ids)
+    |> where([cu, c], not is_nil(c.level))
+    |> Repo.all
+    |> Preload.category_users(options)
+  end
+  def category_users(%{ids: ids} = options) do
+    CategoryUser
+    |> join(:left, [cu], category in assoc(cu, :category))
+    |> where([cu], cu.id in ^ids)
     |> where([cu, c], not is_nil(c.level))
     |> Repo.all
     |> Preload.category_users(options)
