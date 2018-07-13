@@ -48,6 +48,7 @@ defmodule Ello.Notifications.Stream.Client.HTTP do
       limit: stream.per_page,
       before: stream.before,
       category: stream.category,
+      exclude_originating_user_ids: Enum.join(stream.current_user.all_blocked_ids, ","),
     }
   end
 
