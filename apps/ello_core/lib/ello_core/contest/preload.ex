@@ -19,18 +19,17 @@ defmodule Ello.Core.Contest.Preload do
   end
 
   @default_artist_invite_submission_preloads %{
-    posts: %{
+    post: %{
       assets: %{},
       current_user_state: %{},
       categories: %{},
-      artist_invite_submission: %{artist_invite: %{}},
       author: %{current_user_state: %{}, user_stats: %{}, categories: %{}},
       post_stats: %{},
       reposted_source: %{}
     }
   }
 
-  def artist_invite_submissions(submissions, %{preloads: preloads} = options) do
+  def artist_invite_submissions(submissions, %{preloads: %{} = preloads} = options) do
     submissions
     |> preload_posts(%{options | preloads: preloads[:post]})
   end
