@@ -34,7 +34,7 @@ defmodule Ello.Core.Contest.Preload do
     |> preload_posts(%{options | preloads: preloads[:post]})
   end
   def artist_invite_submissions(s, options) do
-    artist_invite_submissions(s, %{options | preloads: @default_artist_invite_submission_preloads})
+    artist_invite_submissions(s, Map.put(options, :preloads, @default_artist_invite_submission_preloads))
   end
 
   defp preload_posts(submissions, %{preloads: nil}), do: submissions
