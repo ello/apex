@@ -1,8 +1,17 @@
 defmodule Ello.V3.Resolvers.PostViewHelpers do
   alias Ello.Events
   alias Ello.Events.CountPostView
-  alias Ello.Core.Content.Post
-  alias Ello.Core.Discovery.Editorial
+  alias Ello.Core.Content.{
+    Post,
+    Love,
+  }
+  alias Ello.Core.Discovery.{
+    Editorial,
+    CategoryPost,
+  }
+  alias Ello.Core.Contest.{
+    ArtistInviteSubmission,
+  }
   alias Ello.Notifications
 
   @doc """
@@ -29,15 +38,22 @@ defmodule Ello.V3.Resolvers.PostViewHelpers do
 
   defp post_ids([]), do: []
   defp post_ids(nil), do: []
-  defp post_ids(%Post{id: id}), do: [id]
-  defp post_ids([%Post{} | _] = posts), do: Enum.map(posts, &(&1.id))
-  defp post_ids([%Editorial{} | _] = editorials) do
-    editorials
-    |> Enum.map(&(&1.post_id))
+  defp post_ids(%{} = struct), do: post_ids([struct])
+  defp post_ids(models) when is_list(models) do
+    models
+    |> Enum.map(&post_id(&1))
+    |> List.flatten
     |> Enum.reject(&is_nil/1)
   end
-  # TODO - handle notification post views
-  defp post_ids([%Notifications.Stream.Item{} | _]), do: []
+
+  defp post_id(%Post{id: id}), do: id
+  defp post_id(%Editorial{post_id: post_id}) when not is_nil(post_id), do: post_id
+  defp post_id(%Editorial{curated_posts: posts}) when is_list(posts), do: Enum.map(posts, &(&1.id))
+  defp post_id(%Love{post_id: post_id}), do: post_id
+  defp post_id(%ArtistInviteSubmission{post_id: post_id}), do: post_id
+  defp post_id(%CategoryPost{post_id: post_id}), do: post_id
+  defp post_id(%Notifications.Stream.Item{subject: subject}), do: post_id(subject)
+  defp post_id(_), do: nil
 
   defp user_id(%{current_user: %{id: id}}), do: id
   defp user_id(_), do: nil
