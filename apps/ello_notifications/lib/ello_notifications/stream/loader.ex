@@ -29,22 +29,10 @@ defmodule Ello.Notifications.Stream.Loader do
     Map.put(stream, :models, items)
   end
 
-  @user_preloads %{current_user_state: %{}}
 
   defp load_related(%{models: items} = stream) do
-    subjects = items
-               |> Enum.group_by(&(&1.subject_type))
-               |> Enum.map(&async_fetch_subjects(&1, stream))
-               |> Enum.map(&Task.await(&1, 10_000))
-               |> Enum.reduce(%{}, fn ({type, models}, loaded) ->
-                 Map.put(loaded, type, Enum.reduce(models, %{}, &Map.put(&2, &1.id, &1)))
-               end)
-
-    users = Network.users(%{
-      ids: Enum.map(items, &(&1.originating_user_id)),
-      current_user: stream.current_user,
-      preloads: @user_preloads,
-    }) |> Enum.reduce(%{}, &Map.put(&2, &1.id, &1))
+    subjects = preload_subjects(stream)
+    users = preload_orignating_users(stream)
 
     loaded = Enum.map(items, &Map.merge(&1, %{
       subject: subjects[&1.subject_type][&1.subject_id],
@@ -54,13 +42,7 @@ defmodule Ello.Notifications.Stream.Loader do
     %{stream | models: loaded}
   end
 
-  defp async_fetch_subjects({type, items}, %{current_user: current_user}) do
-    ids = items
-          |> Enum.map(&(&1.subject_id))
-          |> Enum.dedup
-    Task.async(__MODULE__, :fetch_subjects, [type, ids, current_user])
-  end
-
+  @user_preloads %{current_user_state: %{}}
   @post_preloads %{
     assets: %{},
     author: @user_preloads,
@@ -77,6 +59,32 @@ defmodule Ello.Notifications.Stream.Loader do
   @category_user_preloads %{user: @user_preloads, category: %{}}
   @category_post_preloads %{post: @post_preloads, category: %{}}
   @artist_invite_submission_preloads %{post: @post_preloads, artist_invite: %{}}
+
+  defp preload_orignating_users(stream) do
+    Enum.reduce(Network.users(%{
+      ids: Enum.map(stream.models, &(&1.originating_user_id)),
+      current_user: stream.current_user,
+      preloads: @user_preloads,
+    }), %{}, &Map.put(&2, &1.id, &1))
+  end
+
+  defp preload_subjects(stream) do
+    stream.models
+    |> Enum.group_by(&(&1.subject_type))
+    |> Enum.map(&async_fetch_subjects(&1, stream))
+    |> Enum.map(&Task.await(&1, 10_000))
+    |> Enum.reduce(%{}, fn ({type, models}, loaded) ->
+      Map.put(loaded, type, Enum.reduce(models, %{}, &Map.put(&2, &1.id, &1)))
+    end)
+  end
+
+
+  defp async_fetch_subjects({type, items}, %{current_user: current_user}) do
+    ids = items
+          |> Enum.map(&(&1.subject_id))
+          |> Enum.dedup
+    Task.async(__MODULE__, :fetch_subjects, [type, ids, current_user])
+  end
 
   def fetch_subjects("Post", ids, user) do
     {"Post", Content.posts(%{
