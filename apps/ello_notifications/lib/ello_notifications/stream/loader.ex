@@ -29,8 +29,8 @@ defmodule Ello.Notifications.Stream.Loader do
     Map.put(stream, :models, items)
   end
 
-
-  defp load_related(%{models: items} = stream) do
+  defp load_related(%{preload: false} = stream), do: stream
+  defp load_related(%{models: items, preload: true} = stream) do
     subjects = preload_subjects(stream)
     users = preload_orignating_users(stream)
 

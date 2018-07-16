@@ -18,6 +18,7 @@ defmodule Ello.Notifications.Stream do
     models: [],
     category: :all,
     __response: nil,
+    preload: true,
   ]
 
   @doc """
