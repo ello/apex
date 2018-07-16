@@ -32,7 +32,8 @@ defmodule Ello.V3.Schema.NotificationTypes do
     field :kind, :string
     field :subject_id, :id
     field :subject_type, :string
-    field :subject, :notification_subject #, resolve: fn(item,_,_) -> {:ok, item.subject} end
+    field :subject, :notification_subject
+    field :originating_user, :user
     field :created_at, :string
   end
 

@@ -30,15 +30,23 @@ defmodule Ello.Core.Contest.Preload do
   }
 
   def artist_invite_submissions(submissions, %{preloads: %{} = preloads} = options) do
-    submissions
-    |> preload_posts(%{options | preloads: preloads[:post]})
+    preload_list = []
+                   |> preload_posts(%{options | preloads: preloads[:post]})
+                   |> preload_invites(%{options | preloads: preloads[:artist_invite]})
+
+    Repo.preload(submissions, preload_list)
   end
   def artist_invite_submissions(s, options) do
     artist_invite_submissions(s, Map.put(options, :preloads, @default_artist_invite_submission_preloads))
   end
 
-  defp preload_posts(submissions, %{preloads: nil}), do: submissions
-  defp preload_posts(submissions, options) do
-    Repo.preload(submissions, post: &Content.posts(Map.put(options, :ids, &1)))
+  defp preload_posts(preload_list, %{preloads: nil}), do: preload_list
+  defp preload_posts(preload_list, options) do
+    [{:post, &Content.posts(Map.put(options, :ids, &1))} | preload_list]
+  end
+
+  defp preload_invites(preload_list, %{preloads: nil}), do: preload_list
+  defp preload_invites(preload_list, options) do
+    [{:artist_invite, &Contest.artist_invites(Map.put(options, :ids, &1))} | preload_list]
   end
 end

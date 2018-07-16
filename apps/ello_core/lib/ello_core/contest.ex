@@ -71,6 +71,13 @@ defmodule Ello.Core.Contest do
     |> Repo.all
     |> Preload.artist_invites(options)
   end
+  def artist_invites(%{ids: ids} = options) do
+    ArtistInvite
+    |> where([ai], ai.status != "preview")
+    |> where([ai], ai.id in ^ids)
+    |> Repo.all
+    |> Preload.artist_invites(options)
+  end
 
   def my_artist_invites(%{current_user: %{is_staff: true}} = options) do
     ArtistInvite

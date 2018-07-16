@@ -29,18 +29,28 @@ defmodule Ello.Notifications.Stream.Loader do
     Map.put(stream, :models, items)
   end
 
+  @user_preloads %{current_user_state: %{}}
+
   defp load_related(%{models: items} = stream) do
     subjects = items
                |> Enum.group_by(&(&1.subject_type))
                |> Enum.map(&async_fetch_subjects(&1, stream))
-               |> Enum.map(&Task.await(&1,10_000))
+               |> Enum.map(&Task.await(&1, 10_000))
                |> Enum.reduce(%{}, fn ({type, models}, loaded) ->
                  Map.put(loaded, type, Enum.reduce(models, %{}, &Map.put(&2, &1.id, &1)))
                end)
 
-    loaded = Enum.map(items, &(%{&1 | subject: subjects[&1.subject_type][&1.subject_id]}))
+    users = Network.users(%{
+      ids: Enum.map(items, &(&1.originating_user_id)),
+      current_user: stream.current_user,
+      preloads: @user_preloads,
+    }) |> Enum.reduce(%{}, &Map.put(&2, &1.id, &1))
 
-    # TODO: originating_users
+    loaded = Enum.map(items, &Map.merge(&1, %{
+      subject: subjects[&1.subject_type][&1.subject_id],
+      originating_user: users[&1.originating_user_id],
+    }))
+
     %{stream | models: loaded}
   end
 
@@ -51,7 +61,6 @@ defmodule Ello.Notifications.Stream.Loader do
     Task.async(__MODULE__, :fetch_subjects, [type, ids, current_user])
   end
 
-  @user_preloads %{current_user_state: %{}}
   @post_preloads %{
     assets: %{},
     author: @user_preloads,
