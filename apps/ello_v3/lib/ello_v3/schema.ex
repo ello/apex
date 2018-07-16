@@ -138,6 +138,14 @@ defmodule Ello.V3.Schema do
       arg :before, :string, description: "Pagination cursor, returned by previous page"
       arg :per_page, :integer, default_value: 10
     end
+
+    @desc "Search users"
+    field :search_users, :user_stream do
+      resolve &Resolvers.SearchUsers.call/3
+      arg :query, :string
+      arg :username, :boolean, default_value: true, description: "Search by username only"
+      arg :per_page, :integer, default_value: 10
+    end
   end
 
   @doc """

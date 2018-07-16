@@ -32,6 +32,13 @@ defmodule Ello.V3.Schema.NetworkTypes do
     field :meta_attributes, :user_meta_attributes, resolve: &user_meta/2
   end
 
+  object :user_stream do
+    field :next, :string
+    field :per_page, :integer
+    field :is_last_page, :boolean
+    field :users, list_of(:user)
+  end
+
   object :external_link do
     field :icon, :string
     field :type, :string
