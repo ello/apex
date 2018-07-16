@@ -122,15 +122,15 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     })
 
 
-    # watch = Factory.insert(:watch, post: post)
-    # assert :ok = Stream.create(%{
-    #   user_id: user.id,
-    #   subject_id: watch.id,
-    #   subject_type: "Watch",
-    #   kind: "watch_notification",
-    #   created_at: DateTime.from_unix!(11000),
-    #   originating_user_id: watch.user_id,
-    # })
+    watch = Factory.insert(:watch, post: post)
+    assert :ok = Stream.create(%{
+      user_id: user.id,
+      subject_id: watch.id,
+      subject_type: "Watch",
+      kind: "watch_notification",
+      created_at: DateTime.from_unix!(11_000),
+      originating_user_id: watch.user_id,
+    })
 
     {:ok, %{
       user: user,
@@ -227,6 +227,11 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
       user { ...authorSummary }
     }
 
+    fragment watchSummary on Watch {
+      id
+      post { ...postSummary repostedSource { ...postSummary } }
+    }
+
     query($perPage: Int, $before: String, $category: NotificationCategory) {
       notificationStream(perPage: $perPage, before: $before, category: $category) {
         isLastPage
@@ -244,6 +249,7 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
             ... on CategoryPost { ...categoryPostSummary }
             ... on Love { ...loveSummary }
             ... on ArtistInviteSubmission { ...artistInviteSubmissionSummary }
+            ... on Watch { ...watchSummary }
           }
         }
       }
@@ -267,16 +273,23 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     }}, user)
     assert %{"data" => %{"notificationStream" => json2}} = json_response(resp2)
     assert %{"notifications" => notifications2, "isLastPage" => true, "next" => _} = json2
-    assert length(notifications2) == 8
+    assert length(notifications2) == 9
   end
 
   test "getting notifications with subjects", %{
     user: user,
   } do
-    resp = post_graphql(%{query: @full_query, variables: %{}}, user)
+    resp = post_graphql(%{query: @full_query, variables: %{perPage: 25}}, user)
     assert %{"data" => %{"notificationStream" => json}} = json_response(resp)
-    assert %{"notifications" => notifications, "isLastPage" => false, "next" => _next} = json
-    assert [n1, n2, n3, n4, n5, n6, n7, n8, n9, n10] = notifications
+    assert %{"notifications" => notifications, "isLastPage" => true, "next" => _next} = json
+    assert length(notifications) == 11
+    assert [n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10] = notifications
+
+    assert n0["subjectType"] == "Watch"
+    assert n0["subject"]["id"]
+    assert n0["subject"]["post"]["token"]
+    assert n0["subject"]["post"]["author"]["username"]
+    assert n0["originatingUser"]["username"]
 
     assert n1["subjectType"] == "CategoryUser"
     assert n1["subject"]["id"]

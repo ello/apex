@@ -10,6 +10,7 @@ defmodule Ello.Core.Content do
     Preload,
     Post,
     Love,
+    Watch,
   }
 
   @moduledoc """
@@ -196,5 +197,12 @@ defmodule Ello.Core.Content do
     |> Filter.loves_query(options)
     |> Repo.all
     |> Preload.love_list(options)
+  end
+
+  def watches(%{ids: ids} = options) do
+    Watch
+    |> where([w], w.id in ^ids)
+    |> Repo.all
+    |> Preload.watches_list(options)
   end
 end

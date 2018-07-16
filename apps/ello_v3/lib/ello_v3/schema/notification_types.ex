@@ -6,7 +6,7 @@ defmodule Ello.V3.Schema.NotificationTypes do
     Contest,
     Discovery,
   }
-  alias Content.{Post, Love}
+  alias Content.{Post, Love, Watch}
   alias Contest.ArtistInviteSubmission
   alias Discovery.CategoryPost
   alias Network.{CategoryUser, User}
@@ -38,7 +38,7 @@ defmodule Ello.V3.Schema.NotificationTypes do
   end
 
   union :notification_subject do
-    types [:user, :love, :post, :artist_invite_submission, :category_post, :category_user]
+    types [:user, :love, :post, :artist_invite_submission, :category_post, :category_user, :watch]
     resolve_type fn
       %User{}, _ -> :user
       %Post{}, _ -> :post
@@ -46,7 +46,7 @@ defmodule Ello.V3.Schema.NotificationTypes do
       %CategoryUser{}, _ -> :category_user
       %CategoryPost{}, _ -> :category_post
       %ArtistInviteSubmission{}, _ -> :artist_invite_submission
-      #%Watch{}, _ -> :watch # TODO: Support watch
+      %Watch{}, _ -> :watch
     end
   end
 end

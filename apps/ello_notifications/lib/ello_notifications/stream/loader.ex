@@ -59,6 +59,7 @@ defmodule Ello.Notifications.Stream.Loader do
   @category_user_preloads %{user: @user_preloads, category: %{}}
   @category_post_preloads %{post: @post_preloads, category: %{}}
   @artist_invite_submission_preloads %{post: @post_preloads, artist_invite: %{}}
+  @watch_preloads %{post: @post_preloads}
 
   defp preload_orignating_users(stream) do
     Enum.reduce(Network.users(%{
@@ -128,5 +129,11 @@ defmodule Ello.Notifications.Stream.Loader do
       preloads: @love_preloads,
     })}
   end
-  def fetch_subjects(other, _ids, _user), do: {other, []}
+  def fetch_subjects("Watch", ids, user) do
+    {"Watch", Content.watches(%{
+      ids: ids,
+      current_user: user,
+      preloads: @watch_preloads,
+    })}
+  end
 end

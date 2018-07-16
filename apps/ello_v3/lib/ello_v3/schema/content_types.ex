@@ -102,6 +102,11 @@ defmodule Ello.V3.Schema.ContentTypes do
     serialize &(&1)
   end
 
+  object :watch do
+    field :id, :id
+    field :post, :post
+  end
+
   defp post_summary(_, %{source: %{reposted_source: %{rendered_summary: summary}}}),
     do: {:ok, summary}
   defp post_summary(_, %{source: %{rendered_summary: post_summary}}),

@@ -77,6 +77,13 @@ defmodule Ello.Core.Content.Preload do
     love_list(loves, Map.put(options, :preloads, @love_default_preloads))
   end
 
+  def watches_list(nil, _), do: nil
+  def watches_list([], _), do: []
+  def watches_list(watches, %{preloads: %{post: post_preloads}} = options) do
+    Repo.preload(watches, post: &Content.posts(Map.merge(options, %{ids: &1, preloads: post_preloads})))
+  end
+  def watches_list(watches, _), do: watches
+
   defp post_and_repost_preloads(posts, options) do
     posts
     |> prefetch_ecto_preloads(options)
