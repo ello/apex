@@ -237,6 +237,7 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
         isLastPage
         next
         notifications {
+          id
           kind
           subjectType
           createdAt
@@ -285,12 +286,14 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     assert length(notifications) == 11
     assert [n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10] = notifications
 
+    assert n0["id"]
     assert n0["subjectType"] == "Watch"
     assert n0["subject"]["id"]
     assert n0["subject"]["post"]["token"]
     assert n0["subject"]["post"]["author"]["username"]
     assert n0["originatingUser"]["username"]
 
+    assert n1["id"]
     assert n1["subjectType"] == "CategoryUser"
     assert n1["subject"]["id"]
     assert n1["subject"]["role"]

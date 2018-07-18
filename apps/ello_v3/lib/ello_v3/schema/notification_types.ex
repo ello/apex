@@ -28,7 +28,7 @@ defmodule Ello.V3.Schema.NotificationTypes do
   end
 
   object :notification do
-    field :id, :id
+    field :id, :id, resolve: &notification_id/2
     field :kind, :string
     field :subject_id, :id
     field :subject_type, :string
@@ -48,5 +48,9 @@ defmodule Ello.V3.Schema.NotificationTypes do
       %ArtistInviteSubmission{}, _ -> :artist_invite_submission
       %Watch{}, _ -> :watch
     end
+  end
+
+  defp notification_id(_, %{source: notification}) do
+    {:ok, Enum.join([notification.kind, notification.subject_id, notification.created_at], ":")}
   end
 end
