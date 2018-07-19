@@ -153,6 +153,16 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
       metadata { height width type size }
     }
 
+    fragment responsiveImageVersions on ResponsiveImageVersions {
+      xhdpi { ...imageVersionProps }
+      hdpi { ...imageVersionProps }
+      mdpi { ...imageVersionProps }
+      ldpi { ...imageVersionProps }
+      optimized { ...imageVersionProps }
+      original { ...imageVersionProps }
+      video { ...imageVersionProps }
+    }
+
     fragment avatarImageVersion on TshirtImageVersions {
       small { ...imageVersionProps }
       regular { ...imageVersionProps }
@@ -165,9 +175,7 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
       username
       name
       currentUserState { relationshipPriority }
-      avatar {
-        ...avatarImageVersion
-      }
+      avatar { ...avatarImageVersion }
     }
 
     fragment contentProps on ContentBlocks {
@@ -183,18 +191,20 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
       createdAt
       summary { ...contentProps }
       author { ...authorSummary }
-      assets {
-        id
-        attachment {
-          hdpi {
-            url
-          }
-        }
-      }
+      assets { id attachment { ...responsiveImageVersions } }
       postStats { lovesCount commentsCount viewsCount repostsCount }
       currentUserState { watching loved reposted }
     }
 
+    fragment commentSummary on Comment {
+      id
+      createdAt
+      author { ...authorSummary }
+      summary { ...contentProps }
+      content { ...contentProps }
+      assets { id attachment { ...responsiveImageVersions } }
+      parentPost { ...postSummary }
+    }
 
     fragment categorySummary on Category {
       id slug name
@@ -246,6 +256,7 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
           subject {
             __typename
             ... on Post { ...postSummary repostedSource { ...postSummary } }
+            ... on Comment { ...commentSummary parentPost { ...postSummary } }
             ... on User { ...authorSummary }
             ... on CategoryUser { ...categoryUserSummary }
             ... on CategoryPost { ...categoryPostSummary }
@@ -306,14 +317,26 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     assert n2["subject"]["username"]
     assert n2["originatingUser"]["username"]
 
+    assert n3["kind"] == "comment_on_repost_notification"
     assert n3["subjectType"] == "Post"
+    assert n3["subject"]["__typename"] == "Comment"
     assert n3["subject"]["id"]
-    assert n3["subject"]["token"]
+    assert n3["subject"]["content"]
+    assert n3["subject"]["parentPost"]["id"]
+    assert n3["subject"]["parentPost"]["token"]
+    assert n3["subject"]["parentPost"]["author"]["id"]
+    assert n3["subject"]["parentPost"]["author"]["username"]
     assert n3["originatingUser"]["username"]
 
+    assert n4["kind"] == "comment_notification"
     assert n4["subjectType"] == "Post"
+    assert n3["subject"]["__typename"] == "Comment"
     assert n4["subject"]["id"]
-    assert n4["subject"]["token"]
+    assert n4["subject"]["content"]
+    assert n4["subject"]["parentPost"]["id"]
+    assert n4["subject"]["parentPost"]["token"]
+    assert n4["subject"]["parentPost"]["author"]["id"]
+    assert n4["subject"]["parentPost"]["author"]["username"]
     assert n4["originatingUser"]["username"]
 
     assert n5["subjectType"] == "ArtistInviteSubmission"

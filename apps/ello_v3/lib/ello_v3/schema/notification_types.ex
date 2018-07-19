@@ -38,10 +38,20 @@ defmodule Ello.V3.Schema.NotificationTypes do
   end
 
   union :notification_subject do
-    types [:user, :love, :post, :artist_invite_submission, :category_post, :category_user, :watch]
+    types [
+      :user,
+      :love,
+      :post,
+      :artist_invite_submission,
+      :category_post,
+      :category_user,
+      :watch,
+      :comment,
+    ]
     resolve_type fn
       %User{}, _ -> :user
-      %Post{}, _ -> :post
+      %Post{parent_post_id: nil}, _ -> :post
+      %Post{parent_post_id: _id}, _ -> :comment
       %Love{}, _ -> :love
       %CategoryUser{}, _ -> :category_user
       %CategoryPost{}, _ -> :category_post

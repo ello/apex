@@ -141,6 +141,15 @@ defmodule Ello.Core.Content do
   """
   def comments(%{post: %{reposted_source: %Post{} = source}} = options),
     do: comments(Map.put(options, :post, source))
+  def comments(%{ids: ids} = options) do
+    # We don't filter NSFW users from comments
+    options = Map.merge(options, %{allow_nsfw: true, allow_nudity: true})
+    Post
+    |> where([p], p.id in ^ids)
+    |> Repo.all
+    |> Preload.comment_list(options)
+    |> Filter.post_list(options)
+  end
   def comments(options) do
     # We don't filter NSFW users from comments
     options = Map.merge(options, %{allow_nsfw: true, allow_nudity: true})

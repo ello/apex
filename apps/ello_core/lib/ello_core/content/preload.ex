@@ -161,12 +161,11 @@ defmodule Ello.Core.Content.Preload do
   end
   defp prefetch_reposted_source(post_or_posts, _), do: post_or_posts
 
-  defp prefetch_parent_post(comment_or_comments, %{preloads: %{parent_post: _preloads}}) do
-    Repo.preload comment_or_comments, parent_post: fn(ids) ->
-      Post
-      |> where([p], p.id in ^ids)
-      |> Repo.all
-    end
+  defp prefetch_parent_post(comment_or_comments, %{preloads: %{parent_post: preloads}} = options) do
+    Repo.preload(comment_or_comments, parent_post: &Content.posts(Map.merge(options, %{
+      preloads: preloads,
+      ids: &1,
+    })))
   end
   defp prefetch_parent_post(comment_or_comments, _), do: comment_or_comments
 

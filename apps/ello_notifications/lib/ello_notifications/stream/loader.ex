@@ -35,7 +35,7 @@ defmodule Ello.Notifications.Stream.Loader do
     users = preload_orignating_users(stream)
 
     loaded = Enum.map(items, &Map.merge(&1, %{
-      subject: subjects[&1.subject_type][&1.subject_id],
+      subject: subjects[subject_type(&1)][&1.subject_id],
       originating_user: users[&1.originating_user_id],
     }))
 
@@ -55,6 +55,7 @@ defmodule Ello.Notifications.Stream.Loader do
       author: @user_preloads,
     }
   }
+  @comment_preloads %{parent_post: @post_preloads, author: @user_preloads, assets: %{}}
   @love_preloads %{post: @post_preloads, user: @user_preloads}
   @category_user_preloads %{user: @user_preloads, category: %{}}
   @category_post_preloads %{post: @post_preloads, category: %{}, featured_by: @user_preloads}
@@ -71,13 +72,24 @@ defmodule Ello.Notifications.Stream.Loader do
 
   defp preload_subjects(stream) do
     stream.models
-    |> Enum.group_by(&(&1.subject_type))
+    |> Enum.group_by(&subject_type/1)
     |> Enum.map(&async_fetch_subjects(&1, stream))
     |> Enum.map(&Task.await(&1, 10_000))
     |> Enum.reduce(%{}, fn ({type, models}, loaded) ->
       Map.put(loaded, type, Enum.reduce(models, %{}, &Map.put(&2, &1.id, &1)))
     end)
   end
+
+
+  # Comments have subject_type Post, but should be loaded as comments with the parent post.
+  @comment_kinds ~w(
+    comment_mention_notification
+    comment_notification
+    comment_on_repost_notification
+    comment_on_original_post_notification
+  )
+  defp subject_type(%{subject_type: "Post", kind: kind}) when kind in @comment_kinds, do: "Comment"
+  defp subject_type(%{subject_type: type}), do: type
 
 
   defp async_fetch_subjects({type, items}, %{current_user: current_user}) do
@@ -92,6 +104,13 @@ defmodule Ello.Notifications.Stream.Loader do
       ids: ids,
       current_user: user,
       preloads: @post_preloads,
+    })}
+  end
+  def fetch_subjects("Comment", ids, user) do
+    {"Comment", Content.comments(%{
+      ids: ids,
+      current_user: user,
+      preloads: @comment_preloads,
     })}
   end
   def fetch_subjects("User", ids, user) do
