@@ -51,6 +51,11 @@ defmodule Ello.V3.Schema.NotificationTypes do
   end
 
   defp notification_id(_, %{source: notification}) do
-    {:ok, Enum.join([notification.kind, notification.subject_id, notification.created_at], ":")}
+    {:ok, Enum.join([
+      notification.kind,
+      notification.subject_id,
+      notification.created_at,
+      notification.originating_user_id,
+    ], ":")}
   end
 end

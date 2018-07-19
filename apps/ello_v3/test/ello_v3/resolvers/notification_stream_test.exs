@@ -205,6 +205,7 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
       status
       category { ...categorySummary }
       post { ...postSummary repostedSource { ...postSummary } }
+      featuredBy { ...authorSummary }
     }
 
     fragment categoryUserSummary on CategoryUser {
@@ -324,6 +325,7 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     assert n6["subjectType"] == "CategoryPost"
     assert n6["subject"]["id"]
     assert n6["subject"]["category"]["name"]
+    assert n6["subject"]["featuredBy"]["username"]
     assert n6["originatingUser"]["username"]
 
     assert n7["subjectType"] == "Love"

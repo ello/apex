@@ -57,7 +57,7 @@ defmodule Ello.Notifications.Stream.Loader do
   }
   @love_preloads %{post: @post_preloads, user: @user_preloads}
   @category_user_preloads %{user: @user_preloads, category: %{}}
-  @category_post_preloads %{post: @post_preloads, category: %{}}
+  @category_post_preloads %{post: @post_preloads, category: %{}, featured_by: @user_preloads}
   @artist_invite_submission_preloads %{post: @post_preloads, artist_invite: %{}}
   @watch_preloads %{post: @post_preloads}
 
