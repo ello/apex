@@ -9,9 +9,17 @@ defmodule Ello.Events.MarkNotificationsAsRead do
   def args(struct) do
     [
       %{
-        user: struct.user_id,
-        last_notification_time: struct.last_notification_time,
+        user: %{active_record: %{id: struct.user_id, class: "User"}},
+        last_notification_time: parse_last_notification_time(struct),
       }
     ]
   end
+
+  defp parse_last_notification_time(%{last_notification_time: time}) when is_binary(time) do
+    case DateTime.from_iso8601(time) do
+      {:ok, dt, _} -> DateTime.to_unix(dt)
+      _ -> 0
+    end
+  end
+  defp parse_last_notification_time(%{last_notification_time: time}), do: time
 end
