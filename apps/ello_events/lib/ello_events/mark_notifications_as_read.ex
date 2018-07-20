@@ -6,9 +6,10 @@ defmodule Ello.Events.MarkNotificationsAsRead do
     last_notification_time: 0,
   ]
 
-  def args(map) do
+  def args(struct) do
     [
-      Map.from_struct(map),
+      user: struct.user_id,
+      last_notification_time: struct.last_notification_time,
     ]
   end
 end
