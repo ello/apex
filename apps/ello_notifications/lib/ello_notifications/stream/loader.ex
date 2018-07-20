@@ -16,6 +16,7 @@ defmodule Ello.Notifications.Stream.Loader do
 
   defp build_items(%{__response: json} = stream) do
     items = Enum.map json, fn (j) ->
+      IO.inspect(j["kind"])
       %Item{
         user_id: j["user_id"],
         kind: j["kind"],
@@ -87,6 +88,7 @@ defmodule Ello.Notifications.Stream.Loader do
     comment_notification
     comment_on_repost_notification
     comment_on_original_post_notification
+    watch_comment_notification
   )
   defp subject_type(%{subject_type: "Post", kind: kind}) when kind in @comment_kinds, do: "Comment"
   defp subject_type(%{subject_type: type}), do: type
