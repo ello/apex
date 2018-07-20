@@ -111,10 +111,6 @@ defmodule Ello.V3.Schema.ContentTypes do
     do: {:ok, summary}
   defp post_summary(_, %{source: %{rendered_summary: post_summary}}),
     do: {:ok, post_summary}
-  defp post_summary(_, %{source: source}) do
-    IO.inspect(source)
-    {:ok, "<p>debugging</p>"}
-  end
 
   defp post_content(_, %{source: %{rendered_content: post_content}}),
     do: {:ok, post_content}

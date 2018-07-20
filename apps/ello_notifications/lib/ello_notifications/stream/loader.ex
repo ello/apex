@@ -16,7 +16,6 @@ defmodule Ello.Notifications.Stream.Loader do
 
   defp build_items(%{__response: json} = stream) do
     items = Enum.map json, fn (j) ->
-      IO.inspect(j["kind"])
       %Item{
         user_id: j["user_id"],
         kind: j["kind"],
