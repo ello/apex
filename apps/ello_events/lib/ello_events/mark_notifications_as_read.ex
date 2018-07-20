@@ -8,8 +8,10 @@ defmodule Ello.Events.MarkNotificationsAsRead do
 
   def args(struct) do
     [
-      user: struct.user_id,
-      last_notification_time: struct.last_notification_time,
+      %{
+        user: struct.user_id,
+        last_notification_time: struct.last_notification_time,
+      }
     ]
   end
 end
