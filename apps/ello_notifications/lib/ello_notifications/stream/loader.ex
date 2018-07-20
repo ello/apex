@@ -60,7 +60,7 @@ defmodule Ello.Notifications.Stream.Loader do
   @category_user_preloads %{user: @user_preloads, category: %{}}
   @category_post_preloads %{post: @post_preloads, category: %{}, featured_by: @user_preloads}
   @artist_invite_submission_preloads %{post: @post_preloads, artist_invite: %{}}
-  @watch_preloads %{post: @post_preloads}
+  @watch_preloads %{post: @post_preloads, user: @user_preloads}
 
   defp preload_orignating_users(stream) do
     Enum.reduce(Network.users(%{

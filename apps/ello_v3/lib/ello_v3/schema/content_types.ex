@@ -105,6 +105,7 @@ defmodule Ello.V3.Schema.ContentTypes do
   object :watch do
     field :id, :id
     field :post, :post
+    field :user, :user
   end
 
   defp post_summary(_, %{source: %{reposted_source: %{rendered_summary: summary}}}),

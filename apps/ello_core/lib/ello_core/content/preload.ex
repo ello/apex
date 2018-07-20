@@ -79,10 +79,22 @@ defmodule Ello.Core.Content.Preload do
 
   def watches_list(nil, _), do: nil
   def watches_list([], _), do: []
-  def watches_list(watches, %{preloads: %{post: post_preloads}} = options) do
-    Repo.preload(watches, post: &Content.posts(Map.merge(options, %{ids: &1, preloads: post_preloads})))
+  def watches_list(watches, %{preloads: preloads} = options) do
+    preloads = []
+               |> add_watch_user_preload(preloads[:user], options)
+               |> add_watch_post_preload(preloads[:post], options)
+    Repo.preload(watches, preloads)
   end
   def watches_list(watches, _), do: watches
+
+  def add_watch_user_preload(preloads, nil, _), do: preloads
+  def add_watch_user_preload(preloads, user_preloads, options) do
+    [{:user, &Network.users(Map.merge(options, %{ids: &1, preloads: user_preloads}))} | preloads]
+  end
+  def add_watch_post_preload(preloads, nil, _), do: preloads
+  def add_watch_post_preload(preloads, post_preloads, options) do
+    [{:post, &Content.posts(Map.merge(options, %{ids: &1, preloads: post_preloads}))} | preloads]
+  end
 
   defp post_and_repost_preloads(posts, options) do
     posts

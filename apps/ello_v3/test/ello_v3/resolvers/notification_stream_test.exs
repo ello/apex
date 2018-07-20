@@ -241,6 +241,7 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     fragment watchSummary on Watch {
       id
       post { ...postSummary repostedSource { ...postSummary } }
+      user { ...authorSummary }
     }
 
     query($perPage: Int, $before: String, $category: NotificationCategory) {
@@ -303,6 +304,8 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     assert n0["subject"]["id"]
     assert n0["subject"]["post"]["token"]
     assert n0["subject"]["post"]["author"]["username"]
+    assert n0["subject"]["user"]["id"]
+    assert n0["subject"]["user"]["username"]
     assert n0["originatingUser"]["username"]
 
     assert n1["id"]
