@@ -1,6 +1,7 @@
 defmodule Ello.V3.Resolvers.NotificationStreamTest do
   use Ello.V3.Case, async: false
   alias Ello.Notifications.Stream
+  alias Ello.Core.Redis
 
   setup do
     # Test against real service
@@ -143,6 +144,14 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
         isLastPage
         next
         notifications { kind subjectId subjectType createdAt }
+      }
+    }
+  """
+
+  @new_content_query """
+    query {
+      newNotificationStreamContent {
+        newContent
       }
     }
   """
@@ -384,5 +393,34 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     assert n10["subject"]["author"]
     assert n10["subject"]["author"]["username"]
     assert n10["originatingUser"]["username"]
+  end
+
+  test "checking for new notifications - no last read", %{
+    user: user,
+  } do
+    Redis.command(["DEL", "user:#{user.id}:last_read_notification_time"])
+    resp = post_graphql(%{query: @new_content_query, variables: %{}}, user)
+    assert %{"data" => %{"newNotificationStreamContent" => json}} = json_response(resp)
+    assert %{"newContent" => true} = json
+  end
+
+  test "checking for new notifications - have read last notification", %{
+    user: user,
+  } do
+    Redis.command(["SET", "user:#{user.id}:last_read_notification_time", 100_000])
+    resp = post_graphql(%{query: @new_content_query, variables: %{}}, user)
+    Redis.command(["DEL", "user:#{user.id}:last_read_notification_time"])
+    assert %{"data" => %{"newNotificationStreamContent" => json}} = json_response(resp)
+    assert %{"newContent" => false} = json
+  end
+
+  test "checking for new notifications - have not read last notification", %{
+    user: user,
+  } do
+    Redis.command(["SET", "user:#{user.id}:last_read_notification_time", 100])
+    resp = post_graphql(%{query: @new_content_query, variables: %{}}, user)
+    Redis.command(["DEL", "user:#{user.id}:last_read_notification_time"])
+    assert %{"data" => %{"newNotificationStreamContent" => json}} = json_response(resp)
+    assert %{"newContent" => true} = json
   end
 end

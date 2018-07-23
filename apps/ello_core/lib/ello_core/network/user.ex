@@ -110,6 +110,14 @@ defmodule Ello.Core.Network.User do
     |> MapSet.new
   end
 
+  def last_read_notification_time(%__MODULE__{id: id}) do
+    {:ok, last} = Redis.command(["GET", "user:#{id}:last_read_notification_time"], name: :last_read_notification_time)
+    case last do
+      nil -> nil
+      int -> String.to_integer(int)
+    end
+  end
+
   def seo_description(%{formatted_short_bio: nil} = user),
     do: default_description(user)
   def seo_description(user) do

@@ -148,6 +148,12 @@ defmodule Ello.V3.Schema do
       arg :per_page, :integer, default_value: 10
       arg :category, :notification_category, default_value: :all
     end
+
+    @desc "Is there any new content since the provided datetime."
+    field :new_notification_stream_content, :new_content do
+      middleware Middleware.RequireCurrentUser
+      resolve &Resolvers.NotificationStream.new_content/3
+    end
   end
 
   @doc """
