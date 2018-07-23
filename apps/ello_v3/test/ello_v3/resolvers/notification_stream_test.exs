@@ -262,7 +262,6 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
           kind
           subjectType
           createdAt
-          originatingUser { ...authorSummary }
           subject {
             __typename
             ... on Post { ...postSummary repostedSource { ...postSummary } }
@@ -315,19 +314,16 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     assert n0["subject"]["post"]["author"]["username"]
     assert n0["subject"]["user"]["id"]
     assert n0["subject"]["user"]["username"]
-    assert n0["originatingUser"]["username"]
 
     assert n1["id"]
     assert n1["subjectType"] == "CategoryUser"
     assert n1["subject"]["id"]
     assert n1["subject"]["role"]
     assert n1["subject"]["category"]["name"]
-    assert n1["originatingUser"]["username"]
 
     assert n2["subjectType"] == "User"
     assert n2["subject"]["id"]
     assert n2["subject"]["username"]
-    assert n2["originatingUser"]["username"]
 
     assert n3["kind"] == "comment_on_repost_notification"
     assert n3["subjectType"] == "Post"
@@ -338,7 +334,6 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     assert n3["subject"]["parentPost"]["token"]
     assert n3["subject"]["parentPost"]["author"]["id"]
     assert n3["subject"]["parentPost"]["author"]["username"]
-    assert n3["originatingUser"]["username"]
 
     assert n4["kind"] == "comment_notification"
     assert n4["subjectType"] == "Post"
@@ -349,19 +344,16 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     assert n4["subject"]["parentPost"]["token"]
     assert n4["subject"]["parentPost"]["author"]["id"]
     assert n4["subject"]["parentPost"]["author"]["username"]
-    assert n4["originatingUser"]["username"]
 
     assert n5["subjectType"] == "ArtistInviteSubmission"
     assert n5["subject"]["id"]
     assert n5["subject"]["artistInvite"]["id"]
     assert n5["subject"]["artistInvite"]["title"]
-    assert n5["originatingUser"]["username"]
 
     assert n6["subjectType"] == "CategoryPost"
     assert n6["subject"]["id"]
     assert n6["subject"]["category"]["name"]
     assert n6["subject"]["featuredBy"]["username"]
-    assert n6["originatingUser"]["username"]
 
     assert n7["subjectType"] == "Love"
     assert n7["subject"]["id"]
@@ -369,14 +361,12 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     assert n7["subject"]["post"]["token"]
     assert n7["subject"]["post"]["author"]
     assert n7["subject"]["post"]["author"]["username"]
-    assert n7["originatingUser"]["username"]
 
     assert n8["subjectType"] == "Post"
     assert n8["subject"]["id"]
     assert n8["subject"]["token"]
     assert n8["subject"]["author"]
     assert n8["subject"]["author"]["username"]
-    assert n8["originatingUser"]["username"]
 
     assert n9["subjectType"] == "Love"
     assert n9["subject"]["id"]
@@ -384,7 +374,6 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     assert n9["subject"]["post"]["token"]
     assert n9["subject"]["post"]["author"]
     assert n9["subject"]["post"]["author"]["username"]
-    assert n9["originatingUser"]["username"]
 
     assert n10["subjectType"] == "Post"
     assert n10["subject"]["id"]
@@ -392,7 +381,6 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     assert n10["subject"]["token"]
     assert n10["subject"]["author"]
     assert n10["subject"]["author"]["username"]
-    assert n10["originatingUser"]["username"]
   end
 
   test "checking for new notifications - no last read", %{

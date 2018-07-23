@@ -32,11 +32,9 @@ defmodule Ello.Notifications.Stream.Loader do
   defp load_related(%{preload: false} = stream), do: stream
   defp load_related(%{models: items, preload: true} = stream) do
     subjects = preload_subjects(stream)
-    users = preload_orignating_users(stream)
 
     loaded = Enum.map(items, &Map.merge(&1, %{
       subject: subjects[subject_type(&1)][&1.subject_id],
-      originating_user: users[&1.originating_user_id],
     }))
 
     %{stream | models: loaded}
@@ -62,14 +60,6 @@ defmodule Ello.Notifications.Stream.Loader do
   @artist_invite_submission_preloads %{post: @post_preloads, artist_invite: %{}}
   @watch_preloads %{post: @post_preloads, user: @user_preloads}
 
-  defp preload_orignating_users(stream) do
-    Enum.reduce(Network.users(%{
-      ids: Enum.map(stream.models, &(&1.originating_user_id)),
-      current_user: stream.current_user,
-      preloads: @user_preloads,
-    }), %{}, &Map.put(&2, &1.id, &1))
-  end
-
   defp preload_subjects(stream) do
     stream.models
     |> Enum.group_by(&subject_type/1)
@@ -79,7 +69,6 @@ defmodule Ello.Notifications.Stream.Loader do
       Map.put(loaded, type, Enum.reduce(models, %{}, &Map.put(&2, &1.id, &1)))
     end)
   end
-
 
   # Comments have subject_type Post, but should be loaded as comments with the parent post.
   @comment_kinds ~w(

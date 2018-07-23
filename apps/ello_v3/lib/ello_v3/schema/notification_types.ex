@@ -33,7 +33,6 @@ defmodule Ello.V3.Schema.NotificationTypes do
     field :subject_id, :id
     field :subject_type, :string
     field :subject, :notification_subject
-    field :originating_user, :user
     field :created_at, :string
   end
 
