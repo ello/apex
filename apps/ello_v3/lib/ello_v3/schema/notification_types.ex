@@ -31,7 +31,7 @@ defmodule Ello.V3.Schema.NotificationTypes do
     field :id, :id, resolve: &notification_id/2
     field :kind, :string
     field :subject_id, :id
-    field :subject_type, :string
+    field :subject_type, :string, resolve: &notification_subject_type/2
     field :subject, :notification_subject
     field :created_at, :string
   end
@@ -67,4 +67,12 @@ defmodule Ello.V3.Schema.NotificationTypes do
       notification.originating_user_id,
     ], ":")}
   end
+
+  # override because it's a comment
+  defp notification_subject_type(_, %{
+    source: %{subject: %Post{parent_post_id: post_id}}
+  }) when not is_nil(post_id) do
+    {:ok, "Comment"}
+  end
+  defp notification_subject_type(_, %{source: notification}), do: {:ok, notification.subject_type}
 end

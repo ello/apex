@@ -263,7 +263,6 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
           subjectType
           createdAt
           subject {
-            __typename
             ... on Post { ...postSummary repostedSource { ...postSummary } }
             ... on Comment { ...commentSummary parentPost { ...postSummary } }
             ... on User { ...authorSummary }
@@ -326,8 +325,7 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     assert n2["subject"]["username"]
 
     assert n3["kind"] == "comment_on_repost_notification"
-    assert n3["subjectType"] == "Post"
-    assert n3["subject"]["__typename"] == "Comment"
+    assert n3["subjectType"] == "Comment"
     assert n3["subject"]["id"]
     assert n3["subject"]["content"]
     assert n3["subject"]["parentPost"]["id"]
@@ -336,8 +334,7 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     assert n3["subject"]["parentPost"]["author"]["username"]
 
     assert n4["kind"] == "comment_notification"
-    assert n4["subjectType"] == "Post"
-    assert n3["subject"]["__typename"] == "Comment"
+    assert n4["subjectType"] == "Comment"
     assert n4["subject"]["id"]
     assert n4["subject"]["content"]
     assert n4["subject"]["parentPost"]["id"]
