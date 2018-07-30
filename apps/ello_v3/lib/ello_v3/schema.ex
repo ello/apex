@@ -122,6 +122,16 @@ defmodule Ello.V3.Schema do
       arg :id, :id, description: "Find user by id"
     end
 
+    @desc "Find a list of users that are following/followed by the given user"
+    field :user_network_stream, :user_stream do
+      resolve &Resolvers.UserNetworkStream.call/3
+      arg :username, :string, description: "Find user relationships for username"
+      arg :id, :id, description: "Find user relationships for user id"
+      arg :kind, :relationship_kind, description: "Type of relationships to find"
+      arg :before, :string, description: "Pagination cursor, returned by previous page"
+      arg :per_page, :integer, default_value: 10
+    end
+
     @desc "Returns a list of comments"
     field :comment_stream, :comment_stream do
       resolve &Resolvers.CommentStream.call/3
