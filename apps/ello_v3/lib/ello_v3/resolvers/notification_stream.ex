@@ -1,5 +1,6 @@
 defmodule Ello.V3.Resolvers.NotificationStream do
   import Ello.V3.Resolvers.PostViewHelpers
+  import Ello.V3.Resolvers.PaginationHelpers
   alias Ello.Notifications.Stream
   alias Ello.Events.MarkNotificationsAsRead
   alias Ello.Core.Network.User
@@ -11,7 +12,7 @@ defmodule Ello.V3.Resolvers.NotificationStream do
 
     {:ok, %{
       notifications: track(stream.models, args, kind: :notifications),
-      is_last_page: length(stream.models) < args.per_page,
+      is_last_page: is_last_page(args, stream.models),
       next: stream.next,
     }}
   end

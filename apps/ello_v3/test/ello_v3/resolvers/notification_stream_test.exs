@@ -133,6 +133,16 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
       originating_user_id: watch.user_id,
     })
 
+    # Notification with non-existant (deleted) subject
+    assert :ok = Stream.create(%{
+      user_id: user.id,
+      subject_id: 0,
+      subject_type: "Post",
+      kind: "post_mention_notification",
+      created_at: DateTime.from_unix!(12_000),
+      originating_user_id: author.id,
+    })
+
     {:ok, %{
       user: user,
     }}
@@ -280,7 +290,7 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
   test "getting paginated notifications - no subjects", %{
     user: user,
   } do
-    resp = post_graphql(%{query: @basic_query, variables: %{perPage: 2}}, user)
+    resp = post_graphql(%{query: @basic_query, variables: %{perPage: 3}}, user)
     assert %{"data" => %{"notificationStream" => json}} = json_response(resp)
     assert %{"notifications" => notifications, "isLastPage" => false, "next" => next} = json
     assert [_n1, n2] = notifications

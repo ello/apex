@@ -12,6 +12,7 @@ defmodule Ello.Notifications.Stream.Loader do
     stream
     |> build_items
     |> load_related
+    |> filter_missing
   end
 
   defp build_items(%{__response: json} = stream) do
@@ -38,6 +39,11 @@ defmodule Ello.Notifications.Stream.Loader do
     }))
 
     %{stream | models: loaded}
+  end
+
+  defp filter_missing(%{preload: false} = stream), do: stream
+  defp filter_missing(%{models: items} = stream) do
+    %{stream | models: Enum.reject(items, &(is_nil(&1.subject)))}
   end
 
   @user_preloads %{current_user_state: %{}}
