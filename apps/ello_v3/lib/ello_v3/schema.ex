@@ -9,6 +9,7 @@ defmodule Ello.V3.Schema do
   import_types __MODULE__.NetworkTypes
   import_types __MODULE__.AssetTypes
   import_types __MODULE__.ContestTypes
+  import_types __MODULE__.NotificationTypes
 
   query do
     @desc "Get a post by username and token"
@@ -137,6 +138,21 @@ defmodule Ello.V3.Schema do
       arg :username, non_null(:string)
       arg :before, :string, description: "Pagination cursor, returned by previous page"
       arg :per_page, :integer, default_value: 10
+    end
+
+    @desc "Stream of a user's notifications"
+    field :notification_stream, :notification_stream do
+      middleware Middleware.RequireCurrentUser
+      resolve &Resolvers.NotificationStream.call/3
+      arg :before, :string, description: "Pagination cursor, returned by previous page"
+      arg :per_page, :integer, default_value: 10
+      arg :category, :notification_category, default_value: :all
+    end
+
+    @desc "Is there any new content since the provided datetime."
+    field :new_notification_stream_content, :new_content do
+      middleware Middleware.RequireCurrentUser
+      resolve &Resolvers.NotificationStream.new_content/3
     end
 
     @desc "Search users"

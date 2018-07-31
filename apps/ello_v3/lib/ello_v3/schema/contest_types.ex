@@ -11,6 +11,7 @@ defmodule Ello.V3.Schema.ContestTypes do
     field :id, :id
     field :status, :string, resolve: &submission_status/2
     field :artist_invite, :artist_invite
+    field :post, :post
     field :actions, :artist_invite_submission_actions, resolve: &actions/2
   end
 
