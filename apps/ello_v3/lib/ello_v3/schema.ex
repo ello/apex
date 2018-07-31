@@ -154,6 +154,14 @@ defmodule Ello.V3.Schema do
       middleware Middleware.RequireCurrentUser
       resolve &Resolvers.NotificationStream.new_content/3
     end
+
+    @desc "Search users"
+    field :search_users, :user_stream do
+      resolve &Resolvers.SearchUsers.call/3
+      arg :query, :string
+      arg :username, :boolean, default_value: true, description: "Search by username only"
+      arg :per_page, :integer, default_value: 10
+    end
   end
 
   @doc """
