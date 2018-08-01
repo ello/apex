@@ -103,8 +103,20 @@ defmodule Ello.Core.Network.User do
     |> MapSet.new
   end
 
+  def silenced_and_inverse_blocked_ids(%__MODULE__{} = user, limit \\ 5000) do
+    full_set = MapSet.union(silenced_ids(user), inverse_blocked_ids(user))
+    Enum.take(full_set, limit)
+  end
+
   defp inverse_blocked_ids(%__MODULE__{id: id}) do
     {:ok, ids} = Redis.command(["SMEMBERS", "user:#{id}:inverse_block_id_cache"], name: :inverse_blocked_ids)
+    ids
+    |> Enum.map(&String.to_integer/1)
+    |> MapSet.new
+  end
+
+  defp silenced_ids(%__MODULE__{id: id}) do
+    {:ok, ids} = Redis.command(["SMEMBERS", "user:#{id}:silence_id_cache"], name: :silenced_ids)
     ids
     |> Enum.map(&String.to_integer/1)
     |> MapSet.new

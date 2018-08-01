@@ -1,5 +1,6 @@
 defmodule Ello.Notifications.Stream.Client.HTTP do
   use HTTPoison.Base
+  alias Ello.Core.Network.User
   alias Ello.Notifications.Stream.{
     Client,
     Item,
@@ -43,12 +44,15 @@ defmodule Ello.Notifications.Stream.Client.HTTP do
   defp user_path(user_id), do: "/api/v1/users/#{user_id}/notifications"
 
   defp to_params(stream) do
+    exclude = stream.current_user
+              |> User.silenced_and_inverse_blocked_ids(500)
+              |> Enum.join(",")
     %{
       user_id: stream.current_user.id,
       limit: stream.per_page,
       before: stream.before,
       category: stream.category,
-      exclude_originating_user_ids: Enum.join(stream.current_user.all_blocked_ids, ","),
+      exclude_originating_user_ids: exclude,
     }
   end
 
