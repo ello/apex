@@ -21,5 +21,8 @@ defmodule Ello.Events.MarkNotificationsAsRead do
       _ -> 0
     end
   end
+  defp parse_last_notification_time(%{last_notification_time: %DateTime{} = time}) do
+    DateTime.to_unix(time)
+  end
   defp parse_last_notification_time(%{last_notification_time: time}), do: time
 end
