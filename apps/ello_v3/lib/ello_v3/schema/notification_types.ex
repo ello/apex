@@ -33,7 +33,7 @@ defmodule Ello.V3.Schema.NotificationTypes do
     field :subject_id, :id
     field :subject_type, :string, resolve: &notification_subject_type/2
     field :subject, :notification_subject
-    field :created_at, :string
+    field :created_at, :datetime
   end
 
   union :notification_subject do

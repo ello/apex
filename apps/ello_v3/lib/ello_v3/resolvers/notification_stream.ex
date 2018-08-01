@@ -19,9 +19,8 @@ defmodule Ello.V3.Resolvers.NotificationStream do
 
   def new_content(_parent, %{current_user: current_user} = args, _resolution) do
     with stream <- Stream.fetch(Map.merge(args, %{preload: false, per_page: 1})),
-         %{models: [%{created_at: newest} | _]} <- stream,
+         %{models: [%{created_at: newest_dt} | _]} <- stream,
          last_read when is_number(last_read) <- User.last_read_notification_time(current_user),
-         {:ok, newest_dt, _} <- DateTime.from_iso8601(newest),
          {:ok, last_read_dt} <- DateTime.from_unix(last_read),
          1 <- Timex.compare(newest_dt, last_read_dt, :seconds) do
       {:ok, %{new_content: true}}

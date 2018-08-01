@@ -22,13 +22,25 @@ defmodule Ello.Notifications.Stream.Loader do
         kind: j["kind"],
         subject_id: j["subject_id"],
         subject_type: j["subject_type"],
-        created_at: j["created_at"],
+        created_at: parse_created_at(j["created_at"]),
         originating_user_id: j["originating_user_id"],
       }
     end
 
     Map.put(stream, :models, items)
   end
+
+  defp parse_created_at(created_at) when is_binary(created_at) do
+    # Example string: 2018-06-12T10:21:37.000000000+0000
+    case Timex.parse(created_at, "{YYYY}-{M}-{D}T{h24}:{m}:{s}.{ss}{Z}") do
+      {:ok, dt} -> dt
+      {:error, _} ->
+        # In case we actually get iso format (like from the test client)
+        {:ok, dt, _} = DateTime.from_iso8601(created_at)
+        dt
+    end
+  end
+  defp parse_created_at(created_at), do: created_at
 
   defp load_related(%{preload: false} = stream), do: stream
   defp load_related(%{models: items, preload: true} = stream) do

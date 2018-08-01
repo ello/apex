@@ -57,6 +57,6 @@ defmodule Ello.Notifications.Stream do
 
   defp set_next(%{models: []} = stream), do: stream
   defp set_next(%{models: models} = stream) do
-    %{stream | next: List.last(models).created_at}
+    %{stream | next: DateTime.to_iso8601(List.last(models).created_at)}
   end
 end
