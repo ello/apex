@@ -33,6 +33,7 @@ defmodule Ello.Notifications.Mixfile do
     [
       {:httpoison, "~> 1.0"},
       {:jason, "~> 1.0"},
+      {:timex, "~> 3.0"},
 
       {:ello_core, in_umbrella: true},
     ]
