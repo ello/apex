@@ -8,7 +8,10 @@ defmodule Ello.V3.Resolvers.NotificationStream do
   def call(_parent, args, _resolver) do
     stream = Stream.fetch(args)
 
-    if !args.before, do: mark_notifications_as_read(args, hd(stream.models))
+    with %{before: b4} when b4 in [nil, ""] <- args,
+         [newest | _] <- stream.models do
+      mark_notifications_as_read(args, newest)
+    end
 
     {:ok, %{
       notifications: track(stream.models, args, kind: :notifications),

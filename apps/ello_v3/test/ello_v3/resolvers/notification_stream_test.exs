@@ -287,6 +287,13 @@ defmodule Ello.V3.Resolvers.NotificationStreamTest do
     }
   """
 
+  test "getting notifications - no notifications" do
+    user = Factory.insert(:user)
+    resp = post_graphql(%{query: @basic_query, variables: %{perPage: 3}}, user)
+    assert %{"data" => %{"notificationStream" => json}} = json_response(resp)
+    assert %{"notifications" => [], "isLastPage" => true, "next" => nil} = json
+  end
+
   test "getting paginated notifications - no subjects", %{
     user: user,
   } do
