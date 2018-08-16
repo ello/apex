@@ -149,6 +149,12 @@ defmodule Ello.V3.Schema do
       arg :category, :notification_category, default_value: :all
     end
 
+    @desc "Current user profile"
+    field :profile, :profile do
+      middleware Middleware.RequireCurrentUser
+      resolve &Resolvers.Profile.call/3
+    end
+
     @desc "Is there any new content since the provided datetime."
     field :new_notification_stream_content, :new_content do
       middleware Middleware.RequireCurrentUser
