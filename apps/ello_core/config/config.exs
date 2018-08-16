@@ -20,3 +20,7 @@ config :ello_core,
   pg_statement_timeout: (System.get_env("PG_STATEMENT_TIMEOUT") || "1min")
 
 import_config "#{Mix.env}.exs"
+
+if File.exists?("config/config.local.exs") || File.exists?("../../config/config.local.exs") do
+  import_config "config.local.exs"
+end
