@@ -32,6 +32,7 @@ defmodule Ello.Core.Network.User do
     field :bad_for_seo?, :boolean, default: true
     field :badges, {:array, :string}, default: []
     field :followed_category_ids, {:array, :integer}, default: []
+    field :web_onboarding_version, :string
 
     field :locked_at, :utc_datetime
     field :locked_reason, :string

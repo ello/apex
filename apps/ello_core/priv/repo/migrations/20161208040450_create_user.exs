@@ -29,6 +29,7 @@ defmodule Ello.Repo.Migrations.CreateUser do
       add :bad_for_seo?, :boolean, default: true
       add :category_ids, {:array, :integer}
       add :followed_category_ids, {:array, :integer}
+      add :web_onboarding_version, :string
 
       add :is_community, :boolean
       add :badges, {:array, :string}
@@ -59,7 +60,6 @@ defmodule Ello.Repo.Migrations.CreateUser do
       # t.string   "unlock_token",                   limit: 255
       # t.datetime "last_bounced_from_sendgrid_at"
       # t.datetime "last_bounced_from_mailchimp_at"
-      # t.string   "web_onboarding_version",         limit: 255
     end
   end
 end
