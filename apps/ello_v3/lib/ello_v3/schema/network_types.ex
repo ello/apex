@@ -85,7 +85,7 @@ defmodule Ello.V3.Schema.NetworkTypes do
   defp experimental_features(_, _), do: {:ok, false}
 
 
-  def user_meta(_, %{source: user}) do
+  defp user_meta(_, %{source: user}) do
     {:ok, %{
       title: User.title(user),
       robots: User.robots(user),
