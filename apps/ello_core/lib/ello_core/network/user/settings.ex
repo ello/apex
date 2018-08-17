@@ -23,6 +23,7 @@ defmodule Ello.Core.Network.User.Settings do
     field :has_reposting_enabled, :boolean, default: true
     field :has_ad_notifications_enabled, :boolean, default: false
     field :has_auto_watch_enabled, :boolean, default: true
+    field :has_announcements_enabled, :boolean, default: true
 
     # email notification
     field :notify_of_mentions_via_email, :boolean, default: true
@@ -44,6 +45,12 @@ defmodule Ello.Core.Network.User.Settings do
     field :notify_of_reposts_via_push, :boolean, default: true
     field :notify_of_watches_via_push, :boolean, default: true
     field :notify_of_announcements_via_push, :boolean, default: true
+    field :notify_of_approved_submissions_from_following_via_email, :boolean, default: true
+    field :notify_of_approved_submissions_via_push, :boolean, default: true
+    field :notify_of_featured_category_post_via_email, :boolean, default: true
+    field :notify_of_featured_category_post_via_push, :boolean, default: true
+    field :notify_of_approved_submissions_from_following_via_push, :boolean, default: true
+    field :notify_of_what_you_missed_via_email, :boolean, default: true
 
     # misc
     field :allows_analytics, :boolean, default: true

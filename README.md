@@ -18,6 +18,11 @@ You can check out all of Ello's OSS on [Ello's github profile](https://github.co
 and our philosophy on OSS is written up in @jayzes's
 [blog post](https://ello.co/jayzes/post/tqll-z8u8gfbdysrk6wbkg).
 
+## Docker
+
+The docker file to run all the services for Apex is in Mothership.  The docker
+file in Apex just runs Apex.
+
 ## Organization
 
 Apex, (module name `Ello`) is an Elixir Umbrella application wrapping several
@@ -58,7 +63,7 @@ streams.  [README](/apps/ello_stream/)
 
 To learn more
 about how we handle and serve time ordered streams check out or Go and Roshi
-based 
+based
 
 ### `Ello.Search`
 
