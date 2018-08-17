@@ -121,6 +121,18 @@ defmodule Ello.V3.Schema.NetworkTypes do
     field :relationship_priority, :string, resolve: &relationship_priority/2
   end
 
+  enum :relationship_kind do
+    value :following
+    value :followers
+  end
+
+  object :user_stream do
+    field :users, list_of(:user)
+    field :next, :string
+    field :per_page, :integer
+    field :is_last_page, :boolean
+  end
+
   defp relationship_priority(_, %{source: %{id: id}, context: %{current_user: %{id: id}}}), do: {:ok, "self"}
   defp relationship_priority(_, %{source: %{relationship_to_current_user: nil}}), do: {:ok, nil}
   defp relationship_priority(_, %{source: %{relationship_to_current_user: %{priority: p}}}), do: {:ok, p}
