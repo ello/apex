@@ -140,9 +140,8 @@ defmodule Ello.V3.Schema.NetworkTypes do
     }}
   end
 
-  defp user_profile(_, %{source: user, definition: %{name: name}}) do
-    key = String.to_existing_atom(name)
-    {:ok, Map.get(user.settings, key)}
+  defp user_profile(_, %{source: user, definition: %{schema_node: %{identifier: name}}}) do
+    {:ok, Map.get(user.settings, name)}
   end
 
   defp image(user) do
