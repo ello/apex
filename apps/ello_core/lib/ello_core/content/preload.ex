@@ -77,6 +77,25 @@ defmodule Ello.Core.Content.Preload do
     love_list(loves, Map.put(options, :preloads, @love_default_preloads))
   end
 
+  def watches_list(nil, _), do: nil
+  def watches_list([], _), do: []
+  def watches_list(watches, %{preloads: preloads} = options) do
+    preloads = []
+               |> add_watch_user_preload(preloads[:user], options)
+               |> add_watch_post_preload(preloads[:post], options)
+    Repo.preload(watches, preloads)
+  end
+  def watches_list(watches, _), do: watches
+
+  def add_watch_user_preload(preloads, nil, _), do: preloads
+  def add_watch_user_preload(preloads, user_preloads, options) do
+    [{:user, &Network.users(Map.merge(options, %{ids: &1, preloads: user_preloads}))} | preloads]
+  end
+  def add_watch_post_preload(preloads, nil, _), do: preloads
+  def add_watch_post_preload(preloads, post_preloads, options) do
+    [{:post, &Content.posts(Map.merge(options, %{ids: &1, preloads: post_preloads}))} | preloads]
+  end
+
   defp post_and_repost_preloads(posts, options) do
     posts
     |> prefetch_ecto_preloads(options)
@@ -132,7 +151,7 @@ defmodule Ello.Core.Content.Preload do
   defp add_post_preload(preloads, _), do: preloads
 
   defp add_category_preload(preloads, %{category_posts: cp_preloads}),
-    do: [{:category_posts, &Discovery.category_posts(%{ids: &1, preloads: cp_preloads})} | preloads]
+    do: [{:category_posts, &Discovery.category_posts(%{post_ids: &1, preloads: cp_preloads})} | preloads]
   defp add_category_preload(preloads, %{categories: _}),
     do: [{:categories, &Discovery.categories(%{ids: &1})} | preloads]
   defp add_category_preload(preloads, _), do: preloads
@@ -154,12 +173,11 @@ defmodule Ello.Core.Content.Preload do
   end
   defp prefetch_reposted_source(post_or_posts, _), do: post_or_posts
 
-  defp prefetch_parent_post(comment_or_comments, %{preloads: %{parent_post: _preloads}}) do
-    Repo.preload comment_or_comments, parent_post: fn(ids) ->
-      Post
-      |> where([p], p.id in ^ids)
-      |> Repo.all
-    end
+  defp prefetch_parent_post(comment_or_comments, %{preloads: %{parent_post: preloads}} = options) do
+    Repo.preload(comment_or_comments, parent_post: &Content.posts(Map.merge(options, %{
+      preloads: preloads,
+      ids: &1,
+    })))
   end
   defp prefetch_parent_post(comment_or_comments, _), do: comment_or_comments
 

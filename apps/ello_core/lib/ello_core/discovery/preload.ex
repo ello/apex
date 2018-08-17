@@ -17,11 +17,12 @@ defmodule Ello.Core.Discovery.Preload do
 
   def category_posts(nil, _), do: nil
   def category_posts([], _),  do: []
-  def category_posts(category_posts, %{preloads: preloads}) do
+  def category_posts(category_posts, %{preloads: preloads} = opts) do
     ecto_preloads = []
                     |> add_category_preload(preloads)
                     |> add_submitted_by_preload(preloads)
                     |> add_featured_by_preload(preloads)
+                    |> add_post_preload(preloads, opts[:current_user])
     Repo.preload(category_posts, ecto_preloads)
   end
 
@@ -152,4 +153,8 @@ defmodule Ello.Core.Discovery.Preload do
   defp add_featured_by_preload(preloads, %{featured_by: user_preloads}),
     do: [{:featured_by, &Network.users(%{ids: &1, preloads: user_preloads})} | preloads]
   defp add_featured_by_preload(preloads, _), do: preloads
+
+  defp add_post_preload(preloads, %{post: post_preloads}, current_user),
+    do: [{:post, &Content.posts(%{ids: &1, preloads: post_preloads, current_user: current_user})} | preloads]
+  defp add_post_preload(preloads, _, _), do: preloads
 end

@@ -32,6 +32,7 @@ defmodule Ello.Core.Network.User do
     field :bad_for_seo?, :boolean, default: true
     field :badges, {:array, :string}, default: []
     field :followed_category_ids, {:array, :integer}, default: []
+    field :web_onboarding_version, :string
 
     field :locked_at, :utc_datetime
     field :locked_reason, :string
@@ -103,11 +104,31 @@ defmodule Ello.Core.Network.User do
     |> MapSet.new
   end
 
+  def silenced_and_inverse_blocked_ids(%__MODULE__{} = user, limit \\ 5000) do
+    full_set = MapSet.union(silenced_ids(user), inverse_blocked_ids(user))
+    Enum.take(full_set, limit)
+  end
+
   defp inverse_blocked_ids(%__MODULE__{id: id}) do
     {:ok, ids} = Redis.command(["SMEMBERS", "user:#{id}:inverse_block_id_cache"], name: :inverse_blocked_ids)
     ids
     |> Enum.map(&String.to_integer/1)
     |> MapSet.new
+  end
+
+  defp silenced_ids(%__MODULE__{id: id}) do
+    {:ok, ids} = Redis.command(["SMEMBERS", "user:#{id}:silence_id_cache"], name: :silenced_ids)
+    ids
+    |> Enum.map(&String.to_integer/1)
+    |> MapSet.new
+  end
+
+  def last_read_notification_time(%__MODULE__{id: id}) do
+    {:ok, last} = Redis.command(["GET", "user:#{id}:last_read_notification_time"], name: :last_read_notification_time)
+    case last do
+      nil -> nil
+      int -> String.to_integer(int)
+    end
   end
 
   def seo_description(%{formatted_short_bio: nil} = user),

@@ -39,6 +39,52 @@ defmodule Ello.V3.Schema.NetworkTypes do
     field :users, list_of(:user)
   end
 
+  object :profile do
+    field :name, :string
+    field :username, :string
+    field :email, :string
+    field :location, :string
+    field :formatted_short_bio, :string
+    field :short_bio, :string
+    field :web_onboarding_version, :string
+    field :allows_analytics, :boolean, resolve: &user_profile/2
+    field :discoverable, :boolean, resolve: &user_profile/2
+    field :has_ad_notifications_enabled, :boolean, resolve: &user_profile/2
+    field :has_announcements_enabled, :boolean, resolve: &user_profile/2
+    field :has_auto_watch_enabled, :boolean, resolve: &user_profile/2
+    field :has_reposting_enabled, :boolean, resolve: &user_profile/2
+    field :has_sharing_enabled, :boolean, resolve: &user_profile/2
+    field :is_collaborateable, :boolean, resolve: &user_profile/2
+    field :is_hireable, :boolean, resolve: &user_profile/2
+    field :notify_of_announcements_via_push, :boolean, resolve: &user_profile/2
+    field :notify_of_approved_submissions_from_following_via_email, :boolean, resolve: &user_profile/2
+    field :notify_of_approved_submissions_via_push, :boolean, resolve: &user_profile/2
+    field :notify_of_featured_category_post_via_email, :boolean, resolve: &user_profile/2
+    field :notify_of_featured_category_post_via_push, :boolean, resolve: &user_profile/2
+    field :notify_of_approved_submissions_from_following_via_push, :boolean, resolve: &user_profile/2
+    field :notify_of_comments_on_post_watch_via_email, :boolean, resolve: &user_profile/2
+    field :notify_of_comments_on_post_watch_via_push, :boolean, resolve: &user_profile/2
+    field :notify_of_comments_via_email, :boolean, resolve: &user_profile/2
+    field :notify_of_comments_via_push, :boolean, resolve: &user_profile/2
+    field :notify_of_invitation_acceptances_via_email, :boolean, resolve: &user_profile/2
+    field :notify_of_invitation_acceptances_via_push, :boolean, resolve: &user_profile/2
+    field :notify_of_loves_via_email, :boolean, resolve: &user_profile/2
+    field :notify_of_loves_via_push, :boolean, resolve: &user_profile/2
+    field :notify_of_mentions_via_email, :boolean, resolve: &user_profile/2
+    field :notify_of_mentions_via_push, :boolean, resolve: &user_profile/2
+    field :notify_of_new_followers_via_email, :boolean, resolve: &user_profile/2
+    field :notify_of_new_followers_via_push, :boolean, resolve: &user_profile/2
+    field :notify_of_reposts_via_email, :boolean, resolve: &user_profile/2
+    field :notify_of_reposts_via_push, :boolean, resolve: &user_profile/2
+    field :notify_of_watches_via_email, :boolean, resolve: &user_profile/2
+    field :notify_of_watches_via_push, :boolean, resolve: &user_profile/2
+    field :notify_of_what_you_missed_via_email, :boolean, resolve: &user_profile/2
+    field :subscribe_to_daily_ello, :boolean, resolve: &user_profile/2
+    field :subscribe_to_onboarding_drip, :boolean, resolve: &user_profile/2
+    field :subscribe_to_users_email_list, :boolean, resolve: &user_profile/2
+    field :subscribe_to_weekly_ello, :boolean, resolve: &user_profile/2
+  end
+
   object :external_link do
     field :icon, :string
     field :type, :string
@@ -97,13 +143,17 @@ defmodule Ello.V3.Schema.NetworkTypes do
   defp experimental_features(_, _), do: {:ok, false}
 
 
-  def user_meta(_, %{source: user}) do
+  defp user_meta(_, %{source: user}) do
     {:ok, %{
       title: User.title(user),
       robots: User.robots(user),
       image: image(user),
       description: User.seo_description(user),
     }}
+  end
+
+  defp user_profile(_, %{source: user, definition: %{schema_node: %{identifier: name}}}) do
+    {:ok, Map.get(user.settings, name)}
   end
 
   defp image(user) do

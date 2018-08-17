@@ -10,6 +10,7 @@ defmodule Ello.Core.Content do
     Preload,
     Post,
     Love,
+    Watch,
   }
 
   @moduledoc """
@@ -140,6 +141,15 @@ defmodule Ello.Core.Content do
   """
   def comments(%{post: %{reposted_source: %Post{} = source}} = options),
     do: comments(Map.put(options, :post, source))
+  def comments(%{ids: ids} = options) do
+    # We don't filter NSFW users from comments
+    options = Map.merge(options, %{allow_nsfw: true, allow_nudity: true})
+    Post
+    |> where([p], p.id in ^ids)
+    |> Repo.all
+    |> Preload.comment_list(options)
+    |> Filter.post_list(options)
+  end
   def comments(options) do
     # We don't filter NSFW users from comments
     options = Map.merge(options, %{allow_nsfw: true, allow_nudity: true})
@@ -189,5 +199,19 @@ defmodule Ello.Core.Content do
     |> Network.paginate(options)
     |> Repo.all
     |> Preload.love_list(options)
+  end
+  def loves(%{ids: ids} = options) do
+    Love
+    |> where([l], l.id in ^ids)
+    |> Filter.loves_query(options)
+    |> Repo.all
+    |> Preload.love_list(options)
+  end
+
+  def watches(%{ids: ids} = options) do
+    Watch
+    |> where([w], w.id in ^ids)
+    |> Repo.all
+    |> Preload.watches_list(options)
   end
 end
