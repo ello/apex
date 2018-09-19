@@ -4,7 +4,7 @@ defmodule Ello.Serve.Webapp.ArtistInviteIndexView do
 
   def render("meta.html", assigns) do
     assigns = assigns
-              |> Map.put(:title, "Artist Invites | Ello")
+              |> Map.put(:title, "Invites | Ello")
               |> Map.put(:description, "Submit your work, get published, and earn $$$.")
               |> Map.put(:robots, "index, follow")
     render_template("meta.html", assigns)
@@ -20,8 +20,8 @@ defmodule Ello.Serve.Webapp.ArtistInviteIndexView do
            |> String.to_integer
            |> (fn(n) -> n + 1 end).()
            |> Integer.to_string
-    webapp_url("artist-invites", page: page)
+    webapp_url("invites", page: page)
   end
   def next_artist_invite_page_url(_),
-    do: webapp_url("artist-invites", page: "2")
+    do: webapp_url("invites", page: "2")
 end
