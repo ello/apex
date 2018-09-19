@@ -25,7 +25,7 @@ defmodule Ello.Serve.Webapp.ArtistInviteShowControllerTest do
   end
 
   @tag :meta
-  test "artist-invites/:slug - meta", %{conn: conn, a_inv1: a_inv1} do
+  test "invites/:slug - meta", %{conn: conn, a_inv1: a_inv1} do
     resp = get(conn, artist_invite_show_path(conn, :show, a_inv1.slug))
     html = html_response(resp, 200)
 
@@ -35,7 +35,7 @@ defmodule Ello.Serve.Webapp.ArtistInviteShowControllerTest do
     assert has_meta(html, name: "robots", content: "index, follow")
   end
 
-  test "artist-invites/:slug - it renders noscript", %{conn: conn, a_inv1: a_inv1, sub1: sub1, sub2: sub2, sub3: sub3} do
+  test "invites/:slug - it renders noscript", %{conn: conn, a_inv1: a_inv1, sub1: sub1, sub2: sub2, sub3: sub3} do
     resp = get(conn, artist_invite_show_path(conn, :show, a_inv1.slug), %{"per_page" => "2"})
     html = html_response(resp, 200)
 
@@ -60,21 +60,21 @@ defmodule Ello.Serve.Webapp.ArtistInviteShowControllerTest do
     assert html2 =~ sub3.post.token
   end
 
-  test "artist-invites/:slug - it renders noscript with selections", %{conn: conn, a_inv2: a_inv2} do
+  test "invites/:slug - it renders noscript with selections", %{conn: conn, a_inv2: a_inv2} do
     resp = get(conn, artist_invite_show_path(conn, :show, a_inv2.slug, %{"per_page" => "2"}))
     html = html_response(resp, 200)
     assert html =~ "<h2>Selections</h2>"
   end
 
   test "it 404s if invite not found", %{conn: conn} do
-    resp = get(conn, "/artist-invites/nope-nope-nope")
+    resp = get(conn, "/invites/nope-nope-nope")
     assert resp.status == 404
   end
 
   test "it 200s if invite not found but and user is logged in (soft 404)", %{conn: conn} do
     resp = conn
            |> put_req_cookie("ello_skip_prerender", "true")
-           |> get("/artist-invtes/nope-nope-nope")
+           |> get("/invites/nope-nope-nope")
     assert resp.status == 200
   end
 end

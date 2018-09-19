@@ -22,6 +22,6 @@ defmodule Ello.Serve.Webapp.ArtistInviteShowView do
              |> List.last
              |> Map.get(:created_at)
              |> DateTime.to_iso8601
-    webapp_url("artist-invites/#{slug}", before: before)
+    webapp_url("invites/#{slug}", before: before)
   end
 end

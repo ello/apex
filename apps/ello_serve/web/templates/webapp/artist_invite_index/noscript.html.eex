@@ -1,5 +1,5 @@
 <%= for artist_invite <- @artist_invites do %>
-  <a href="<%= webapp_url("artist-invites/#{artist_invite.slug}") %>">
+  <a href="<%= webapp_url("invites/#{artist_invite.slug}") %>">
     <img src="<%= artist_invite_image_url(artist_invite) %>" alt="<%= artist_invite.title %>" />
     <h2><%= artist_invite.title %></h2>
   </a>
