@@ -25,6 +25,7 @@ defmodule Ello.V2.ArtistInviteView do
     :title,
     :slug,
     :invite_type,
+    :redirect_url,
     :opened_at,
     :closed_at,
     :submission_body_block,
