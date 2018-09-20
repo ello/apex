@@ -13,6 +13,7 @@ defmodule Ello.Core.Repo.Migrations.CreateArtistInviteTable do
       add :og_image, :string
       add :og_image_metadata, :json
       add :invite_type, :string
+      add :redirect_url, :string
       add :status, :string
       add :opened_at, :utc_datetime
       add :closed_at, :utc_datetime

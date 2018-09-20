@@ -20,6 +20,7 @@ defmodule Ello.Core.Contest.ArtistInvite do
     field :og_image_metadata, :map
 
     field :invite_type, :string
+    field :redirect_url, :string
     field :status, :string, default: "preview"
     field :opened_at, :utc_datetime
     field :closed_at, :utc_datetime
