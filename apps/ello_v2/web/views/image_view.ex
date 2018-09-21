@@ -46,8 +46,8 @@ defmodule Ello.V2.ImageView do
 
   Handles domain sharding.
   """
-  def image_url(path, nil), do: ""
-  def image_url(path, ""), do: ""
+  def image_url(_, nil), do: ""
+  def image_url(_, ""), do: ""
   def image_url(path, filename) do
     filename
     |> asset_host
