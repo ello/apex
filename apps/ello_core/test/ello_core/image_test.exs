@@ -72,4 +72,49 @@ defmodule Ello.Core.ImageTest do
     } = hd(Image.Version.from_metadata(metadata, name))
   end
 
+  test "Version.from_metadata/2 - returns something sensible when no image" do
+    metadata = %{
+      "large" => %{
+        "size" => 220_669,
+        "type" => "image/png",
+        "width" => 360,
+        "height" => 360
+      },
+      "regular" => %{
+        "size" => 36_629,
+        "type" => "image/png",
+        "width" => 120,
+        "height" => 120
+      },
+      "small" => %{
+        "size" => 17_753,
+        "type" => "image/png",
+        "width" => 60,
+        "height" => 60
+      }
+    }
+
+    assert [%Image.Version{}, %Image.Version{}, %Image.Version{}] = Image.Version.from_metadata(metadata, nil)
+    assert %Image.Version{
+      name: "large",
+      width: 360,
+      height: 360,
+      size: 220_669,
+      type: "image/png",
+      filename: "",
+      pixellated_filename: "",
+    } = hd(Image.Version.from_metadata(metadata, nil))
+
+    assert [%Image.Version{}, %Image.Version{}, %Image.Version{}] = Image.Version.from_metadata(metadata, "")
+    assert %Image.Version{
+      name: "large",
+      width: 360,
+      height: 360,
+      size: 220_669,
+      type: "image/png",
+      filename: "",
+      pixellated_filename: "",
+    } = hd(Image.Version.from_metadata(metadata, ""))
+  end
+
 end

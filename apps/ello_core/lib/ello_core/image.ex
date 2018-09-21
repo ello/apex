@@ -31,6 +31,8 @@ defmodule Ello.Core.Image do
       end
     end
 
+    defp filename(nil, _, _), do: ""
+    defp filename("", _, _), do: ""
     defp filename(original_filename, version_name, type) do
       version_name = String.replace(version_name, "_", "-")
       ext          = extension(type)
