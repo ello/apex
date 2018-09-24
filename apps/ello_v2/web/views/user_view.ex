@@ -94,6 +94,7 @@ defmodule Ello.V2.UserView do
     :has_auto_watch_enabled,
     :is_hireable,
     :is_collaborateable,
+    :is_brand,
   ]
 
   defp add_meta(resp, user, true) do

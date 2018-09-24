@@ -100,6 +100,7 @@ defmodule Ello.V3.Schema.NetworkTypes do
     field :has_loves_enabled, :boolean
     field :is_collaborateable, :boolean
     field :is_hireable, :boolean
+    field :is_brand, :boolean
   end
 
   object :user_stats do

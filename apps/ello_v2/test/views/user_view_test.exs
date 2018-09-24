@@ -63,6 +63,7 @@ defmodule Ello.V2.UserViewTest do
       is_hireable: false,
       is_collaborateable: false,
       is_community: false,
+      is_brand: false,
       posts_count: nil,
       followers_count: nil,
       following_count: nil,
