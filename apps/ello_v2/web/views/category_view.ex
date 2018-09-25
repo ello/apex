@@ -10,7 +10,7 @@ defmodule Ello.V2.CategoryView do
   def render("index.json", %{data: categories} = opts) do
     promotionals = Enum.flat_map(categories, &(&1.promotionals))
     users = Enum.map(promotionals, &(&1.user))
-    brand_accounts = Enum.map(categories, &(&1.brand_account))
+    brand_accounts = Enum.map(categories, &pluck_brand_account/1)
 
     json_response()
     |> render_resource(:categories, categories, __MODULE__, opts)
@@ -27,7 +27,7 @@ defmodule Ello.V2.CategoryView do
     |> render_resource(:categories, category, __MODULE__, opts)
     |> include_linked(:promotionals, category.promotionals, PromotionalView, opts)
     |> include_linked(:users, users, UserView, opts)
-    |> include_linked(:brand_account, category.brand_account, UserView, opts)
+    |> include_linked(:brand_account, pluck_brand_account(category), UserView, opts)
   end
 
   @doc "Render a single category as included in other reponses"
@@ -73,6 +73,9 @@ defmodule Ello.V2.CategoryView do
       recent: %{related: related_link(category)},
     }
   end
+
+  defp pluck_brand_account(%{brand_account: %Ello.Core.Network.User{} = brand_account}), do: brand_account
+  defp pluck_brand_account(_), do: nil
 
   defp brand_account(%{brand_account: %Ello.Core.Network.User{} = user}) do
     %{
