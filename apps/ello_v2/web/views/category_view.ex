@@ -76,7 +76,7 @@ defmodule Ello.V2.CategoryView do
 
   defp brand_account(nil), do: nil
   defp brand_account(%{brand_account: nil}), do: nil
-  defp brand_account(%{brand_account: user}) do
+  defp brand_account(%{brand_account: %User{} = user}) do
     %{
       id: "#{user.id}",
       type: "users",
