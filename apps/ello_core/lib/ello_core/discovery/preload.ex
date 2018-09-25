@@ -98,10 +98,10 @@ defmodule Ello.Core.Discovery.Preload do
   defp include_current_user_state(categories, _), do: categories
 
 
-  defp include_brand_account(categories, %{preloads: %{brand_account: _}}) do
-    Repo.preload(categories, :brand_account)
+  defp include_brand_account(categories, %{preloads: %{brand_account: _}, current_user: current_user}) do
+    Repo.preload(categories, [brand_account: &Network.users(%{ids: &1, current_user: current_user})])
   end
-  defp include_brand_account(categories, _), do: categories
+defp include_brand_account(categories, _), do: categories
 
 
   defp promotional_includes(promotionals, %{preloads: preloads} = options) do
