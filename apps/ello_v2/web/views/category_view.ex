@@ -74,8 +74,6 @@ defmodule Ello.V2.CategoryView do
     }
   end
 
-  defp brand_account(nil), do: nil
-  defp brand_account(%{brand_account: nil}), do: nil
   defp brand_account(%{brand_account: %Ello.Core.Network.User{} = user}) do
     %{
       id: "#{user.id}",
@@ -83,6 +81,7 @@ defmodule Ello.V2.CategoryView do
       href: "/api/v2/users/#{user.id}",
     }
   end
+  defp brand_account(_), do: nil
 
   defp related_link(%{slug: slug}) do
     "/api/v2/categories/#{slug}/posts/recent"
