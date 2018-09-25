@@ -23,9 +23,9 @@ defmodule Ello.V2.CategoryControllerTest do
     assert %{"name" => "Featured"} = json_response(conn, 200)["categories"]
   end
 
-  test "GET /v2/categories/:slug - brand account", %{conn: conn, brand_user: brand_user, branded: branded} do
+  test "GET /v2/categories/:slug - brand account", %{conn: conn, brand_user: %{username: username}, branded: branded} do
     conn = get(conn, category_path(conn, :show, branded.slug))
-    assert %{"brand_account" => %{"username" => brand_user.username}} = json_response(conn, 200)["categories"]
+    assert %{"brand_account" => %{"username" => username}} = json_response(conn, 200)["categories"]
   end
 
   test "GET /v2/categories/:slug - 404", %{conn: conn} do
