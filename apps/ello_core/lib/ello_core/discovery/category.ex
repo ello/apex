@@ -37,6 +37,8 @@ defmodule Ello.Core.Discovery.Category do
 
     # Used to eager load current users role in the category.
     has_one :current_user_state, CategoryUser
+
+    belongs_to :brand_account, User
   end
 
   @doc """
