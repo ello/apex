@@ -56,6 +56,7 @@ defmodule Ello.V3.Schema.NetworkTypes do
     field :has_sharing_enabled, :boolean, resolve: &user_profile/2
     field :is_collaborateable, :boolean, resolve: &user_profile/2
     field :is_hireable, :boolean, resolve: &user_profile/2
+    field :is_brand, :boolean, resolve: &user_profile/2
     field :notify_of_announcements_via_push, :boolean, resolve: &user_profile/2
     field :notify_of_approved_submissions_from_following_via_email, :boolean, resolve: &user_profile/2
     field :notify_of_approved_submissions_via_push, :boolean, resolve: &user_profile/2
@@ -100,6 +101,7 @@ defmodule Ello.V3.Schema.NetworkTypes do
     field :has_loves_enabled, :boolean
     field :is_collaborateable, :boolean
     field :is_hireable, :boolean
+    field :is_brand, :boolean
   end
 
   object :user_stats do

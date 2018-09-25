@@ -83,6 +83,7 @@ defmodule Ello.V3.Resolvers.UserPostStreamTest do
               has_loves_enabled
               is_collaborateable
               is_hireable
+              is_brand
             }
             avatar {
               original {
@@ -136,6 +137,7 @@ defmodule Ello.V3.Resolvers.UserPostStreamTest do
     assert "has_loves_enabled" in settings_keys
     assert "is_collaborateable" in settings_keys
     assert "is_hireable" in settings_keys
+    assert "is_brand" in settings_keys
     assert author["current_user_state"]["relationship_priority"] == "friend"
   end
 end

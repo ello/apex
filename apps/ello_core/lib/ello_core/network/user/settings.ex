@@ -7,6 +7,7 @@ defmodule Ello.Core.Network.User.Settings do
     field :is_public, :boolean, default: true
     field :is_hireable, :boolean, default: false
     field :is_collaborateable, :boolean, default: false
+    field :is_brand, :boolean, default: false
     field :discoverable, :boolean, default: true
 
     # NSFW content (porn)

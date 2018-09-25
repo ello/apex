@@ -15,6 +15,7 @@ defmodule Ello.V3.Resolvers.ProfileTest do
         has_sharing_enabled: true,
         is_collaborateable: true,
         is_hireable: true,
+        is_brand: false,
         notify_of_announcements_via_push: true,
         notify_of_approved_submissions_from_following_via_email: true,
         notify_of_approved_submissions_via_push: true,
@@ -66,6 +67,7 @@ defmodule Ello.V3.Resolvers.ProfileTest do
         has_sharing_enabled
         is_collaborateable
         is_hireable
+        is_brand
         notify_of_announcements_via_push
         notify_of_approved_submissions_from_following_via_email
         notify_of_approved_submissions_via_push
@@ -119,6 +121,7 @@ defmodule Ello.V3.Resolvers.ProfileTest do
     assert json["has_sharing_enabled"]
     assert json["is_collaborateable"]
     assert json["is_hireable"]
+    assert json["is_brand"] == false
     assert json["notify_of_announcements_via_push"]
     assert json["notify_of_approved_submissions_from_following_via_email"]
     assert json["notify_of_approved_submissions_via_push"]
