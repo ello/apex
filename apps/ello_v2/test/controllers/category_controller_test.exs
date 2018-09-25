@@ -4,13 +4,13 @@ defmodule Ello.V2.CategoryControllerTest do
   setup %{conn: conn} do
     Script.insert(:featured_category)
     Script.insert(:lacross_category)
-    brand = Factory.insert(:brand, %{username: "brandy"})
+    brand_user = Factory.insert(:user, %{username: "brandy"})
     design = Factory.insert(:category, %{name: "Design", slug: "design", is_creator_type: true})
-    branded = Factory.insert(:category, %{name: "Branded", slug: "branded", brand_account: brand})
+    branded = Factory.insert(:category, %{name: "Branded", slug: "branded", brand_account: brand_user})
     spying = Script.insert(:espionage_category)
     archer = Script.insert(:archer)
     Factory.insert(:category_user, user: archer, category: spying)
-    {:ok, conn: auth_conn(conn, archer), unauth_conn: conn, spying: spying, design: design, brand: brand, branded: branded}
+    {:ok, conn: auth_conn(conn, archer), unauth_conn: conn, spying: spying, design: design, brand_user: brand_user, branded: branded}
   end
 
   test "GET /v2/categories/:slug - without token", %{unauth_conn: conn} do
@@ -23,9 +23,9 @@ defmodule Ello.V2.CategoryControllerTest do
     assert %{"name" => "Featured"} = json_response(conn, 200)["categories"]
   end
 
-  test "GET /v2/categories/:slug - brand account", %{conn: conn, brandy: brandy, branded: branded} do
+  test "GET /v2/categories/:slug - brand account", %{conn: conn, brand_user: brand_user, branded: branded} do
     conn = get(conn, category_path(conn, :show, branded.slug))
-    assert %{"brand_account" => %{"username" => brandy.username}} = json_response(conn, 200)["categories"]
+    assert %{"brand_account" => %{"username" => brand_user.username}} = json_response(conn, 200)["categories"]
   end
 
   test "GET /v2/categories/:slug - 404", %{conn: conn} do
