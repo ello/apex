@@ -6,6 +6,7 @@ defmodule Ello.Core.Discovery.Category do
   }
   alias Ello.Core.Network.{
     CategoryUser,
+    User,
   }
   alias __MODULE__.TileImage
 
