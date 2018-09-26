@@ -2,7 +2,9 @@ defmodule Ello.V3.Resolvers.CategoryTest do
   use Ello.V3.Case
 
   setup do
-    cat1 = Factory.insert(:category, level: "secondary", id: 3)
+    cat1 = Factory.insert(:category, level: "secondary")
+    brand_user = Factory.insert(:user, username: "brandy")
+    brand_cat = Factory.insert(:category, level: "secondary", brand_account: brand_user)
     current_user = Factory.insert(:user)
     user1 = Factory.insert(:user)
 
@@ -15,6 +17,8 @@ defmodule Ello.V3.Resolvers.CategoryTest do
 
     {:ok,
       cat1: cat1,
+      brand_cat: brand_cat,
+      brand_user: brand_user,
       cu1: cu1,
       cu2: cu2,
       cu3: cu3,
@@ -49,6 +53,23 @@ defmodule Ello.V3.Resolvers.CategoryTest do
     resp = post_graphql(%{query: query})
     assert %{"data" => %{"category" => json}} = json_response(resp)
     assert json["id"] == "#{cat1.id}"
+  end
+
+  test "Returns the brand account", %{brand_cat: brand_cat, brand_user: brand_user} do
+    query = """
+    {
+      category(slug: "#{brand_cat.slug}") {
+          id
+          brand_account {
+            id
+          }
+        }
+    }
+    """
+
+    resp = post_graphql(%{query: query})
+    assert %{"data" => %{"category" => json}} = json_response(resp)
+    assert json["brand_account"]["id"] == "#{brand_user.id}"
   end
 
   test "Returns the category with users", %{cat1: cat1, cu2: cu2, cu2: cu3, current_user: current_user} do

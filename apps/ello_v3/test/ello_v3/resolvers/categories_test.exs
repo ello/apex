@@ -24,6 +24,7 @@ defmodule Ello.V3.Resolvers.CategoriesTest do
           slug
           level
           order
+          brand_account { id }
           tile_image {
             small {
               url
@@ -41,16 +42,21 @@ defmodule Ello.V3.Resolvers.CategoriesTest do
 
     resp = post_graphql(%{query: query})
     assert %{"data" => %{"allCategories" => json}} = json_response(resp)
-    assert to_string(context.cat1.id) in Enum.map(json, &(&1["id"]))
-    assert to_string(context.cat2.id) in Enum.map(json, &(&1["id"]))
-    refute to_string(context.cat3.id) in Enum.map(json, &(&1["id"]))
-    refute to_string(context.cat4.id) in Enum.map(json, &(&1["id"]))
 
-    assert to_string(context.cat1.name) in Enum.map(json, &(&1["name"]))
-    assert to_string(context.cat2.name) in Enum.map(json, &(&1["name"]))
+    all_ids = Enum.map(json, &(&1["id"]))
+    all_names = Enum.map(json, &(&1["name"]))
+    all_slugs = Enum.map(json, &(&1["slug"]))
 
-    assert to_string(context.cat1.slug) in Enum.map(json, &(&1["slug"]))
-    assert to_string(context.cat2.slug) in Enum.map(json, &(&1["slug"]))
+    assert to_string(context.cat1.id) in all_ids
+    assert to_string(context.cat2.id) in all_ids
+    refute to_string(context.cat3.id) in all_ids
+    refute to_string(context.cat4.id) in all_ids
+
+    assert to_string(context.cat1.name) in all_names
+    assert to_string(context.cat2.name) in all_names
+
+    assert to_string(context.cat1.slug) in all_slugs
+    assert to_string(context.cat2.slug) in all_slugs
 
     assert length(Enum.map(json, &(&1["tile_image"]))) === 2
   end
