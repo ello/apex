@@ -102,6 +102,7 @@ own config options in it's README.
 * To start a console run `iex -S mix`
 * To start a console and webserver run `iex -S mix phoenix.server`
 * To run tests `mix test`
+* To rebuild the database `mix do ecto.drop, ecto.create, ecto.migrate`
 
 ## Code of Conduct
 Ello was created by idealists who believe that the essential nature of all

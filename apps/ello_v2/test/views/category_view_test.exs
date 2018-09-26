@@ -52,7 +52,8 @@ defmodule Ello.V2.CategoryViewTest do
       header: "Spy Shit",
       links: %{
         promotionals: [],
-        recent: %{related: "/api/v2/categories/espionage/posts/recent"}
+        recent: %{related: "/api/v2/categories/espionage/posts/recent"},
+        brand_account: nil,
       },
       tile_image: %{
         "original" => %{
@@ -95,7 +96,8 @@ defmodule Ello.V2.CategoryViewTest do
       header: "Lacross",
       links: %{
         promotionals: Enum.map(context.cat2.promotionals, &("#{&1.id}")),
-        recent: %{related: "/api/v2/categories/lacross/posts/recent"}
+        recent: %{related: "/api/v2/categories/lacross/posts/recent"},
+        brand_account: nil,
       },
       tile_image: %{
         "original" => %{

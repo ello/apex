@@ -20,6 +20,7 @@ defmodule Ello.Repo.Migrations.CreateCategory do
       add :cta_caption, :string
       add :cta_href, :string
       add :uses_page_promotionals, :boolean
+      add :brand_account_id, :integer
     end
 
     create_if_not_exists unique_index(:categories, [:slug])
