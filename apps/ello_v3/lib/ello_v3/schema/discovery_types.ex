@@ -20,6 +20,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
       resolve &Resolvers.CategoryUsers.call/3
     end
     field :current_user_state, :category_user
+    field :brand_account, :user
   end
 
   object :category_search_result do
