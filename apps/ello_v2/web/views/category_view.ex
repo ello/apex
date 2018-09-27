@@ -21,11 +21,11 @@ defmodule Ello.V2.CategoryView do
   @doc "Render categories and relations for /api/v2/categories/:id"
   def render("show.json", %{data: category} = opts) do
     users = Enum.map(category.promotionals, &(&1.user))
-    if brand_account = pluck_brand_account(category) do
-      brand_accounts = [brand_account]
-    else
-      brand_accounts = []
-    end
+    brand_accounts =
+      case pluck_brand_account(category) do
+        nil -> []
+        brand_account -> [brand_account]
+      end
 
     json_response()
     |> render_resource(:categories, category, __MODULE__, opts)
