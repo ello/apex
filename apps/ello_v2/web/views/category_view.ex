@@ -15,19 +15,22 @@ defmodule Ello.V2.CategoryView do
     json_response()
     |> render_resource(:categories, categories, __MODULE__, opts)
     |> include_linked(:promotionals, promotionals, PromotionalView, opts)
-    |> include_linked(:users, users, UserView, opts)
-    |> include_linked(:brand_account, brand_accounts, UserView, opts)
+    |> include_linked(:users, brand_accounts ++ users, UserView, opts)
   end
 
   @doc "Render categories and relations for /api/v2/categories/:id"
   def render("show.json", %{data: category} = opts) do
     users = Enum.map(category.promotionals, &(&1.user))
+    brand_accounts =
+      case pluck_brand_account(category) do
+        nil -> []
+        brand_account -> [brand_account]
+      end
 
     json_response()
     |> render_resource(:categories, category, __MODULE__, opts)
     |> include_linked(:promotionals, category.promotionals, PromotionalView, opts)
-    |> include_linked(:users, users, UserView, opts)
-    |> include_linked(:brand_account, pluck_brand_account(category), UserView, opts)
+    |> include_linked(:users, users ++ brand_accounts, UserView, opts)
   end
 
   @doc "Render a single category as included in other reponses"
