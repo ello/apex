@@ -28,7 +28,8 @@ defmodule Ello.V2.CategoryControllerTest do
     response = json_response(conn, 200)
     user_id_str = "#{user_id}"
     assert %{"links" => %{"brand_account" => %{"id" => ^user_id_str}}} = response["categories"]
-    assert %{"brand_account" => %{"username" => ^username}} = response["linked"]
+    assert %{"users" => users} = response["linked"]
+    assert Enum.any?(users, &(&1["username"] == username))
   end
 
   test "GET /v2/categories/:slug - 404", %{conn: conn} do
