@@ -121,6 +121,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     value :post_stream
     value :internal
     value :external
+    value :sponsored
   end
 
   object :editorial_post_stream do
@@ -191,6 +192,7 @@ defmodule Ello.V3.Schema.DiscoveryTypes do
     "curated_posts" => :post_stream,
     "internal" => :internal,
     "external" => :external,
+    "sponsored" => :sponsored,
   }
   defp editorial_kind(_, %{source: %{kind: kind}}), do: {:ok, @editorial_kinds[kind]}
 

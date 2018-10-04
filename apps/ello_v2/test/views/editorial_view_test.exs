@@ -43,6 +43,21 @@ defmodule Ello.V2.EditorialViewTest do
     refute json[:links]
   end
 
+  test "editorial.json - sponsored kind", context do
+    editorial = Editorial.build_images(Factory.insert(:external_editorial))
+    json = render(EditorialView, "editorial.json",
+      editorial: editorial,
+      conn: context.conn
+    )
+    assert json[:id] == "#{editorial.id}"
+    assert json[:kind] == "sponsored"
+    assert json[:title]
+    assert json[:subtitle]
+    assert json[:rendered_subtitle]
+    assert json[:url]
+    refute json[:links]
+  end
+
   test "editorial.json - internal kind", context do
     editorial = Editorial.build_images(Factory.insert(:internal_editorial))
     json = render(EditorialView, "editorial.json",

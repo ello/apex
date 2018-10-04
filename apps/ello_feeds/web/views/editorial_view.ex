@@ -19,6 +19,8 @@ defmodule Ello.Feeds.EditorialView do
     do: webapp_url(editorial.content["path"])
   def editorial_link(%{kind: "external"} = editorial),
     do: editorial.content["url"]
+  def editorial_link(%{kind: "sponsored"} = editorial),
+    do: editorial.content["url"]
 
   # Not an actuall valid url, we are just using what the URL would be as a link.
   # We have sent "isPermalink=false" because it isn't a real uri.

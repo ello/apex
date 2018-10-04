@@ -10,7 +10,7 @@ defmodule Ello.V3.Resolvers.EditorialStream do
       editorials: editorials,
       next: next(args, editorials),
       is_last_page: is_last_page(args, editorials),
-      kinds: [:curated_posts, :post, :internal, :external],
+      kinds: [:curated_posts, :post, :internal, :external, :sponsored],
     }}
   end
 

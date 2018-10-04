@@ -18,7 +18,7 @@ defmodule Ello.Feeds.EditorialController do
       preview:      false,
       per_page:     100,
       before:       nil,
-      kinds:        ["post", "internal", "external"],
+      kinds:        ["post", "internal", "external", "sponsored"],
     })
   end
 end
