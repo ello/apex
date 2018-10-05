@@ -62,6 +62,9 @@ defmodule Ello.V3.Resolvers.CategoryTest do
           id
           brand_account {
             id
+            external_links_list { icon type url text }
+            avatar { original { url } }
+            cover_image { original { url } }
           }
         }
     }

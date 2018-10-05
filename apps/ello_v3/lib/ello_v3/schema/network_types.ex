@@ -15,15 +15,9 @@ defmodule Ello.V3.Schema.NetworkTypes do
     field :badges, list_of(:string), resolve: &user_badges/2
     field :experimental_features, :boolean, resolve: &experimental_features/2
     field :is_community, :boolean
-    field :external_links_list, list_of(:external_link), resolve: fn(_args, %{source: user}) ->
-      {:ok, user.rendered_links}
-    end
-    field :avatar, :tshirt_image_versions, resolve: fn(_args, %{source: user}) ->
-      {:ok, user.avatar_struct}
-    end
-    field :cover_image, :responsive_image_versions, resolve: fn(_args, %{source: user}) ->
-      {:ok, user.cover_image_struct}
-    end
+    field :external_links_list, list_of(:external_link), resolve: &external_links_list/2
+    field :avatar, :tshirt_image_versions, resolve: &avatar_struct/2
+    field :cover_image, :responsive_image_versions, resolve: &cover_image_struct/2
     field :current_user_state, :user_current_user_state, resolve: &source_self/2
     field :category_users, list_of(:category_user) do
       arg :roles, list_of(:category_user_role)
@@ -162,6 +156,23 @@ defmodule Ello.V3.Schema.NetworkTypes do
     version = Enum.find(user.cover_image_struct.versions, &(&1.name == "optimized"))
     image_url(user.cover_image_struct.path, version.filename)
   end
+
+
+  defp external_links_list(_args, %{source: %{rendered_links: rendered_links}}) do
+    {:ok, rendered_links}
+  end
+  defp external_links_list(_args, _), do: {:ok, nil}
+
+  defp avatar_struct(_args, %{source: %{avatar_struct: avatar_struct}}) do
+    {:ok, avatar_struct}
+  end
+  defp avatar_struct(_args, _), do: {:ok, nil}
+
+  defp cover_image_struct(_args, %{source: %{cover_image_struct: cover_image_struct}}) do
+    {:ok, cover_image_struct}
+  end
+  defp cover_image_struct(_args, _), do: {:ok, nil}
+
 
   @sensitive_badges [
     "nsfw",
