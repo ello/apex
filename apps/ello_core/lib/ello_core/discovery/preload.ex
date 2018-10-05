@@ -98,8 +98,17 @@ defmodule Ello.Core.Discovery.Preload do
   defp include_current_user_state(categories, _), do: categories
 
 
-  defp include_brand_account(categories, %{preloads: %{brand_account: _}, current_user: current_user}) do
-    Repo.preload(categories, [brand_account: &Network.users(%{ids: &1, current_user: current_user})])
+  defp include_brand_account(categories, %{preloads: %{brand_account: brand_preloads}} = opts) do
+    {args, preloads} = Map.pop(brand_preloads, :args, %{})
+    opts = opts
+           |> Map.merge(args)
+           |> Map.put(:preloads, preloads)
+           |> Map.put(:current_user, opts[:current_user])
+           |> Map.put(:ids, [])
+
+    Repo.preload(categories, [
+      brand_account: &Network.users(%{opts | ids: &1})
+    ])
   end
 defp include_brand_account(categories, _), do: categories
 
