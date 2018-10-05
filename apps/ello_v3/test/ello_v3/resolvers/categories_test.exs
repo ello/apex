@@ -58,6 +58,8 @@ defmodule Ello.V3.Resolvers.CategoriesTest do
     assert to_string(context.cat1.slug) in all_slugs
     assert to_string(context.cat2.slug) in all_slugs
 
+    assert hd(json)["brand_account"] == nil
+
     assert length(Enum.map(json, &(&1["tile_image"]))) === 2
   end
 end

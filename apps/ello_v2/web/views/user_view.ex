@@ -108,11 +108,12 @@ defmodule Ello.V2.UserView do
     |> Map.merge(resp)
   end
 
-  def links(user, _conn) do
+  def links(%{categories: categories}, _conn) when is_list(categories) do
     %{
-      categories: Enum.map(user.categories, &("#{&1.id}"))
+      categories: Enum.map(categories, &("#{&1.id}"))
     }
   end
+  def links(_, _conn), do: %{}
 
   def href(%{id: id}, _conn), do: "/api/v2/users/#{id}"
 
