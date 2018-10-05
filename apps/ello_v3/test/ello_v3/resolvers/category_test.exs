@@ -75,6 +75,26 @@ defmodule Ello.V3.Resolvers.CategoryTest do
     assert json["brand_account"]["id"] == "#{brand_user.id}"
   end
 
+  test "Returns null for brand account", %{cat1: cat1} do
+    query = """
+    {
+      category(slug: "#{cat1.slug}") {
+          id
+          brand_account {
+            id
+            external_links_list { icon type url text }
+            avatar { original { url } }
+            cover_image { original { url } }
+          }
+        }
+    }
+    """
+
+    resp = post_graphql(%{query: query})
+    assert %{"data" => %{"category" => json}} = json_response(resp)
+    assert json["brand_account"] == nil
+  end
+
   test "Returns the category with users", %{cat1: cat1, cu2: cu2, cu2: cu3, current_user: current_user} do
     query = """
       query($slug: String, $roles: [CategoryUserRole]) {
