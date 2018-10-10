@@ -44,7 +44,7 @@ defmodule Ello.V2.EditorialViewTest do
   end
 
   test "editorial.json - sponsored kind", context do
-    editorial = Editorial.build_images(Factory.insert(:external_editorial))
+    editorial = Editorial.build_images(Factory.insert(:sponsored_editorial))
     json = render(EditorialView, "editorial.json",
       editorial: editorial,
       conn: context.conn
