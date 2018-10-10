@@ -13,6 +13,8 @@ defmodule Ello.Serve.Webapp.EditorialView do
     do: render("internal_editorial.html", assigns)
   def render("editorial.html", %{editorial: %{kind: "external"}} = assigns),
     do: render("external_editorial.html", assigns)
+  def render("editorial.html", %{editorial: %{kind: "sponsored"}} = assigns),
+    do: render("external_editorial.html", assigns)
   def render("editorial.html", %{editorial: %{kind: "category"}} = assigns),
     do: render("category_editorial.html", assigns)
   def render("editorial.html", %{editorial: %{kind: "artist_invite"}} = assigns),

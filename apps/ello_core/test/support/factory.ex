@@ -221,6 +221,19 @@ defmodule Ello.Core.Factory do
     })
   end
 
+  def sponsored_editorial_factory do
+    Map.merge(editorial_factory(), %{
+      kind: "sponsored",
+      content: %{
+        "title"              => "Sponsored Editorial",
+        "subtitle"           => "check *it* out",
+        "plaintext_subtitle" => "check it out",
+        "rendered_subtitle"  => "<p>check <em>it</em> out</p>",
+        "url"                => "https://ello.co/wtf",
+      }
+    })
+  end
+
   def internal_editorial_factory do
     Map.merge(editorial_factory(), %{
       kind: "internal",

@@ -83,26 +83,27 @@ defmodule Ello.V3.Resolvers.EditorialStreamTest do
     e5 = Factory.insert(:curated_posts_editorial, published_position: 4, preview_position: 5)
     e6 = Factory.insert(:external_editorial, published_position: nil, preview_position: 6)
     e7 = Factory.insert(:curated_posts_editorial, published_position: 5, preview_position: 7)
+    e8 = Factory.insert(:sponsored_editorial, published_position: 6, preview_position: 8)
     staff = Factory.insert(:user, is_staff: true)
 
     {:ok, %{
       staff: staff,
-      editorials: [e1, e2, e3, e4, e5, e6, e7],
+      editorials: [e1, e2, e3, e4, e5, e6, e7, e8],
     }}
   end
 
   test "Published order - public user", %{
-    editorials: [_e1, _e2, e3, e4, e5, _e6, e7],
+    editorials: [_e1, _e2, e3, e4, e5, _e6, e7, e8],
   } do
-    resp = post_graphql(%{query: @summary_query, variables: %{"perPage" => 4}})
+    resp = post_graphql(%{query: @summary_query, variables: %{"perPage" => 5}})
     assert %{"data" => %{"editorialStream" => json}} = json_response(resp)
     assert %{"isLastPage" => false, "next" => "2", "editorials" => editorials} = json
     assert Enum.map(editorials, &(String.to_integer(&1["id"]))) ==
-      [e7.id, e5.id, e4.id, e3.id]
+      [e8.id, e7.id, e5.id, e4.id, e3.id]
   end
 
   test "Published order - public user - second page", %{
-    editorials: [e1, _e2, _e3, _e4, _e5, _e6, _e7],
+    editorials: [e1, _e2, _e3, _e4, _e5, _e6, _e7, _e8],
   } do
     resp = post_graphql(%{query: @summary_query, variables: %{"perPage" => 4, "before" => "2"}})
     assert %{"data" => %{"editorialStream" => json}} = json_response(resp)
@@ -112,36 +113,36 @@ defmodule Ello.V3.Resolvers.EditorialStreamTest do
   end
 
   test "Preview requested but published order given - public user", %{
-    editorials: [_e1, _e2, e3, e4, e5, _e6, e7],
+    editorials: [_e1, _e2, e3, e4, e5, _e6, e7, e8],
   } do
     resp = post_graphql(%{
       query: @summary_query,
-      variables: %{"perPage" => 4, "preview" => true}
+      variables: %{"perPage" => 5, "preview" => true}
     })
     assert %{"data" => %{"editorialStream" => json}} = json_response(resp)
     assert %{"isLastPage" => false, "next" => "2", "editorials" => editorials} = json
     assert Enum.map(editorials, &(String.to_integer(&1["id"]))) ==
-      [e7.id, e5.id, e4.id, e3.id]
+      [e8.id, e7.id, e5.id, e4.id, e3.id]
   end
 
   test "Preview order given - staff user", %{
     staff: staff,
-    editorials: [_e1, _e2, _e3, e4, e5, e6, e7],
+    editorials: [_e1, _e2, _e3, e4, e5, e6, e7, e8],
   } do
     resp = post_graphql(%{
       query: @summary_query,
-      variables: %{"perPage" => 4, "preview" => true}
+      variables: %{"perPage" => 5, "preview" => true}
     }, staff)
     assert %{"data" => %{"editorialStream" => json}} = json_response(resp)
     assert %{"isLastPage" => false, "next" => next, "editorials" => editorials} = json
     assert next == "4"
     assert Enum.map(editorials, &(String.to_integer(&1["id"]))) ==
-      [e7.id, e6.id, e5.id, e4.id]
+      [e8.id, e7.id, e6.id, e5.id, e4.id]
   end
 
   test "Full editorial serialization", %{
     staff: staff,
-    editorials: [_e1, e2, _e3, e4, _e5, e6, e7],
+    editorials: [_e1, e2, _e3, e4, _e5, e6, e7, e8],
   } do
     resp = post_graphql(%{
       query: @full_query,
@@ -149,7 +150,11 @@ defmodule Ello.V3.Resolvers.EditorialStreamTest do
     }, staff)
 
     assert %{"data" => %{"editorialStream" => %{"editorials" => editorials}}} = json_response(resp)
-    assert [je7, je6, _je5, je4, je2, _je3, _je1] = editorials
+    assert [je8, je7, je6, _je5, je4, je2, _je3, _je1] = editorials
+
+    assert je8["id"] == "#{e8.id}"
+    assert je8["kind"] == "SPONSORED"
+    assert je8["url"] == "https://ello.co/wtf"
 
     assert je7["id"] == "#{e7.id}"
     assert je7["kind"] == "POST_STREAM"
