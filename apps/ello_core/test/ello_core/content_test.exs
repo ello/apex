@@ -184,6 +184,19 @@ defmodule Ello.Core.ContentTest do
     refute fetched_post
   end
 
+  test "post/1 - returns banned author when current_user is_staff" do
+    user = Factory.insert(:user, %{is_staff: true})
+    banned_author = Factory.insert(:user, %{locked_at: DateTime.utc_now})
+    banned_post = Factory.insert(:post, %{author: banned_author})
+    fetched_post = Content.post(%{
+      id_or_token:  banned_post.id,
+      current_user: user,
+      allow_nsfw:   true,
+      allow_nudity: true,
+    })
+    assert fetched_post
+  end
+
   test "post/1 - does not return banned repost author" do
     banned_author = Factory.insert(:user, %{locked_at: DateTime.utc_now})
     banned_post = Factory.insert(:post, %{author: banned_author})

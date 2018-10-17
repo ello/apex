@@ -17,7 +17,7 @@ defmodule Ello.Core.Content.Filter do
     query
     |> filter_nsfw(options)
     |> filter_nudity(options)
-    |> filter_banned
+    |> filter_banned(options)
     |> filter_private(options)
   end
 
@@ -43,7 +43,8 @@ defmodule Ello.Core.Content.Filter do
   defp filter_nudity(query, %{allow_nudity: true}), do: query
   defp filter_nudity(query, _), do: where(query, [p], not p.has_nudity)
 
-  defp filter_banned(query) do
+  defp filter_banned(query, %{current_user: %{is_staff: true}}), do: query
+  defp filter_banned(query, _) do
     query
     |> join(:inner, [p], a in assoc(p, :author))
     |> join(:left, [p, a], rp in assoc(p, :reposted_source))
