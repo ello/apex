@@ -3,7 +3,6 @@ defmodule Ello.Auth.PublicToken.Client do
   def fetch_token(client_id, client_secret) do
     case make_request(client_id, client_secret) do
       {:ok, %{status_code: 200, body: body}} -> Jason.decode(body)
-      _ -> {:ok, nil}
     end
   end
 
