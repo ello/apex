@@ -108,6 +108,7 @@ defmodule Ello.Serve.Webapp.EditorialView do
       ""
     end
   end
+  def editorial_image_url(_), do: ""
 
   def post_image_url(post) do
     block = Enum.find(post.rendered_content, &(&1["kind"] == "image"))
