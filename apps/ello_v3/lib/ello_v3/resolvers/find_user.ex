@@ -1,4 +1,6 @@
 defmodule Ello.V3.Resolvers.FindUser do
+  import Ello.Auth
+
   def call(_parent, %{username: username} = args, _resolver) do
     user = Ello.Core.Network.user(Map.merge(args, %{id_or_username: "~#{username}"}))
     if can_view_user?(%{assigns: args}, user)
