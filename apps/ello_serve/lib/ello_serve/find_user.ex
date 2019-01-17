@@ -21,7 +21,7 @@ defmodule Ello.Serve.FindUser do
   end
 
   defp try_load_user(conn, user) do
-    if can_view_user?(conn, user)
+    if can_view_user?(conn, user) do
       assign(conn, :user, user)
     else
       halt send_resp(conn, 404, "")
