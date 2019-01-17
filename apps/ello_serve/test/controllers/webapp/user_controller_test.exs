@@ -26,12 +26,10 @@ defmodule Ello.Serve.Webapp.UserControllerTest do
     assert resp.status == 404
   end
 
-  test "it renders 200 if private user and known logged in user", %{conn: conn} do
-    Factory.insert(:user, %{username: "private", is_public: false})
-    resp = conn
-           |> put_req_cookie("ello_skip_prerender", "true")
-           |> get("/private")
-    assert resp.status == 200
+  test "it renders 404 if locked user and no known logged in user", %{conn: conn} do
+    Factory.insert(:user, %{username: "locked", locked_at: DateTime.utc_now})
+    resp = get(conn, "/locked")
+    assert resp.status == 404
   end
 
   @tag :meta
