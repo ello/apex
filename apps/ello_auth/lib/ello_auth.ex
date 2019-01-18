@@ -14,7 +14,7 @@ defmodule Ello.Auth do
   Returns false if the current user blocks or is blocked by the fetched user.
   """
   def can_view_user?(%{assigns: %{current_user: current_user}},
-                      %{locked_at: nil} = user) do
+                      %{locked_at: nil} = user) when not is_nil(current_user) do
     not user.id in current_user.all_blocked_ids
   end
   def can_view_user?(_, nil), do: false
