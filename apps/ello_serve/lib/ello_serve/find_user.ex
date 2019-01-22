@@ -7,7 +7,6 @@ defmodule Ello.Serve.FindUser do
       plug Ello.Serve.FindUser
   """
   use Plug.Builder
-  import Ello.Auth
   alias Ello.Core.Network
   plug :find_user
 
@@ -16,15 +15,7 @@ defmodule Ello.Serve.FindUser do
     case {user, conn.assigns.logged_in_user?} do
       {nil, _}                     -> halt send_resp(conn, 404, "")
       {%{is_public: false}, false} -> halt send_resp(conn, 404, "")
-      {user, _}                    -> try_load_user(conn, user)
-    end
-  end
-
-  defp try_load_user(conn, user) do
-    if can_view_user?(conn, user) do
-      assign(conn, :user, user)
-    else
-      halt send_resp(conn, 404, "")
+      {user, _}                    -> assign(conn, :user, user)
     end
   end
 end
