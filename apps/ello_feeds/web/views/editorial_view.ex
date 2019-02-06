@@ -29,21 +29,31 @@ defmodule Ello.Feeds.EditorialView do
   end
 
   def image_url(%{one_by_one_image_struct: image}) do
-    version = fetch_version(image)
-    image_url(image.path, version.filename)
+    case fetch_version(image) do
+      %{filename: filename} -> image_url(image.path, filename)
+      _ -> ""
+    end
   end
 
   def image_type(%{one_by_one_image_struct: image}) do
-    version = fetch_version(image)
-    version.type
+    case fetch_version(image) do
+      %{type: type} -> type
+      _ -> ""
+    end
   end
 
   def image_length(%{one_by_one_image_struct: image}) do
-    version = fetch_version(image)
-    version.size
+    case fetch_version(image) do
+      %{size: size} -> size
+      _ -> ""
+    end
   end
 
   defp fetch_version(%{versions: versions}) do
+    Enum.find(versions, &(&1.name == "xhdpi"))
+  end
+
+  defp fetch_version(_) do
     Enum.find(versions, &(&1.name == "xhdpi"))
   end
 
