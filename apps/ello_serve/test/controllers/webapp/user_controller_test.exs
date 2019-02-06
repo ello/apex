@@ -26,12 +26,6 @@ defmodule Ello.Serve.Webapp.UserControllerTest do
     assert resp.status == 404
   end
 
-  test "it renders 404 if locked user and no known logged in user", %{conn: conn} do
-    Factory.insert(:user, %{username: "locked", locked_at: DateTime.utc_now})
-    resp = get(conn, "/locked")
-    assert resp.status == 404
-  end
-
   @tag :meta
   test "it renders the proper meta", %{conn: conn} do
     resp = get(conn, "/archer")
