@@ -54,7 +54,7 @@ defmodule Ello.Feeds.EditorialView do
   end
 
   defp fetch_version(_) do
-    Enum.find(versions, &(&1.name == "xhdpi"))
+    nil
   end
 
   def categories(%{kind: "post", post: post}) do
