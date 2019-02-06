@@ -49,7 +49,7 @@ defmodule Ello.Core.Discovery do
   end
 
   @doc """
-  Return C (filtered by other options)ategories.
+  Return Categories (filtered by other options).
 
   Fetch options:
 
