@@ -44,7 +44,7 @@ defmodule Ello.V3.Resolvers.CommentStreamTest do
     comment2 = Factory.insert(:comment, %{parent_post: post, created_at:  DateTime.from_unix!(100_000_100)})
     comment3 = Factory.insert(:comment, %{parent_post: post, created_at:  DateTime.from_unix!(100_000_200)})
 
-    resp = post_graphql(%{query: @query, variables: %{"token" => "~#{post.token}", "perPage" => 3}})
+    resp = post_graphql(%{query: @query, variables: %{"token" => post.token, "perPage" => 3}})
     assert %{"data" => %{"commentStream" => json}} = json_response(resp)
     assert %{"comments" => comments, "next" => next, "isLastPage" => false} = json
     assert to_string(comment3.id) in Enum.map(comments, &(&1["id"]))
@@ -54,7 +54,7 @@ defmodule Ello.V3.Resolvers.CommentStreamTest do
     assert to_string(comment2.author.id) in Enum.map(comments, &(&1["author"]["id"]))
     assert to_string(comment1.author.id) in Enum.map(comments, &(&1["author"]["id"]))
 
-    resp2 = post_graphql(%{query: @query, variables: %{"token" => "~#{post.token}", "before" => next, "perPage" => 3}})
+    resp2 = post_graphql(%{query: @query, variables: %{"token" => post.token, "before" => next, "perPage" => 3}})
     assert %{"data" => %{"commentStream" => json2}} = json_response(resp2)
     assert %{"isLastPage" => true, "next" => _, "comments" => []} = json2
   end
