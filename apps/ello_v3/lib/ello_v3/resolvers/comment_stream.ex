@@ -4,7 +4,7 @@ defmodule Ello.V3.Resolvers.CommentStream do
   alias Ello.Core.Content
 
   def call(_parent, %{id: id} = args, _resolution), do: resolve_comments(id, args)
-  def call(_parent, %{token: token} = args, _resolution), do: resolve_comments(token, args)
+  def call(_parent, %{token: token} = args, _resolution), do: resolve_comments("~#{token}", args)
 
   defp resolve_comments(id_or_token, args) do
     case find_post(id_or_token, args) do
