@@ -2,6 +2,9 @@ defmodule TH.Dash.StatusController do
   use TH.Dash.Web, :controller
 
   def ping(conn, _) do
-    render(conn, :index)
+    json(conn, %{
+      status: "okay",
+      ping: "pong",
+    })
   end
 end

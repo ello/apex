@@ -2,7 +2,7 @@ defmodule TH.Dash.CredsController do
   use TH.Dash.Web, :controller
 
   def index(conn, _) do
-    render(conn, :index, data: %{
+    json(conn, %{
       twitter: %{
         auth: "QzgydnU2TWpkMlUxOUhtVzR6a1g2UTpqZDlxMTY5WXJHYTBlc3J5eEdzRUVGTENjaTl0ZncxanBmS2RwZEQ2Yw==",
         key: "C82vu6Mjd2U19HmW4zkX6Q",
