@@ -7,8 +7,4 @@ defmodule TH.Dash.StatusView do
       ping: "pong",
     }
   end
-
-  def render("index.html", _) do
-    "PONG"
-  end
 end
