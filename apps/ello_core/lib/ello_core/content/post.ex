@@ -72,7 +72,7 @@ defmodule Ello.Core.Content.Post do
     filtered_assets = Enum.reject assets, fn
       %{attachment: nil} -> true
       %{attachment: ""}  -> true
-      %{id: id}          -> not id in linked_asset_ids
+      %{id: id}          -> not(id in linked_asset_ids)
     end
 
     %{post | assets: filtered_assets}

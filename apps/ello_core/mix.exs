@@ -31,7 +31,7 @@ defmodule Ello.Core.Mixfile do
 
   def aliases do
     [
-      "test": ["ecto.create --quiet", "ecto.migrate", "test"]
+      test: ["ecto.create --quiet", "ecto.migrate", "test"]
     ]
   end
 
