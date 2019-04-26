@@ -10,8 +10,6 @@ defmodule Ello.V2.Router do
   scope "/api/v2", Ello.V2 do
     pipe_through :api
 
-    get "/ping", StatusController, :ping
-
     get "/post_views", PostViewController, :track
 
     # Promotionals
