@@ -39,14 +39,28 @@ defmodule Ello.Serve.Webapp.SearchControllerTest do
     html = html_response(resp, 200)
 
     assert html =~ "<noscript>"
-    assert html =~ "@#{post3.author.username()}"
-    assert html =~ "@#{post2.author.username()}"
+    other_post = if html =~ "@#{post1.author.username()}" && html =~ "@#{post2.author.username()}" do
+      post3
+    else
+      if html =~ "@#{post2.author.username()}" && html =~ "@#{post3.author.username()}" do
+        post1
+      else
+        if html =~ "@#{post3.author.username()}" && html =~ "@#{post1.author.username()}" do
+          post2
+        else
+          assert html =~ "@#{post3.author.username()}"
+          nil
+        end
+      end
+    end
+
+
 
     resp = get(conn, "/search", %{terms: "Phrasing", page: "2", per_page: "2"})
     html = html_response(resp, 200)
 
     assert html =~ "<noscript>"
-    assert html =~ "@#{post1.author.username()}"
+    assert html =~ "@#{other_post.author.username()}"
   end
 
   test "/search?type=users - it renders noscript", %{conn: conn} do

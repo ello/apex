@@ -1,5 +1,5 @@
 defmodule Ello.Core.Repo do
-  use Ecto.Repo, otp_app: :ello_core
+  use Ecto.Repo, otp_app: :ello_core, adapter: Ecto.Adapters.Postgres
   import Ecto.Query
 
   def after_connect(conn) do

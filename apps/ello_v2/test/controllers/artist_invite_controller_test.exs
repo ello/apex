@@ -5,9 +5,9 @@ defmodule Ello.V2.ArtistInviteControllerTest do
     archer = Script.insert(:archer)
     brand  = Factory.insert(:user)
     staff  = Factory.insert(:user, %{is_staff: true})
-    a_inv1 = Factory.insert(:artist_invite, %{status: "open"})
-    a_inv2 = Factory.insert(:artist_invite, %{status: "preview"})
-    a_inv3 = Factory.insert(:artist_invite, %{status: "preview", brand_account: brand})
+    a_inv1 = Factory.insert(:artist_invite, status: "open", created_at: FactoryTime.now_offset(1))
+    a_inv2 = Factory.insert(:artist_invite, status: "preview", created_at: FactoryTime.now_offset(2))
+    a_inv3 = Factory.insert(:artist_invite, status: "preview", brand_account: brand, created_at: FactoryTime.now_offset(3))
     {:ok,
       unauth_conn: conn,
       conn: auth_conn(conn, archer),
@@ -46,7 +46,6 @@ defmodule Ello.V2.ArtistInviteControllerTest do
     assert Enum.member?(artist_invite_ids(artist_invites), "#{a_inv2.id}")
     assert Enum.member?(artist_invite_ids(artist_invites), "#{a_inv3.id}")
   end
-
 
   test "GET /v2/artist_invites - pagination", %{staff_conn: conn, a_inv1: a_inv1, a_inv2: a_inv2, a_inv3: a_inv3} do
     resp = get(conn, artist_invite_path(conn, :index), %{

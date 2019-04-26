@@ -30,7 +30,7 @@ defmodule Ello.Stream.Mixfile do
 
   defp deps do
     [
-      {:httpoison, "~> 1.0"},
+      {:httpoison, "~> 1.4"},
       {:jason, "~> 1.0"},
 
       {:ello_core, in_umbrella: true},

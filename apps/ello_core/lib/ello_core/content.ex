@@ -1,5 +1,7 @@
 defmodule Ello.Core.Content do
-  import NewRelicPhoenix, only: [measure_segment: 2]
+  # 2019-05-07 - the 'newrelic' repo has out of date dependencies, disabling
+  # newrelic until we have bandwidth to update our code, maybe to new_relic
+  # import NewRelicPhoenix, only: [measure_segment: 2]
   import Ecto.Query
   import Ello.Core
   alias Ello.Core.Repo
@@ -188,7 +190,7 @@ defmodule Ello.Core.Content do
   defp filter_spam(q, %{current_user: %{is_spammer: true}}), do: q
   defp filter_spam(q, _) do
     q
-    |> join(:left, [c, a, parent], f in Flag, [subject_user_id: a.id, verified: true, kind: "spam"])
+    |> join(:left, [c, a, parent], f in Flag, on: [subject_user_id: a.id, verified: true, kind: "spam"])
     |> where([c, a, parent, flags], is_nil(flags.id))
   end
 

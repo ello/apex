@@ -1,7 +1,9 @@
 defmodule Ello.Core.Network do
   import Ello.Core
   import Ecto.Query
-  import NewRelicPhoenix, only: [measure_segment: 2]
+  # 2019-05-07 - the 'newrelic' repo has out of date dependencies, disabling
+  # newrelic until we have bandwidth to update our code, maybe to new_relic
+  # import NewRelicPhoenix, only: [measure_segment: 2]
   alias Ello.Core.{Repo, Redis}
   alias __MODULE__.{User, Preload, Relationship, Flag}
 

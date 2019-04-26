@@ -31,7 +31,7 @@ defmodule Ello.Notifications.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:httpoison, "~> 1.0"},
+      {:httpoison, "~> 1.4"},
       {:jason, "~> 1.0"},
       {:timex, "~> 3.0"},
 

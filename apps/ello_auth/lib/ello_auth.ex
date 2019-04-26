@@ -17,7 +17,7 @@ defmodule Ello.Auth do
   def can_view_user?(_, nil), do: false
   def can_view_user?(%{assigns: %{current_user: current_user}},
                       %{locked_at: nil} = user) when not is_nil(current_user) do
-    not user.id in current_user.all_blocked_ids
+    user.id not in current_user.all_blocked_ids
   end
   def can_view_user?(_, %{is_public: false}), do: false
   def can_view_user?(_, %{locked_at: nil}), do: true

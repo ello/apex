@@ -11,14 +11,14 @@ defmodule Ello.V3.Resolvers.FindPostTest do
     Factory.insert(:featured_category_post, %{
       post: post,
       category: cat1,
-      featured_at: DateTime.utc_now,
+      featured_at: FactoryTime.now,
       featured_by: Factory.insert(:user, username: "Curator McCurator"),
     })
     reposter = Factory.insert(:user)
     a_inv = Factory.insert(:artist_invite, %{id: 1, status: "closed", brand_account: reposter})
     Factory.insert(:artist_invite_submission, post: post, artist_invite: a_inv, status: "approved")
     repost = Factory.insert(:post, reposted_source: post, author: reposter)
-    Factory.insert(:category_post, post: repost, category: cat1, submitted_at: DateTime.utc_now)
+    Factory.insert(:category_post, post: repost, category: cat1, submitted_at: FactoryTime.now)
     Factory.insert(:artist_invite_submission, post: repost, artist_invite: a_inv, status: "approved")
     {:ok, %{user: user, staff: staff, post: post, repost: repost, reposter: reposter}}
   end

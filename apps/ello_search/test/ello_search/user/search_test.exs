@@ -1,7 +1,7 @@
 defmodule Ello.Search.User.SearchTest do
   use Ello.Search.Case
   alias Ello.Search.User.{Index, Search}
-  alias Ello.Core.{Repo, Factory, Network}
+  alias Ello.Core.{Repo, Network}
 
   setup do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
@@ -10,7 +10,7 @@ defmodule Ello.Search.User.SearchTest do
     lana32d      = Factory.insert(:user, %{id: 1, username: "lanakane32d"})
     lanakane     = Factory.insert(:user, %{id: 2, username: "lanakane"})
     lanabandero  = Factory.insert(:user, %{id: 3, username: "lana-bandero"})
-    locked_user  = Factory.insert(:user, %{locked_at: DateTime.utc_now})
+    locked_user  = Factory.insert(:user, %{locked_at: FactoryTime.now})
     spam_user    = Factory.insert(:user)
     nsfw_user    = Factory.insert(:user, settings: %{posts_adult_content: true})
     nudity_user  = Factory.insert(:user, settings: %{posts_nudity: true})

@@ -36,7 +36,9 @@ defmodule Ello.V3.Mixfile do
       {:plug,          "~> 1.3"},
       {:jason,         "~> 1.0"},
 
-      {:newrelic_phoenix, github: "ello/newrelic_phoenix", branch: "master"},
+      # 2019-05-07 - the 'newrelic' repo has out of date dependencies, disabling
+      # newrelic until we have bandwidth to update our code, maybe to new_relic
+      # {:newrelic_phoenix, github: "ello/newrelic_phoenix", branch: "master"},
 
       {:ello_core,   in_umbrella: true},
       {:ello_stream, in_umbrella: true},

@@ -32,7 +32,7 @@ defmodule Ello.Core.Content.Love do
     filtered_assets = Enum.reject assets, fn
       %{attachment: nil} -> true
       %{attachment: ""}  -> true
-      %{id: id}          -> not id in linked_asset_ids
+      %{id: id}          -> not(id in linked_asset_ids)
     end
 
     Map.put(love, :post, %{love.post | assets: filtered_assets})

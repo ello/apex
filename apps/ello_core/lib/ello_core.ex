@@ -14,4 +14,11 @@ defmodule Ello.Core do
       _ -> nil
     end
   end
+
+  defmacro measure_segment(name, do: block) do
+    quote do
+      unquote(_ = name)
+      unquote(block)
+    end
+  end
 end

@@ -23,6 +23,7 @@ defmodule Ello.Feeds.ConnCase do
       import Ello.Feeds.Router.Helpers
       alias Ello.Core.{
         Factory,
+        FactoryTime,
         Repo,
       }
 

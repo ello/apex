@@ -6,7 +6,11 @@ config :ello_dispatch, Ello.Dispatch.Endpoint,
   url:  [host: System.get_env("WEBAPP_HOST") || "localhost"],
   http: [port: System.get_env("PORT") || 5000],
   render_errors: [view: Ello.Dispatch.ErrorView, accepts: ~w(json)],
-  instrumenters: [NewRelicPhoenix.Endpoint]
+  instrumenters: [
+    # 2019-05-07 - the 'newrelic' repo has out of date dependencies, disabling
+    # newrelic until we have bandwidth to update our code, maybe to new_relic
+    # NewRelicPhoenix.Endpoint
+  ]
 
 config :ello_dispatch,
   ecto_repos: []
@@ -22,9 +26,11 @@ config :honeybadger,
   exclude_envs: [:dev, :test]
 
 
-config :newrelic_phoenix,
-  application_name: "Elixir API - #{env_name}",
-  license_key: {:system, "NEW_RELIC_LICENSE_KEY"}
+# 2019-05-07 - the 'newrelic' repo has out of date dependencies, disabling
+# newrelic until we have bandwidth to update our code, maybe to new_relic
+# config :newrelic_phoenix,
+#   application_name: "Elixir API - #{env_name}",
+#   license_key: {:system, "NEW_RELIC_LICENSE_KEY"}
 
 
 import_config "#{Mix.env}.exs"

@@ -1,25 +1,15 @@
 language: elixir
 sudo: required
 elixir:
-  - 1.5.3
-otp_release:
-  - 20.2
+  - 1.8.2
 services:
   - redis-server
   - postgresql
+  - elasticsearch
 env:
   - MIX_ENV=test
 addons:
-  postgresql: '9.6' # Overwritten in before_script.
-  apt:
-    packages:
-      - oracle-java8-set-default
-before_install:
-  - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.deb
-  - sudo dpkg -i --force-confnew elasticsearch-5.1.1.deb
-  - sudo service elasticsearch start
-before_script:
-  - bash script/install-postgres-10.sh
+  postgresql: '10'
 script:
   - mix credo -a
   - mix test --exclude skip_on_travis

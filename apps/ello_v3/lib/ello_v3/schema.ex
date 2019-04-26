@@ -186,7 +186,10 @@ defmodule Ello.V3.Schema do
   Allows us to track each different query as a seperate request for profiling in newrelic.
   """
   def middleware(middle, _field, %{identifier: :query}) do
-    [Middleware.NewRelic, Middleware.StandardizeArguments | middle]
+    [
+      Middleware.NewRelic,
+      Middleware.StandardizeArguments | middle
+    ]
   end
   def middleware(middle, _field, _object), do: middle
 end

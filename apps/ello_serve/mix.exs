@@ -32,6 +32,7 @@ defmodule Ello.Serve.Mixfile do
   defp deps do
     [
       {:phoenix, "~> 1.3.3"},
+      {:plug_cowboy, "~> 1.0"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_html, "~> 2.10"},
       {:gettext, "~> 0.11"},

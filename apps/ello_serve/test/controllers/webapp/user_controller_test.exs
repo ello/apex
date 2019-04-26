@@ -44,13 +44,12 @@ defmodule Ello.Serve.Webapp.UserControllerTest do
   end
 
   test "it renders noscript with post summaries", %{conn: conn, user: user} do
-
     source_post = Factory.insert(:post)
 
-    Factory.add_assets(Factory.insert(:post, author: user))
-    Factory.insert(:post, author: user)
-    Factory.add_assets(Factory.insert(:post, author: user))
-    Factory.insert(:post, author: user, reposted_source: source_post)
+    Factory.add_assets(Factory.insert(:post, author: user, created_at: FactoryTime.now_offset(1)))
+    Factory.insert(:post, author: user, created_at: FactoryTime.now_offset(2))
+    Factory.add_assets(Factory.insert(:post, author: user, created_at: FactoryTime.now_offset(3)))
+    Factory.insert(:post, author: user, reposted_source: source_post, created_at: FactoryTime.now_offset(4))
 
     resp = get(conn, "/archer", %{"per_page" => "2"})
     html = html_response(resp, 200)
@@ -58,6 +57,6 @@ defmodule Ello.Serve.Webapp.UserControllerTest do
     assert html =~ "<noscript>"
     assert html =~ "<h2>@archer</h2>"
     assert html =~ ~r"<h5>.*@archer.*</h5>"s
-    assert html =~ ~r"<h6>.*@archer.*</h6>"s
+    assert html =~ ~r"Reposted by.*@archer.*"s
   end
 end

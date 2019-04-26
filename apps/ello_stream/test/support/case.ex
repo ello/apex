@@ -3,7 +3,7 @@ defmodule Ello.Stream.Case do
 
   using do
     quote do
-      alias Ello.Core.{Factory, Factory.Script}
+      alias Ello.Core.{Factory, FactoryTime, Factory.Script}
     end
   end
 

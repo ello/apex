@@ -30,7 +30,9 @@ defmodule Ello.Dispatch.Mixfile do
       {:honeybadger, "~> 0.7"},
       {:cors_plug, "~> 1.1"},
 
-      {:newrelic_phoenix, github: "ello/newrelic_phoenix", branch: "master"},
+      # 2019-05-07 - the 'newrelic' repo has out of date dependencies, disabling
+      # newrelic until we have bandwidth to update our code, maybe to new_relic
+      # {:newrelic_phoenix, github: "ello/newrelic_phoenix", branch: "master"},
 
       {:ello_v2,    in_umbrella: true},
       {:ello_v3,    in_umbrella: true},

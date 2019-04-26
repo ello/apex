@@ -276,8 +276,8 @@ defmodule Ello.Core.Contest do
 
   def artist_invite_comment_count(%{artist_invite: %{id: id}}) do
     Post
-    |> join(:inner, [c], p in Post, c.parent_post_id == p.id or c.parent_post_id == p.reposted_source_id)
-    |> join(:inner, [c, p], s in ArtistInviteSubmission, p.id == s.post_id or p.reposted_source_id == s.post_id)
+    |> join(:inner, [c], p in Post, on: c.parent_post_id == p.id or c.parent_post_id == p.reposted_source_id)
+    |> join(:inner, [c, p], s in ArtistInviteSubmission, on: p.id == s.post_id or p.reposted_source_id == s.post_id)
     |> where([c, p, s], s.artist_invite_id == ^id)
     |> select([c], count(c.id, :distinct))
     |> Repo.one
@@ -285,8 +285,8 @@ defmodule Ello.Core.Contest do
 
   def artist_invite_love_count(%{artist_invite: %{id: id}}) do
     Love
-    |> join(:inner, [l], p in Post, l.post_id == p.id or l.post_id == p.reposted_source_id)
-    |> join(:inner, [l, p], s in ArtistInviteSubmission, p.id == s.post_id or p.reposted_source_id == s.post_id)
+    |> join(:inner, [l], p in Post, on: l.post_id == p.id or l.post_id == p.reposted_source_id)
+    |> join(:inner, [l, p], s in ArtistInviteSubmission, on: p.id == s.post_id or p.reposted_source_id == s.post_id)
     |> where([l, p, s], s.artist_invite_id == ^id)
     |> select([l], count(l.id, :distinct))
     |> Repo.one
@@ -294,8 +294,8 @@ defmodule Ello.Core.Contest do
 
   def artist_invite_repost_count(%{artist_invite: %{id: id}}) do
     Post
-    |> join(:inner, [rp], p in Post, rp.reposted_source_id == p.id)
-    |> join(:inner, [rp, p], s in ArtistInviteSubmission, p.id == s.post_id)
+    |> join(:inner, [rp], p in Post, on: rp.reposted_source_id == p.id)
+    |> join(:inner, [rp, p], s in ArtistInviteSubmission, on: p.id == s.post_id)
     |> where([rp, p, s], s.artist_invite_id == ^id)
     |> select([rp], count(rp.id, :distinct))
     |> Repo.one

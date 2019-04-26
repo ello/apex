@@ -98,9 +98,9 @@ own config options in it's README.
 
 ### Commands
 
-* To start the web server run `mix phoenix.server`.
+* To start the web server run `mix phx.server`.
 * To start a console run `iex -S mix`
-* To start a console and webserver run `iex -S mix phoenix.server`
+* To start a console and webserver run `iex -S mix phx.server`
 * To run tests `mix test`
 * To rebuild the database `mix do ecto.drop, ecto.create, ecto.migrate`
 

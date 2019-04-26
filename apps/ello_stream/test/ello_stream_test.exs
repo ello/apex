@@ -12,9 +12,7 @@ defmodule Ello.StreamTest do
   end
 
   test "returns 0 items when zero items in stream" do
-    stream = Stream.fetch(
-      keys: ["test"],
-    )
+    stream = Stream.fetch(keys: ["test"])
 
     assert Enum.empty?(stream.posts)
     assert stream.__batches == 1
@@ -60,7 +58,7 @@ defmodule Ello.StreamTest do
 
     stream = Stream.fetch(
       keys: ["test"],
-      per_page: 10,
+      per_page: 10
     )
 
     assert stream.__batches == max_batches
@@ -77,7 +75,7 @@ defmodule Ello.StreamTest do
 
     stream = Stream.fetch(
       keys: ["test"],
-      per_page: per_page,
+      per_page: per_page
     )
 
     assert Enum.count(stream.posts) >= per_page
@@ -94,7 +92,7 @@ defmodule Ello.StreamTest do
 
     stream = Stream.fetch(
       keys: ["test"],
-      per_page: per_page,
+      per_page: per_page
     )
 
     assert Enum.count(stream.posts) == num_posts
@@ -112,12 +110,12 @@ defmodule Ello.StreamTest do
 
     page1 = Stream.fetch(
       keys: ["test"],
-      per_page: per_page,
+      per_page: per_page
     )
     page2 = Stream.fetch(
       keys: ["test"],
       per_page: per_page,
-      before: page1.before,
+      before: page1.before
     )
 
     assert Enum.count(page1.posts) >= per_page

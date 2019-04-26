@@ -26,7 +26,9 @@ defmodule Ello.V3 do
 
   use Plug.Router
 
-  plug Ello.V3.Plug.NewRelic
+  # 2019-05-07 - the 'newrelic' repo has out of date dependencies, disabling
+  # newrelic until we have bandwidth to update our code, maybe to new_relic
+  # plug Ello.V3.Plug.NewRelic
   plug :match
   plug :dispatch
 
