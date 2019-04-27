@@ -9,6 +9,6 @@ defmodule TH.Dash.Router do
     pipe_through :api
 
     get "/ping", StatusController, :ping
-    get "/creds", CredsController, :index
+    get "/secrets", SecretsController, :index
   end
 end

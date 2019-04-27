@@ -1,4 +1,4 @@
-defmodule TH.Dash.CredsController do
+defmodule TH.Dash.SecretsController do
   use TH.Dash.Web, :controller
 
   def index(conn, _) do
