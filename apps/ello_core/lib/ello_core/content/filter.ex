@@ -1,6 +1,9 @@
 defmodule Ello.Core.Content.Filter do
   import Ecto.Query
   alias Ello.Core.Content.Post
+  alias Ello.Core.Redis
+
+  @minimum_cred (Application.get_env(:ello_core, :minimum_cred) || 100)
 
   @doc """
   Takes a post query and adds filtering clauses to it.
@@ -34,7 +37,9 @@ defmodule Ello.Core.Content.Filter do
   be called on a list of posts.
   """
   def post_list(list, options) do
-    filter_blocked(list, options)
+    list
+    |> filter_blocked(options)
+    |> filter_require_cred(options)
   end
 
   defp filter_nsfw(query, %{allow_nsfw: true}), do: query
@@ -72,6 +77,30 @@ defmodule Ello.Core.Content.Filter do
   end
   defp filter_private_comments(query, _), do: query
 
+  defp filter_require_cred(nil, _), do: nil
+  defp filter_require_cred([], _), do: []
+  defp filter_require_cred(%Post{} = post, %{require_cred: true}),
+    do: if author_has_cred(post), do: post, else: nil
+  defp filter_require_cred(posts, %{require_cred: true}) do
+    Enum.filter(posts, &author_has_cred(&1))
+  end
+  defp filter_require_cred(posts, _), do: posts
+
+  defp author_has_cred(%{author_id: author_id}) do
+    key = "user:#{author_id}:total_post_views_counter"
+    redis_counts = Redis.command(["GET" | [key]], name: :user_counts)
+    try do
+      case redis_counts do
+        {:ok, nil} -> false
+        {:ok, ""} -> false
+        {:ok, user_counts} ->
+          String.to_integer(user_counts) > @minimum_cred
+        _ -> true
+      end
+    rescue _ in ArgumentError ->
+      true
+    end
+  end
 
   defp filter_blocked(nil, _), do: nil
   defp filter_blocked([], _), do: []
