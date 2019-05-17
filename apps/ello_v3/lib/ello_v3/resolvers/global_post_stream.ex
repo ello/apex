@@ -30,7 +30,8 @@ defmodule Ello.V3.Resolvers.GlobalPostStream do
 
     stream = Stream.fetch(Map.merge(args, %{
       keys:       Enum.map(sources, &Stream.key(&1, :featured)),
-      allow_nsfw: true, # No NSFW in categories or artist invites, so reduce slop
+      allow_nsfw: true,
+      require_cred: require_cred?(args),
     }))
 
     {:ok, %{
@@ -43,7 +44,8 @@ defmodule Ello.V3.Resolvers.GlobalPostStream do
   def call(_, %{kind: :recent} = args, _) do
     stream = Stream.fetch(Map.merge(args, %{
       keys:       [Stream.key(:global_recent)],
-      allow_nsfw: true, # No NSFW in recent stream, reduces slop.
+      allow_nsfw: true,
+      require_cred: require_cred?(args),
     }))
 
     {:ok, %{
@@ -56,7 +58,8 @@ defmodule Ello.V3.Resolvers.GlobalPostStream do
   def call(_, %{kind: :shop} = args, _) do
     stream = Stream.fetch(Map.merge(args, %{
       keys:       [Stream.key(:global_shop)],
-      allow_nsfw: true, # No NSFW in recent stream, reduces slop.
+      allow_nsfw: true,
+      require_cred: require_cred?(args),
     }))
 
     {:ok, %{
@@ -65,4 +68,9 @@ defmodule Ello.V3.Resolvers.GlobalPostStream do
       is_last_page: is_last_page(args, stream.posts)
     }}
   end
+
+  # whether to require the author to have 100 total post views
+  # staff accounts do not have this requirement
+  defp require_cred?(%{current_user: %{is_staff: true}}), do: false
+  defp require_cred?(_), do: true
 end

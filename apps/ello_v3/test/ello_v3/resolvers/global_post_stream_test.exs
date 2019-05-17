@@ -3,6 +3,7 @@ defmodule Ello.V3.Resolvers.GlobalPostStreamTest do
   alias Ello.Stream
   alias Ello.Stream.Item
   alias Ello.Search.Post.Index
+  alias Ello.Core.Redis
 
   @query """
     query($perPage: String, $before: String, $kind: StreamKind!) {
@@ -24,12 +25,15 @@ defmodule Ello.V3.Resolvers.GlobalPostStreamTest do
 
   test "Recent stream", %{} do
     user = Factory.insert(:user)
-    post1 = Factory.add_assets(Factory.insert(:post))
-    post2 = Factory.insert(:post)
-    post3 = Factory.insert(:post, has_nudity: true)
-    post4 = Factory.insert(:post)
-    post5 = Factory.insert(:post)
-    post6 = Factory.insert(:post, has_nudity: true)
+    author = Factory.insert(:user)
+    Redis.command(["SET", "user:#{author.id}:total_post_views_counter", "101"])
+
+    post1 = Factory.add_assets(Factory.insert(:post, author: author))
+    post2 = Factory.insert(:post, author: author)
+    post3 = Factory.insert(:post, has_nudity: true, author: author)
+    post4 = Factory.insert(:post, author: author)
+    post5 = Factory.insert(:post, author: author)
+    post6 = Factory.insert(:post, has_nudity: true, author: author)
     Factory.insert(:love, post: post1, user: user)
     key = Stream.key(:global_recent)
     roshi_items = [
@@ -71,12 +75,15 @@ defmodule Ello.V3.Resolvers.GlobalPostStreamTest do
 
   test "Shop stream", %{} do
     user = Factory.insert(:user)
-    post1 = Factory.add_assets(Factory.insert(:post))
-    post2 = Factory.insert(:post, is_saleable: true)
-    post3 = Factory.insert(:post, has_nudity: true, is_saleable: true)
-    post4 = Factory.insert(:post, is_saleable: true)
-    post5 = Factory.insert(:post, is_saleable: true)
-    post6 = Factory.insert(:post, has_nudity: true, is_saleable: true)
+    author = Factory.insert(:user)
+    Redis.command(["SET", "user:#{author.id}:total_post_views_counter", "101"])
+
+    post1 = Factory.add_assets(Factory.insert(:post, author: author))
+    post2 = Factory.insert(:post, is_saleable: true, author: author)
+    post3 = Factory.insert(:post, has_nudity: true, is_saleable: true, author: author)
+    post4 = Factory.insert(:post, is_saleable: true, author: author)
+    post5 = Factory.insert(:post, is_saleable: true, author: author)
+    post6 = Factory.insert(:post, has_nudity: true, is_saleable: true, author: author)
     Factory.insert(:love, post: post1, user: user)
     key = Stream.key(:global_shop)
     roshi_items = [
@@ -118,7 +125,9 @@ defmodule Ello.V3.Resolvers.GlobalPostStreamTest do
 
 
   test "Trending stream", _ do
-    posts = Factory.insert_list(6, :post)
+    author = Factory.insert(:user)
+    Redis.command(["SET", "user:#{author.id}:total_post_views_counter", "101"])
+    posts = Factory.insert_list(6, :post, %{author: author})
     Index.delete
     Index.create
     Enum.each(posts, &Index.add/1)
