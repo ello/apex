@@ -13,6 +13,7 @@ defmodule Ello.Stream do
     before:         nil,
     posts:          [],
     preloads:       nil,
+    require_cred:   false,  # on discover streams, require that the author has > 100 total views
     __batches:      0,
     __stream_items: [],
     __limit:        nil,
@@ -73,7 +74,7 @@ defmodule Ello.Stream do
 
   defp fetch_filtered_posts(stream) do
     post_ids = Enum.map(stream.__stream_items, &(String.to_integer(&1.id)))
-    filters = Map.take(stream, [:current_user, :allow_nsfw, :allow_nudity, :preloads])
+    filters = Map.take(stream, [:current_user, :allow_nsfw, :allow_nudity, :preloads, :require_cred])
     posts = Content.posts(Map.merge(filters, %{ids: post_ids}))
     Map.put(stream, :posts, stream.posts ++ posts)
   end
