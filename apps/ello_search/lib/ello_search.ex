@@ -1,5 +1,5 @@
 defmodule Ello.Search do
-  alias Ello.Search.{Client}
+  alias Ello.Search.Client
   # 2019-05-07 - the 'newrelic' repo has out of date dependencies, disabling
   # newrelic until we have bandwidth to update our code, maybe to new_relic
   # import NewRelicPhoenix, only: [measure_segment: 2]
