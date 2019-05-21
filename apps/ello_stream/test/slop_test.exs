@@ -32,4 +32,17 @@ defmodule Ello.SlopTest do
     assert Slop.slop_factor(%{current_user: %{all_blocked_ids: [1, 2, 3]}}, factors) == 6
   end
 
+  test "it calculates default slop_factor when requiring cred" do
+    factors = %{
+      cred_slop_factor: 2,
+
+      base_slop_factor: 0,
+      block_slop_multiplier: 0,
+      max_block_slop_factor: 0,
+      nsfw_slop_factor: 0,
+      nudity_slop_factor: 0,
+    }
+    assert Slop.slop_factor(%{require_cred: true}, factors) == 2
+  end
+
 end

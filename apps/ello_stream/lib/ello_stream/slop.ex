@@ -5,6 +5,7 @@ defmodule Ello.Stream.Slop do
   @max_block_slop_factor Application.get_env(:ello_stream, :max_block_slop_factor)
   @nsfw_slop_factor      Application.get_env(:ello_stream, :nsfw_slop_factor)
   @nudity_slop_factor    Application.get_env(:ello_stream, :nudity_slop_factor)
+  @cred_slop_factor    Application.get_env(:ello_stream, :cred_slop_factor)
 
   def slop_factor(stream, factors \\ %{}) do
     base_slop_factor = factors[:base_slop_factor] || @base_slop_factor
@@ -12,10 +13,12 @@ defmodule Ello.Stream.Slop do
     max_block_slop_factor = factors[:max_block_slop_factor] || @max_block_slop_factor
     nsfw_slop_factor = factors[:nsfw_slop_factor] || @nsfw_slop_factor
     nudity_slop_factor = factors[:nudity_slop_factor] || @nudity_slop_factor
+    cred_slop_factor = factors[:cred_slop_factor] || @cred_slop_factor
 
     base_slop_factor +
       calc_nsfw_slop_factor(stream, nsfw_slop_factor) +
       calc_nudity_slop_factor(stream, nudity_slop_factor) +
+      calc_cred_slop_factor(stream, cred_slop_factor) +
       calc_blocked_users_slop_factor(stream, block_slop_multiplier, max_block_slop_factor)
   end
 
@@ -31,5 +34,8 @@ defmodule Ello.Stream.Slop do
 
   defp calc_nudity_slop_factor(%{allow_nudity: true}, _), do: 0.0
   defp calc_nudity_slop_factor(_, nudity_slop_factor), do: nudity_slop_factor
+
+  defp calc_cred_slop_factor(%{require_cred: true}, cred_slop_factor), do: cred_slop_factor
+  defp calc_cred_slop_factor(_, _), do: 0.0
 
 end
