@@ -1,7 +1,7 @@
 # Note: When running in an umbrella we do not start this endpoint directly.
-# Instead TH.Dash.Endpoint is run.
-defmodule TH.Dash.Endpoint do
-  use Phoenix.Endpoint, otp_app: :th_dash
+# Instead TH.TrueDash.Endpoint is run.
+defmodule TH.TrueDash.Endpoint do
+  use Phoenix.Endpoint, otp_app: :true_dash
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
@@ -17,5 +17,5 @@ defmodule TH.Dash.Endpoint do
     pass: ["*/*"],
     json_decoder: Jason
 
-  plug TH.Dash.Router
+  plug TH.TrueDash.Router
 end

@@ -21,7 +21,7 @@ defmodule Ello.Dispatch do
   def dispatch(%{path_info: ["api", "serve" | _]} = conn, _),
     do: Ello.Serve.Router.call(conn, [])
   def dispatch(%{path_info: ["api", "cidash" | _]} = conn, _),
-    do: TH.Dash.Router.call(conn, [])
+    do: TH.TrueDash.Router.call(conn, [])
   def dispatch(%{method: "GET"} = conn, _),
     do: Ello.Serve.Router.call(conn, [])
   def dispatch(conn, _),

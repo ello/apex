@@ -39,7 +39,7 @@ defmodule Ello.Dispatch.Mixfile do
       {:ello_feeds, in_umbrella: true},
       {:ello_serve, in_umbrella: true},
 
-      {:th_dash, in_umbrella: true},
+      {:true_dash, in_umbrella: true},
     ]
   end
 end

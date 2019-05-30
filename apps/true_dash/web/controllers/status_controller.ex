@@ -1,5 +1,5 @@
-defmodule TH.Dash.StatusController do
-  use TH.Dash.Web, :controller
+defmodule TH.TrueDash.StatusController do
+  use TH.TrueDash.Web, :controller
 
   def ping(conn, _) do
     json(conn, %{

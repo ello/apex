@@ -1,4 +1,4 @@
-defmodule TH.Dash do
+defmodule TH.TrueDash do
   @moduledoc false
   use Application
 
@@ -10,15 +10,15 @@ defmodule TH.Dash do
     # Define workers and child supervisors to be supervised
     children = [
       # Start the endpoint when the application starts
-      supervisor(TH.Dash.Endpoint, []),
+      supervisor(TH.TrueDash.Endpoint, []),
     ]
 
-    opts = [strategy: :one_for_one, name: TH.Dash.Supervisor]
+    opts = [strategy: :one_for_one, name: TH.TrueDash.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
   def config_change(changed, _new, removed) do
-    TH.Dash.Endpoint.config_change(changed, removed)
+    TH.TrueDash.Endpoint.config_change(changed, removed)
     :ok
   end
 end

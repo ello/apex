@@ -1,5 +1,5 @@
-defmodule TH.Dash.StatusControllerTest do
-  use TH.Dash.ConnCase, async: false
+defmodule TH.TrueDash.StatusControllerTest do
+  use TH.TrueDash.ConnCase, async: false
   use ExUnit.Case
 
   setup %{conn: conn} do

@@ -77,12 +77,11 @@ builds html and pushes it to Ello.Serve. We can then activate specific versions
 of the app in a given environment. Ello.Serve is also responsible for serving up
 basic html for clients not supporting Javascript. [README](/apps/ello_serve/).
 
-### `TH.Dash`
+### `TH.TrueDash`
 
-Dash is a tiny helper app to accompany Talenthouse's "True Dash" marketing
-dashboard.  It provides app tokens (so they don't have to be stored in-app) and
-some "helper" endpoints for things that can't be accomplished in javascript via
-ajax.
+TrueDash is a tiny helper app to accompany Talenthouse's marketing dashboard.
+It provides app tokens (so they don't have to be stored in-app) and some
+"helper" endpoints for things that can't be accomplished in javascript via ajax.
 
 
 ## Getting Started

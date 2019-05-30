@@ -1,5 +1,5 @@
-defmodule TH.Dash.SecretsControllerTest do
-  use TH.Dash.ConnCase, async: false
+defmodule TH.TrueDash.SecretsControllerTest do
+  use TH.TrueDash.ConnCase, async: false
   use ExUnit.Case
 
   setup %{conn: conn} do

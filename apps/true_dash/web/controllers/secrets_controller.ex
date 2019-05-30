@@ -1,5 +1,5 @@
-defmodule TH.Dash.SecretsController do
-  use TH.Dash.Web, :controller
+defmodule TH.TrueDash.SecretsController do
+  use TH.TrueDash.Web, :controller
 
   def index(conn, _) do
     json(conn, %{

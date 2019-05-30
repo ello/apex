@@ -1,8 +1,8 @@
-defmodule TH.Dash.Mixfile do
+defmodule TH.TrueDash.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :th_dash,
+    [app: :true_dash,
      version: "0.1.0",
      build_path: "../../_build",
      config_path: "../../config/config.exs",
@@ -21,7 +21,7 @@ defmodule TH.Dash.Mixfile do
   def elixirc_paths(_),     do: ["lib", "web"]
 
   def application do
-    [mod: {TH.Dash, []},
+    [mod: {TH.TrueDash, []},
      extra_applications: [:logger]]
   end
 
@@ -29,7 +29,10 @@ defmodule TH.Dash.Mixfile do
     [
       {:phoenix, "~> 1.3.3"},
       {:cowboy, "~> 1.0"},
-      {:httpoison, "~> 1.0"},
+      {:httpoison, "~> 1.4"},
+      {:hackney, "~> 1.12"},
+      {:nimble_csv, "~> 0.6.0"},
+      {:html_entities, "~> 0.4.0"},
 
       {:ello_auth,   in_umbrella: true},
     ]

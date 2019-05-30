@@ -1,4 +1,4 @@
-defmodule TH.Dash.ConnCase do
+defmodule TH.TrueDash.ConnCase do
   use ExUnit.CaseTemplate
   alias Ello.Auth.JWT
 
@@ -7,11 +7,11 @@ defmodule TH.Dash.ConnCase do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
 
-      import TH.Dash.ConnCase, only: [auth_conn: 2, user_conn: 2, public_conn: 1]
-      alias Ello.Core.{Factory, Factory.Script}
+      import TH.TrueDash.ConnCase, only: [auth_conn: 2, user_conn: 2, public_conn: 1]
+      alias Ello.Core.{Factory, FactoryTime, Factory.Script}
 
       # The default endpoint for testing
-      @endpoint TH.Dash.Endpoint
+      @endpoint TH.TrueDash.Endpoint
     end
   end
 
