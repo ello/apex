@@ -7,6 +7,7 @@ defmodule Ello.V3.Case do
     quote do
       alias Ello.Core.{
         Factory,
+        FactoryTime,
         Factory.Script,
         Repo,
       }

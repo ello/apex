@@ -1,6 +1,9 @@
 defmodule Ello.Core.Content.Preload do
   import Ecto.Query
-  import NewRelicPhoenix, only: [measure_segment: 2]
+  # 2019-05-07 - the 'newrelic' repo has out of date dependencies, disabling
+  # newrelic until we have bandwidth to update our code, maybe to new_relic
+  # import NewRelicPhoenix, only: [measure_segment: 2]
+  import Ello.Core, only: [measure_segment: 2]
   alias Ello.Core.{
     Discovery,
     Content,
@@ -216,7 +219,7 @@ defmodule Ello.Core.Content.Preload do
     # Add counts to posts
     counts
     |> Enum.map(&(String.to_integer(&1 || "0")))
-    |> Enum.chunk(4)
+    |> Enum.chunk_every(4)
     |> Enum.zip(posts)
     |> Enum.map(fn({[loves, comments, reposts, views], user}) ->
       Map.merge user, %{

@@ -1,7 +1,10 @@
 defmodule Ello.Serve.Render do
   import Phoenix.Controller, only: [view_module: 1, html: 2]
   import Phoenix.View, only: [render_to_iodata: 3]
-  import NewRelicPhoenix, only: [measure_segment: 2]
+  # 2019-05-07 - the 'newrelic' repo has out of date dependencies, disabling
+  # newrelic until we have bandwidth to update our code, maybe to new_relic
+  # import NewRelicPhoenix, only: [measure_segment: 2]
+  import Ello.Core, only: [measure_segment: 2]
   alias Ello.Serve.{Webapp, Bread}
 
   def render_html(conn, data \\ [])

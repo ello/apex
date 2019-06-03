@@ -75,7 +75,7 @@ defmodule Ello.Core.Network.Preload do
     # Add counts to users
     counts
     |> Enum.map(&(String.to_integer(&1 || "0")))
-    |> Enum.chunk(5)
+    |> Enum.chunk_every(5)
     |> Enum.zip(users)
     |> Enum.map(&merge_user_counts/1)
   end

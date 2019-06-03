@@ -11,27 +11,33 @@ defmodule Ello.V2.ArtistInviteSubmissionControllerTest do
       status:        "open",
       slug:          "test",
     })
-    declined = Factory.insert_list(4, :artist_invite_submission, %{
-      artist_invite: invite,
-      status:        "declined",
-    })
-    unapproved = Factory.insert_list(4, :artist_invite_submission, %{
-      artist_invite: invite,
-      status:        "unapproved",
-    })
-    approved = Factory.insert_list(2, :artist_invite_submission, %{
-      artist_invite: invite,
-      status:        "approved",
-    })
-    approved_with_images = Factory.insert_list(2, :artist_invite_submission, %{
-      artist_invite: invite,
-      status:        "approved",
-      post:          Factory.add_assets(Factory.insert(:post)),
-    })
-    selected = Factory.insert_list(4, :artist_invite_submission, %{
-      artist_invite: invite,
-      status:        "selected",
-    })
+
+    declined_submission_1 = Factory.insert(:artist_invite_submission, artist_invite: invite, status: "declined", created_at: FactoryTime.now_offset(1))
+    declined_submission_2 = Factory.insert(:artist_invite_submission, artist_invite: invite, status: "declined", created_at: FactoryTime.now_offset(2))
+    declined_submission_3 = Factory.insert(:artist_invite_submission, artist_invite: invite, status: "declined", created_at: FactoryTime.now_offset(3))
+    declined_submission_4 = Factory.insert(:artist_invite_submission, artist_invite: invite, status: "declined", created_at: FactoryTime.now_offset(4))
+
+    unapproved_submission_1 = Factory.insert(:artist_invite_submission, artist_invite: invite, status: "unapproved", created_at: FactoryTime.now_offset(5))
+    unapproved_submission_2 = Factory.insert(:artist_invite_submission, artist_invite: invite, status: "unapproved", created_at: FactoryTime.now_offset(6))
+    unapproved_submission_3 = Factory.insert(:artist_invite_submission, artist_invite: invite, status: "unapproved", created_at: FactoryTime.now_offset(7))
+    unapproved_submission_4 = Factory.insert(:artist_invite_submission, artist_invite: invite, status: "unapproved", created_at: FactoryTime.now_offset(8))
+
+    approved_submission_1 = Factory.insert(:artist_invite_submission, artist_invite: invite, status: "approved", created_at: FactoryTime.now_offset(9))
+    approved_submission_2 = Factory.insert(:artist_invite_submission, artist_invite: invite, status: "approved", created_at: FactoryTime.now_offset(10))
+    approved_submission_3 = Factory.insert(:artist_invite_submission, artist_invite: invite, status: "approved", post: Factory.add_assets(Factory.insert(:post)), created_at: FactoryTime.now_offset(11))
+    approved_submission_4 = Factory.insert(:artist_invite_submission, artist_invite: invite, status: "approved", post: Factory.add_assets(Factory.insert(:post)), created_at: FactoryTime.now_offset(12))
+
+    selected_submission_1 = Factory.insert(:artist_invite_submission, artist_invite: invite, status: "selected", created_at: FactoryTime.now_offset(13))
+    selected_submission_2 = Factory.insert(:artist_invite_submission, artist_invite: invite, status: "selected", created_at: FactoryTime.now_offset(14))
+    selected_submission_3 = Factory.insert(:artist_invite_submission, artist_invite: invite, status: "selected", created_at: FactoryTime.now_offset(15))
+    selected_submission_4 = Factory.insert(:artist_invite_submission, artist_invite: invite, status: "selected", created_at: FactoryTime.now_offset(16))
+
+    declined = [declined_submission_1, declined_submission_2, declined_submission_3, declined_submission_4]
+    unapproved = [unapproved_submission_1, unapproved_submission_2, unapproved_submission_3, unapproved_submission_4]
+    approved = [approved_submission_1, approved_submission_2]
+    approved_with_images = [approved_submission_3, approved_submission_4]
+    selected = [selected_submission_1, selected_submission_2, selected_submission_3, selected_submission_4]
+
     {:ok, [
       conn:       public_conn(conn),
       staff_conn: auth_conn(conn, staff),

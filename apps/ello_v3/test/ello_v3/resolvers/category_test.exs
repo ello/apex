@@ -95,7 +95,7 @@ defmodule Ello.V3.Resolvers.CategoryTest do
     assert json["brand_account"] == nil
   end
 
-  test "Returns the category with users", %{cat1: cat1, cu2: cu2, cu2: cu3, current_user: current_user} do
+  test "Returns the category with users", %{cat1: cat1, cu2: cu2, cu3: cu3, current_user: current_user} do
     query = """
       query($slug: String, $roles: [CategoryUserRole]) {
         category(slug: $slug) {

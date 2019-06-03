@@ -6,9 +6,10 @@ defmodule Ello.V3.Resolvers.UserNetworkStreamTest do
     boring = Factory.insert(:user)
     interesting = Factory.insert(:user)
 
-    Enum.each(Factory.insert_list(10, :user), fn(user) ->
-      Factory.insert(:relationship, subject: user, owner: boring, priority: "friend")
-      Factory.insert(:relationship, subject: interesting, owner: user, priority: "friend")
+    users_with_offset = Factory.insert_list(10, :user)
+    Enum.each(users_with_offset |> Enum.with_index, fn({user, offset}) ->
+      Factory.insert(:relationship, subject: user, owner: boring, priority: "friend", created_at: FactoryTime.now_offset(offset))
+      Factory.insert(:relationship, subject: interesting, owner: user, priority: "friend", created_at: FactoryTime.now_offset(offset))
     end)
 
     {:ok, %{
@@ -56,7 +57,7 @@ defmodule Ello.V3.Resolvers.UserNetworkStreamTest do
     assert %{"users" => [], "isLastPage" => true, "next" => _} = json
   end
 
-  test "followers by id", %{interesting: interesting, boring: boring} do
+  test "followers by id", %{interesting: interesting} do
     resp = post_graphql(%{
       query: @query,
       variables: %{
@@ -64,7 +65,7 @@ defmodule Ello.V3.Resolvers.UserNetworkStreamTest do
         kind: "FOLLOWERS",
         perPage: 3,
       }
-    }, boring)
+    })
     assert %{"data" => %{"userNetworkStream" => json}} = json_response(resp)
     assert %{"users" => users, "isLastPage" => false, "next" => next} = json
     assert length(users) == 3

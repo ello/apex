@@ -44,7 +44,7 @@ defmodule Ello.V2.UserControllerTest do
             |> get(user_path(conn, :show, archer))
     assert resp2.status == 304
     archer
-    |> Ecto.Changeset.change(%{updated_at: DateTime.utc_now})
+    |> Ecto.Changeset.change(%{updated_at: FactoryTime.now_offset(1)})
     |> Ello.Core.Repo.update!
     resp3 = conn
             |> put_req_header("if-none-match", etag)
@@ -80,7 +80,7 @@ defmodule Ello.V2.UserControllerTest do
 
   test "GET /v2/users/:id - when locked", context do
     context.archer
-    |> Ecto.Changeset.change(locked_at: DateTime.utc_now)
+    |> Ecto.Changeset.change(locked_at: FactoryTime.now)
     |> Ello.Core.Repo.update!
 
     conn = auth_conn(context.unauth_conn, context.user)

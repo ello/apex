@@ -82,7 +82,7 @@ defmodule Ello.V3.Resolvers.SearchCategoriesTest do
   end
 
   test "filters by role when present", %{
-    cat2: cat1,
+    cat1: cat1,
     cat2: cat2,
     cat4: cat4,
     cat5: cat5,
@@ -104,7 +104,7 @@ defmodule Ello.V3.Resolvers.SearchCategoriesTest do
   end
 
   test "filters by role and query when present", %{
-    cat2: cat1,
+    cat1: cat1,
     cat2: cat2,
     cat4: cat4,
     cat5: cat5,

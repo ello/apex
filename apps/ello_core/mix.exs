@@ -31,21 +31,24 @@ defmodule Ello.Core.Mixfile do
 
   def aliases do
     [
-      "test": ["ecto.create --quiet", "ecto.migrate", "test"]
+      test: ["ecto.create --quiet", "ecto.migrate", "test"]
     ]
   end
 
   defp deps do
     [
-      {:phoenix_ecto, "~> 3.0"},
+      {:phoenix_ecto, "~> 4.0"},
       {:postgrex,     ">= 0.0.0"},
-      {:redix,        "~> 0.7.1"},
+      {:redix,        "~> 0.7"},
       {:jason,        "~> 1.0"},
-      {:ex_machina,   "~> 2.2.0"},
+      {:ex_machina,   "~> 2.3"},
       {:timex,        "~> 3.0"},
-      {:ecto,         "~> 2.2.7"},
+      {:ecto,         "~> 3.0"},
+      {:ecto_sql,     "~> 3.0"},
 
-      {:newrelic_phoenix, github: "ello/newrelic_phoenix", branch: "master"},
+      # 2019-05-07 - the 'newrelic' repo has out of date dependencies, disabling
+      # newrelic until we have bandwidth to update our code, maybe to new_relic
+      # {:newrelic_phoenix, github: "ello/newrelic_phoenix", branch: "master"},
     ]
   end
 end

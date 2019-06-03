@@ -20,8 +20,8 @@ defmodule Ello.Mixfile do
 
   defp aliases do
     [
-      "server": ["phoenix.server"],
-      "test": ["ecto.create --quiet", "ecto.migrate", "test"],
+      server: ["phx.server"],
+      test: ["ecto.create --quiet", "ecto.migrate", "test"],
     ]
   end
 end

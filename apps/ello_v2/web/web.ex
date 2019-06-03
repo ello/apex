@@ -5,7 +5,7 @@ defmodule Ello.V2.Web do
 
   This can be used in your application as:
 
-      use Ello.V3.Web, :controller
+      use Ello.V2.Web, :controller
       use Ello.V2.Web, :view
 
   The definitions below will be executed for every view,

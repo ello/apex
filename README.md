@@ -77,6 +77,12 @@ builds html and pushes it to Ello.Serve. We can then activate specific versions
 of the app in a given environment. Ello.Serve is also responsible for serving up
 basic html for clients not supporting Javascript. [README](/apps/ello_serve/).
 
+### `TH.TrueDash`
+
+TrueDash is a tiny helper app to accompany Talenthouse's marketing dashboard.
+It provides app tokens (so they don't have to be stored in-app) and some
+"helper" endpoints for things that can't be accomplished in javascript via ajax.
+
 
 ## Getting Started
 
@@ -98,9 +104,9 @@ own config options in it's README.
 
 ### Commands
 
-* To start the web server run `mix phoenix.server`.
+* To start the web server run `mix phx.server`.
 * To start a console run `iex -S mix`
-* To start a console and webserver run `iex -S mix phoenix.server`
+* To start a console and webserver run `iex -S mix phx.server`
 * To run tests `mix test`
 * To rebuild the database `mix do ecto.drop, ecto.create, ecto.migrate`
 

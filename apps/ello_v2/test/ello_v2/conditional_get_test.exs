@@ -28,17 +28,17 @@ defmodule Ello.V2.ConditionalGetTest do
     category = Factory.build(:category, %{
       id: "123",
       updated_at: date,
-      promotionals: Factory.build_list(2, :promotional),
+      promotionals: Factory.build_list(2, :promotional, updated_at: DateTime.from_unix!(0)),
     })
     changes = [
       %{id: "124"},
       %{updated_at: other_date},
-      %{promotionals: Factory.build_list(2, :promotional)}
+      %{promotionals: Factory.build_list(2, :promotional, updated_at: DateTime.from_unix!(1))}
     ]
 
     for change <- changes do
       new_category = Map.merge(category, change)
-      refute etag(category) == etag(new_category)
+      refute etag(category) == etag(new_category), "changing " <> inspect(hd(Map.keys(change))) <> " doesn't change the etag"
     end
   end
 

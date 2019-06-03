@@ -33,7 +33,7 @@ defmodule Ello.Notifications.StreamTest do
       subject_id: post.id,
       subject_type: "Post",
       kind: "post_mention_notification",
-      created_at: DateTime.utc_now(),
+      created_at: FactoryTime.now,
       originating_user_id: author.id,
     })
     assert stream = %Stream{} = Stream.fetch(%{current_user: user})
@@ -60,7 +60,7 @@ defmodule Ello.Notifications.StreamTest do
       subject_id: post.id,
       subject_type: "Post",
       kind: "post_mention_notification",
-      created_at: DateTime.utc_now(),
+      created_at: FactoryTime.now,
       originating_user_id: author.id,
     })
     assert :ok = Stream.create(%{
@@ -68,7 +68,7 @@ defmodule Ello.Notifications.StreamTest do
       subject_id: repost.id,
       subject_type: "Post",
       kind: "repost_notification",
-      created_at: DateTime.utc_now(),
+      created_at: FactoryTime.now,
       originating_user_id: repost.author_id,
     })
     assert stream = %Stream{} = Stream.fetch(%{current_user: user, category: :reposts})
@@ -100,7 +100,7 @@ defmodule Ello.Notifications.StreamTest do
       subject_id: post.id,
       subject_type: "Post",
       kind: "post_mention_notification",
-      created_at: DateTime.utc_now(),
+      created_at: FactoryTime.now,
       originating_user_id: author.id,
     })
     assert stream = %Stream{} = Stream.fetch(%{current_user: user})

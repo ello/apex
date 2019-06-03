@@ -86,7 +86,7 @@ defmodule Ello.V2.EditorialView do
   end
   def links(%{kind: "following"}, %{assigns: %{current_user: user}}) when not is_nil(user) do
     case Network.following_ids(user, 1) do
-      list when length(list) > 0 ->
+      list when list != [] ->
         %{
           post_stream: %{
             type: "posts",

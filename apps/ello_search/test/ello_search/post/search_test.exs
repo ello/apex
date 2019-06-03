@@ -1,7 +1,7 @@
 defmodule Ello.Search.Post.SearchTest do
   use Ello.Search.Case
   alias Ello.Search.Post.{Index, Search}
-  alias Ello.Core.{Repo, Factory, Network}
+  alias Ello.Core.{Repo, Network}
 
   setup do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
@@ -21,7 +21,7 @@ defmodule Ello.Search.Post.SearchTest do
     Factory.insert(:category_post, post: nudity_post, category: cat1)
     private_user = Factory.insert(:user, %{is_public: false})
     private_post = Factory.insert(:post, %{author: private_user})
-    locked_user  = Factory.insert(:user, %{locked_at: DateTime.utc_now})
+    locked_user  = Factory.insert(:user, %{locked_at: FactoryTime.now})
     locked_post  = Factory.insert(:post, %{author: locked_user})
     spam_post    = Factory.insert(:post)
     hashtag_post = Factory.insert(:post, %{body: [%{"data" => "#phrasing", "kind" => "text"}]})

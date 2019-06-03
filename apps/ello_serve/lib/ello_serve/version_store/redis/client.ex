@@ -6,7 +6,11 @@ defmodule Ello.Serve.VersionStore.Redis.Client do
   Each worker can handle multiple concurrent requests, so this is more of a
   load balancing technique then a real "checkout" style pool.
   """
-  import NewRelicPhoenix, only: [measure_segment: 2]
+
+  # 2019-05-07 - the 'newrelic' repo has out of date dependencies, disabling
+  # newrelic until we have bandwidth to update our code, maybe to new_relic
+  # import NewRelicPhoenix, only: [measure_segment: 2]
+  import Ello.Core, only: [measure_segment: 2]
 
   @doc "Start supervisor"
   def start_link, do: Supervisor.start_link(__MODULE__, [])

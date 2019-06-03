@@ -1,5 +1,6 @@
 defmodule Ello.Core.Factory do
   alias Ello.Core.{Repo, Discovery, Network, Content, Contest}
+  alias Ello.Core.FactoryTime
   alias Discovery.{Category, Promotional, Editorial, PagePromotional, CategoryPost}
   alias Network.{User, Relationship, Flag, CategoryUser}
   alias Content.{Post, Love, Watch, Asset}
@@ -13,8 +14,8 @@ defmodule Ello.Core.Factory do
       email_hash: sequence(:user_email_hash, &"emailhash#{&1}"),
       settings:   %User.Settings{},
 
-      created_at: DateTime.utc_now,
-      updated_at: DateTime.utc_now,
+      created_at: FactoryTime.now,
+      updated_at: FactoryTime.now,
     }
     |> Repo.preload(:categories)
     |> User.load_images
@@ -30,9 +31,9 @@ defmodule Ello.Core.Factory do
       subject_user: insert(:user),
       verified: true,
       kind: "spam",
-      resolved_at: DateTime.utc_now,
-      created_at: DateTime.utc_now,
-      updated_at: DateTime.utc_now,
+      resolved_at: FactoryTime.now,
+      created_at: FactoryTime.now,
+      updated_at: FactoryTime.now,
     }
   end
 
@@ -62,8 +63,8 @@ defmodule Ello.Core.Factory do
                          }],
       reposted_source: nil,
       parent_post:     nil,
-      created_at: DateTime.utc_now,
-      updated_at: DateTime.utc_now,
+      created_at: FactoryTime.now,
+      updated_at: FactoryTime.now,
     }
   end
 
@@ -109,8 +110,8 @@ defmodule Ello.Core.Factory do
         "mdpi" => %{"size"=>77_422, "type"=>"image/jpeg", "width"=>375, "height"=>300},
         "ldpi" => %{"size"=>19_718, "type"=>"image/jpeg", "width"=>180, "height"=>144}
       },
-      created_at: DateTime.utc_now,
-      updated_at: DateTime.utc_now,
+      created_at: FactoryTime.now,
+      updated_at: FactoryTime.now,
     } |> Asset.build_attachment
   end
 
@@ -126,8 +127,8 @@ defmodule Ello.Core.Factory do
         "mdpi" => %{"size"=>77_422, "type"=>"image/jpeg", "width"=>375, "height"=>300},
         "ldpi" => %{"size"=>19_718, "type"=>"image/jpeg", "width"=>180, "height"=>144}
       },
-      created_at: DateTime.utc_now,
-      updated_at: DateTime.utc_now,
+      created_at: FactoryTime.now,
+      updated_at: FactoryTime.now,
     } |> Asset.build_attachment
   end
 
@@ -136,7 +137,7 @@ defmodule Ello.Core.Factory do
       status: "submitted",
       category: build(:category),
       post: build(:post),
-      submitted_at: DateTime.utc_now,
+      submitted_at: FactoryTime.now,
     }
   end
 
@@ -153,8 +154,8 @@ defmodule Ello.Core.Factory do
       status: "featured",
       category: build(:category),
       post: build(:post),
-      submitted_at: DateTime.utc_now,
-      featured_at: DateTime.utc_now,
+      submitted_at: FactoryTime.now,
+      featured_at: FactoryTime.now,
     }
   end
 
@@ -299,8 +300,8 @@ defmodule Ello.Core.Factory do
     %Love{
       user: build(:user),
       post: build(:post),
-      created_at: DateTime.utc_now,
-      updated_at: DateTime.utc_now,
+      created_at: FactoryTime.now,
+      updated_at: FactoryTime.now,
     }
   end
 
@@ -308,8 +309,8 @@ defmodule Ello.Core.Factory do
     %Watch{
       user: build(:user),
       post: build(:post),
-      created_at: DateTime.utc_now,
-      updated_at: DateTime.utc_now,
+      created_at: FactoryTime.now,
+      updated_at: FactoryTime.now,
     }
   end
 
@@ -332,8 +333,8 @@ defmodule Ello.Core.Factory do
       order:        Enum.random(0..10),
       uses_page_promotionals: false,
       promotionals: [build(:promotional)],
-      created_at:   DateTime.utc_now,
-      updated_at:   DateTime.utc_now,
+      created_at:   FactoryTime.now,
+      updated_at:   FactoryTime.now,
     } |> Category.load_images
   end
 
@@ -343,8 +344,8 @@ defmodule Ello.Core.Factory do
       image_metadata: %{},
       post_token: "abc-123",
       user: build(:user),
-      created_at: DateTime.utc_now,
-      updated_at: DateTime.utc_now,
+      created_at: FactoryTime.now,
+      updated_at: FactoryTime.now,
     } |> Promotional.load_images
   end
 
@@ -362,8 +363,8 @@ defmodule Ello.Core.Factory do
       image_metadata: %{},
       post_token: "abc-123",
       user: build(:user),
-      created_at: DateTime.utc_now,
-      updated_at: DateTime.utc_now,
+      created_at: FactoryTime.now,
+      updated_at: FactoryTime.now,
     } |> PagePromotional.load_images
   end
 
@@ -372,8 +373,8 @@ defmodule Ello.Core.Factory do
       priority: "friend",
       owner:    build(:user),
       subject:  build(:user),
-      created_at: DateTime.utc_now,
-      updated_at: DateTime.utc_now,
+      created_at: FactoryTime.now,
+      updated_at: FactoryTime.now,
     }
   end
 
@@ -384,8 +385,8 @@ defmodule Ello.Core.Factory do
       invite_type: "Art Exhibition",
       slug: sequence(:slug, &"foo-brand-#{&1}"),
       brand_account: build(:user),
-      opened_at: DateTime.utc_now,
-      closed_at: DateTime.utc_now,
+      opened_at: FactoryTime.now,
+      closed_at: FactoryTime.now,
       status: "open",
       raw_description: "Foo brand is looking for artists",
       rendered_description: "<p>Foo brand is looking for artists</p>",
@@ -443,8 +444,8 @@ defmodule Ello.Core.Factory do
         "mdpi" => %{"size" => 222_222, "type" => "image/jpeg", "width" => 375, "height" => 375},
         "ldpi" => %{"size" => 111_111, "type" => "image/jpeg", "width" => 190, "height" => 190},
       },
-      created_at: DateTime.utc_now,
-      updated_at: DateTime.utc_now,
+      created_at: FactoryTime.now,
+      updated_at: FactoryTime.now,
     }
   end
 
@@ -453,8 +454,8 @@ defmodule Ello.Core.Factory do
       artist_invite: build(:artist_invite),
       post:          build(:post),
       status:        "unapproved",
-      created_at:    DateTime.utc_now,
-      updated_at:    DateTime.utc_now,
+      created_at:    FactoryTime.now,
+      updated_at:    FactoryTime.now,
     }
   end
 
@@ -480,8 +481,8 @@ defmodule Ello.Core.Factory do
             "icon"=>"https://social-icons.ello.co/twitter.png"},
         ],
         avatar: "ello-2274bdfe-57d8-4499-ba67-a7c003d5a962.png",
-        created_at: DateTime.utc_now,
-        updated_at: DateTime.utc_now,
+        created_at: FactoryTime.now,
+        updated_at: FactoryTime.now,
         avatar_metadata: %{
           "large" => %{
             "size" => 220_669,
@@ -556,8 +557,8 @@ defmodule Ello.Core.Factory do
         level: "meta",
         order: 0,
         uses_page_promotionals: true,
-        created_at: DateTime.utc_now,
-        updated_at: DateTime.utc_now,
+        created_at: FactoryTime.now,
+        updated_at: FactoryTime.now,
       } |> Category.load_images
     end
 
@@ -574,8 +575,8 @@ defmodule Ello.Core.Factory do
         level: nil,
         order: 0,
         uses_page_promotionals: false,
-        created_at: DateTime.utc_now,
-        updated_at: DateTime.utc_now,
+        created_at: FactoryTime.now,
+        updated_at: FactoryTime.now,
         promotionals: [],
       } |> Category.load_images
     end
@@ -593,8 +594,8 @@ defmodule Ello.Core.Factory do
         level: "Primary",
         order: 0,
         uses_page_promotionals: false,
-        created_at: DateTime.utc_now,
-        updated_at: DateTime.utc_now,
+        created_at: FactoryTime.now,
+        updated_at: FactoryTime.now,
         tile_image: "ello-optimized-8bcedb76.jpg",
         tile_image_metadata: %{
           "large" => %{

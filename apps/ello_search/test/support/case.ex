@@ -3,7 +3,7 @@ defmodule Ello.Search.Case do
 
   using do
     quote do
-      alias Ello.Core.{Factory, Factory.Script, Redis}
+      alias Ello.Core.{Factory, FactoryTime, Factory.Script, Redis}
     end
   end
 

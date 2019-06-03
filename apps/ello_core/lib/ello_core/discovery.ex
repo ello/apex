@@ -130,6 +130,7 @@ defmodule Ello.Core.Discovery do
   def category_users(%{category_ids: ids} = options) do
     CategoryUser
     |> where([cu], cu.category_id in ^ids)
+    |> order_by(asc: :created_at)
     |> Repo.all
     |> Preload.category_users(options)
   end
@@ -140,6 +141,7 @@ defmodule Ello.Core.Discovery do
     |> where([cu, c], cu.user_id in ^ids)
     |> where([cu, c], cu.role in ^roles)
     |> where([cu, c], not is_nil(c.level))
+    |> order_by(asc: :created_at)
     |> Repo.all
     |> Preload.category_users(options)
   end
@@ -148,6 +150,7 @@ defmodule Ello.Core.Discovery do
     |> join(:left, [cu], category in assoc(cu, :category))
     |> where([cu], cu.user_id in ^ids)
     |> where([cu, c], not is_nil(c.level))
+    |> order_by(asc: :created_at)
     |> Repo.all
     |> Preload.category_users(options)
   end
@@ -156,6 +159,7 @@ defmodule Ello.Core.Discovery do
     |> join(:left, [cu], category in assoc(cu, :category))
     |> where([cu], cu.id in ^ids)
     |> where([cu, c], not is_nil(c.level))
+    |> order_by(asc: :created_at)
     |> Repo.all
     |> Preload.category_users(options)
   end

@@ -5,11 +5,26 @@ defmodule Ello.V3.Resolvers.FindUserTest do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
     user = Factory.insert(:user, username: "gql")
     cat1 = Factory.insert(:category)
-    Factory.insert(:category_user, user: user, category: cat1, role: "featured")
+    Factory.insert(:category_user,
+      user: user,
+      category: cat1,
+      role: "featured",
+      created_at: DateTime.from_unix!(1)
+      )
     cat2 = Factory.insert(:category)
-    Factory.insert(:category_user, user: user, category: cat2, role: "curator")
+    Factory.insert(:category_user,
+      user: user,
+      category: cat2,
+      role: "curator",
+      created_at: DateTime.from_unix!(2)
+      )
     cat3 = Factory.insert(:category)
-    Factory.insert(:category_user, user: user, category: cat3, role: "moderator")
+    Factory.insert(:category_user,
+      user: user,
+      category: cat3,
+      role: "moderator",
+      created_at: DateTime.from_unix!(3)
+      )
 
     {:ok, user: user, categories: [cat1, cat2, cat3]}
   end

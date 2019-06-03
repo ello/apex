@@ -5,11 +5,13 @@ use Mix.Config
 # incompatable table of same name and blow up if we don't set this.
 config :ello_core, Ello.Core.Repo,
   migration_source: "ecto_migrations",
-  loggers: [{Ecto.LogEntry, :log, []}, NewRelicPhoenix.Ecto],
+  loggers: [{Ecto.LogEntry, :log, []},
+    # 2019-05-07 - the 'newrelic' repo has out of date dependencies, disabling
+    # newrelic until we have bandwidth to update our code, maybe to new_relic
+    # NewRelicPhoenix.Ecto
+    ],
   after_connect: {Ello.Core.Repo, :after_connect, []},
   types: Ello.Core.PostgresTypes
-
-config :ecto, json_library: Jason
 
 
 config :ello_core,

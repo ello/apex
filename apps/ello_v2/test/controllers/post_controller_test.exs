@@ -26,7 +26,7 @@ defmodule Ello.V2.PostControllerTest do
             |> get(post_path(conn, :show, post))
     assert resp2.status == 304
     post
-    |> Ecto.Changeset.change(%{updated_at: DateTime.utc_now})
+    |> Ecto.Changeset.change(%{updated_at: FactoryTime.now_offset(1)})
     |> Ello.Core.Repo.update!
     resp3 = conn
             |> put_req_header("if-none-match", etag)

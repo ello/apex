@@ -24,7 +24,7 @@ defmodule Ello.V2.ConnCase do
       import Ello.V2.Router.Helpers
       import Ello.V2.ConnCase, only: [auth_conn: 2, user_conn: 2, public_conn: 1]
       import Ello.V2.JsonSchema, only: [validate_json: 2]
-      alias Ello.Core.{Factory, Factory.Script}
+      alias Ello.Core.{Factory, FactoryTime, Factory.Script}
 
       # The default endpoint for testing
       @endpoint Ello.V2.Endpoint

@@ -26,6 +26,10 @@ defmodule Ello.V3.Resolvers.UserNetworkStream do
     Ello.Core.Network.user(Map.merge(args, %{id_or_username: "~#{username}", preload: false}))
   end
 
-  defp get_relationship_user(%{subject: user}, :following), do: user
-  defp get_relationship_user(%{owner: user}, :followers), do: user
+  defp get_relationship_user(%{subject: user} = relationship, :following) do
+    Map.put(user, :relationship_to_current_user, relationship)
+  end
+  defp get_relationship_user(%{owner: user} = relationship, :followers) do
+    Map.put(user, :relationship_to_current_user, relationship)
+  end
 end

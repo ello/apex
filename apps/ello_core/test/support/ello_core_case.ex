@@ -14,6 +14,7 @@ defmodule Ello.Core.Case do
         Discovery,
         Network,
         Factory,
+        FactoryTime,
       }
       alias Network.{
         User,

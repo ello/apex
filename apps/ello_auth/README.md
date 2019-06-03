@@ -15,6 +15,7 @@ environments:
 
 * JWT_PRIVATE_KEY - Key used to sign JWT tokens.
 * ACCESS_TOKEN_EXPIRATION_SECONDS - How long generated tokens are valid for (see note above).
+* AUTH_HOST - defaults to WEBAPP_HOST, but could be different (on rainbow 'ello-fg-rainbow' doesn't work, has to be 'ello-pre-production')
 
 Ello.Auth also has the following application configuration options:
 

@@ -335,7 +335,7 @@ defmodule Ello.V2.PostViewTest do
     post = Map.put(context[:post], :artist_invite_submission, submission)
     json = render(PostView, "show.json",
       data: post,
-      conn: context[:conn],
+      conn: context[:conn]
     )[:posts]
 
     assert json[:artist_invite_id] == "0"
@@ -350,7 +350,7 @@ defmodule Ello.V2.PostViewTest do
     post = Map.put(context[:post], :artist_invite_submission, submission)
     json = render(PostView, "show.json",
       data: post,
-      conn: context[:conn],
+      conn: context[:conn]
     )[:posts]
 
     assert json[:artist_invite_id] == "0"
@@ -365,7 +365,7 @@ defmodule Ello.V2.PostViewTest do
     post = Map.put(context[:post], :artist_invite_submission, submission)
     json = render(PostView, "show.json",
       data: post,
-      conn: context[:conn],
+      conn: context[:conn]
     )[:posts]
 
     assert json[:artist_invite_id] == "0"
@@ -380,7 +380,7 @@ defmodule Ello.V2.PostViewTest do
     post = Map.put(context[:post], :artist_invite_submission, submission)
     json = render(PostView, "show.json",
       data: post,
-      conn: context[:conn],
+      conn: context[:conn]
     )[:posts]
 
     assert json[:artist_invite_id] == "0"
@@ -395,7 +395,7 @@ defmodule Ello.V2.PostViewTest do
     post = Map.put(context[:post], :artist_invite_submission, submission)
     json = render(PostView, "show.json",
       data: post,
-      conn: context[:conn],
+      conn: context[:conn]
     )[:posts]
 
     assert json[:artist_invite_id] == "0"
@@ -410,7 +410,7 @@ defmodule Ello.V2.PostViewTest do
     repost = put_in(context[:repost].reposted_source.artist_invite_submission, submission)[:repost]
     json = render(PostView, "show.json",
       data: repost,
-      conn: context[:conn],
+      conn: context[:conn]
     )[:posts]
 
     assert json[:artist_invite_id] == nil
@@ -425,7 +425,7 @@ defmodule Ello.V2.PostViewTest do
     repost = put_in(context[:repost].reposted_source.artist_invite_submission, submission)[:repost]
     json = render(PostView, "show.json",
       data: repost,
-      conn: context[:conn],
+      conn: context[:conn]
     )[:posts]
 
     assert json[:artist_invite_id] == nil
@@ -440,7 +440,7 @@ defmodule Ello.V2.PostViewTest do
     repost = put_in(context[:repost].reposted_source.artist_invite_submission, submission)[:repost]
     json = render(PostView, "show.json",
       data: repost,
-      conn: context[:conn],
+      conn: context[:conn]
     )[:posts]
 
     assert json[:artist_invite_id] == nil
@@ -455,7 +455,7 @@ defmodule Ello.V2.PostViewTest do
     repost = put_in(context[:repost].reposted_source.artist_invite_submission, submission)[:repost]
     json = render(PostView, "show.json",
       data: repost,
-      conn: context[:conn],
+      conn: context[:conn]
     )[:posts]
 
     assert json[:artist_invite_id] == nil
@@ -470,7 +470,7 @@ defmodule Ello.V2.PostViewTest do
     repost = put_in(context[:repost].reposted_source.artist_invite_submission, submission)[:repost]
     json = render(PostView, "show.json",
       data: repost,
-      conn: context[:conn],
+      conn: context[:conn]
     )[:posts]
 
     assert json[:artist_invite_id] == nil
