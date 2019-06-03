@@ -46,7 +46,7 @@ defmodule Ello.Events.Sidekiq do
   end
 
   defp unix_now_float do
-    DateTime.to_unix(DateTime.utc_now(), :microseconds) / 1_000_000
+    DateTime.to_unix(DateTime.utc_now(), :microsecond) / 1_000_000
   end
 
   defp redis(args) do
