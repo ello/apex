@@ -69,8 +69,10 @@ defmodule Ello.V3.Resolvers.GlobalPostStream do
     }}
   end
 
-  # whether to require the author to have 100 total post views
-  # staff accounts do not have this requirement
-  defp require_cred?(%{current_user: %{is_staff: true}}), do: true
-  defp require_cred?(_), do: false
+  # require the post author to have 100 total post views
+  # staff accounts remove this requirement
+  defp require_cred?(%{require_cred: true}), do: true
+  defp require_cred?(%{require_cred: false}), do: false
+  defp require_cred?(%{current_user: %{is_staff: true}}), do: false
+  defp require_cred?(_), do: true
 end

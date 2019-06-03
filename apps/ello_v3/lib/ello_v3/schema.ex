@@ -71,6 +71,7 @@ defmodule Ello.V3.Schema do
       arg :kind, non_null(:stream_kind), description: "Which variation of the stream to return"
       arg :before, :string, description: "Pagination cursor, returned by previous page"
       arg :per_page, :integer, default_value: 25
+      arg :require_cred, :boolean, default_value: nil
     end
 
     @desc "Aggregate post streams from all subscribed categories"
