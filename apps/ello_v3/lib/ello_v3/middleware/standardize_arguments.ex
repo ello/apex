@@ -42,7 +42,7 @@ defmodule Ello.V3.Middleware.StandardizeArguments do
   defp per_page(_), do: @default_page_size
 
 
-  # Root and query types are droped so we just get a list of the preloads
+  # Root and query types are dropped so we just get a list of the preloads
   @root_fields [:post, :posts, :page_headers, :editorials, :category, :categories, :comments,
                 :loves, :users]
   @query_types [:post_stream, :category_post_stream, :editorial_stream, :category_nav, :find_posts,
