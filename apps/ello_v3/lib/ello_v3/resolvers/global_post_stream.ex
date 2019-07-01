@@ -74,5 +74,5 @@ defmodule Ello.V3.Resolvers.GlobalPostStream do
   defp require_cred?(%{require_cred: true}), do: true
   defp require_cred?(%{require_cred: false}), do: false
   defp require_cred?(%{current_user: %{is_staff: true}}), do: false
-  defp require_cred?(_), do: true
+  defp require_cred?(_), do: IO.inspect(true, label: "require_cred: ")
 end
