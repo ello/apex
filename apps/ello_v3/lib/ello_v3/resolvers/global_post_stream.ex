@@ -71,8 +71,8 @@ defmodule Ello.V3.Resolvers.GlobalPostStream do
 
   # require the post author to have 100 total post views
   # staff accounts remove this requirement
-  defp require_cred?(%{require_cred: true}), do: IO.inspect(true, label: "require_cred @ 74:")
-  defp require_cred?(%{require_cred: false}), do: IO.inspect(false, label: "require_cred @ 75:")
-  defp require_cred?(%{current_user: %{is_staff: true}}), do: IO.inspect(false, label: "require_cred @ 76:")
-  defp require_cred?(_), do: IO.inspect(true, label: "require_cred @ 77:")
+  defp require_cred?(%{require_cred: true}), do: true
+  defp require_cred?(%{require_cred: false}), do: false
+  defp require_cred?(%{current_user: %{is_staff: true}}), do: false
+  defp require_cred?(_), do: true
 end
