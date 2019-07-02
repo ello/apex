@@ -94,9 +94,6 @@ defmodule Ello.Core.Content.Filter do
         {:ok, nil} -> false
         {:ok, ""} -> false
         {:ok, user_counts} ->
-          IO.puts("=============== #{__ENV__.file} line #{__ENV__.line} ===============")
-          IO.puts("user_counts: #{inspect(user_counts)}")
-          IO.puts("@minimum_cred: #{inspect(@minimum_cred)}")
           String.to_integer(user_counts) > @minimum_cred
         _ -> true
       end
