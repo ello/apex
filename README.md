@@ -18,13 +18,6 @@ You can check out all of Ello's OSS on [Ello's github profile](https://github.co
 and our philosophy on OSS is written up in @jayzes's
 [blog post](https://ello.co/jayzes/post/tqll-z8u8gfbdysrk6wbkg).
 
-## Weird redis connection issue
-
-If the app is crashing for no good reason, check the `REDIS_URL` constants, and
-make sure they _don't_ have the username.  Some nit wit who manages redix
-decided that it was a good idea to _not allow_ the username as part of the
-connection URL.
-
 ## Docker
 
 The docker file to run all the services for Apex is in Mothership.  The docker
