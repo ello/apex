@@ -39,7 +39,7 @@ defmodule Ello.Core.Mixfile do
     [
       {:phoenix_ecto, "~> 4.0"},
       {:postgrex,     ">= 0.0.0"},
-      {:redix,        "~> 0.7"},
+      {:redix,        "~> 0.10"},
       {:jason,        "~> 1.0"},
       {:ex_machina,   "~> 2.3"},
       {:timex,        "~> 3.0"},
