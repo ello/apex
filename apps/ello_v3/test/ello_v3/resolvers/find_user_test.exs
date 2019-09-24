@@ -3,7 +3,16 @@ defmodule Ello.V3.Resolvers.FindUserTest do
 
   setup do
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
-    user = Factory.insert(:user, username: "gql")
+    user = Factory.insert(:user,
+      username: "gql",
+      links: "http://www.twitter.com/gql",
+      rendered_links: [
+        %{"url"=>"http://www.twitter.com/gql",
+          "text"=>"twitter.com/gql",
+          "type"=>"Twitter",
+          "icon"=>"https://social-icons.ello.co/twitter.png"},
+      ]
+      )
     cat1 = Factory.insert(:category)
     Factory.insert(:category_user,
       user: user,
@@ -75,6 +84,14 @@ defmodule Ello.V3.Resolvers.FindUserTest do
     assert json["userStats"]["postsCount"]
     assert json["settings"]["hasCommentingEnabled"]
     assert json["metaAttributes"]["title"]
+    assert json["externalLinksList"] == [
+        %{
+          "url" => "http://www.twitter.com/gql",
+          "text" => "twitter.com/gql",
+          "type" => "Twitter",
+          "icon" => "https://social-icons.ello.co/twitter.png"
+        },
+      ]
 
     assert [j1, j2, j3] = json["categoryUsers"]
     assert j1["role"] == "FEATURED"
