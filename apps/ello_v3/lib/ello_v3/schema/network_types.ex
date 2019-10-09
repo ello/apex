@@ -157,6 +157,7 @@ defmodule Ello.V3.Schema.NetworkTypes do
   end
 
 
+  defp external_links_list(_args, %{source: %{rendered_links: nil}}), do: {:ok, []}
   defp external_links_list(_args, %{source: %{rendered_links: rendered_links}}) do
     rendered_links_as_atoms = rendered_links |> Enum.map(fn(link) ->
       for {key, val} <- link, into: %{}, do: {
