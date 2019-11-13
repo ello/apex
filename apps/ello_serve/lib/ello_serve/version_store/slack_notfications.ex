@@ -9,7 +9,7 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
             title: "Compare",
             text: """
             Compare to the active version in each env:
-            #{compare_link(app, ver, "stage1")} #{compare_link(app, ver, "stage2")} #{compare_link(app, ver, "ninja")} #{compare_link(app, ver, "rainbow")} #{compare_link(app, ver, "production")}
+            #{compare_link(app, ver, "stage")}  #{compare_link(app, ver, "rainbow")} #{compare_link(app, ver, "production")}
             """,
             color: "#0366d6",
           },
@@ -18,7 +18,7 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
             text: """
             Previews are available only by accessing the app with the url with the version link. You will continue seeing the preview version until you refresh.
             You may preview in any environment:
-            #{preview_link(app, ver, "stage1")} #{preview_link(app, ver, "stage2")} #{preview_link(app, ver, "ninja")} #{preview_link(app, ver, "rainbow")} #{preview_link(app, ver, "production")}
+            #{preview_link(app, ver, "stage")} #{preview_link(app, ver, "ninja")} #{preview_link(app, ver, "rainbow")} #{preview_link(app, ver, "production")}
             """,
             color: "good",
           },
@@ -29,25 +29,13 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
             callback_id: "publish:#{app}",
             actions: [
               %{
-                name: "stage1",
-                text: "stage1",
+                name: "stage",
+                text: "stage",
                 value: ver,
                 type: "button",
                 confirm: %{
                   title: "Are you sure?",
-                  text: "Publishing this version will push it to stage1 for all users.",
-                  ok_text: "I got this",
-                  dismiss_text: "Nope."
-                }
-              },
-              %{
-                name: "stage2",
-                text: "stage2",
-                value: ver,
-                type: "button",
-                confirm: %{
-                  title: "Are you sure?",
-                  text: "Publishing this version will push it to stage2 for all users.",
+                  text: "Publishing this version will push it to stage for all users.",
                   ok_text: "I got this",
                   dismiss_text: "Nope."
                 }
@@ -175,8 +163,7 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
   end
 
   @env_host %{
-    "stage1" => "ello-fg-stage1.herokuapp.com",
-    "stage2" => "ello-fg-stage1.herokuapp.com",
+    "stage" => "ello-fg-stage.herokuapp.com",
     "ninja" => "ello.ninja",
     "rainbow" => "ello-fg-rainbow.herokuapp.com",
     "production" => "ello.co",
