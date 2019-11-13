@@ -9,7 +9,7 @@ defmodule Ello.Serve.VersionStore.SlackNotifications do
             title: "Compare",
             text: """
             Compare to the active version in each env:
-            #{compare_link(app, ver, "rainbow")} #{compare_link(app, ver, "production")}
+            #{compare_link(app, ver, "ninja")} #{compare_link(app, ver, "rainbow")} #{compare_link(app, ver, "production")}
             """,
             color: "#0366d6",
           },
