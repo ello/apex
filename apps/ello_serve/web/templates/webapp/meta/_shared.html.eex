@@ -16,3 +16,10 @@
 <%= if assigns[:robots] do %>
   <meta name="robots" content="<%= assigns[:robots] %>"/>
 <% end %>
+<script type="text/javascript">
+  var onloadRecaptcha = function() {
+    grecaptcha.execute('<%= recaptcha_key %>', {action: '<%= recaptcha_action(assigns) %>'}).then(function(token) {
+    });
+  }
+</script>
+<script src="https://www.google.com/recaptcha/api.js?onload=onloadRecaptcha&render=explicit" async defer></script>
