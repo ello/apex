@@ -17,9 +17,12 @@
   <meta name="robots" content="<%= assigns[:robots] %>"/>
 <% end %>
 <script type="text/javascript">
+  window.recaptchaKey = '<%= recaptcha_key %>';
+  window.recaptchaToken = null;
   var onloadRecaptcha = function() {
     grecaptcha.execute('<%= recaptcha_key %>', {action: '<%= recaptcha_action(assigns) %>'}).then(function(token) {
+      window.recaptchaToken = token;
     });
   }
 </script>
-<script src="https://www.google.com/recaptcha/api.js?onload=onloadRecaptcha&render=explicit" async defer></script>
+<script src="https://www.google.com/recaptcha/api.js?onload=onloadRecaptcha&render=<%= recaptcha_key %>" async defer></script>

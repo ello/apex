@@ -5,7 +5,8 @@ defmodule Ello.Serve.Webapp.MetaView do
   def recaptcha_key, do: Application.get_env(:ello_serve, :recaptcha_key)
 
   def current_path(%{path: path}), do: path
-  def current_path(%{conn: conn}), do: conn.request_path
+  def current_path(%{conn: %{request_path: request_path}}), do: request_path
+  def current_path(_), do: ""
 
   def current_url(%{url: url}), do: url
   def current_url(assigns) do
@@ -15,8 +16,8 @@ defmodule Ello.Serve.Webapp.MetaView do
   def title(%{title: title}), do: title
   def title(_), do: "Ello | The Creators Network"
 
-  def recaptcha_action(%{path: "/join"}), do: 'join'
-  def recaptcha_action(%{path: "/enter"}), do: 'login'
+  def recaptcha_action(%{conn: %{request_path: "/join" <> _}}), do: 'join'
+  def recaptcha_action(%{conn: %{request_path: "/enter" <> _}}), do: 'login'
   def recaptcha_action(_), do: "any"
 
   def description(%{description: description}), do: description
