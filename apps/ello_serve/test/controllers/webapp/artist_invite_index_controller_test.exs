@@ -13,7 +13,7 @@ defmodule Ello.Serve.Webapp.ArtistInviteControllerTest do
 
   @tag :meta
   test "artist-invites - meta", %{conn: conn} do
-    resp = get(conn, "/invites")
+    resp = get(conn, "/creative-briefs")
     html = html_response(resp, 200)
     assert html =~ "<title>Invites | Ello</title>"
     assert has_meta(html, property: "og:title", content: "Invites | Ello")
@@ -22,15 +22,15 @@ defmodule Ello.Serve.Webapp.ArtistInviteControllerTest do
   end
 
   test "artist-invites - it renders noscript", %{conn: conn} do
-    resp = get(conn, "/invites", %{"per_page" => "2"})
+    resp = get(conn, "/creative-briefs", %{"per_page" => "2"})
     html = html_response(resp, 200)
 
     assert html =~ "<noscript>"
     assert html =~ "<h2>Foo Brand</h2>"
     assert html =~ ~r"<p>Bar</p>"
-    assert [_, page] = Regex.run(~r'"https://ello.co/invites\?page=(.*)">Next Page</a>', html)
+    assert [_, page] = Regex.run(~r'"https://ello.co/creative-briefs\?page=(.*)">Next Page</a>', html)
 
-    resp2 = get(conn, "/invites", %{"per_page" => "2", "page" => page})
+    resp2 = get(conn, "/creative-briefs", %{"per_page" => "2", "page" => page})
     html2 = html_response(resp2, 200)
 
     refute html2 == html
@@ -38,7 +38,7 @@ defmodule Ello.Serve.Webapp.ArtistInviteControllerTest do
     assert html2 =~ "<noscript>"
     assert html2 =~ "<h2>Not For Print1</h2>"
 
-    resp3 = get(conn, "/invites", %{"per_page" => "2", "page" => "3"})
+    resp3 = get(conn, "/creative-briefs", %{"per_page" => "2", "page" => "3"})
     html3 = html_response(resp3, 200)
 
     refute html3 == html2

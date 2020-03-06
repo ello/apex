@@ -67,14 +67,14 @@ defmodule Ello.Serve.Webapp.ArtistInviteShowControllerTest do
   end
 
   test "it 404s if invite not found", %{conn: conn} do
-    resp = get(conn, "/invites/nope-nope-nope")
+    resp = get(conn, "/creative-briefs/nope-nope-nope")
     assert resp.status == 404
   end
 
   test "it 200s if invite not found but and user is logged in (soft 404)", %{conn: conn} do
     resp = conn
            |> put_req_cookie("ello_skip_prerender", "true")
-           |> get("/invites/nope-nope-nope")
+           |> get("/creative-briefs/nope-nope-nope")
     assert resp.status == 200
   end
 end

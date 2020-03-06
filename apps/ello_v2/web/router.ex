@@ -35,7 +35,6 @@ defmodule Ello.V2.Router do
       resources "/comments", CommentController, only: @read, name: :comments
     end
 
-
     # Following
     head "/following/posts/recent", FollowingPostController, :recent_updated
     get "/following/posts/recent", FollowingPostController, :recent
