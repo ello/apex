@@ -14,13 +14,14 @@ grow to take over write responsibility in the future.
 While the Ruby Ello Mothership is not (yet) open source, the
 [Swift based iOS app](https://github.com/ello/webapp) and
 [React based webapp](https://github.com/ello/webapp) API consumers are OSS.
-You can check out all of Ello's OSS on [Ello's github profile](https://github.com/ello)
-and our philosophy on OSS is written up in @jayzes's
+You can check out all of Ello’s OSS on
+[Ello’s GitHub profile](https://github.com/ello) and our philosophy on OSS is
+written up in @jayzes’s
 [blog post](https://ello.co/jayzes/post/tqll-z8u8gfbdysrk6wbkg).
 
 ## Docker
 
-The docker file to run all the services for Apex is in Mothership.  The docker
+The docker file to run all the services for Apex is in Mothership. The docker
 file in Apex just runs Apex.
 
 ## Organization
@@ -35,8 +36,8 @@ historically managed by the Rails Mothership. [README](/apps/ello_core/)
 
 ### `Ello.Dispatch`
 
-Dispatch is a simple Phoenix app with no controllers of it's own. The only job
-of dispatch is to delegate HTTP and Websocket requests to the proper app.
+Dispatch is a simple Phoenix app with no controllers of its own. The only job of
+dispatch is to delegate HTTP and Websocket requests to the proper app.
 [README](/apps/ello_dispatch/)
 
 ### `Ello.V2`
@@ -59,7 +60,7 @@ event in the background (or any other asynchronous processing).
 ### `Ello.Stream`
 
 Ello Stream provides and real and test APIs for fetching our temporal post
-streams.  [README](/apps/ello_stream/)
+streams. [README](/apps/ello_stream/)
 
 To learn more
 about how we handle and serve time ordered streams check out or Go and Roshi
@@ -68,7 +69,8 @@ based
 ### `Ello.Search`
 
 Ello Search provides a wrapper around our ElasticSearch cluster. Ello.Search
-powers our trending algorithm in addition to the search page. [README](/apps/ello_search/).
+powers our trending algorithm in addition to the search page.
+[README](/apps/ello_search/).
 
 ### `Ello.Serve`
 
@@ -79,38 +81,39 @@ basic html for clients not supporting Javascript. [README](/apps/ello_serve/).
 
 ### `TH.TrueDash`
 
-TrueDash is a tiny helper app to accompany Talenthouse's marketing dashboard.
-It provides app tokens (so they don't have to be stored in-app) and some
-"helper" endpoints for things that can't be accomplished in javascript via ajax.
-
+TrueDash is a tiny helper app to accompany Talenthouse’s marketing dashboard.
+It provides app tokens (so they don’t have to be stored in-app) and some
+“helper” endpoints for things that can’t be accomplished in javascript via AJAX.
 
 ## Getting Started
 
 ### Requirements
 
-* Elixir 1.4.5 - Installation via asdf or exenv recommended.
-* Postgres - Posgres.app suggested running on localhost.
-* Redis - Redis.app suggested running on localhost.
-* Docker & docker-compose - docker-compose up boots:
-  * Ello Streams API (golang) - What Ello.Stream elixir app uses.
-  * Roshi - powers Ello Streams API
-  * Redis - powers Roshi.
-  * ElasticSearch 5.1 - Powers Ello.Searc
+- Elixir 1.8.2 – Installation via asdf or exenv recommended.
+- Postgres – Posgres.app suggested running on localhost.
+- Redis – Redis.app suggested running on localhost.
+- Docker & docker-compose – docker-compose up boots:
+  - Ello Streams API (golang) – What Ello.Stream elixir app uses.
+  - Roshi – powers Ello Streams API
+  - Redis – powers Roshi.
+  - ElasticSearch 5.1 – Powers Ello.Search
 
 ### Configuration
 
-All apps should run by default without config changes. Each app details it's
-own config options in it's README.
+All apps should run by default without config changes. Each app details its
+own config options in its README.
 
 ### Commands
 
-* To start the web server run `mix phx.server`.
-* To start a console run `iex -S mix`
-* To start a console and webserver run `iex -S mix phx.server`
-* To run tests `mix test`
-* To rebuild the database `mix do ecto.drop, ecto.create, ecto.migrate`
+- To install dependencies run `mix deps.get`
+- To start the web server run `mix phx.server`
+- To start a console run `iex -S mix`
+- To start a console and webserver run `iex -S mix phx.server`
+- To run tests `mix test`
+- To rebuild the database `mix do ecto.drop, ecto.create, ecto.migrate`
 
 ## Code of Conduct
+
 Ello was created by idealists who believe that the essential nature of all
 human beings is to be kind, considerate, helpful, intelligent, responsible,
 and respectful of others. To that end, we will be enforcing
@@ -119,7 +122,10 @@ source projects. If you don’t follow the rules, you risk being ignored, banned
 or reported for abuse.
 
 ## Contributing
-Bug reports and pull requests are welcome on GitHub at https://github.com/ello/apex.
+
+Bug reports and pull requests are welcome on GitHub at
+https://github.com/ello/apex.
 
 ## License
+
 Ello Apex is released under the [MIT License](/LICENSE.txt)
