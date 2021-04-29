@@ -1,18 +1,25 @@
 language: elixir
+
 sudo: required
+
 elixir:
   - 1.8.2
+
 services:
   - redis-server
   - postgresql
   - elasticsearch
+
 env:
   - MIX_ENV=test
+
 addons:
-  postgresql: '10'
+  postgresql: "10"
+
 script:
   - mix credo -a
   - mix test --exclude skip_on_travis
+
 notifications:
   email: false
   slack:
